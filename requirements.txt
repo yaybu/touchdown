@@ -1,0 +1,8 @@
+six<1.4
+nose2
+coverage
+coveralls
+flake8
+mock
+
+-e .

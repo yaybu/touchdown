@@ -1,0 +1,26 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "pypy"
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - coverage run $(which nose2)
+  - flake8 touchdown
+
+after_success:
+  - coveralls
+
+notifications:
+    irc:
+        channels:
+          - "irc.oftc.net#yaybu"
+        use_notice: true
+        skip_join: true
+        on_success: change
+        on_failure: always
