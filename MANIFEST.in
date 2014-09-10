@@ -1,0 +1,4 @@
+recursive-include touchdown *
+recursive-include doc *
+include *
+global-exclude *.pyc
