@@ -1,5 +1,5 @@
 six
-py.test
+pytest
 coverage
 coveralls
 flake8
