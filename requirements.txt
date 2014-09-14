@@ -1,5 +1,5 @@
-six<=1.7.3
-nose2
+six
+py.test
 coverage
 coveralls
 flake8
