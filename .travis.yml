@@ -6,8 +6,15 @@ python:
   - "3.4"
   - "pypy"
 
+sudo: false
+
+cache:
+  directories:
+    - $HOME/wheelhouse
+
 install:
-  - pip install -r requirements.txt
+  - pip wheel --find-links=$HOME/wheelhouse -r requirements.txt --wheel-dir=$HOME/wheelhouse
+  - pip install --no-index --find-links=$HOME/wheelhouse -r requirements.txt
 
 script:
   - coverage run $(py.test)
