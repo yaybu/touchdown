@@ -1,4 +1,5 @@
 botocore==0.80.0
+click==3.3
 
 six
 pytest
