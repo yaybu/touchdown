@@ -17,7 +17,7 @@ install:
   - pip install --no-index --find-links=$HOME/wheelhouse -r requirements.txt
 
 script:
-  - coverage run $(py.test touchdown)
+  - coverage run $(which py.test) touchdown
   - flake8 touchdown
 
 after_success:
