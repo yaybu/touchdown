@@ -1,3 +1,5 @@
+botocore==0.80.0
+
 six
 pytest
 coverage
