@@ -13,23 +13,33 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
+from touchdown.core.policy import Policy
+from touchdown.core.action import Action
 from touchdown.core.argument import String
 
-from .ec2 import KeyPair
-from .route53 import HostedZone
-from .vpc import VPC
+from .route53 import Route53Mixin
 
 
-class AWS(Resource):
+class Record(Resource):
+    resource_name = "record"
 
-    resource_name = "aws"
+    name = String()
+    record_type = String()
+    data = String()
 
-    subresources = [
-        KeyPair,
-        HostedZone,
-        VPC,
-    ]
 
-    region = String()
-    access_key = String()
-    secret_key = String()
+class AddRecord(Action):
+
+    description = "Add %(name)s to hosted zone"
+
+    def run(self):
+        print "Adding record..."
+
+
+class Apply(Policy, Route53Mixin):
+    name = "apply"
+    resource = Record
+    default = True
+
+    def get_actions(self, runner):
+        return [AddRecord(self)]

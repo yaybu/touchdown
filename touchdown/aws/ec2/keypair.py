@@ -15,21 +15,8 @@
 from touchdown.core.resource import Resource
 from touchdown.core.argument import String
 
-from .ec2 import KeyPair
-from .route53 import HostedZone
-from .vpc import VPC
 
+class KeyPair(Resource):
+    resource_name = "keypair"
 
-class AWS(Resource):
-
-    resource_name = "aws"
-
-    subresources = [
-        KeyPair,
-        HostedZone,
-        VPC,
-    ]
-
-    region = String()
-    access_key = String()
-    secret_key = String()
+    name = String()

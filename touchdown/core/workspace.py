@@ -12,24 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
-from touchdown.core.argument import String
+from .resource import Resource
 
-from .ec2 import KeyPair
-from .route53 import HostedZone
-from .vpc import VPC
+from ..aws import AWS
 
 
-class AWS(Resource):
+class Workspace(Resource):
 
-    resource_name = "aws"
+    resource_name = "workspace"
 
-    subresources = [
-        KeyPair,
-        HostedZone,
-        VPC,
-    ]
+    subresources = [AWS]
 
-    region = String()
-    access_key = String()
-    secret_key = String()
+    def __init__(self):
+        super(Workspace, self).__init__(self)

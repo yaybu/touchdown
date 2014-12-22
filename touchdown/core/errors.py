@@ -12,24 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
-from touchdown.core.argument import String
 
-from .ec2 import KeyPair
-from .route53 import HostedZone
-from .vpc import VPC
+class Error(Exception):
+    pass
 
 
-class AWS(Resource):
+class InvalidPolicy(Error):
+    pass
 
-    resource_name = "aws"
 
-    subresources = [
-        KeyPair,
-        HostedZone,
-        VPC,
-    ]
+class NonConformingPolicy(Error):
+    pass
 
-    region = String()
-    access_key = String()
-    secret_key = String()
+
+class CycleError(Error):
+    """ The graph has a cycle so there is no way to apply changes to the cluster
+    sanely """

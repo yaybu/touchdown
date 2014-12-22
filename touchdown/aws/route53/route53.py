@@ -12,24 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
-from touchdown.core.argument import String
-
-from .ec2 import KeyPair
-from .route53 import HostedZone
-from .vpc import VPC
+from botocore import session
 
 
-class AWS(Resource):
+class Route53Mixin(object):
 
-    resource_name = "aws"
-
-    subresources = [
-        KeyPair,
-        HostedZone,
-        VPC,
-    ]
-
-    region = String()
-    access_key = String()
-    secret_key = String()
+    def __init__(self, *args, **kwargs):
+        super(Route53Mixin, self).__init__(*args, **kwargs)
+        self.session = session.Session()
+        # self.session.set_credentials(aws_access_key_id, aws_secret_access_key)
+        self.service = self.session.get_service("route53")
+        self.endpoint = self.service.get_endpoint()

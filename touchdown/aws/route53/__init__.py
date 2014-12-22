@@ -12,24 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
-from touchdown.core.argument import String
+from .zone import HostedZone
 
-from .ec2 import KeyPair
-from .route53 import HostedZone
-from .vpc import VPC
-
-
-class AWS(Resource):
-
-    resource_name = "aws"
-
-    subresources = [
-        KeyPair,
-        HostedZone,
-        VPC,
-    ]
-
-    region = String()
-    access_key = String()
-    secret_key = String()
+__all__ = [
+    'HostedZone',
+]
