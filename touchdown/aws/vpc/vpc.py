@@ -58,26 +58,28 @@ class AddVPC(Action):
         if response.status_code != 200:
             raise errors.Error("Unable to create VPC")
 
-"""
-class UpdateVPCName(Action):
+        # FIXME: Create and invoke CreateTags to set the name here.
 
-    description = "Change zone comment to '%(comment)s'"
 
-    def __init__(self, policy, zone_id):
-        super(UpdateHostedZoneComment, self).__init__(policy)
-        self.zone_id = zone_id
+class CreateTags(Action):
+
+    description = "Set tags on resource '%(comment)s'"
+
+    def __init__(self, policy, resources, tags):
+        super(CreateTags, self).__init__(policy)
+        self.resources = resources
+        self.tags = tags
 
     def run(self):
-        operation = self.policy.service.get_operation("UpdateHostedZoneComment")
+        operation = self.policy.service.get_operation("CreateTags")
         response, data = operation.call(
             self.policy.endpoint,
-            Id=self.zone_id,
-            Comment=self.resource.comment,
+            Resources=self.resources,
+            Tags=[{"Key": k, "Value": v} for k, v in self.tags.items()],
         )
 
         if response.status_code != 200:
             raise errors.Error("Failed to update hosted zone comment")
-"""
 
 
 class Apply(Policy, VPCMixin):
@@ -95,5 +97,16 @@ class Apply(Policy, VPCMixin):
 
     def get_actions(self, runner):
         zone = self.get_vpc()
+
         if not zone:
             yield AddVPC(self)
+            return
+
+        tags = dict((v["Key"], v["Value"]) for v in zone.get('Tags', []))
+
+        if tags.get('name', '') != self.resource.name:
+            yield CreateTags(
+                self,
+                resources=[zone['VpcId']],
+                tags={"name": self.resource.name}
+            )
