@@ -20,40 +20,38 @@ from touchdown.core.action import Action
 from touchdown.core.argument import String
 from touchdown.core import errors
 
-from .subnet import Subnet
 from .common import VPCMixin
-from ..common import SetTags
 
 
-class VPC(Resource):
+class Subnet(Resource):
 
-    """ A DNS zone hosted at Amazon Route53 """
-
-    resource_name = "vpc"
+    resource_name = "subnet"
 
     subresources = [
-        Subnet,
     ]
 
     name = String()
     cidr_block = String()
 
 
-class AddVPC(Action):
+class AddSubnet(Action):
 
     @property
     def description(self):
-        yield "Add virtual private cloud '{}'".format(self.resource.name)
+        yield "Add subnet for {} to virtual private cloud".format(
+            self.resource.cidr_block,
+        )
 
     def run(self):
-        operation = self.policy.service.get_operation("CreateVpc")
+        operation = self.policy.service.get_operation("CreateSubnet")
         response, data = operation.call(
             self.policy.endpoint,
+            VpcId=self.vpc_id,
             CidrBlock=self.resource.cidr_block,
         )
 
         if response.status_code != 200:
-            raise errors.Error("Unable to create VPC")
+            raise errors.Error("Unable to create subnet")
 
         # FIXME: Create and invoke CreateTags to set the name here.
 
@@ -61,21 +59,27 @@ class AddVPC(Action):
 class Apply(Policy, VPCMixin):
 
     name = "apply"
-    resource = VPC
+    resource = Subnet
     default = True
 
-    def get_vpc(self):
-        operation = self.service.get_operation("DescribeVpcs")
-        response, data = operation.call(self.endpoint)
-        for vpc in data['Vpcs']:
-            if vpc['CidrBlock'] == self.resource.cidr_block:
-                return vpc
+    def get_subnet(self):
+        operation = self.service.get_operation("DescribeSubnets")
+        response, data = operation.call(
+            self.endpoint,
+            Filters=[
+                {'Name': 'cidrBlock', 'Values': [self.resource.cidr_block]},
+            ],
+        )
+        if len(data['Subnets']) > 0:
+            raise errors.Error("Too many possible subnets found")
+        if data['Subnets']:
+            return data['Subnets'][0]
 
     def get_actions(self, runner):
-        zone = self.get_vpc()
+        subnet = self.get_subnet()
 
-        if not zone:
-            yield AddVPC(self)
+        if not subnet:
+            yield AddSubnet(self)
             return
 
         tags = dict((v["Key"], v["Value"]) for v in zone.get('Tags', []))
@@ -83,6 +87,6 @@ class Apply(Policy, VPCMixin):
         if tags.get('name', '') != self.resource.name:
             yield SetTags(
                 self,
-                resources=[zone['VpcId']],
+                resources=[zone['SubnetId']],
                 tags={"name": self.resource.name}
             )

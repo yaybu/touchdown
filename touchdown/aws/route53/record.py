@@ -30,7 +30,9 @@ class Record(Resource):
 
 class AddRecord(Action):
 
-    description = "Add %(name)s to hosted zone"
+    @property
+    def description(self):
+        yield "Add {} to hosted zone".format(self.resource.name)
 
     def run(self):
         print "Adding record..."

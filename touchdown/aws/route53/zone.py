@@ -40,11 +40,13 @@ class HostedZone(Resource):
 
 class AddHostedZone(Action):
 
-    description = "Route53: Add zone '%(name)s'"
-
     def __init__(self, policy):
         self.policy = policy
         self.resource = policy.resource
+
+    @property    
+    def description(self):
+        yield "Add hosted zone '{}'".format(self.resource.name)
 
     def run(self):
         print "Creating zone"

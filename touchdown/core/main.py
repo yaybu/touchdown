@@ -28,7 +28,10 @@ class ConsoleInterface(object):
             if actions:
                 click.echo("%s:" % resource)
                 for action in actions:
-                    click.echo("  * %s" % action)
+                    description = list(action.description)
+                    click.echo("  * %s" % description[0])
+                    for line in description[1:]:
+                        click.echo("    %s" % line)
                 click.echo("")
 
         return click.confirm("Do you want to continue?")
