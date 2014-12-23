@@ -37,4 +37,4 @@ class SetTags(Action):
         )
 
         if response.status_code != 200:
-            raise errors.Error("Failed to update hosted zone comment")
+            raise errors.Error("Failed to update resource tags")
