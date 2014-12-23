@@ -16,6 +16,7 @@ import click
 
 from .runner import Runner
 from .workspace import Workspace
+from . import errors
 
 
 class ConsoleInterface(object):
@@ -45,7 +46,11 @@ def main(ctx, debug):
     execfile("Touchdownfile", g)
 
     r = Runner(g['workspace'], ConsoleInterface())
-    r.apply()
+
+    try:
+        r.apply()
+    except errors.Error as e:
+        raise click.ClickException(str(e))
 
 
 if __name__ == "__main__":
