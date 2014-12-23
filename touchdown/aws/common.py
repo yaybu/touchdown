@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from botocore import session
+
 from touchdown.core.action import Action
 
 
@@ -38,3 +40,35 @@ class SetTags(Action):
 
         if response.status_code != 200:
             raise errors.Error("Failed to update resource tags")
+
+
+class SimpleApply(object):
+
+    name = "apply"
+    default = True
+
+    def __init__(self, *args, **kwargs):
+        super(SimpleApply, self).__init__(*args, **kwargs)
+        self.session = session.Session()
+        # self.session.set_credentials(aws_access_key_id, aws_secret_access_key)
+        self.service = self.session.get_service("ec2")
+        self.endpoint = self.service.get_endpoint("eu-west-1")
+
+    def get_object(self):
+        pass
+
+    def get_actions(self, runner):
+        resource = self.get_object()
+        if not resource:
+            yield self.add_action(self)
+            return
+
+        if hasattr(self.resource.tags):
+            tags = dict((v["Key"], v["Value"]) for v in resource.get('Tags', []))
+
+            if tags.get('name', '') != self.resource.name:
+                yield SetTags(
+                    self,
+                    resources=[self.key],
+                    tags={"name": self.resource.name}
+                )

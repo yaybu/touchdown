@@ -21,8 +21,8 @@ from touchdown.core.argument import String
 from touchdown.core import errors
 
 from .subnet import Subnet
-from .common import VPCMixin
-from ..common import SetTags
+from .internet_gateway import InternetGateway
+from ..common import SimpleApply
 
 
 class VPC(Resource):
@@ -58,31 +58,15 @@ class AddVPC(Action):
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(Policy, VPCMixin):
+class Apply(Policy, SimpleApply):
 
-    name = "apply"
     resource = VPC
-    default = True
+    add_action = AddVPC
+    key = 'VpcId'
 
-    def get_vpc(self):
+    def get_object(self):
         operation = self.service.get_operation("DescribeVpcs")
         response, data = operation.call(self.endpoint)
         for vpc in data['Vpcs']:
             if vpc['CidrBlock'] == self.resource.cidr_block:
                 return vpc
-
-    def get_actions(self, runner):
-        zone = self.get_vpc()
-
-        if not zone:
-            yield AddVPC(self)
-            return
-
-        tags = dict((v["Key"], v["Value"]) for v in zone.get('Tags', []))
-
-        if tags.get('name', '') != self.resource.name:
-            yield SetTags(
-                self,
-                resources=[zone['VpcId']],
-                tags={"name": self.resource.name}
-            )

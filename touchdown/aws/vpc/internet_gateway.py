@@ -20,57 +20,50 @@ from touchdown.core.action import Action
 from touchdown.core.argument import String
 from touchdown.core import errors
 
-from ..common import SimpleApply
+from .common import VPCMixin
 
 
-class Subnet(Resource):
+class InternetGateway(Resource):
 
-    resource_name = "subnet"
+    resource_name = "internet-gateway"
 
     subresources = [
     ]
 
     name = String()
-    cidr_block = String()
 
 
-class AddSubnet(Action):
+class AddInternetGateway(Action):
 
     @property
     def description(self):
-        yield "Add subnet for {} to virtual private cloud".format(
-            self.resource.cidr_block,
-        )
+        yield "Add internet gateway"
 
     def run(self):
-        operation = self.policy.service.get_operation("CreateSubnet")
-        response, data = operation.call(
-            self.policy.endpoint,
-            VpcId=self.vpc_id,
-            CidrBlock=self.resource.cidr_block,
-        )
+        operation = self.policy.service.get_operation("CreateInternetGateway")
+        response, data = operation.call(self.policy.endpoint)
 
         if response.status_code != 200:
-            raise errors.Error("Unable to create subnet")
+            raise errors.Error("Unable to create internet gateway")
 
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(Policy, SimpleApply):
+class Apply(Policy, VPCMixin):
 
-    resource = Subnet
-    add_action = AddSubnet
-    key = 'SubnetId'
+    resource = InternetGateway
+    add_action = AddInternetGateway
+    key = "InternetGatewayId"
 
     def get_object(self):
-        operation = self.service.get_operation("DescribeSubnets")
+        operation = self.service.get_operation("DescribeInternetGateways")
         response, data = operation.call(
             self.endpoint,
             Filters=[
-                {'Name': 'cidrBlock', 'Values': [self.resource.cidr_block]},
+                #{'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
             ],
         )
-        if len(data['Subnets']) > 0:
-            raise errors.Error("Too many possible subnets found")
-        if data['Subnets']:
-            return data['Subnets'][0]
+        if len(data['InternetGateways']) > 0:
+            raise errors.Error("Too many possible gateways found")
+        if data['InternetGateways']:
+            return data['InternetGateways'][0]
