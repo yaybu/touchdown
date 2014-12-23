@@ -22,6 +22,7 @@ from touchdown.core import errors
 
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
+from .route_table import RouteTable
 from ..common import SimpleApply
 
 

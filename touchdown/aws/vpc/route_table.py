@@ -23,9 +23,9 @@ from touchdown.core import errors
 from ..common import SimpleApply
 
 
-class InternetGateway(Resource):
+class RouteTable(Resource):
 
-    resource_name = "internet-gateway"
+    resource_name = "route-table"
 
     subresources = [
     ]
@@ -33,37 +33,40 @@ class InternetGateway(Resource):
     name = String()
 
 
-class AddInternetGateway(Action):
+class AddRouteTable(Action):
 
     @property
     def description(self):
-        yield "Add internet gateway"
+        yield "Add route table"
 
     def run(self):
-        operation = self.policy.service.get_operation("CreateInternetGateway")
-        response, data = operation.call(self.policy.endpoint)
+        operation = self.policy.service.get_operation("CreateRouteTable")
+        response, data = operation.call(
+            self.policy.endpoint,
+            VpcId=self.vpc_id,
+        )
 
         if response.status_code != 200:
-            raise errors.Error("Unable to create internet gateway")
+            raise errors.Error("Unable to create route table")
 
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
 class Apply(Policy, SimpleApply):
 
-    resource = InternetGateway
-    add_action = AddInternetGateway
-    key = "InternetGatewayId"
+    resource = RouteTable
+    add_action = AddRouteTable
+    key = "RouteTableId"
 
     def get_object(self):
-        operation = self.service.get_operation("DescribeInternetGateways")
+        operation = self.service.get_operation("DescribeRouteTables")
         response, data = operation.call(
             self.endpoint,
             Filters=[
                 #{'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
             ],
         )
-        if len(data['InternetGateways']) > 0:
+        if len(data['RouteTables']) > 0:
             raise errors.Error("Too many possible gateways found")
-        if data['InternetGateways']:
-            return data['InternetGateways'][0]
+        if data['RouteTables']:
+            return data['RouteTables'][0]
