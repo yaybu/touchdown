@@ -58,8 +58,10 @@ class AddVPC(Action):
 
         # FIXME: Create and invoke CreateTags to set the name here.
 
+        self.policy.object = data
 
-class Apply(Policy, SimpleApply):
+
+class Apply(SimpleApply, Policy):
 
     resource = VPC
     add_action = AddVPC

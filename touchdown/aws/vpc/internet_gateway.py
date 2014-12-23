@@ -49,7 +49,7 @@ class AddInternetGateway(Action):
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(Policy, SimpleApply):
+class Apply(SimpleApply, Policy):
 
     resource = InternetGateway
     add_action = AddInternetGateway

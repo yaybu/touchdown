@@ -46,9 +46,11 @@ class AddSubnet(Action):
         operation = self.policy.service.get_operation("CreateSubnet")
         response, data = operation.call(
             self.policy.endpoint,
-            VpcId=self.vpc_id,
+            VpcId=self.resource.parent.resource_id,
             CidrBlock=self.resource.cidr_block,
         )
+
+        print response, data
 
         if response.status_code != 200:
             raise errors.Error("Unable to create subnet")
@@ -56,7 +58,7 @@ class AddSubnet(Action):
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(Policy, SimpleApply):
+class Apply(SimpleApply, Policy):
 
     resource = Subnet
     add_action = AddSubnet
@@ -70,6 +72,7 @@ class Apply(Policy, SimpleApply):
                 {'Name': 'cidrBlock', 'Values': [self.resource.cidr_block]},
             ],
         )
+
         if len(data['Subnets']) > 0:
             raise errors.Error("Too many possible subnets found")
         if data['Subnets']:

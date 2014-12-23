@@ -24,4 +24,8 @@ class Workspace(Resource):
     subresources = [AWS]
 
     def __init__(self):
-        super(Workspace, self).__init__(self)
+        super(Workspace, self).__init__(None)
+
+    @property
+    def root(self):
+        return self

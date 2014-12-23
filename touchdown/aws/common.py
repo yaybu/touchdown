@@ -58,13 +58,13 @@ class SimpleApply(object):
         pass
 
     def get_actions(self, runner):
-        resource = self.get_object()
-        if not resource:
+        self.object = self.get_object()
+        if not self.object:
             yield self.add_action(self)
             return
 
-        if hasattr(self.resource.tags):
-            tags = dict((v["Key"], v["Value"]) for v in resource.get('Tags', []))
+        if hasattr(self.resource, "tags"):
+            tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
 
             if tags.get('name', '') != self.resource.name:
                 yield SetTags(
@@ -72,3 +72,7 @@ class SimpleApply(object):
                     resources=[self.key],
                     tags={"name": self.resource.name}
                 )
+
+    @property
+    def resource_id(self):
+        return self.object[self.key]

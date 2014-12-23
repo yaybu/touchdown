@@ -26,7 +26,7 @@ class ResourceType(type):
     def __new__(meta, class_name, bases, new_attrs):
         for sub in new_attrs.get("subresources", []):
             def _(self, **kwargs):
-                r = sub(self.root, **kwargs)
+                r = sub(self, **kwargs)
                 self.root.add_dependency(r)
                 if self != self.root:
                     r.add_dependency(self)
@@ -55,13 +55,17 @@ class Resource(six.with_metaclass(ResourceType)):
 
     policy = PolicyArgument()
 
-    def __init__(self, root, **kwargs):
-        self.root = root
+    def __init__(self, parent, **kwargs):
+        self.parent = parent
         self.dependencies = set()
         for key, value in kwargs.items():
             if key not in self.__args__:
                 raise errors.Error("'%s' is not a valid option" % (key, ))
             setattr(self, key, value)
+
+    @property
+    def root(self):
+        return self.parent.root
 
     def add_dependency(self, dependency):
         self.dependencies.add(dependency)
