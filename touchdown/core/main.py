@@ -21,10 +21,7 @@ from . import errors
 
 class ConsoleInterface(object):
 
-    def confirm_plan(self, plan):
-        click.echo("Generated a plan to update infrastructure configuration:")
-        click.echo()
-
+    def render_plan(self, plan):
         for resource, actions in plan:
             if actions:
                 click.echo("%s:" % resource)
@@ -35,22 +32,39 @@ class ConsoleInterface(object):
                         click.echo("    %s" % line)
                 click.echo("")
 
+    def confirm_plan(self, plan):
+        click.echo("Generated a plan to update infrastructure configuration:")
+        click.echo()
+
+        self.render_plan(plan)
+
         return click.confirm("Do you want to continue?")
 
 
-@click.command()
+@click.group()
 @click.option('--debug/--no-debug', default=False, envvar='DEBUG')
 @click.pass_context
 def main(ctx, debug):
     g = {"workspace": Workspace()}
     execfile("Touchdownfile", g)
+    ctx.obj = g['workspace']
 
-    r = Runner(g['workspace'], ConsoleInterface())
 
+@main.command()
+@click.pass_context
+def apply(ctx):
+    r = Runner(ctx.obj, ConsoleInterface())
     try:
         r.apply()
     except errors.Error as e:
         raise click.ClickException(str(e))
+
+
+@main.command()
+@click.pass_context
+def plan(ctx):
+    r = Runner(ctx.obj, ConsoleInterface())
+    r.ui.render_plan(r._plan())
 
 
 if __name__ == "__main__":

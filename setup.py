@@ -30,8 +30,10 @@ setup(
     zip_safe=False,
     install_requires=[
         'six',
+        'click',
     ],
-    extras_require = {
-        'test': ['unittest2', 'mock'],
-        },
+    entry_points='''
+        [console_scripts]
+        touchdown = touchdown.core.main:main
+    ''',
 )
