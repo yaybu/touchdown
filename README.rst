@@ -20,22 +20,14 @@ You can find us in #yaybu on irc.oftc.net.
 Examples
 ========
 
-::
-    from touchdown.core import Plan
-    from touchdown.aws import Region
+Here is an example ``Touchdownfile``::
 
-    p = Plan()
-
-    aws = p.region(
-        region='...',
-        access_key='...',
-        secret_key='...',
+    aws = workspace.aws(
+        region='eu-west-1',
     )
 
-    vpc = aws.virtual_private_cloud(
-        name='example',
-        has_internet_gateway=True,
-    )
+    vpc = aws.virtual_private_cloud(name='example')
+    vpc.add_internet_gateway(name="internet")
 
     example = vpc.subnet(
         name='example',
@@ -54,5 +46,6 @@ Examples
         ),
     )
 
-    print p.plan()
-    p.apply()
+You can then apply this configuration with::
+
+    touchdown apply
