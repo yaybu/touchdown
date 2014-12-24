@@ -33,7 +33,7 @@ class Runner(object):
         resolved.append(node)
         unresolved.remove(node)
 
-    def _plan(self):
+    def plan(self):
         resolved = []
         self._resolve(self.node, resolved, [])
 
@@ -44,7 +44,7 @@ class Runner(object):
         return plan
 
     def apply(self):
-        plan = self._plan()
+        plan = self.plan()
 
         if not self.ui.confirm_plan(plan):
             return

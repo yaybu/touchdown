@@ -64,7 +64,7 @@ def apply(ctx):
 @click.pass_context
 def plan(ctx):
     r = Runner(ctx.obj, ConsoleInterface())
-    r.ui.render_plan(r._plan())
+    r.ui.render_plan(r.plan())
 
 
 if __name__ == "__main__":
