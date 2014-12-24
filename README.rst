@@ -22,26 +22,37 @@ Examples
 
 Here is an example ``Touchdownfile``::
 
-    aws = workspace.aws(
+    from touchdown.core.renderable import Format, Json, Property
+
+    aws = workspace.add_aws(
         region='eu-west-1',
     )
 
-    vpc = aws.virtual_private_cloud(name='example')
+    vpc = aws.add_virtual_private_cloud(name='example')
     vpc.add_internet_gateway(name="internet")
 
-    example = vpc.subnet(
-        name='example',
+    database = aws.add_database(
+        name='database',
+    )
+
+    example = vpc.add_subnet(
+        name='application',
         cidr_block='192.168.0.1/24',
     )
 
-    asg = aws.autoscaling_group(
+    asg = aws.add_autoscaling_group(
         name='example',
-        launch_configuration=aws.launch_configuration(
+        launch_configuration=aws.add_launch_configuration(
             name="example",
             ami='ami-62366',
             subnets=[example],
-            user_data=json.dumps({
+            user_data=Json({
                 "SECRET_KEY": "059849utiruoierutiou45",
+                "DATABASES":
+                    "default": {
+                        "HOST": Property(database, "url"),
+                    }, 
+                },
             })
         ),
     )
