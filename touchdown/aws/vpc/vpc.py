@@ -28,8 +28,6 @@ from ..common import SimpleApply
 
 class VPC(Resource):
 
-    """ A DNS zone hosted at Amazon Route53 """
-
     resource_name = "vpc"
 
     subresources = [
