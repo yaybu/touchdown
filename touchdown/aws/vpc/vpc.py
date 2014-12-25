@@ -60,6 +60,9 @@ class AddVPC(Action):
 
         self.policy.object = data
 
+        waiter = self.policy.service.get_waiter("VpcAvailable", self.policy.endpoint)
+        waiter.wait(VpcIds=[data['VpcId']])
+
 
 class Apply(SimpleApply, Policy):
 
