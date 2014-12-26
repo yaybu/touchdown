@@ -14,6 +14,8 @@
 
 import six
 
+import netaddr
+
 from . import errors, policy
 from .utils import force_str
 
@@ -45,6 +47,9 @@ class Argument(object):
 
     def present(self, instance):
         return hasattr(instance, self.arg_id)
+
+    def contribute_to_class(self, cls):
+        pass
 
     def __set__(self, instance, value):
         pass
@@ -87,7 +92,7 @@ class Integer(Argument):
             try:
                 value = int(value)
             except ValueError:
-                raise errors.ParseError("%s is not an integer" % value)
+                raise errors.InvalidParameter("%s is not an integer" % value)
         setattr(instance, self.arg_id, value)
 
 
@@ -99,21 +104,34 @@ class Octal(Integer):
         setattr(instance, self.arg_id, value)
 
 
+class IPAddress(String):
+
+    def __set__(self, instance, value):
+        try:
+            value = netaddr.IPAddress(value)
+        except netaddr.core.AddrFormatError:
+            raise errors.InvalidParameter("{} is not a valid IP Address")
+        setattr(instance, self.arg_id, value)
+
+
+class IPNetwork(String):
+
+    def __set__(self, instance, value):
+        try:
+            value = netaddr.IPNetwork(value)
+        except netaddr.core.AddrFormatError:
+            raise errors.InvalidParameter("{} is not a valid IP Address")
+        if value != value.cidr:
+            raise errors.InvalidParameter("{} looks wrong - did you mean {}?".format(value, value.cdr))
+        setattr(instance, self.arg_id, value)
+
+
 class Dict(Argument):
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
 
 
 class List(Argument):
-    def __set__(self, instance, value):
-        setattr(instance, self.arg_id, value)
-
-
-class File(Argument):
-
-    """ Provided with a URL, this can get files by various means. Often used
-    with the package:// scheme """
-
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
 
@@ -132,3 +150,54 @@ class PolicyArgument(Argument):
         if not instance.default_policy:
             return policy.NullPolicy(instance)
         return instance.default_policy(instance)
+
+
+class Resource(Argument):
+
+    """
+    An argument that represents a resource that we depend on. For example,
+    to create an AWS subnet we an AWS VPC to put it in. You might define such a
+    subnet as::
+
+        from touchdown.core.resource import Resource
+        from touchdown.core import arguments
+
+        class Subnet(Resource):
+            cidr_block = argument.CidrBlock()
+            vpc = argument.Resource(VPC)
+    """
+
+    def __init__(self, resource_class, **kwargs):
+        super(Resource, self).__init__(**kwargs)
+        self.resource_class = resource_class
+
+    def __set__(self, instance, value):
+        """
+        Every time you assign a value to a Resource argument we validate it is
+        the correct type. We also mark self as depending on the resource.
+        """
+        if not isinstance(value, self.resource_class):
+            raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
+        instance.add_dependency(value)
+        setattr(instance, self.arg_id, value)
+
+    def contribute_to_class(self, cls):
+        """
+        If we mark a resource as being assignable to another resource then it
+        automatically gains a factory method. Continuing the VPC+Subnet example,
+        we can now::
+
+            some_vpc.add_subnet(cidr_block='192.168.0.1/24')
+
+        With this form you don't have to pass the vpc argument (it is done
+        implicitly).
+        """
+        argument_name = self.argument_name
+        resource_class = self.resource_class
+        def _(self, **kwargs):
+            arguments = {argument_name: self}
+            arguments.update(kwargs)
+            resource = cls(self, **arguments)
+            self.workspace.add_dependency(resource)
+            return resource
+        setattr(self.resource_class, 'add_%s' % cls.resource_name,  _)

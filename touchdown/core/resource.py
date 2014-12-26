@@ -24,15 +24,6 @@ logger = logging.getLogger(__name__)
 class ResourceType(type):
 
     def __new__(meta, class_name, bases, new_attrs):
-        for sub in new_attrs.get("subresources", []):
-            def _(self, **kwargs):
-                r = sub(self, **kwargs)
-                self.root.add_dependency(r)
-                if self != self.root:
-                    r.add_dependency(self)
-                return r
-            new_attrs['add_%s' % sub.resource_name] = _
-
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
         cls.__args__ = {}
@@ -44,6 +35,8 @@ class ResourceType(type):
         for key, value in new_attrs.items():
             if isinstance(value, Argument):
                 cls.__args__[key] = value
+                value.argument_name = key
+                value.contribute_to_class(cls)
 
         return cls
 
@@ -60,15 +53,17 @@ class Resource(six.with_metaclass(ResourceType)):
         self.dependencies = set()
         for key, value in kwargs.items():
             if key not in self.__args__:
-                raise errors.Error("'%s' is not a valid option" % (key, ))
+                raise errors.InvalidParameter("'%s' is not a valid option" % (key, ))
             setattr(self, key, value)
 
     @property
-    def root(self):
-        return self.parent.root
+    def workspace(self):
+        return self.parent.workspace
 
     def add_dependency(self, dependency):
-        self.dependencies.add(dependency)
+        if self.workspace != dependency:
+            print self, self.workspace, dependency
+            self.dependencies.add(dependency)
 
     def __str__(self):
         return self.resource_name

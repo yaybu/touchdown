@@ -17,11 +17,10 @@ import uuid
 from touchdown.core.resource import Resource
 from touchdown.core.policy import Policy
 from touchdown.core.action import Action
-from touchdown.core.argument import String
-from touchdown.core import errors
+from touchdown.core import argument, errors
 
+from ..account import AWS
 from .route53 import Route53Mixin
-from .record import Record
 
 
 class HostedZone(Resource):
@@ -30,12 +29,9 @@ class HostedZone(Resource):
 
     resource_name = "hosted_zone"
 
-    subresources = [
-        Record,
-    ]
-
-    name = String()
-    comment = String()
+    name = argument.String()
+    comment = argument.String()
+    account = argument.Resource(AWS)
 
 
 class AddHostedZone(Action):
@@ -44,7 +40,7 @@ class AddHostedZone(Action):
         self.policy = policy
         self.resource = policy.resource
 
-    @property    
+    @property
     def description(self):
         yield "Add hosted zone '{}'".format(self.resource.name)
 

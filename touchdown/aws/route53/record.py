@@ -15,7 +15,7 @@
 from touchdown.core.resource import Resource
 from touchdown.core.policy import Policy
 from touchdown.core.action import Action
-from touchdown.core.argument import String
+from touchdown.core import argument
 
 from .route53 import Route53Mixin
 
@@ -23,9 +23,10 @@ from .route53 import Route53Mixin
 class Record(Resource):
     resource_name = "record"
 
-    name = String()
-    record_type = String()
-    data = String()
+    name = argument.String()
+    record_type = argument.String()
+    data = argument.String()
+    zone = argument.Resource(Zone)
 
 
 class AddRecord(Action):

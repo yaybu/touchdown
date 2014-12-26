@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.argument import String
+from touchdown.core import argument
 
 
 class KeyPair(Resource):
     resource_name = "keypair"
 
-    name = String()
+    name = argument.String()

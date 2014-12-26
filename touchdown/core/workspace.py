@@ -14,18 +14,14 @@
 
 from .resource import Resource
 
-from ..aws import AWS
-
 
 class Workspace(Resource):
 
     resource_name = "workspace"
 
-    subresources = [AWS]
-
     def __init__(self):
         super(Workspace, self).__init__(None)
 
     @property
-    def root(self):
+    def workspace(self):
         return self

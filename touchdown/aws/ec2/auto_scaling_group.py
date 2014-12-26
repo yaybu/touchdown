@@ -17,8 +17,7 @@ from botocore import session
 from touchdown.core.resource import Resource
 from touchdown.core.policy import Policy
 from touchdown.core.action import Action
-from touchdown.core.argument import String
-from touchdown.core import errors
+from touchdown.core import argument, errors
 
 from ..common import SimpleApply
 
@@ -27,11 +26,8 @@ class AutoScalingGroup(Resource):
 
     resource_name = "auto_scaling_group"
 
-    subresources = [
-    ]
-
-    name = String()
-    cidr_block = String()
+    name = argument.String()
+    cidr_block = argument.String()
 
 
 class AddAutoScalingGroup(Action):

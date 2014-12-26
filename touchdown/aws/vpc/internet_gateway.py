@@ -17,9 +17,9 @@ from botocore import session
 from touchdown.core.resource import Resource
 from touchdown.core.policy import Policy
 from touchdown.core.action import Action
-from touchdown.core.argument import String
-from touchdown.core import errors
+from touchdown.core import argument, errors
 
+from .vpc import VPC
 from ..common import SimpleApply
 
 
@@ -27,10 +27,8 @@ class InternetGateway(Resource):
 
     resource_name = "internet-gateway"
 
-    subresources = [
-    ]
-
-    name = String()
+    name = argument.String()
+    vpc = argument.Resource(VPC)
 
 
 class AddInternetGateway(Action):

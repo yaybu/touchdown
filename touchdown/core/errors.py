@@ -17,6 +17,10 @@ class Error(Exception):
     pass
 
 
+class InvalidParameter(Exception):
+    pass
+
+
 class InvalidPolicy(Error):
     pass
 

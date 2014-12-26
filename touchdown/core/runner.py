@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from .errors import CycleError
+
+
+logger = logging.getLogger(__name__)
 
 
 class Runner(object):
@@ -39,7 +44,11 @@ class Runner(object):
 
         plan = []
         for resource in resolved:
-            plan.append((resource, tuple(resource.policy.get_actions(self))))
+            actions = tuple(resource.policy.get_actions(self))
+            if not actions:
+                logger.debug("No actions for {} - skipping".format(resource))
+                continue
+            plan.append((resource, actions))
 
         return plan
 

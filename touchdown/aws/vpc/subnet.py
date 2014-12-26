@@ -17,9 +17,9 @@ from botocore import session
 from touchdown.core.resource import Resource
 from touchdown.core.policy import Policy
 from touchdown.core.action import Action
-from touchdown.core.argument import String
-from touchdown.core import errors
+from touchdown.core import argument, errors
 
+from .vpc import VPC
 from ..common import SimpleApply
 
 
@@ -27,11 +27,9 @@ class Subnet(Resource):
 
     resource_name = "subnet"
 
-    subresources = [
-    ]
-
-    name = String()
-    cidr_block = String()
+    name = argument.String()
+    cidr_block = argument.IPNetwork()
+    vpc = argument.Resource(VPC)
 
 
 class AddSubnet(Action):
@@ -46,8 +44,8 @@ class AddSubnet(Action):
         operation = self.policy.service.get_operation("CreateSubnet")
         response, data = operation.call(
             self.policy.endpoint,
-            VpcId=self.resource.parent.resource_id,
-            CidrBlock=self.resource.cidr_block,
+            VpcId=self.resource.vpc.object['VpcId'],
+            CidrBlock=str(self.resource.cidr_block),
         )
 
         print response, data
@@ -69,7 +67,7 @@ class Apply(SimpleApply, Policy):
         response, data = operation.call(
             self.endpoint,
             Filters=[
-                {'Name': 'cidrBlock', 'Values': [self.resource.cidr_block]},
+                {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
             ],
         )
 

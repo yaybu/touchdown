@@ -17,12 +17,9 @@ from botocore import session
 from touchdown.core.resource import Resource
 from touchdown.core.policy import Policy
 from touchdown.core.action import Action
-from touchdown.core.argument import String
-from touchdown.core import errors
+from touchdown.core import argument, errors
 
-from .subnet import Subnet
-from .internet_gateway import InternetGateway
-from .route_table import RouteTable
+from ..account import AWS
 from ..common import SimpleApply
 
 
@@ -30,12 +27,9 @@ class VPC(Resource):
 
     resource_name = "vpc"
 
-    subresources = [
-        Subnet,
-    ]
-
-    name = String()
-    cidr_block = String()
+    name = argument.String()
+    cidr_block = argument.IPNetwork()
+    account = argument.Resource(AWS)
 
 
 class AddVPC(Action):
@@ -48,7 +42,7 @@ class AddVPC(Action):
         operation = self.policy.service.get_operation("CreateVpc")
         response, data = operation.call(
             self.policy.endpoint,
-            CidrBlock=self.resource.cidr_block,
+            CidrBlock=str(self.resource.cidr_block),
         )
 
         if response.status_code != 200:
@@ -72,5 +66,5 @@ class Apply(SimpleApply, Policy):
         operation = self.service.get_operation("DescribeVpcs")
         response, data = operation.call(self.endpoint)
         for vpc in data['Vpcs']:
-            if vpc['CidrBlock'] == self.resource.cidr_block:
+            if vpc['CidrBlock'] == str(self.resource.cidr_block):
                 return vpc

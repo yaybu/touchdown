@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .vpc import VPC
+from .internet_gateway import InternetGateway
+from .route_table import RouteTable
+from .subnet import Subnet
+
 
 __all__ = [
     'VPC',
