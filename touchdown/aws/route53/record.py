@@ -17,7 +17,6 @@ from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument
 
-from .route53 import Route53Mixin
 from .zone import Zone
 
 
@@ -40,7 +39,7 @@ class AddRecord(Action):
         print "Adding record..."
 
 
-class Apply(Target, Route53Mixin):
+class Apply(Target):
     name = "apply"
     resource = Record
     default = True

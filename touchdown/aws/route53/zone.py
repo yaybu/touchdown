@@ -20,7 +20,6 @@ from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
 from ..account import AWS
-from .route53 import Route53Mixin
 
 
 class HostedZone(Resource):
@@ -67,7 +66,7 @@ class UpdateHostedZoneComment(Action):
         )
 
 
-class Apply(Target, Route53Mixin):
+class Apply(Target):
 
     name = "apply"
     resource = HostedZone
