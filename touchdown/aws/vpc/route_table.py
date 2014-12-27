@@ -38,10 +38,12 @@ class AddRouteTable(Action):
         yield "Add route table"
 
     def run(self):
+        vpc = self.get_target(self.resource.vpc)
+
         operation = self.policy.service.get_operation("CreateRouteTable")
         response, data = operation.call(
             self.policy.endpoint,
-            VpcId=self.resource.parent.resource_id,
+            VpcId=vpc.object['VpcId'],
         )
 
         if response.status_code != 200:

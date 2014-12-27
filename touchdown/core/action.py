@@ -15,9 +15,13 @@
 
 class Action(object):
 
-    def __init__(self, policy):
+    def __init__(self, runner, policy):
+        self.runner = runner
         self.policy = policy
         self.resource = policy.resource
+
+    def get_target(self, resource):
+        return self.runner.get_target(resource)
 
     def __str__(self):
         return self.description

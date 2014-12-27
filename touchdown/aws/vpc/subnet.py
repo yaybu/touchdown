@@ -41,14 +41,14 @@ class AddSubnet(Action):
         )
 
     def run(self):
+        vpc = self.get_target(self.resource.vpc)
+
         operation = self.policy.service.get_operation("CreateSubnet")
         response, data = operation.call(
             self.policy.endpoint,
-            VpcId=self.resource.vpc.object['VpcId'],
+            VpcId=vpc.object['VpcId'],
             CidrBlock=str(self.resource.cidr_block),
         )
-
-        print response, data
 
         if response.status_code != 200:
             raise errors.Error("Unable to create subnet")

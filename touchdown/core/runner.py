@@ -25,6 +25,7 @@ class Runner(object):
     def __init__(self, node, ui):
         self.node = node
         self.ui = ui
+        self.context = {}
 
     def _resolve(self, node, resolved, unresolved):
         unresolved.append(node)
@@ -38,13 +39,18 @@ class Runner(object):
         resolved.append(node)
         unresolved.remove(node)
 
+    def get_target(self, resource):
+        if not resource in self.resources:
+            self.resources[resource] = resource.policy
+        return resource.policy
+
     def plan(self):
         resolved = []
         self._resolve(self.node, resolved, [])
 
         plan = []
         for resource in resolved:
-            actions = tuple(resource.policy.get_actions(self))
+            actions = tuple(self.get_target(resource).get_actions(self))
             if not actions:
                 logger.debug("No actions for {} - skipping".format(resource))
                 continue

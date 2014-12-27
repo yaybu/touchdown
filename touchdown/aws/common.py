@@ -19,8 +19,8 @@ from touchdown.core.action import Action
 
 class SetTags(Action):
 
-    def __init__(self, policy, resources, tags):
-        super(SetTags, self).__init__(policy)
+    def __init__(self, runner, policy, resources, tags):
+        super(SetTags, self).__init__(runner, policy)
         self.resources = resources
         self.tags = tags
 
@@ -60,7 +60,7 @@ class SimpleApply(object):
     def get_actions(self, runner):
         self.object = self.get_object()
         if not self.object:
-            yield self.add_action(self)
+            yield self.add_action(runner, self)
             return
 
         if hasattr(self.resource, "tags"):
@@ -68,6 +68,7 @@ class SimpleApply(object):
 
             if tags.get('name', '') != self.resource.name:
                 yield SetTags(
+                    runner,
                     self,
                     resources=[self.key],
                     tags={"name": self.resource.name}
