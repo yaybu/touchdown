@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
-
 from touchdown.core.resource import Resource
-from touchdown.core.policy import Policy
+from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
@@ -43,9 +41,9 @@ class AddSubnet(Action):
     def run(self):
         vpc = self.get_target(self.resource.vpc)
 
-        operation = self.policy.service.get_operation("CreateSubnet")
+        operation = self.target.service.get_operation("CreateSubnet")
         response, data = operation.call(
-            self.policy.endpoint,
+            self.target.endpoint,
             VpcId=vpc.object['VpcId'],
             CidrBlock=str(self.resource.cidr_block),
         )
@@ -56,7 +54,7 @@ class AddSubnet(Action):
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(SimpleApply, Policy):
+class Apply(SimpleApply, Target):
 
     resource = Subnet
     add_action = AddSubnet

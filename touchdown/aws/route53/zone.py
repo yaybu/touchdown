@@ -15,7 +15,7 @@
 import uuid
 
 from touchdown.core.resource import Resource
-from touchdown.core.policy import Policy
+from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
@@ -36,19 +36,15 @@ class HostedZone(Resource):
 
 class AddHostedZone(Action):
 
-    def __init__(self, policy):
-        self.policy = policy
-        self.resource = policy.resource
-
     @property
     def description(self):
         yield "Add hosted zone '{}'".format(self.resource.name)
 
     def run(self):
         print "Creating zone"
-        operation = self.policy.service.get_operation("CreateHostedZone")
+        operation = self.target.service.get_operation("CreateHostedZone")
         response, data = operation.call(
-            self.policy.endpoint,
+            self.target.endpoint,
             CallerReference=str(uuid.uuid4()),
             Name=self.resource.name,
             HostedZoneConfig={
@@ -64,14 +60,14 @@ class UpdateHostedZoneComment(Action):
 
     description = "Change zone comment to '%(comment)s'"
 
-    def __init__(self, policy, zone_id):
-        super(UpdateHostedZoneComment, self).__init__(policy)
+    def __init__(self, runner, target, zone_id):
+        super(UpdateHostedZoneComment, self).__init__(runner, target)
         self.zone_id = zone_id
 
     def run(self):
-        operation = self.policy.service.get_operation("UpdateHostedZoneComment")
+        operation = self.target.service.get_operation("UpdateHostedZoneComment")
         response, data = operation.call(
-            self.policy.endpoint,
+            self.target.endpoint,
             Id=self.zone_id,
             Comment=self.resource.comment,
         )
@@ -80,7 +76,7 @@ class UpdateHostedZoneComment(Action):
             raise errors.Error("Failed to update hosted zone comment")
 
 
-class Apply(Policy, Route53Mixin):
+class Apply(Target, Route53Mixin):
 
     name = "apply"
     resource = HostedZone

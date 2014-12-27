@@ -15,8 +15,12 @@
 from .internet_gateway import InternetGateway
 from .route_table import RouteTable
 from .subnet import Subnet
+from .vpc import VPC
 
 
 __all__ = [
     'VPC',
+    'InternetGateway',
+    'RouteTable',
+    'Subnet',
 ]

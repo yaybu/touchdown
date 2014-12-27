@@ -16,7 +16,7 @@ import six
 
 import netaddr
 
-from . import errors, policy
+from . import errors, target
 from .utils import force_str
 
 
@@ -136,20 +136,18 @@ class List(Argument):
         setattr(instance, self.arg_id, value)
 
 
-class PolicyArgument(Argument):
-
-    """ Parses the policy: argument for resources, including triggers etc. """
+class TargetArgument(Argument):
 
     def __set__(self, instance, value):
         try:
-            setattr(instance, self.arg_id, instance.policies[value](instance))
+            setattr(instance, self.arg_id, instance.targets[value](instance))
         except KeyError:
-            raise errors.InvalidPolicy("'%s' not a valid policy" % (value, ))
+            raise errors.InvalidTarget("'%s' not a valid target" % (value, ))
 
     def default(self, instance):
-        if not instance.default_policy:
-            return policy.NullPolicy(instance)
-        return instance.default_policy(instance)
+        if not instance.default_target:
+            return target.NullTarget(instance)
+        return instance.default_target(instance)
 
 
 class Resource(Argument):
@@ -193,7 +191,7 @@ class Resource(Argument):
         implicitly).
         """
         argument_name = self.argument_name
-        resource_class = self.resource_class
+
         def _(self, **kwargs):
             arguments = {argument_name: self}
             arguments.update(kwargs)

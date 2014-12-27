@@ -32,11 +32,11 @@ class Renderable(object):
         raise NotImplementedError(self.render)
 
 
- class Property(Renderable):
+class Property(Renderable):
 
-     """
-     Lazy 'getattr'
-     """
+    """
+    Lazy 'getattr'
+    """
 
     def __init__(self, object, attribute):
         if not isinstance(object, Resource):
@@ -84,4 +84,4 @@ class Format(Renderable):
                 node.add_dependency(obj)
 
     def render(self):
-        return self.format_string.format(*args, **kwargs)
+        return self.format_string.format(*self.args, **self.kwargs)

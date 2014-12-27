@@ -16,43 +16,41 @@ import six
 from . import errors
 
 
-class PolicyType(type):
+class TargetType(type):
 
-    """ Registers the policy on the resource """
+    """ Registers the target on the resource """
 
     def __new__(meta, class_name, bases, new_attrs):
         cls = type.__new__(meta, class_name, bases, new_attrs)
         if getattr(cls, "resource", None) is not None:
             cls.resource.policies[cls.name] = cls
             if cls.default:
-                cls.resource.default_policy = cls
+                cls.resource.default_target = cls
         return cls
 
 
-class Policy(six.with_metaclass(PolicyType)):
+class Target(six.with_metaclass(TargetType)):
 
     """
-    A policy is a representation of a resource. A policy requires a
-    certain argument signature to be present before it can be used. There may
-    be multiple policies selected for a resource, in which case all argument
-    signatures must be conformant.
-
-    Providers must provide all selected policies to be a valid provider for
-    the resource.
+    A goal state for infrastructure based on a resource. For example, a target
+    to move a resource towards existing or not existing.
     """
 
-    # specify true if you wish this policy to be enabled by default
+    # specify true if you wish this target to be the default
     default = False
-    # the name of the policy, used to find it in the ensures config
+
+    # the name of the target
+
     name = None
-    # specify the resource to which this policy applies
+
+    # specify the resource to which this target applies
     resource = None
 
     # Override this with a list of assertions
     signature = ()
 
     def __init__(self, resource):
-        super(Policy, self).__init__()
+        super(Target, self).__init__()
         self.resource = resource
 
     def validate(self):
@@ -60,7 +58,7 @@ class Policy(six.with_metaclass(PolicyType)):
         if a.test(self.resource):
             return
 
-        msg = ["Resource doesn't confirm to the policy %s" % self.name]
+        msg = ["Resource doesn't confirm to the target %s" % self.name]
         msg.extend(a.describe(self.resource))
         raise errors.NonConformingPolicy("\n".join(msg))
 
@@ -68,8 +66,8 @@ class Policy(six.with_metaclass(PolicyType)):
         return []
 
 
-class NullPolicy(Policy):
-    """ A possible that doesn't do anything """
+class NullTarget(Target):
+    """ A target that doesn't do anything """
 
 
 class ArgumentAssertion(object):

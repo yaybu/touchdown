@@ -14,13 +14,14 @@
 
 from botocore import session
 
+from touchdown.core import errors
 from touchdown.core.action import Action
 
 
 class SetTags(Action):
 
-    def __init__(self, runner, policy, resources, tags):
-        super(SetTags, self).__init__(runner, policy)
+    def __init__(self, runner, target, resources, tags):
+        super(SetTags, self).__init__(runner, target)
         self.resources = resources
         self.tags = tags
 
@@ -31,9 +32,9 @@ class SetTags(Action):
             yield "{} = {}".format(k, v)
 
     def run(self):
-        operation = self.policy.service.get_operation("CreateTags")
+        operation = self.target.service.get_operation("CreateTags")
         response, data = operation.call(
-            self.policy.endpoint,
+            self.target.endpoint,
             Resources=self.resources,
             Tags=[{"Key": k, "Value": v} for k, v in self.tags.items()],
         )

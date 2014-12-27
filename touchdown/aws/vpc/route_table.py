@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
-
 from touchdown.core.resource import Resource
-from touchdown.core.policy import Policy
+from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
@@ -40,9 +38,9 @@ class AddRouteTable(Action):
     def run(self):
         vpc = self.get_target(self.resource.vpc)
 
-        operation = self.policy.service.get_operation("CreateRouteTable")
+        operation = self.target.service.get_operation("CreateRouteTable")
         response, data = operation.call(
-            self.policy.endpoint,
+            self.target.endpoint,
             VpcId=vpc.object['VpcId'],
         )
 
@@ -52,7 +50,7 @@ class AddRouteTable(Action):
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(SimpleApply, Policy):
+class Apply(SimpleApply, Target):
 
     resource = RouteTable
     add_action = AddRouteTable
@@ -63,7 +61,7 @@ class Apply(SimpleApply, Policy):
         response, data = operation.call(
             self.endpoint,
             Filters=[
-                #{'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
+                # {'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
             ],
         )
         if len(data['RouteTables']) > 0:

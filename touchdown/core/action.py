@@ -15,10 +15,10 @@
 
 class Action(object):
 
-    def __init__(self, runner, policy):
+    def __init__(self, runner, target):
         self.runner = runner
-        self.policy = policy
-        self.resource = policy.resource
+        self.target = target
+        self.resource = target.resource
 
     def get_target(self, resource):
         return self.runner.get_target(resource)

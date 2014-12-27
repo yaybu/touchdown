@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
-
 from touchdown.core.resource import Resource
-from touchdown.core.policy import Policy
+from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
@@ -39,9 +37,9 @@ class AddVPC(Action):
         yield "Add virtual private cloud '{}'".format(self.resource.name)
 
     def run(self):
-        operation = self.policy.service.get_operation("CreateVpc")
+        operation = self.target.service.get_operation("CreateVpc")
         response, data = operation.call(
-            self.policy.endpoint,
+            self.target.endpoint,
             CidrBlock=str(self.resource.cidr_block),
         )
 
@@ -50,13 +48,13 @@ class AddVPC(Action):
 
         # FIXME: Create and invoke CreateTags to set the name here.
 
-        self.policy.object = data
+        self.target.object = data
 
-        waiter = self.policy.service.get_waiter("VpcAvailable", self.policy.endpoint)
+        waiter = self.target.service.get_waiter("VpcAvailable", self.target.endpoint)
         waiter.wait(VpcIds=[data['VpcId']])
 
 
-class Apply(SimpleApply, Policy):
+class Apply(SimpleApply, Target):
 
     resource = VPC
     add_action = AddVPC

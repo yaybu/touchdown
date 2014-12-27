@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
-
 from touchdown.core.resource import Resource
-from touchdown.core.policy import Policy
+from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
@@ -38,8 +36,8 @@ class AddInternetGateway(Action):
         yield "Add internet gateway"
 
     def run(self):
-        operation = self.policy.service.get_operation("CreateInternetGateway")
-        response, data = operation.call(self.policy.endpoint)
+        operation = self.target.service.get_operation("CreateInternetGateway")
+        response, data = operation.call(self.target.endpoint)
 
         if response.status_code != 200:
             raise errors.Error("Unable to create internet gateway")
@@ -47,7 +45,7 @@ class AddInternetGateway(Action):
         # FIXME: Create and invoke CreateTags to set the name here.
 
 
-class Apply(SimpleApply, Policy):
+class Apply(SimpleApply, Target):
 
     resource = InternetGateway
     add_action = AddInternetGateway
@@ -58,7 +56,7 @@ class Apply(SimpleApply, Policy):
         response, data = operation.call(
             self.endpoint,
             Filters=[
-                #{'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
+                # {'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
             ],
         )
         if len(data['InternetGateways']) > 0:

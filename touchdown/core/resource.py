@@ -16,7 +16,7 @@ import logging
 import six
 
 from . import errors
-from .argument import Argument, PolicyArgument
+from .argument import Argument, TargetArgument
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +43,10 @@ class ResourceType(type):
 
 class Resource(six.with_metaclass(ResourceType)):
 
-    default_policy = None
+    default_target = None
     policies = {}
 
-    policy = PolicyArgument()
+    target = TargetArgument()
 
     def __init__(self, parent, **kwargs):
         self.parent = parent
@@ -62,7 +62,6 @@ class Resource(six.with_metaclass(ResourceType)):
 
     def add_dependency(self, dependency):
         if self.workspace != dependency:
-            print self, self.workspace, dependency
             self.dependencies.add(dependency)
 
     def __str__(self):

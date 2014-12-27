@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.policy import Policy
+from touchdown.core.target import Target
 from touchdown.core.action import Action
 from touchdown.core import argument
 
 from .route53 import Route53Mixin
+from .zone import Zone
 
 
 class Record(Resource):
@@ -39,7 +40,7 @@ class AddRecord(Action):
         print "Adding record..."
 
 
-class Apply(Policy, Route53Mixin):
+class Apply(Target, Route53Mixin):
     name = "apply"
     resource = Record
     default = True

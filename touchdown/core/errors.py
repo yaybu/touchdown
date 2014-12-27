@@ -21,7 +21,7 @@ class InvalidParameter(Exception):
     pass
 
 
-class InvalidPolicy(Error):
+class InvalidTarget(Error):
     pass
 
 
