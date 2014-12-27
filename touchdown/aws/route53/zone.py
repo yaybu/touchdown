@@ -41,10 +41,7 @@ class AddHostedZone(Action):
         yield "Add hosted zone '{}'".format(self.resource.name)
 
     def run(self):
-        print "Creating zone"
-        operation = self.target.service.get_operation("CreateHostedZone")
-        response, data = operation.call(
-            self.target.endpoint,
+        self.target.client.create_hosted_zone(
             CallerReference=str(uuid.uuid4()),
             Name=self.resource.name,
             HostedZoneConfig={
@@ -52,28 +49,22 @@ class AddHostedZone(Action):
             }
         )
 
-        if response.status_code != 201:
-            raise errors.Error("Failed to create hosted zone %s" % self.resource.name)
-
 
 class UpdateHostedZoneComment(Action):
 
-    description = "Change zone comment to '%(comment)s'"
+    @property
+    def description(self):
+        yield "Change zone comment to '{}'".format(self.resource.comment)
 
     def __init__(self, runner, target, zone_id):
         super(UpdateHostedZoneComment, self).__init__(runner, target)
         self.zone_id = zone_id
 
     def run(self):
-        operation = self.target.service.get_operation("UpdateHostedZoneComment")
-        response, data = operation.call(
-            self.target.endpoint,
+        self.target.client.update_hosted_zone_comment(
             Id=self.zone_id,
             Comment=self.resource.comment,
         )
-
-        if response.status_code != 200:
-            raise errors.Error("Failed to update hosted zone comment")
 
 
 class Apply(Target, Route53Mixin):
@@ -84,13 +75,16 @@ class Apply(Target, Route53Mixin):
 
     def get_zone(self):
         zone_name = self.resource.name.rstrip(".") + "."
-        operation = self.service.get_operation("ListHostedZones")
-        for response, data in operation.paginate(self.endpoint):
-            for zone in data['HostedZones']:
+        paginator = self.target.client.get_paginator("list_hosted_zones")
+        for page in paginator.paginate():
+            for zone in page['HostedZones']:
                 if zone['Name'] == zone_name:
                     return zone
 
     def get_actions(self, runner):
+        account = runner.get_target(self.resource.account)
+        self.client = account.get_client('route53')
+
         zone = self.get_zone()
         if zone:
             if zone['Config'].get('Comment', '') != self.resource.comment:

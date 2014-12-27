@@ -38,16 +38,9 @@ class AddRouteTable(Action):
     def run(self):
         vpc = self.get_target(self.resource.vpc)
 
-        operation = self.target.service.get_operation("CreateRouteTable")
-        response, data = operation.call(
-            self.target.endpoint,
+        self.target.object = vpc.client.create_route_table(
             VpcId=vpc.object['VpcId'],
         )
-
-        if response.status_code != 200:
-            raise errors.Error("Unable to create route table")
-
-        # FIXME: Create and invoke CreateTags to set the name here.
 
 
 class Apply(SimpleApply, Target):
@@ -56,15 +49,16 @@ class Apply(SimpleApply, Target):
     add_action = AddRouteTable
     key = "RouteTableId"
 
-    def get_object(self):
-        operation = self.service.get_operation("DescribeRouteTables")
-        response, data = operation.call(
-            self.endpoint,
+    def get_object(self, runner):
+        self.client = runner.get_target(self.resource.vpc).client
+
+        routetables = self.client.describe_route_tables(
             Filters=[
                 # {'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
             ],
         )
-        if len(data['RouteTables']) > 0:
-            raise errors.Error("Too many possible gateways found")
+        if len(data['RouteTables']) > 1:
+            raise errors.Error("Too many possible route tables found")
+
         if data['RouteTables']:
             return data['RouteTables'][0]

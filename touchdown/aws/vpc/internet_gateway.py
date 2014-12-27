@@ -36,13 +36,7 @@ class AddInternetGateway(Action):
         yield "Add internet gateway"
 
     def run(self):
-        operation = self.target.service.get_operation("CreateInternetGateway")
-        response, data = operation.call(self.target.endpoint)
-
-        if response.status_code != 200:
-            raise errors.Error("Unable to create internet gateway")
-
-        # FIXME: Create and invoke CreateTags to set the name here.
+        self.target.object = self.target.client.create_internet_gateway()
 
 
 class Apply(SimpleApply, Target):
@@ -51,10 +45,10 @@ class Apply(SimpleApply, Target):
     add_action = AddInternetGateway
     key = "InternetGatewayId"
 
-    def get_object(self):
-        operation = self.service.get_operation("DescribeInternetGateways")
-        response, data = operation.call(
-            self.endpoint,
+    def get_object(self, runner):
+        self.client = runner.get_target(self.resource.vpc).client
+
+        gateways = self.client.describe_internet_gateways(
             Filters=[
                 # {'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
             ],

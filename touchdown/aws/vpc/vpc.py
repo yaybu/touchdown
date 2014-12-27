@@ -37,21 +37,12 @@ class AddVPC(Action):
         yield "Add virtual private cloud '{}'".format(self.resource.name)
 
     def run(self):
-        operation = self.target.service.get_operation("CreateVpc")
-        response, data = operation.call(
-            self.target.endpoint,
+        obj = self.target.object = self.target.client.create_vpc(
             CidrBlock=str(self.resource.cidr_block),
         )
 
-        if response.status_code != 200:
-            raise errors.Error("Unable to create VPC")
-
-        # FIXME: Create and invoke CreateTags to set the name here.
-
-        self.target.object = data
-
-        waiter = self.target.service.get_waiter("VpcAvailable", self.target.endpoint)
-        waiter.wait(VpcIds=[data['VpcId']])
+        waiter = self.target.client.get_waiter("vpc_available")
+        waiter.wait(VpcIds=[obj['VpcId']])
 
 
 class Apply(SimpleApply, Target):
@@ -60,9 +51,8 @@ class Apply(SimpleApply, Target):
     add_action = AddVPC
     key = 'VpcId'
 
-    def get_object(self):
-        operation = self.service.get_operation("DescribeVpcs")
-        response, data = operation.call(self.endpoint)
-        for vpc in data['Vpcs']:
+    def get_object(self, runner):
+        self.client = runner.get_target(self.resource.account).get_client('ec2')
+        for vpc in self.client.describe_vpcs()['Vpcs']:
             if vpc['CidrBlock'] == str(self.resource.cidr_block):
                 return vpc

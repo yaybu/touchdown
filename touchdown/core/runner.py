@@ -42,7 +42,7 @@ class Runner(object):
     def get_target(self, resource):
         if resource not in self.resources:
             self.resources[resource] = resource.target
-        return resource.target
+        return self.resources[resource]
 
     def plan(self):
         resolved = []

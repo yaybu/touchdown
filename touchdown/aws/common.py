@@ -32,15 +32,10 @@ class SetTags(Action):
             yield "{} = {}".format(k, v)
 
     def run(self):
-        operation = self.target.service.get_operation("CreateTags")
-        response, data = operation.call(
-            self.target.endpoint,
+        self.target.client.create_tags(
             Resources=self.resources,
             Tags=[{"Key": k, "Value": v} for k, v in self.tags.items()],
         )
-
-        if response.status_code != 200:
-            raise errors.Error("Failed to update resource tags")
 
 
 class SimpleApply(object):
@@ -48,18 +43,11 @@ class SimpleApply(object):
     name = "apply"
     default = True
 
-    def __init__(self, *args, **kwargs):
-        super(SimpleApply, self).__init__(*args, **kwargs)
-        self.session = session.Session()
-        # self.session.set_credentials(aws_access_key_id, aws_secret_access_key)
-        self.service = self.session.get_service("ec2")
-        self.endpoint = self.service.get_endpoint("eu-west-1")
-
-    def get_object(self):
+    def get_object(self, runner):
         pass
 
     def get_actions(self, runner):
-        self.object = self.get_object()
+        self.object = self.get_object(runner)
         if not self.object:
             yield self.add_action(runner, self)
             return
@@ -71,7 +59,7 @@ class SimpleApply(object):
                 yield SetTags(
                     runner,
                     self,
-                    resources=[self.key],
+                    resources=[self.resource_id],
                     tags={"name": self.resource.name}
                 )
 

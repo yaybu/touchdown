@@ -41,17 +41,10 @@ class AddSubnet(Action):
     def run(self):
         vpc = self.get_target(self.resource.vpc)
 
-        operation = self.target.service.get_operation("CreateSubnet")
-        response, data = operation.call(
-            self.target.endpoint,
+        self.target.object = vpc.client.create_subnet(
             VpcId=vpc.object['VpcId'],
             CidrBlock=str(self.resource.cidr_block),
         )
-
-        if response.status_code != 200:
-            raise errors.Error("Unable to create subnet")
-
-        # FIXME: Create and invoke CreateTags to set the name here.
 
 
 class Apply(SimpleApply, Target):
@@ -60,16 +53,17 @@ class Apply(SimpleApply, Target):
     add_action = AddSubnet
     key = 'SubnetId'
 
-    def get_object(self):
-        operation = self.service.get_operation("DescribeSubnets")
-        response, data = operation.call(
-            self.endpoint,
+    def get_object(self, runner):
+        self.client = runner.get_target(self.resource.vpc).client
+
+        subnets = self.client.describe_subnets(
             Filters=[
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
             ],
         )
 
-        if len(data['Subnets']) > 0:
+        if len(subnets['Subnets']) > 1:
             raise errors.Error("Too many possible subnets found")
-        if data['Subnets']:
-            return data['Subnets'][0]
+
+        if subnets['Subnets']:
+            return subnets['Subnets'][0]

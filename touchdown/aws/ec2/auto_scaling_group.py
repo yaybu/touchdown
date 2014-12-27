@@ -24,32 +24,38 @@ class AutoScalingGroup(Resource):
 
     resource_name = "auto_scaling_group"
 
+    """ A name for this AutoScalingGroup. Unique within an AWS account """
     name = argument.String()
-    cidr_block = argument.String()
+
+    """ The minimum number of EC2 instances that must be running """
+    min_size = argument.Integer()
+
+    """ The maximum number of EC2 instances that can be started by this
+    AutoScalingGroup """
+    max_size = argument.Integer()
+
+    """ The number of EC2 instances that should be running. Must be between
+    min_size and max_size. """
+    desired_capacity = argument.Integer()
+
+    """ The amount of time (in seconds) between scaling activities. """
+    default_cooldown = argument.Integer(default=300)
 
 
 class AddAutoScalingGroup(Action):
 
     @property
     def description(self):
-        yield "Add subnet for {} to virtual private cloud".format(
-            self.resource.cidr_block,
-        )
+        yield "Create AutoScalingGroup"
 
     def run(self):
-        operation = self.target.service.get_operation("CreateSubnet")
-        response, data = operation.call(
-            self.target.endpoint,
-            VpcId=self.resource.parent.resource_id,
-            CidrBlock=self.resource.cidr_block,
+        self.target.object = self.target.client.create_auto_scaling_group(
+            AutoScalingGroupName=self.resource.name,
+            MinSize=self.resource.min_size,
+            MaxSize=self.resource.max_size,
+            DesiredCapacity=self.resource.desired_capacity,
+            DefaultCooldown=self.resource.default_cooldown,
         )
-
-        print response, data
-
-        if response.status_code != 200:
-            raise errors.Error("Unable to create subnet")
-
-        # FIXME: Create and invoke CreateTags to set the name here.
 
 
 class Apply(SimpleApply, Target):
@@ -58,16 +64,9 @@ class Apply(SimpleApply, Target):
     add_action = AddAutoScalingGroup
     key = 'AutoScalingGroupId'
 
-    def get_object(self):
-        operation = self.service.get_operation("DescribeAutoScalingGroups")
-        response, data = operation.call(
-            self.endpoint,
-            Filters=[
-                {'Name': 'cidrBlock', 'Values': [self.resource.cidr_block]},
-            ],
+    def get_object(self, runner):
+        asgs = self.client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[self.resource.name],
         )
-
-        if len(data['Subnets']) > 0:
-            raise errors.Error("Too many possible subnets found")
-        if data['Subnets']:
-            return data['Subnets'][0]
+        if data['Asg']:
+            return data['Asg'][0]
