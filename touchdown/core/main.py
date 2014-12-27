@@ -29,7 +29,7 @@ class ConsoleInterface(object):
                     description = list(action.description)
                     click.echo("  * %s" % description[0])
                     for line in description[1:]:
-                        click.echo("    %s" % line)
+                        click.echo("      %s" % line)
                 click.echo("")
 
     def confirm_plan(self, plan):

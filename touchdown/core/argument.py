@@ -130,6 +130,9 @@ class Dict(Argument):
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
 
+    def default(self, instance):
+        return {}
+
 
 class List(Argument):
     def __set__(self, instance, value):

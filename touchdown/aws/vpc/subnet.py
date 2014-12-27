@@ -28,6 +28,7 @@ class Subnet(Resource):
     name = argument.String()
     cidr_block = argument.IPNetwork()
     vpc = argument.Resource(VPC)
+    tags = argument.Dict()
 
 
 class AddSubnet(Action):

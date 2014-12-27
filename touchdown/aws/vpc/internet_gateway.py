@@ -27,6 +27,7 @@ class InternetGateway(Resource):
 
     name = argument.String()
     vpc = argument.Resource(VPC)
+    tags = argument.Dict()
 
 
 class AddInternetGateway(Action):

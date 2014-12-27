@@ -23,10 +23,11 @@ from ..common import SimpleApply
 
 class RouteTable(Resource):
 
-    resource_name = "route-table"
+    resource_name = "route_table"
 
     name = argument.String()
     vpc = argument.Resource(VPC)
+    tags = argument.Dict()
 
 
 class AddRouteTable(Action):
@@ -38,9 +39,10 @@ class AddRouteTable(Action):
     def run(self):
         vpc = self.get_target(self.resource.vpc)
 
-        self.target.object = vpc.client.create_route_table(
+        result = vpc.client.create_route_table(
             VpcId=vpc.object['VpcId'],
         )
+        self.target.object = result['RouteTable']
 
 
 class Apply(SimpleApply, Target):
@@ -54,11 +56,12 @@ class Apply(SimpleApply, Target):
 
         routetables = self.client.describe_route_tables(
             Filters=[
-                # {'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
+                {'Name': 'tag:name', 'Values': [self.resource.name]},
             ],
         )
-        if len(data['RouteTables']) > 1:
+
+        if len(routetables['RouteTables']) > 1:
             raise errors.Error("Too many possible route tables found")
 
-        if data['RouteTables']:
-            return data['RouteTables'][0]
+        if routetables['RouteTables']:
+            return routetables['RouteTables'][0]

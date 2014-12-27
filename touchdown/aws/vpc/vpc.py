@@ -28,6 +28,7 @@ class VPC(Resource):
     name = argument.String()
     cidr_block = argument.IPNetwork()
     account = argument.Resource(AWS)
+    tags = argument.Dict()
 
 
 class AddVPC(Action):

@@ -20,9 +20,8 @@ from touchdown.core.action import Action
 
 class SetTags(Action):
 
-    def __init__(self, runner, target, resources, tags):
+    def __init__(self, runner, target, tags):
         super(SetTags, self).__init__(runner, target)
-        self.resources = resources
         self.tags = tags
 
     @property
@@ -33,7 +32,7 @@ class SetTags(Action):
 
     def run(self):
         self.target.client.create_tags(
-            Resources=self.resources,
+            Resources=[self.target.resource_id],
             Tags=[{"Key": k, "Value": v} for k, v in self.tags.items()],
         )
 
@@ -48,18 +47,26 @@ class SimpleApply(object):
 
     def get_actions(self, runner):
         self.object = self.get_object(runner)
+
         if not self.object:
+            self.object = {}
             yield self.add_action(runner, self)
-            return
 
         if hasattr(self.resource, "tags"):
-            tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
+            local_tags = dict(self.resource.tags)
+            local_tags['name'] = self.resource.name
 
-            if tags.get('name', '') != self.resource.name:
+            remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
+
+            tags = {}
+            for k, v in local_tags.items():
+                if k not in remote_tags or remote_tags[k] != v:
+                    tags[k] = v
+
+            if tags:
                 yield SetTags(
                     runner,
                     self,
-                    resources=[self.resource_id],
                     tags={"name": self.resource.name}
                 )
 
