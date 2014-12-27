@@ -202,3 +202,24 @@ class Resource(Argument):
             self.workspace.add_dependency(resource)
             return resource
         setattr(self.resource_class, 'add_%s' % cls.resource_name,  _)
+
+
+class ResourceList(Argument):
+
+    """
+    An argument that represents a list of resources that we depend on.
+
+    WARNING: A limitation at present is that you can only *set* a list. Do not
+    mutate a resource list in place as it does not update the dependencies.
+    """
+
+    def __init__(self, resource_class, **kwargs):
+        super(ResourceList, self).__init__(**kwargs)
+        self.resource_class = resource_class
+
+    def __set__(self, instance, value):
+        for val in value:
+            if not isinstance(val, self.resource_class):
+                raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
+            instance.add_dependency(val)
+        setattr(instance, self.arg_id, value)

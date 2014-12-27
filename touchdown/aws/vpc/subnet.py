@@ -27,6 +27,7 @@ class Subnet(Resource):
 
     name = argument.String()
     cidr_block = argument.IPNetwork()
+    availability_zone = argument.String()
     vpc = argument.Resource(VPC)
     tags = argument.Dict()
 
@@ -42,10 +43,15 @@ class AddSubnet(Action):
     def run(self):
         vpc = self.get_target(self.resource.vpc)
 
-        self.target.object = vpc.client.create_subnet(
-            VpcId=vpc.object['VpcId'],
-            CidrBlock=str(self.resource.cidr_block),
-        )
+        params = {
+            'VpcId': vpc.object['VpcId'],
+            'CidrBlock': str(self.resource.cidr_block),
+        }
+
+        if self.resource.availability_zone:
+            params['AvailabilityZone'] = self.resource.availability_zone
+
+        self.target.object = vpc.client.create_subnet(**params)
 
 
 class Apply(SimpleApply, Target):
