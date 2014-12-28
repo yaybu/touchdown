@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    route53,
-    ec2,
-    rds,
-    s3,
-)
+from .bucket import Bucket
+
+__all__ = [
+    'Bucket',
+]
