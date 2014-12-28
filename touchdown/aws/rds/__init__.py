@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from .subnet_group import SubnetGroup
+from .database import Database
 
 
 __all__ = [
     'SubnetGroup',
+    'Database'
 ]

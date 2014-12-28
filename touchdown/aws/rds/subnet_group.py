@@ -65,6 +65,7 @@ class Apply(SimpleApply, Target):
         except Exception as e:
             if e.response['Error']['Code'] == 'DBSubnetGroupNotFoundFault':
                 return
+            raise
 
         if len(subnets['DBSubnetGroups']) > 1:
             raise error.Error("Multiple matches for DBSubnetGroups named {}".format(self.resource.name))
