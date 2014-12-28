@@ -15,6 +15,7 @@
 from .internet_gateway import InternetGateway
 from .route_table import RouteTable
 from .subnet import Subnet
+from .security_group import SecurityGroup
 from .vpc import VPC
 
 
@@ -23,4 +24,5 @@ __all__ = [
     'InternetGateway',
     'RouteTable',
     'Subnet',
+    'SecurityGroup',
 ]
