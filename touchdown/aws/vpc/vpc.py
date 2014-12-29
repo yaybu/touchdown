@@ -26,34 +26,24 @@ class VPC(Resource):
     resource_name = "vpc"
 
     name = argument.String()
-    cidr_block = argument.IPNetwork()
+    cidr_block = argument.IPNetwork(aws_field='CidrBlock')
     account = argument.Resource(AWS)
     tags = argument.Dict()
-
-
-class AddVPC(Action):
-
-    @property
-    def description(self):
-        yield "Add virtual private cloud '{}'".format(self.resource.name)
-
-    def run(self):
-        obj = self.target.object = self.target.client.create_vpc(
-            CidrBlock=str(self.resource.cidr_block),
-        )
-
-        waiter = self.target.client.get_waiter("vpc_available")
-        waiter.wait(VpcIds=[obj['VpcId']])
 
 
 class Apply(SimpleApply, Target):
 
     resource = VPC
-    add_action = AddVPC
+    create_action = "create_vpc"
+    describe_action = "describe_vpcs"
+    describe_list_key = "Vpcs"
     key = 'VpcId'
 
-    def get_object(self, runner):
-        self.client = runner.get_target(self.resource.account).get_client('ec2')
+    @property
+    def client(self):
+        return runner.get_target(self.resource.account).get_client('ec2')
+
+    def describe_object(self, runner):
         for vpc in self.client.describe_vpcs()['Vpcs']:
             if vpc['CidrBlock'] == str(self.resource.cidr_block):
                 return vpc

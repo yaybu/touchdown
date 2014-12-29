@@ -27,47 +27,22 @@ class SubnetGroup(Resource):
 
     resource_name = "cache_subnet_group"
 
-    name = argument.String()
-    description = argument.String()
-    subnets = argument.ResourceList(Subnet)
+    name = argument.String(aws_field="CacheSubnetGroupName")
+    description = argument.String(aws_field="CacheSubnetGroupDescription")
+    subnets = argument.ResourceList(Subnet, aws_field="SubnetIds")
     tags = argument.Dict()
 
     account = argument.Resource(AWS)
 
 
-class AddSubnetGroup(Action):
-
-    @property
-    def description(self):
-        yield "Add cache subnet group '{}'".format(self.resource.name)
-
-    def run(self):
-        result = self.target.client.create_db_subnet_group(
-            DBSubnetGroupName=self.resource.name,
-            DBSubnetGroupDescription=self.resource.description,
-            SubnetIds=subnets,
-        )
-
-
 class Apply(SimpleApply, Target):
 
     resource = SubnetGroup
-    add_action = AddSubnetGroup
-    key = 'DBSubnetGroupId'
+    create_action = "create_cache_subnet_group"
+    describe_action = "describe_cache_subnet_groups"
+    describe_list_key = "CacheSubnetGroups"
+    key = 'CacheSubnetGroupId'
 
-    def get_object(self, runner):
-        self.client = runner.get_target(self.resource.account).get_client('rds')
-
-        try:
-            subnets = self.client.describe_db_subnet_groups(
-                DBSubnetGroupName = self.resource.name,
-                )
-        except Exception as e:
-            if e.response['Error']['Code'] == 'DBSubnetGroupNotFoundFault':
-                return
-            raise
-
-        if len(subnets['DBSubnetGroups']) > 1:
-            raise error.Error("Multiple matches for DBSubnetGroups named {}".format(self.resource.name))
-        if subnets['DBSubnetGroups']:
-            return subnets['DBSubnetGroup'][0]
+    @property
+    def client(self):
+        return runner.get_target(self.resource.account).get_client('elasticache')

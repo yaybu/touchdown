@@ -29,9 +29,11 @@ class Argument(object):
     argument_id = 0
     default = None
 
-    def __init__(self, **kwargs):
-        self.default = kwargs.pop("default", self.default)
-        self.__doc__ = kwargs.pop("help", None)
+    def __init__(self, default=None, help=None, **kwargs):
+        self.default = default
+        self.__doc__ = help
+        for k, v in kwargs.items():
+            setattr(self, k, v)
         self.arg_id = "argument_%d" % Argument.argument_id
         Argument.argument_id += 1
 

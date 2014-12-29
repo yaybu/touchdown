@@ -27,12 +27,8 @@ class ResourceType(type):
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
         cls.__args__ = {}
-
-        for b in bases:
-            if hasattr(b, "__args__"):
-                cls.__args__.update(b.__args__)
-
-        for key, value in new_attrs.items():
+        for key in dir(cls):
+            value = getattr(cls, key)
             if isinstance(value, Argument):
                 cls.__args__[key] = value
                 value.argument_name = key
@@ -55,6 +51,10 @@ class Resource(six.with_metaclass(ResourceType)):
             if key not in self.__args__:
                 raise errors.InvalidParameter("'%s' is not a valid option" % (key, ))
             setattr(self, key, value)
+
+    @property
+    def arguments(self):
+        return list(self.__args__.items())
 
     @property
     def workspace(self):

@@ -21,53 +21,26 @@ from touchdown.aws.vpc import Subnet
 
 from ..account import AWS
 from ..common import SimpleApply
+from .cache import BaseCacheCluster
 
 
-class ReplicationGroup(Resource):
+class ReplicationGroup(BaseCacheCluster, Resource):
 
     resource_name = "cache_replication_group"
 
-    name = argument.String()
-    description = argument.String()
-    subnets = argument.ResourceList(Subnet)
-    tags = argument.Dict()
-
-    account = argument.Resource(AWS)
-
-
-class AddReplicationGroup(Action):
-
-    @property
-    def description(self):
-        yield "Add cache subnet group '{}'".format(self.resource.name)
-
-    def run(self):
-        result = self.target.client.create_db_subnet_group(
-            DBSubnetGroupName=self.resource.name,
-            DBSubnetGroupDescription=self.resource.description,
-            SubnetIds=subnets,
-        )
+    name = argument.String(regex=r"[a-z1-9\-]{1,20}", aws_field="CacheClusterId")
+    # primary_cluster = argument.Resouce("touchdown.aws.elasticache.cache.CacheCluster", aws_field="PrimaryClusterId")
+    automatic_failover = argument.Boolean(aws_field="AutomaticFailoverEnabled")
 
 
 class Apply(SimpleApply, Target):
 
     resource = ReplicationGroup
-    add_action = AddReplicationGroup
-    key = 'DBSubnetGroupId'
+    create_action = "create_replication_group"
+    describe_action = "describe_replication_groups"
+    describe_list_key = "ReplicationGroups"
+    key = 'ReplicationGroupId'
 
-    def get_object(self, runner):
-        self.client = runner.get_target(self.resource.account).get_client('rds')
-
-        try:
-            subnets = self.client.describe_db_subnet_groups(
-                DBSubnetGroupName = self.resource.name,
-                )
-        except Exception as e:
-            if e.response['Error']['Code'] == 'DBSubnetGroupNotFoundFault':
-                return
-            raise
-
-        if len(subnets['DBSubnetGroups']) > 1:
-            raise error.Error("Multiple matches for DBSubnetGroups named {}".format(self.resource.name))
-        if subnets['DBSubnetGroups']:
-            return subnets['DBSubnetGroup'][0]
+    @property
+    def client(self):
+        return runner.get_target(self.resource.account).get_client('elasticache')

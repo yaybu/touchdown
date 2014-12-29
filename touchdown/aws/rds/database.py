@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.target import Target, Present
 from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
@@ -29,157 +29,88 @@ class Database(Resource):
 
     resource_name = "database"
 
-    name = argument.String()
-    instance_identifier = argument.String()
+    name = argument.String(aws_field="DBInstanceIdentifier")
+
+    """ The name of a database to create in the database instance """
+    db_name = argument.String(aws_field="DBName")
 
     """ The amount of storage to be allocated (in GB). """
-    allocated_storage = argument.Integer(min=5, max=3072)
+    allocated_storage = argument.Integer(min=5, max=3072, aws_field="AllocatedStorage")
 
-    iops = argument.Integer()
+    iops = argument.Integer(aws_field="Iops")
 
     """ The kind of hardware to use, for example 'db.t1.micro' """
-    instance_class = argument.String()
+    instance_class = argument.String(aws_field="DBInstanceClass")
 
     """ The type of database to use, for example 'postgres' """
-    engine = argument.String(default='postgres')
+    engine = argument.String(default='postgres', aws_field="Engine")
 
-    engine_version = argument.String()
+    engine_version = argument.String(aws_field="EngineVersion")
 
     license_model = argument.String()
 
     """ The username of the main client user """
-    master_username = argument.String()
+    master_username = argument.String(aws_field="MasterUsername")
 
     """ The password of the main client user """
-    master_password = argument.String()
+    master_password = argument.String(aws_field="MasterPassword")
 
     """ A list of security groups to apply to this instance """
-    security_groups = argument.List()
+    security_groups = argument.List(aws_field="VpcSecurityGroupIds")
 
-    publically_accessible = argument.Boolean()
+    publically_accessible = argument.Boolean(aws_field="PubliclyAccessible")
 
-    availability_zone = argument.String()
+    availability_zone = argument.String(aws_field="AvailabilityZone")
 
-    subnet_group = argument.Resource(SubnetGroup)
+    subnet_group = argument.Resource(SubnetGroup, aws_field="DBSubnetGroupName")
 
-    multi_az = argument.Boolean()
+    preferred_maintenance_window = argument.String(aws_field="PreferredMaintenanceWindow")
 
-    storage_type = argument.String()
+    multi_az = argument.Boolean(aws_field="MultiAZ")
 
-    auto_minor_version_upgrade = argument.Boolean()
+    storage_type = argument.String(aws_field="StorageType")
+
+    auto_minor_version_upgrade = argument.Boolean(aws_field="AutoMinorVersionUpgrade")
+
+    character_set_name = argument.String(aws_field="CharacterSetName")
+
+    backup_retention_period = argument.String(aws_field="BackupRetentionPeriod")
+
+    preferred_backup_window = argument.String(aws_field="PreferredBackupWindow")
+
+    license_model = argument.String(aws_field="LicenseModel")
+
+    port = argument.Integer(min=1, max=32768, aws_field="Port")
+
+    # paramter_group = argument.Resource(ParameterGroup, aws_field="DBParameterGroupName")
+    # option_group = argument.Resource(OptionGroup, aws_field="OptionGroupName")
 
     tags = argument.Dict()
 
     account = argument.Resource(AWS)
 
 
-class AddDatabaseInstance(Action):
-
-    @property
-    def description(self):
-        yield "Add database instance '{}'".format(self.resource.name)
-
-    def run(self):
-        params = {
-            "DBInstanceIdentifier": self.resource.name,
-            "AllocatedStorage": self.resource.allocated_storage,
-            "DBInstanceClass": self.resource.instance_class,
-            "Engine": self.resource.engine,
-            "MasterUsername": self.resource.master_username,
-            "MasterUserPassword": self.resource.master_password,
-        }
-
-        if self.resouce.db_name:
-            params['DBName'] = self.resource.db_name
-
-        if self.resource.security_groups:
-            v = params['VpcSecurityGroupIds'] = []
-            for group in self.resource.security_groups:
-                pass
-
-        if self.resource.availability_zone:
-            params['AvailabilityZone'] = self.resource.availability_zone
-
-        if self.resource.subnet_group:
-            subnet_group = runner.get_target(self.resource.subnet_group)
-            params['DBSubnetGroupName'] = subnet_group.resource_id
-
-        if self.resource.preferred_maintenance_window:
-            params['PreferredMaintenanceWindow'] = self.resource.preferred_maintenance_window
-
-        # if self.resource.paramater_group:
-        #     parameter_group = runner.get_target(self.resource.paramter_group)
-        #     params['DBParameterGroupName'] = parameter_group
-
-
-        if self.resource.backup_retention_period:
-            params['BackupRetentionPeriod'] = self.resource.backup_retention_period
-
-        if self.resource.preferred_backup_window:
-            params['PreferredBackupWindow'] = self.resource.preferred_backup_window
-
-        if self.resource.port:
-            params['Port'] = self.resource.port
-
-        if self.resource.multi_az:
-            params['MultiAZ'] = self.resource.multi_az
-
-        if self.resource.engine_version:
-            params['EngineVersion'] = self.resource.engine_version
-
-        if self.resource.auto_minor_version_upgrade:
-            params['AutoMinorVersionUpgrade'] = self.resource.auto_minor_version_upgrade
-
-        if self.resource.license_model:
-            params['LicenseModel'] = self.resource.license_model
-
-        if self.resource.iops:
-            params['Iops'] = self.resource.iops
-
-        # if self.resource.option_group:
-        #     option_group = runner.get_target(self.resource.option_group)
-        #     params['OptionGroupName'] = option_group.resource_id
-
-        if self.resource.character_set_name:
-            params['CharacterSetName'] = self.resource.character_set_name
-
-        if self.resource.publicly_accessible:
-            params['PubliclyAccessible'] = self.resource.publicly_accessible
-
-        if self.resource.storage_type:
-            params['StorageType'] = self.resource.storage_type
-
-        result = self.target.client.create_db_instance(DryRun=True, **params)
-        print result
-
-        waiter = self.target.client.get_waiter("db_instance_available")
-        result = waiter.wait(DBInstanceIdentifier=[obj['DBInstanceIdentifier']])
-        print result
-
-
 class Apply(SimpleApply, Target):
 
     resource = Database
-    add_action = AddDatabaseInstance
+    create_action = "create_db_instance"
+    describe_action = "describe_db_instances"
+    describe_list_key = "DBInstances"
     key = 'DBInstanceIdentifier'
 
-    def get_object(self, runner):
+    signature = (
+        Present("name"),
+        Present("allocated_storage"),
+        Present("instance_class"),
+        Present("engine"),
+        Present("master_username"),
+        Present("master_password"),
+    )
+
+    @property
+    def client(self):
         if self.resource.subnet_group:
-            self.client = runner.get_target(self.resource.subnet_group).client
+            return runner.get_target(self.resource.subnet_group).client
         else:
             account = runner.get_target(self.resource.acount)
-            self.client = account.get_client('rds')
-
-        try:
-            databases = self.client.describe_db_instances(
-                DBInstanceIdentifier = self.resource.name,
-            )
-        except Exception as e:
-            if e.response['Error']['Code'] == 'DBInstanceNotFound':
-                return
-            raise
-
-        if len(databases['DBInstances']) > 1:
-            raise error.Error("Multiple matches for DBInstances named {}".format(self.resource.name))
-        if databases['DBInstances']:
-            return databases['DBInstances'][0]
+            return account.get_client('rds')

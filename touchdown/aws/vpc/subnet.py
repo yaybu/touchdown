@@ -26,51 +26,27 @@ class Subnet(Resource):
     resource_name = "subnet"
 
     name = argument.String()
-    cidr_block = argument.IPNetwork()
-    availability_zone = argument.String()
-    vpc = argument.Resource(VPC)
+    cidr_block = argument.IPNetwork(aws_field='CidrBlock')
+    availability_zone = argument.String(aws_field='AvailabilityZone')
+    vpc = argument.Resource(VPC, aws_field='VpcId')
     tags = argument.Dict()
-
-
-class AddSubnet(Action):
-
-    @property
-    def description(self):
-        yield "Add subnet for {} to virtual private cloud".format(
-            self.resource.cidr_block,
-        )
-
-    def run(self):
-        vpc = self.get_target(self.resource.vpc)
-
-        params = {
-            'VpcId': vpc.object['VpcId'],
-            'CidrBlock': str(self.resource.cidr_block),
-        }
-
-        if self.resource.availability_zone:
-            params['AvailabilityZone'] = self.resource.availability_zone
-
-        self.target.object = vpc.client.create_subnet(**params)
 
 
 class Apply(SimpleApply, Target):
 
     resource = Subnet
-    add_action = AddSubnet
+    create_action = "create_subnet"
+    describe_action = "describe_subnets"
+    describe_list_key = "Subnets"
     key = 'SubnetId'
 
-    def get_object(self, runner):
-        self.client = runner.get_target(self.resource.vpc).client
+    @property
+    def client(self):
+        return runner.get_target(self.resource.vpc).client
 
-        subnets = self.client.describe_subnets(
-            Filters=[
+    def get_describe_filters(self):
+        return {
+            "Filters":[
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
             ],
-        )
-
-        if len(subnets['Subnets']) > 1:
-            raise errors.Error("Too many possible subnets found")
-
-        if subnets['Subnets']:
-            return subnets['Subnets'][0]
+        }

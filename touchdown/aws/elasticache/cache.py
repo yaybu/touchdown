@@ -23,135 +23,69 @@ from ..account import AWS
 from ..common import SimpleApply
 
 from .subnet_group import SubnetGroup
-from .replication_group import ReplicationGroup
 
 
-class CacheCluster(Resource):
+class BaseCacheCluster(object):
 
-    resource_name = "cache_cluster"
-
-    name = argument.String()
+    """ The name of the cache cluster. Stored as a lowercase string """
+    name = argument.String(regex=r"[a-z1-9\-]{1,20}", aws_field="CacheClusterId")
 
     """ The kind of hardware to use, for example 'db.t1.micro' """
     instance_class = argument.String()
 
     """ The type of database to use, for example 'postgres' """
-    engine = argument.String(default='postgres')
+    engine = argument.String(default='postgres', aws_field='Engine')
 
-    engine_version = argument.String()
+    """ The version of the cache engine to run """
+    engine_version = argument.String(aws_field='EngineVersion')
+
+    """ The TCP/IP port to listen on. """
+    port = argument.Integer(min=1, max=32768, aws_field='Port')
 
     """ A list of security groups to apply to this instance """
-    security_groups = argument.List()
+    security_groups = argument.List(aws_field='SecurityGroups')
 
-    availability_zone = argument.String()
+    """ The preferred availability zone to start this CacheCluster in """
+    availability_zone = argument.String(aws_field='PreferredAvailabilityZone')
 
-    subnet_group = argument.Resource(SubnetGroup)
+    """ Whether or not to enable mutli-availability-zone features """
+    multi_az = argument.Boolean(aws_field='AZMode')
 
-    replication_group = argument.Resource(ReplicationGroup)
+    """ Automatically deploy cache minor server upgrades """
+    auto_minor_version_upgrade = argument.Boolean(aws_field='AutoMinorVersionUpgrade')
 
-    multi_az = argument.Boolean()
+    """ The number of nodes to run in this cache cluster """
+    num_cache_nodes = argument.Integer(aws_field='NumCacheNodes')
 
-    storage_type = argument.String()
+    """ The subnets to start the cache cluster in """
+    subnet_group = argument.Resource(SubnetGroup, aws_field='CacheSubnetGroupName')
 
-    auto_minor_version_upgrade = argument.Boolean()
+    # parameter_group = argument.Resource(ParamaterGroup, aws_field='CacheParameterGroupName')
 
     tags = argument.Dict()
 
     account = argument.Resource(AWS)
 
 
-class AddCacheCluster(Action):
+class CacheCluster(BaseCacheCluster, Resource):
 
-    @property
-    def description(self):
-        yield "Add cache cluster '{}'".format(self.resource.name)
+    resource_name = "cache_cluster"
 
-    def run(self):
-        params = {
-            "CacheClusterId": self.resource.name,
-        }
-
-        if self.resource.replication_group:
-            replication_group = self.runner.get_target(self.resource.replication_group)
-            params['ReplicationGroupId'] = replication_group.resource_id
-
-        if self.resource.multi_az:
-            params['AZMode'] = self.resource.multi_az
-
-        if self.resource.availability_zone:
-            params['PreferredAvailabilityZone'] = self.resource.availabilty_zone
-
-        if self.resource.num_cache_nodes:
-            params['NumCacheNodes'] = self.resource.num_cache_nodes
-
-        if self.resource.cache_node_type:
-            params['CacheNodeType'] = self.resource.cache_node_type
-
-        if self.resource.engine:
-            params['Engine'] = self.resource.engine
-
-        if self.resource.engine_version:
-            params['EngineVersion'] = self.resource.engine_version
-
-        if self.resurce.parameter_group:
-            parameter_group = self.runner.get_target(self.resource.parameter_group)
-            params['CacheParameterGroupName'] = parameter_group.reasource_id
-
-        if self.resource.subnet_group:
-            subnet_group = self.runner.get_target(self.resource.subnet_group)
-            params['CacheSubnetGroupName'] = subnet_group.resource_id
-
-        if self.resource.security_groups:
-            # groups = self.runner
-            # params['SecurityGroupIds']
-            pass
-
-        # params['SnapshortArns']
-        # params['SnapshotName']
-        # params['PreferredMaintenanceWindow']
-
-        if self.resource.port:
-            params['Port'] = self.resource.port
-
-        # params['NotificationTopicArn']
-
-        if self.resource.auto_minor_version_upgrade:
-            params['AutoMinorVersionUpgrade'] = self.resource.auto_minor_version_upgrade
-
-        # params['SnapshotRetentionLimit']
-        # params['SnapshotWindow']
-
-        result = self.target.client.create_cache_cluster(DryRun=True, **params)
-        print result
-
-        waiter = self.target.client.get_waiter("db_instance_available")
-        result = waiter.wait(DBInstanceIdentifier=[obj['DBInstanceIdentifier']])
-        print result
+    # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", aws_field='ReplicationGroupId')
 
 
 class Apply(SimpleApply, Target):
 
     resource = CacheCluster
-    add_action = AddCacheCluster
-    key = 'DBInstanceIdentifier'
+    create_action = "create_cache_cluster"
+    describe_action = "describe_cache_cluster"
+    describe_list_key = "CacheClusters"
+    key = 'CacheClusterId'
 
-    def get_object(self, runner):
+    @property
+    def client(self):
         if self.resource.subnet_group:
-            self.client = runner.get_target(self.resource.subnet_group).client
+            return runner.get_target(self.resource.subnet_group).client
         else:
             account = runner.get_target(self.resource.account)
-            self.client = account.get_client('elasticache')
-
-        try:
-            cache_clusters = self.client.describe_cache_clusters(
-                CacheClusterId = self.resource.name,
-            )
-        except Exception as e:
-            if e.response['Error']['Code'] == 'CacheClusterNotFound':
-                return
-            raise
-
-        if len(cache_clusters['CacheClusters']) > 1:
-            raise error.Error("Multiple matches for CacheClusters named {}".format(self.resource.name))
-        if cache_clusters['CacheClusters']:
-            return cache_clusters['CacheClusters'][0]
+            return account.get_client('elasticache')

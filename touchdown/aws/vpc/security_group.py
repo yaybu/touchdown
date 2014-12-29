@@ -25,51 +25,27 @@ class SecurityGroup(Resource):
 
     resource_name = "security_group"
 
-    name = argument.String()
-    description = argument.String()
-    vpc = argument.Resource(VPC)
+    name = argument.String(aws_field="GroupName")
+    description = argument.String(aws_field="Description")
+    vpc = argument.Resource(VPC, aws_field="VpcId")
     tags = argument.Dict()
-
-
-class AddSecurityGroup(Action):
-
-    @property
-    def description(self):
-        yield "Add security group {}".format(self.resource.name)
-
-    def run(self):
-        vpc = self.get_target(self.resource.vpc)
-
-        params = {
-            'GroupName': self.resource.name,
-            'VpcId': vpc.object['VpcId'],
-        }
-
-        if self.resource.description:
-            params['Description'] = self.resource.description
-
-        self.target.object = vpc.client.create_security_group(**params)
 
 
 class Apply(SimpleApply, Target):
 
     resource = SecurityGroup
-    add_action = AddSecurityGroup
+    create_action = "create_security_group"
+    describe_action = "describe_security_groups"
+    describe_list_key = "SecurityGroups"
     key = 'SecurityGroupId'
 
-    def get_object(self, runner):
+    def get_describe_filter(self):
         vpc = runner.get_target(self.resource.vpc)
         self.client = vpc.client
 
-        groups = self.client.describe_security_groups(
-            Filters=[
+        return {
+            "Filters":[
                 {'Name': 'group-name', 'Values': [self.resource.name]},
                 {'Name': 'vpc-id', 'Values': [vpc.resource_id]}
             ],
-        )
-
-        if len(groups['SecurityGroups']) > 1:
-            raise errors.Error("Too many possible security groups found")
-
-        if groups['SecurityGroups']:
-            return groups['SecurityGroups'][0]
+        }

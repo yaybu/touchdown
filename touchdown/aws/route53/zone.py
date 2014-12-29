@@ -20,7 +20,10 @@ from touchdown.core.action import Action
 from touchdown.core import argument, errors
 
 from ..account import AWS
+from ..common import SimpleApply
 
+
+# FIXME: Figure out how to pass comment
 
 class HostedZone(Resource):
 
@@ -28,65 +31,33 @@ class HostedZone(Resource):
 
     resource_name = "hosted_zone"
 
-    name = argument.String()
+    name = argument.String(aws_field="Name")
     comment = argument.String()
     account = argument.Resource(AWS)
 
 
-class AddHostedZone(Action):
+class Apply(SimpleApply, Target):
 
-    @property
-    def description(self):
-        yield "Add hosted zone '{}'".format(self.resource.name)
-
-    def run(self):
-        self.target.client.create_hosted_zone(
-            CallerReference=str(uuid.uuid4()),
-            Name=self.resource.name,
-            HostedZoneConfig={
-                "Comment": self.resource.comment,
-            }
-        )
-
-
-class UpdateHostedZoneComment(Action):
-
-    @property
-    def description(self):
-        yield "Change zone comment to '{}'".format(self.resource.comment)
-
-    def __init__(self, runner, target, zone_id):
-        super(UpdateHostedZoneComment, self).__init__(runner, target)
-        self.zone_id = zone_id
-
-    def run(self):
-        self.target.client.update_hosted_zone_comment(
-            Id=self.zone_id,
-            Comment=self.resource.comment,
-        )
-
-
-class Apply(Target):
-
-    name = "apply"
     resource = HostedZone
-    default = True
+    create_action = "create_hosted_zone"
+    # update_action = "update_hosted_zone_comment"
+    describe_action = "list_hosted_zones"
+    describe_list_key = "HostedZone"
+    key = 'HostedZoneId'
 
-    def get_zone(self):
+    @property
+    def client(self):
+        return runner.get_target(self.resource.account).get_client('route53')
+
+    def describe_object(self):
         zone_name = self.resource.name.rstrip(".") + "."
-        paginator = self.target.client.get_paginator("list_hosted_zones")
+        paginator = self.client.get_paginator("list_hosted_zones")
         for page in paginator.paginate():
             for zone in page['HostedZones']:
                 if zone['Name'] == zone_name:
                     return zone
 
-    def get_actions(self, runner):
-        account = runner.get_target(self.resource.account)
-        self.client = account.get_client('route53')
-
-        zone = self.get_zone()
-        if zone:
-            if zone['Config'].get('Comment', '') != self.resource.comment:
-                yield UpdateHostedZoneComment(self, zone['Id'])
-        else:
-            yield AddHostedZone(self)
+    def get_create_extra_args(self):
+        return {
+            "CallerReference": str(uuid.uuid4()),
+        }

@@ -16,6 +16,39 @@ from botocore import session
 
 from touchdown.core import errors
 from touchdown.core.action import Action
+from touchdown.core.resource import Resource
+
+
+class GenericAction(Action):
+
+    def __init__(self, runner, target, description, api, **kwargs):
+        super(GenericAction, self).__init__(runner, target)
+        self.api = api
+        self._description = description
+        self.kwargs = kwargs
+
+    @property
+    def description(self):
+        yield self._description
+
+    def run(self):
+        params = {}
+        params.update(self.kwargs)
+
+        for name, argument in self.resource.arguments:
+            if not argument.present(self.resource):
+                continue
+
+            if not hasattr(argument, "aws_field"):
+                continue
+
+            value = getattr(self.resource, name)
+            if isinstance(value, Resource):
+                value = self.runner.get_target(value).resource_id
+
+            params[argument.aws_field] = value
+
+        self.api(**params)
 
 
 class SetTags(Action):
@@ -39,18 +72,58 @@ class SetTags(Action):
 
 class SimpleApply(object):
 
+    """
+    A simple data-driven resource for AWS api's that a moderately well behaved.
+
+    For example::
+
+        cache CacheClusterApply(SimplyApply, Target):
+            resource = CacheCluster
+            create_action = "create_cache_cluster"
+            describe_action = "describe_cache_cluster"
+            describe_list_key = "CacheClusters"
+            key = 'CacheClusterId'
+    """
+
     name = "apply"
     default = True
 
-    def get_object(self, runner):
-        pass
+    def get_describe_filters(self):
+        return {
+            self.describe_list_key: self.resource.name
+        }
+
+    def describe_object(self, runner):
+        results = getattr(self.client, self.describe_action)(
+            **self.get_describe_filters(runner)
+        )
+
+        objects = results[self.describe_list_key]
+
+        if len(objects) > 1:
+            raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))
+
+        if len(objects) == 1:
+            return objects[0]
+
+    def get_create_extra_args(self):
+        return {}
+
+    def create_object(self, runner):
+        return GenericAction(
+            runner,
+            self,
+            "Creating {}".format(self.resource),
+            getattr(self.client, self.add_action),
+            **self.get_create_extra_args()
+        )
 
     def get_actions(self, runner):
-        self.object = self.get_object(runner)
+        self.object = self.describe_object(runner)
 
         if not self.object:
             self.object = {}
-            yield self.add_action(runner, self)
+            yield self.create_object(runner)
 
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)

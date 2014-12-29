@@ -26,42 +26,25 @@ class RouteTable(Resource):
     resource_name = "route_table"
 
     name = argument.String()
-    vpc = argument.Resource(VPC)
+    vpc = argument.Resource(VPC, aws_field='VpcId')
     tags = argument.Dict()
-
-
-class AddRouteTable(Action):
-
-    @property
-    def description(self):
-        yield "Add route table"
-
-    def run(self):
-        vpc = self.get_target(self.resource.vpc)
-
-        result = vpc.client.create_route_table(
-            VpcId=vpc.object['VpcId'],
-        )
-        self.target.object = result['RouteTable']
 
 
 class Apply(SimpleApply, Target):
 
     resource = RouteTable
-    add_action = AddRouteTable
+    create_action = "create_route_table"
+    describe_action = "describe_route_tables"
+    describe_list_key = "RouteTables"
     key = "RouteTableId"
 
-    def get_object(self, runner):
-        self.client = runner.get_target(self.resource.vpc).client
+    @property
+    def client(self):
+        return runner.get_target(self.resource.vpc).client
 
-        routetables = self.client.describe_route_tables(
-            Filters=[
+    def get_describe_filter(self):
+        return {
+            "Filters":[
                 {'Name': 'tag:name', 'Values': [self.resource.name]},
             ],
-        )
-
-        if len(routetables['RouteTables']) > 1:
-            raise errors.Error("Too many possible route tables found")
-
-        if routetables['RouteTables']:
-            return routetables['RouteTables'][0]
+        }

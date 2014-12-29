@@ -23,41 +23,31 @@ from ..account import AWS
 from ..common import SimpleApply
 
 
+# FIXME: Figure out how to bind CreateBucketConfiguration.LocationConstraint
+
 class Bucket(Resource):
 
     resource_name = "bucket"
 
-    name = argument.String()
-    comment = argument.String()
+    name = argument.String(aws_field="Bucket")
     region = argument.String(default=lambda instance: instance.account.region)
     account = argument.Resource(AWS)
-
-
-class AddBucket(Action):
-
-    @property
-    def description(self):
-        yield "Add bucket '{}'".format(self.resource.name)
-
-    def run(self):
-        #FIXME: Add: ACL, GrantFullControl, GrantRead, GrantReadACP, etc
-        self.target.client.create_bucket(
-            Bucket=self.resource.name,
-            CreateBucketConfiguration=dict(
-                LocationConstraint=self.resource.region,
-            ),
-        )
 
 
 class Apply(SimpleApply, Target):
 
     resource = Bucket
-    add_action = AddBucket
+    create_action = "create_bucket"
+    describe_action = "list_buckets"
+    describe_list_key = "Buckets"
+    key = 'Name'
 
-    def get_object(self, runner):
+    @property
+    def client(self):
         account = runner.get_target(self.resource.account)
-        self.client = account.get_client('s3')
+        return account.get_client('s3')
 
+    def describe_object(self, runner):
         for bucket in self.client.list_buckets()['Buckets']:
             if bucket['Name'] == self.resource.name:
                 return bucket

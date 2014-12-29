@@ -25,48 +25,27 @@ class AutoScalingGroup(Resource):
     resource_name = "auto_scaling_group"
 
     """ A name for this AutoScalingGroup. Unique within an AWS account """
-    name = argument.String()
+    name = argument.String(aws_field="AutoScalingGroupName")
 
     """ The minimum number of EC2 instances that must be running """
-    min_size = argument.Integer()
+    min_size = argument.Integer(aws_field="MinSize")
 
     """ The maximum number of EC2 instances that can be started by this
     AutoScalingGroup """
-    max_size = argument.Integer()
+    max_size = argument.Integer(aws_field="MaxSize")
 
     """ The number of EC2 instances that should be running. Must be between
     min_size and max_size. """
-    desired_capacity = argument.Integer()
+    desired_capacity = argument.Integer(aws_field="DesiredCapacity")
 
     """ The amount of time (in seconds) between scaling activities. """
-    default_cooldown = argument.Integer(default=300)
-
-
-class AddAutoScalingGroup(Action):
-
-    @property
-    def description(self):
-        yield "Create AutoScalingGroup"
-
-    def run(self):
-        self.target.object = self.target.client.create_auto_scaling_group(
-            AutoScalingGroupName=self.resource.name,
-            MinSize=self.resource.min_size,
-            MaxSize=self.resource.max_size,
-            DesiredCapacity=self.resource.desired_capacity,
-            DefaultCooldown=self.resource.default_cooldown,
-        )
+    default_cooldown = argument.Integer(default=300, aws_field="DefaultCooldown")
 
 
 class Apply(SimpleApply, Target):
 
     resource = AutoScalingGroup
-    add_action = AddAutoScalingGroup
+    create_action = "create_auto_scaling_group"
+    describe_action = "describe_auto_scaling_groups"
+    describe_list_key = "AutoScalingGroups"
     key = 'AutoScalingGroupId'
-
-    def get_object(self, runner):
-        asgs = self.client.describe_auto_scaling_groups(
-            AutoScalingGroupNames=[self.resource.name],
-        )
-        if data['Asg']:
-            return data['Asg'][0]

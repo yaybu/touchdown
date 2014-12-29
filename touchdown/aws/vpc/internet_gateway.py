@@ -30,31 +30,14 @@ class InternetGateway(Resource):
     tags = argument.Dict()
 
 
-class AddInternetGateway(Action):
-
-    @property
-    def description(self):
-        yield "Add internet gateway"
-
-    def run(self):
-        self.target.object = self.target.client.create_internet_gateway()
-
-
 class Apply(SimpleApply, Target):
 
     resource = InternetGateway
-    add_action = AddInternetGateway
+    create_action = "create_internet_gateway"
+    describe_action = "describe_internet_gateways"
+    describe_list_key = "InternetGateways"
     key = "InternetGatewayId"
 
-    def get_object(self, runner):
-        self.client = runner.get_target(self.resource.vpc).client
-
-        gateways = self.client.describe_internet_gateways(
-            Filters=[
-                # {'Name': 'attachement.vpc-id', 'Values': [self.resource.cidr_block]},
-            ],
-        )
-        if len(data['InternetGateways']) > 0:
-            raise errors.Error("Too many possible gateways found")
-        if data['InternetGateways']:
-            return data['InternetGateways'][0]
+    @property
+    def client(self):
+        return runner.get_target(self.resource.vpc).client
