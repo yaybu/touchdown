@@ -106,7 +106,7 @@ class AddCacheCluster(Action):
             # params['SecurityGroupIds']
             pass
 
-        # params['SnapshortArns']
+        # params['SnapshortArns']
         # params['SnapshotName']
         # params['PreferredMaintenanceWindow']
 
@@ -114,7 +114,7 @@ class AddCacheCluster(Action):
             params['Port'] = self.resource.port
 
         # params['NotificationTopicArn']
-        #
+
         if self.resource.auto_minor_version_upgrade:
             params['AutoMinorVersionUpgrade'] = self.resource.auto_minor_version_upgrade
 
@@ -139,7 +139,7 @@ class Apply(SimpleApply, Target):
         if self.resource.subnet_group:
             self.client = runner.get_target(self.resource.subnet_group).client
         else:
-            account = runner.get_target(self.resource.acount)
+            account = runner.get_target(self.resource.account)
             self.client = account.get_client('elasticache')
 
         try:
