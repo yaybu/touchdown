@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    route53,
-    ec2,
-    elasticache,
-    rds,
-    s3,
-)
+from .subnet_group import SubnetGroup
+from .cache import CacheCluster
+from .replication_group import ReplicationGroup
+
+
+__all__ = [
+    'SubnetGroup',
+    'CacheCluster',
+    'ReplicationGroup',
+]

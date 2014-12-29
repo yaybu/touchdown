@@ -29,6 +29,7 @@ class Bucket(Resource):
 
     name = argument.String()
     comment = argument.String()
+    region = argument.String(default=lambda instance: instance.account.region)
     account = argument.Resource(AWS)
 
 
@@ -39,8 +40,12 @@ class AddBucket(Action):
         yield "Add bucket '{}'".format(self.resource.name)
 
     def run(self):
+        #FIXME: Add: ACL, GrantFullControl, GrantRead, GrantReadACP, etc
         self.target.client.create_bucket(
             Bucket=self.resource.name,
+            CreateBucketConfiguration=dict(
+                LocationConstraint=self.resource.region,
+            ),
         )
 
 
