@@ -17,6 +17,7 @@ from botocore import session
 from touchdown.core import errors
 from touchdown.core.action import Action
 from touchdown.core.resource import Resource
+from touchdown.core import argument
 
 
 class GenericAction(Action):
@@ -35,18 +36,24 @@ class GenericAction(Action):
         params = {}
         params.update(self.kwargs)
 
-        for name, argument in self.resource.arguments:
-            if not argument.present(self.resource):
+        for name, arg in self.resource.arguments:
+            if not arg.present(self.resource):
                 continue
 
-            if not hasattr(argument, "aws_field"):
+            if not hasattr(arg, "aws_field"):
                 continue
 
             value = getattr(self.resource, name)
-            if isinstance(value, Resource):
+
+            if isinstance(arg, argument.Resource):
                 value = self.runner.get_target(value).resource_id
 
-            params[argument.aws_field] = value
+            elif isinstance(arg, argument.ResourceList):
+                value = [
+                    self.reunner.get_target(r).resource_id for r in value]
+                ]
+
+            params[arg.aws_field] = value
 
         self.api(**params)
 
