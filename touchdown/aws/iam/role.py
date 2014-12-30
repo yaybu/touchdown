@@ -54,14 +54,14 @@ class Apply(SimpleApply, Target):
     def update_object(self):
         policy_names = []
 
-        # If the object exists then we can look at the roles it has
-        # Otherwise we assume its a new role and it will have no policies
+        # If the object exists then we can look at the roles it has
+        # Otherwise we assume its a new role and it will have no policies
         if self.object:
             policy_names = self.client.list_role_policies(
                 RoleName=self.resource.name,
             )['PolicyNames']
 
-        for name, document in self.policies.items():
+        for name, document in self.resource.policies.items():
             changed = False
             if name not in policy_names:
                 changed = True
@@ -78,7 +78,7 @@ class Apply(SimpleApply, Target):
                 )
 
                 # Decode the json and compare 2 python dictionaries. This is to
-                # because the sort order isn't stable - in theory 2 identical
+                # because the sort order isn't stable - in theory 2 identical
                 # dictionaries might yield different json.
                 if json.loads(policy['PolicyDocument']) != document:
                     changed = True

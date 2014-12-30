@@ -27,7 +27,7 @@ class InstanceProfile(Resource):
 
     name = argument.String(aws_field="InstanceProfileName")
     path = argument.String(aws_file='Path')
-    roles = argument.ResourceList(Policy)
+    roles = argument.ResourceList(Role)
     account = argument.Resource(AWS)
 
 
@@ -54,10 +54,10 @@ class Apply(SimpleApply, Target):
         # Make sure all roles in the workspace are linked up to the
         # corresponding InstanceProfile
         remote_roles = [r['RoleName'] for r in self.object.get('Roles', [])]
-        for role in self.roles:
+        for role in self.resource.roles:
             if role.name not in remote_roles:
                 yield self.generic_action(
-                    "Add role {}".format(role.name)),
+                    "Add role {}".format(role.name),
                     self.client.add_role_to_instance_profile,
                     InstanceProfileName=self.resource.name,
                     RoleName=role.name,
@@ -65,7 +65,7 @@ class Apply(SimpleApply, Target):
 
         # Delete roles that exist on the InstanceProfile at AWS, but arent
         # defined locally
-        local_roles = [r.name for r in self.resources.roles]
+        local_roles = [r.name for r in self.resource.roles]
         for role in remote_roles:
             if role not in local_roles:
                 yield self.generic_action(
