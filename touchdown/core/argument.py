@@ -204,7 +204,7 @@ class Resource(Argument):
             resource = cls(self, **arguments)
             self.workspace.add_dependency(resource)
             return resource
-        setattr(self.resource_class, 'add_%s' % cls.resource_name,  _)
+        setattr(self.resource_class, 'add_%s' % cls.resource_name, _)
 
 
 class ResourceList(Argument):

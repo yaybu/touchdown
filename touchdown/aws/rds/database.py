@@ -14,10 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target, Present
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
-
-from touchdown.aws.vpc import Subnet
+from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleApply

@@ -14,12 +14,8 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
+from touchdown.core import argument
 
-from touchdown.aws.vpc import Subnet
-
-from ..account import AWS
 from ..common import SimpleApply
 from .cache import BaseCacheCluster
 

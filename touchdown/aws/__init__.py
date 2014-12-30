@@ -21,3 +21,13 @@ from . import (
     rds,
     s3,
 )
+
+__all__ = [
+    'account',
+    'vpc',
+    'route53',
+    'ec2',
+    'elasticache',
+    'rds',
+    's3',
+]

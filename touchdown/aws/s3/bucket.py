@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import uuid
-
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
+from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleApply

@@ -14,8 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
+from touchdown.core import argument
 
 from .vpc import VPC
 from ..common import SimpleApply
@@ -44,7 +43,7 @@ class Apply(SimpleApply, Target):
 
     def get_describe_filters(self):
         return {
-            "Filters":[
+            "Filters": [
                 {'Name': 'tag:name', 'Values': [self.resource.name]},
             ],
         }

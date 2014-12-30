@@ -14,8 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
+from touchdown.core import argument
 
 from .vpc import VPC
 from ..common import SimpleApply
@@ -46,7 +45,7 @@ class Apply(SimpleApply, Target):
     def get_describe_filters(self):
         vpc = self.runner.get_target(self.resource.vpc)
         return {
-            "Filters":[
+            "Filters": [
                 {'Name': 'group-name', 'Values': [self.resource.name]},
                 {'Name': 'vpc-id', 'Values': [vpc.resource_id]}
             ],

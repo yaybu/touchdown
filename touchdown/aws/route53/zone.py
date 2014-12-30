@@ -16,8 +16,7 @@ import uuid
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
+from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleApply
@@ -47,7 +46,7 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        return runner.get_target(self.resource.account).get_client('route53')
+        return self.runner.get_target(self.resource.account).get_client('route53')
 
     def describe_object(self):
         zone_name = self.resource.name.rstrip(".") + "."

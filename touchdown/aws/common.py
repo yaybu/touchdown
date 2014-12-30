@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
 from botocore.exceptions import ClientError
 
 from touchdown.core import errors
 from touchdown.core.action import Action
-from touchdown.core.resource import Resource
 from touchdown.core import argument
 
 
@@ -107,7 +105,7 @@ class SimpleApply(object):
         try:
             results = getattr(self.client, self.describe_action)(
                 **self.get_describe_filters()
-                )
+            )
         except ClientError as e:
             if e.response['Error']['Code'] == self.describe_notfound_exception:
                 return

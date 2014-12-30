@@ -14,8 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.action import Action
-from touchdown.core import argument, errors
+from touchdown.core import argument
 
 from .vpc import VPC
 from ..common import SimpleApply
