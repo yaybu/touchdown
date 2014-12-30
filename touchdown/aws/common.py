@@ -127,12 +127,20 @@ class SimpleApply(object):
         return {}
 
     def create_object(self):
-        return GenericAction(
-            self.runner,
-            self,
+        return self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
             **self.get_create_extra_args()
+        )
+
+    def generic_action(self, description, callable, *args, **kwargs):
+        return GenericAction(
+            self.runner,
+            self,
+            description,
+            callable,
+            *args,
+            **kwargs
         )
 
     def get_actions(self):
@@ -142,6 +150,10 @@ class SimpleApply(object):
             self.object = {}
             yield self.create_object()
 
+        for action in self.update_object():
+            yield action
+
+    def update_object(self):
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)
             local_tags['name'] = self.resource.name
