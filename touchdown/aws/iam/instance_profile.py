@@ -18,6 +18,7 @@ from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleApply
+from .role import Role
 
 
 class InstanceProfile(Resource):
@@ -26,6 +27,7 @@ class InstanceProfile(Resource):
 
     name = argument.String(aws_field="InstanceProfileName")
     path = argument.String(aws_file='Path')
+    roles = argument.ResourceList(Policy)
     account = argument.Resource(AWS)
 
 
@@ -47,3 +49,28 @@ class Apply(SimpleApply, Target):
             for ip in page['InstanceProfiles']:
                 if ip['InstanceProfileName'] == self.resource.name:
                     return ip
+
+    def update_object(self):
+        # Make sure all roles in the workspace are linked up to the
+        # corresponding InstanceProfile
+        remote_roles = [r['RoleName'] for r in self.object.get('Roles', [])]
+        for role in self.roles:
+            if role.name not in remote_roles:
+                yield self.generic_action(
+                    "Add role {}".format(role.name)),
+                    self.client.add_role_to_instance_profile,
+                    InstanceProfileName=self.resource.name,
+                    RoleName=role.name,
+                )
+
+        # Delete roles that exist on the InstanceProfile at AWS, but arent
+        # defined locally
+        local_roles = [r.name for r in self.resources.roles]
+        for role in remote_roles:
+            if role not in local_roles:
+                yield self.generic_action(
+                    "Remove role {}".format(role),
+                    self.client.remove_role_from_instance_profile,
+                    InstanceProfileName=self.resource.name,
+                    RoleName=role,
+                )
