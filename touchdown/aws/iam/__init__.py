@@ -12,24 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    ec2,
-    elasticache,
-    iam,
-    rds,
-    route53,
-    s3,
-)
+from .role import Role
+from .instance_profile import InstanceProfile
+
 
 __all__ = [
-    'account',
-    'vpc',
-    'ec2',
-    'elasticache',
-    'iam',
-    'rds',
-    'route53',
-    's3',
+    'Role',
+    'InstanceProfile'
 ]

@@ -14,9 +14,9 @@
 
 from botocore.exceptions import ClientError
 
-from touchdown.core import errors
+from touchdown.core import argument, errors
 from touchdown.core.action import Action
-from touchdown.core import argument
+from touchdown.core.target import Present
 
 
 class GenericAction(Action):
@@ -95,6 +95,10 @@ class SimpleApply(object):
     default = True
 
     describe_notfound_exception = None
+
+    signature = (
+        Present('name'),
+    )
 
     def get_describe_filters(self):
         return {
