@@ -40,4 +40,4 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        return runner.get_target(self.resource.vpc).client
+        return self.runner.get_target(self.resource.vpc).client

@@ -40,7 +40,7 @@ class ResourceType(type):
 class Resource(six.with_metaclass(ResourceType)):
 
     default_target = None
-    policies = {}
+    targets = {}
 
     target = TargetArgument()
 

@@ -41,9 +41,9 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        return runner.get_target(self.resource.account).get_client('ec2')
+        return self.runner.get_target(self.resource.account).get_client('ec2')
 
-    def describe_object(self, runner):
+    def describe_object(self):
         for vpc in self.client.describe_vpcs()['Vpcs']:
             if vpc['CidrBlock'] == str(self.resource.cidr_block):
                 return vpc

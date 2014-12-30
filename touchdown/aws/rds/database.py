@@ -95,6 +95,7 @@ class Apply(SimpleApply, Target):
     resource = Database
     create_action = "create_db_instance"
     describe_action = "describe_db_instances"
+    describe_notfound_exception = "DBInstanceNotFound"
     describe_list_key = "DBInstances"
     key = 'DBInstanceIdentifier'
 
@@ -110,7 +111,7 @@ class Apply(SimpleApply, Target):
     @property
     def client(self):
         if self.resource.subnet_group:
-            return runner.get_target(self.resource.subnet_group).client
+            return self.runner.get_target(self.resource.subnet_group).client
         else:
-            account = runner.get_target(self.resource.acount)
+            account = self.runner.get_target(self.resource.acount)
             return account.get_client('rds')

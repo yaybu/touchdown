@@ -40,9 +40,10 @@ class Apply(SimpleApply, Target):
     resource = SubnetGroup
     create_action = "create_db_subnet_group"
     describe_action = "describe_db_subnet_groups"
+    describe_notfound_exception = "DBSubnetGroupNotFoundFault"
     describe_list_key = "DBSubnetGroups"
-    key = 'DBSubnetGroupId'
+    key = 'DBSubnetGroupName'
 
     @property
     def client(self):
-        return runner.get_target(self.resource.account).get_client('rds')
+        return self.runner.get_target(self.resource.account).get_client('rds')

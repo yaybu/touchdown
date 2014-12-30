@@ -30,8 +30,9 @@ class Argument(object):
     default = None
 
     def __init__(self, default=None, help=None, **kwargs):
-        self.default = default
         self.__doc__ = help
+        if default:
+            self.default = default
         for k, v in kwargs.items():
             setattr(self, k, v)
         self.arg_id = "argument_%d" % Argument.argument_id
@@ -145,14 +146,14 @@ class TargetArgument(Argument):
 
     def __set__(self, instance, value):
         try:
-            setattr(instance, self.arg_id, instance.targets[value](instance))
+            setattr(instance, self.arg_id, instance.targets[value])
         except KeyError:
             raise errors.InvalidTarget("'%s' not a valid target" % (value, ))
 
     def default(self, instance):
         if not instance.default_target:
-            return target.NullTarget(instance)
-        return instance.default_target(instance)
+            return target.NullTarget
+        return instance.default_target
 
 
 class Resource(Argument):

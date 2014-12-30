@@ -41,7 +41,7 @@ class Runner(object):
 
     def get_target(self, resource):
         if resource not in self.resources:
-            self.resources[resource] = resource.target
+            self.resources[resource] = resource.target(self, resource)
         return self.resources[resource]
 
     def plan(self):
@@ -50,7 +50,7 @@ class Runner(object):
 
         plan = []
         for resource in resolved:
-            actions = tuple(self.get_target(resource).get_actions(self))
+            actions = tuple(self.get_target(resource).get_actions())
             if not actions:
                 logger.debug("No actions for {} - skipping".format(resource))
                 continue

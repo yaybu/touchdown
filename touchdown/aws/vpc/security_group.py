@@ -39,10 +39,12 @@ class Apply(SimpleApply, Target):
     describe_list_key = "SecurityGroups"
     key = 'SecurityGroupId'
 
-    def get_describe_filter(self):
-        vpc = runner.get_target(self.resource.vpc)
-        self.client = vpc.client
+    @property
+    def client(self):
+        return self.runner.get_target(self.resource.vpc).client
 
+    def get_describe_filters(self):
+        vpc = self.runner.get_target(self.resource.vpc)
         return {
             "Filters":[
                 {'Name': 'group-name', 'Values': [self.resource.name]},

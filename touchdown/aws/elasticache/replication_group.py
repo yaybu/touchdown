@@ -43,4 +43,4 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        return runner.get_target(self.resource.account).get_client('elasticache')
+        return self.runner.get_target(self.resource.account).get_client('elasticache')

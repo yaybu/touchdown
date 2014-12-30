@@ -44,10 +44,10 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        account = runner.get_target(self.resource.account)
+        account = self.runner.get_target(self.resource.account)
         return account.get_client('s3')
 
-    def describe_object(self, runner):
+    def describe_object(self):
         for bucket in self.client.list_buckets()['Buckets']:
             if bucket['Name'] == self.resource.name:
                 return bucket

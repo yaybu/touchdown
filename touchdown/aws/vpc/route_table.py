@@ -40,9 +40,9 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        return runner.get_target(self.resource.vpc).client
+        return self.runner.get_target(self.resource.vpc).client
 
-    def get_describe_filter(self):
+    def get_describe_filters(self):
         return {
             "Filters":[
                 {'Name': 'tag:name', 'Values': [self.resource.name]},

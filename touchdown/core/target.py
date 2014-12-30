@@ -23,7 +23,7 @@ class TargetType(type):
     def __new__(meta, class_name, bases, new_attrs):
         cls = type.__new__(meta, class_name, bases, new_attrs)
         if getattr(cls, "resource", None) is not None:
-            cls.resource.policies[cls.name] = cls
+            cls.resource.targets[cls.name] = cls
             if cls.default:
                 cls.resource.default_target = cls
         return cls
@@ -49,8 +49,9 @@ class Target(six.with_metaclass(TargetType)):
     # Override this with a list of assertions
     signature = ()
 
-    def __init__(self, resource):
+    def __init__(self, runner, resource):
         super(Target, self).__init__()
+        self.runner = runner
         self.resource = resource
 
     def validate(self):
@@ -62,7 +63,7 @@ class Target(six.with_metaclass(TargetType)):
         msg.extend(a.describe(self.resource))
         raise errors.NonConformingPolicy("\n".join(msg))
 
-    def get_actions(self, runner):
+    def get_actions(self):
         return []
 
 
