@@ -51,7 +51,7 @@ class Apply(SimpleApply, Target):
 
     def get_describe_filters(self):
         return {
-            "Filters":  [
+            "Filters": [
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
             ],
         }

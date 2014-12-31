@@ -15,7 +15,7 @@
 import unittest
 import mock
 
-from touchdown.aws.common import GenericAction
+from touchdown.aws.common import GenericAction, resource_to_dict
 from touchdown.aws.elasticache import CacheCluster
 
 
@@ -28,7 +28,9 @@ class TestGenericAction(unittest.TestCase):
 
         target.resource = CacheCluster(None, name='freddy')
 
-        g = GenericAction(runner, target, "I am an action", api)
+        params = resource_to_dict(runner, target.resource)
+
+        g = GenericAction(runner, target, "I am an action", api, **params)
         self.assertEqual(tuple(g.description), ("I am an action", ))
         g.run()
 

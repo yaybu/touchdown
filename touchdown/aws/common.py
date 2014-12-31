@@ -16,15 +16,34 @@ from botocore.exceptions import ClientError
 
 from touchdown.core import argument, errors
 from touchdown.core.action import Action
-from touchdown.core.renderable import Renderable
+from touchdown.core.renderable import Renderable, ResourceId
 from touchdown.core.target import Present
+
+
+def resource_to_dict(runner, resource):
+    params = {}
+    for name, arg in resource.arguments:
+        if not arg.present(resource):
+            continue
+        if not hasattr(arg, "aws_field"):
+            continue
+
+        value = getattr(resource, name)
+        if isinstance(arg, argument.Resource):
+            value = ResourceId(resource)
+        elif isinstance(arg, argument.ResourceList):
+            value = [ResourceId(r) for r in value]
+
+        params[arg.aws_field] = value
+
+    return params
 
 
 class GenericAction(Action):
 
-    def __init__(self, runner, target, description, api, *args, **kwargs):
+    def __init__(self, runner, target, description, func, *args, **kwargs):
         super(GenericAction, self).__init__(runner, target)
-        self.api = api
+        self.func = func
         self._description = description
         self.args = args
         self.kwargs = kwargs
@@ -39,28 +58,11 @@ class GenericAction(Action):
         for k, v in self.kwargs.items():
             if isinstance(v, Renderable):
                 v = v.render(self.runner)
+            elif isinstance(v, list):
+                v = [x.render(self.runner) for x in v]
             params[k] = v
 
-        for name, arg in self.resource.arguments:
-            if not arg.present(self.resource):
-                continue
-
-            if not hasattr(arg, "aws_field"):
-                continue
-
-            value = getattr(self.resource, name)
-
-            if isinstance(arg, argument.Resource):
-                value = self.runner.get_target(value).resource_id
-
-            elif isinstance(arg, argument.ResourceList):
-                value = [
-                    self.runner.get_target(r).resource_id for r in value
-                ]
-
-            params[arg.aws_field] = value
-
-        self.api(**params)
+        self.func(**params)
 
 
 class SetTags(Action):
@@ -129,14 +131,14 @@ class SimpleApply(object):
         if len(objects) == 1:
             return objects[0]
 
-    def get_create_extra_args(self):
-        return {}
+    def get_create_args(self):
+        return resource_to_dict(self.runner, self.resource)
 
     def create_object(self):
         return self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
-            **self.get_create_extra_args()
+            **self.get_create_args()
         )
 
     def generic_action(self, description, callable, *args, **kwargs):
