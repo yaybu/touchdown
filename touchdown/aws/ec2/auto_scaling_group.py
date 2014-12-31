@@ -55,3 +55,8 @@ class Apply(SimpleApply, Target):
     describe_action = "describe_auto_scaling_groups"
     describe_list_key = "AutoScalingGroups"
     key = 'AutoScalingGroupId'
+
+    @property
+    def client(self):
+        account = self.runner.get_target(self.resource.acount)
+        return account.get_client('autoscale')

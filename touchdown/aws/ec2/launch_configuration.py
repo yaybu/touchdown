@@ -73,3 +73,8 @@ class Apply(SimpleApply, Target):
     describe_action = "describe_launch_configurations"
     describe_list_key = "LaunchConfigurations"
     key = 'LaunchConfigurationId'
+
+    @property
+    def client(self):
+        account = self.runner.get_target(self.resource.acount)
+        return account.get_client('autoscale')
