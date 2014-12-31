@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -39,13 +39,19 @@ class Apply(SimpleApply, Target):
     describe_list_key = "Subnets"
     key = 'SubnetId'
 
+    signature = (
+        Present('name'),
+        Present('vpc'),
+        Present('cidr_block'),
+    )
+
     @property
     def client(self):
         return self.runner.get_target(self.resource.vpc).client
 
     def get_describe_filters(self):
         return {
-            "Filters": [
+            "Filters":  [
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
             ],
         }

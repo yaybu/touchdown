@@ -25,11 +25,23 @@ class Renderable(object):
         """
         raise NotImplementedError(self.attach)
 
-    def render(self):
+    def render(self, runner):
         """
         Render a value.
         """
         raise NotImplementedError(self.render)
+
+
+class ResourceId(Renderable):
+
+    def __init__(self, object):
+        self.object = object
+
+    def attach(self, node):
+        node.add_dependency(self.object)
+
+    def render(self, runner):
+        return runner.get_target(self.object).resource_id
 
 
 class Property(Renderable):
@@ -47,7 +59,7 @@ class Property(Renderable):
     def attach(self, node):
         node.add_dependency(self.object)
 
-    def render(self):
+    def render(self, runner):
         return getattr(self.object, self.attribute)
 
 
@@ -83,5 +95,5 @@ class Format(Renderable):
             if isinstance(obj, Resource):
                 node.add_dependency(obj)
 
-    def render(self):
+    def render(self, runner):
         return self.format_string.format(*self.args, **self.kwargs)

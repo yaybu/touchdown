@@ -13,7 +13,12 @@
 # limitations under the License.
 
 from .keypair import KeyPair
+from .auto_scaling_group import AutoScalingGroup
+from .launch_configuration import LaunchConfiguration
+
 
 __all__ = [
     'KeyPair',
+    'AutoScalingGroup',
+    'LaunchConfiguration',
 ]

@@ -219,6 +219,7 @@ class ResourceList(Argument):
     def __init__(self, resource_class, **kwargs):
         super(ResourceList, self).__init__(**kwargs)
         self.resource_class = resource_class
+        self.default = lambda x: []
 
     def __set__(self, instance, value):
         for val in value:

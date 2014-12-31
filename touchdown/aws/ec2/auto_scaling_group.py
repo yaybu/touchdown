@@ -16,7 +16,9 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
+from ..account import AWS
 from ..common import SimpleApply
+from .launch_configuration import LaunchConfiguration
 
 
 class AutoScalingGroup(Resource):
@@ -39,6 +41,11 @@ class AutoScalingGroup(Resource):
 
     """ The amount of time (in seconds) between scaling activities. """
     default_cooldown = argument.Integer(default=300, aws_field="DefaultCooldown")
+
+    """ A launch configuration """
+    launch_configuration = argument.Resource(LaunchConfiguration)
+
+    account = argument.Resource(AWS)
 
 
 class Apply(SimpleApply, Target):

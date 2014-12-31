@@ -16,15 +16,17 @@ from botocore.exceptions import ClientError
 
 from touchdown.core import argument, errors
 from touchdown.core.action import Action
+from touchdown.core.renderable import Renderable
 from touchdown.core.target import Present
 
 
 class GenericAction(Action):
 
-    def __init__(self, runner, target, description, api, **kwargs):
+    def __init__(self, runner, target, description, api, *args, **kwargs):
         super(GenericAction, self).__init__(runner, target)
         self.api = api
         self._description = description
+        self.args = args
         self.kwargs = kwargs
 
     @property
@@ -33,7 +35,11 @@ class GenericAction(Action):
 
     def run(self):
         params = {}
-        params.update(self.kwargs)
+
+        for k, v in self.kwargs.items():
+            if isinstance(v, Renderable):
+                v = v.render(self.runner)
+            params[k] = v
 
         for name, arg in self.resource.arguments:
             if not arg.present(self.resource):
@@ -174,4 +180,6 @@ class SimpleApply(object):
 
     @property
     def resource_id(self):
-        return self.object[self.key]
+        if self.key in self.object:
+            return self.object[self.key]
+        return None
