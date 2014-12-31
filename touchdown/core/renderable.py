@@ -34,6 +34,8 @@ class Renderable(object):
 
 class ResourceId(Renderable):
 
+    """ Gets the amazon ID for a resource we have defined locally """
+
     def __init__(self, object):
         self.object = object
 
@@ -97,3 +99,11 @@ class Format(Renderable):
 
     def render(self, runner):
         return self.format_string.format(*self.args, **self.kwargs)
+
+
+def render(runner, value):
+    if isinstance(v, Renderable):
+        return v.render(self.runner)
+    elif isinstance(v, list):
+        return [x.render(self.runner) for x in v]
+    return value

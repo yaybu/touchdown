@@ -72,7 +72,7 @@ class Apply(SimpleApply, Target):
     create_action = "create_auto_scaling_group"
     describe_action = "describe_launch_configurations"
     describe_list_key = "LaunchConfigurations"
-    key = 'LaunchConfigurationId'
+    key = 'LaunchConfigurationName'
 
     @property
     def client(self):

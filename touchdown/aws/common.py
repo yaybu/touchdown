@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from botocore.exceptions import ClientError
 
 from touchdown.core import argument, errors
 from touchdown.core.action import Action
-from touchdown.core.renderable import Renderable, ResourceId
+from touchdown.core.renderable import Renderable, ResourceId, render
 from touchdown.core.target import Present
+
+
+logger = logging.getLogger(__name__)
 
 
 def resource_to_dict(runner, resource):
@@ -54,14 +59,8 @@ class GenericAction(Action):
 
     def run(self):
         params = {}
-
         for k, v in self.kwargs.items():
-            if isinstance(v, Renderable):
-                v = v.render(self.runner)
-            elif isinstance(v, list):
-                v = [x.render(self.runner) for x in v]
-            params[k] = v
-
+            params[k] = render(self.runner, v)
         self.func(**params)
 
 
@@ -102,6 +101,7 @@ class SimpleApply(object):
     name = "apply"
     default = True
 
+    update_action = None
     describe_notfound_exception = None
 
     signature = (
@@ -114,10 +114,13 @@ class SimpleApply(object):
         }
 
     def describe_object(self):
+        logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
+
+        filters = self.get_describe_filters()
+        logger.debug("Filters are: {}".format(filters))
+
         try:
-            results = getattr(self.client, self.describe_action)(
-                **self.get_describe_filters()
-            )
+            results = getattr(self.client, self.describe_action)(**filters)
         except ClientError as e:
             if e.response['Error']['Code'] == self.describe_notfound_exception:
                 return
@@ -129,6 +132,7 @@ class SimpleApply(object):
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))
 
         if len(objects) == 1:
+            logger.debug("Found object {}".format(objects[0][self.key]))
             return objects[0]
 
     def get_create_args(self):
@@ -155,13 +159,41 @@ class SimpleApply(object):
         self.object = self.describe_object()
 
         if not self.object:
+            logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resoure))
             self.object = {}
             yield self.create_object()
 
+        logger.debug("Looking for changes to apply")
         for action in self.update_object():
             yield action
 
     def update_object(self):
+        if self.update_action and self.object:
+            logger.debug("Checking resource {} for changes".format(self.resource))
+
+            description = ["Updating {}".format(self.resource)]
+            local = resource_to_dict(self.runner, self.resource)
+            for k, v in local.items():
+                if k not in self.object:
+                    continue
+                v = render(v)
+                if v != self.object[k]:
+                    logger.debug("Resource field {} has changed ({} != {})".format(k, v, self.object[k]))
+                    # FIXME: Make this smarter... Where referring to
+                    # renderables can show a hint
+                    # Instead of Foo => None it should show
+                    # Foo => ResourceId(some_subnet)
+                    description.append("{} => {}".format(k, v))
+
+            logger.debug("Resource has {} differences".format(len(description)-1))
+
+            if len(description) > 1:
+                yield self.generic_action(
+                    description,
+                    getattr(self.client, self.update_action),
+                    **local
+                )
+
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)
             local_tags['name'] = self.resource.name

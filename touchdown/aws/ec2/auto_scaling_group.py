@@ -28,6 +28,9 @@ class AutoScalingGroup(Resource):
     """ A name for this AutoScalingGroup. Unique within an AWS account """
     name = argument.String(aws_field="AutoScalingGroupName")
 
+    """ A launch configuration """
+    launch_configuration = argument.Resource(LaunchConfiguration, aws_field="LaunchConfigurationName")
+
     """ The minimum number of EC2 instances that must be running """
     min_size = argument.Integer(aws_field="MinSize")
 
@@ -42,8 +45,15 @@ class AutoScalingGroup(Resource):
     """ The amount of time (in seconds) between scaling activities. """
     default_cooldown = argument.Integer(default=300, aws_field="DefaultCooldown")
 
-    """ A launch configuration """
-    launch_configuration = argument.Resource(LaunchConfiguration)
+    availability_zones = argument.List(aws_field="AvailabilityZones")
+
+    health_check_type = argument.String(max=32, aws_field="HealthCheckType")
+
+    health_check_grace_period = argument.String(aws_field="HealthCheckGracePeriod")
+
+    placement_group = argument.String(max=255, aws_field="PlacementGroup")
+
+    termination_policies = argument.List(aws_field="TerminationPolicies")
 
     account = argument.Resource(AWS)
 
@@ -52,9 +62,10 @@ class Apply(SimpleApply, Target):
 
     resource = AutoScalingGroup
     create_action = "create_auto_scaling_group"
+    update_action = "update_auto_scaling_group"
     describe_action = "describe_auto_scaling_groups"
     describe_list_key = "AutoScalingGroups"
-    key = 'AutoScalingGroupId'
+    key = 'AutoScalingGroupName'
 
     @property
     def client(self):
