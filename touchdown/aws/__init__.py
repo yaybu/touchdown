@@ -17,6 +17,7 @@ from . import (
     vpc,
     ec2,
     elasticache,
+    elb,
     iam,
     rds,
     route53,

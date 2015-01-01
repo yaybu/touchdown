@@ -17,6 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
+from ..elb import LoadBalancer
 from ..common import SimpleApply
 from .launch_configuration import LaunchConfiguration
 
@@ -46,6 +47,8 @@ class AutoScalingGroup(Resource):
     default_cooldown = argument.Integer(default=300, aws_field="DefaultCooldown")
 
     availability_zones = argument.List(aws_field="AvailabilityZones")
+
+    load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames")
 
     health_check_type = argument.String(max=32, aws_field="HealthCheckType")
 
