@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
 from ..account import AWS

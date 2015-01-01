@@ -29,6 +29,7 @@ __all__ = [
     'vpc',
     'ec2',
     'elasticache',
+    'elb',
     'iam',
     'rds',
     'route53',

@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError
 
 from touchdown.core import argument, errors
 from touchdown.core.action import Action
-from touchdown.core.renderable import Renderable, ResourceId, render
+from touchdown.core.renderable import ResourceId, render
 from touchdown.core.target import Present
 
 
@@ -189,7 +189,7 @@ class SimpleApply(object):
                     # Foo => ResourceId(some_subnet)
                     description.append("{} => {}".format(k, v))
 
-            logger.debug("Resource has {} differences".format(len(description)-1))
+            logger.debug("Resource has {} differences".format(len(description) - 1))
 
             if len(description) > 1:
                 yield self.generic_action(

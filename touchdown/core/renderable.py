@@ -102,8 +102,8 @@ class Format(Renderable):
 
 
 def render(runner, value):
-    if isinstance(v, Renderable):
-        return v.render(self.runner)
-    elif isinstance(v, list):
-        return [x.render(self.runner) for x in v]
+    if isinstance(value, Renderable):
+        return value.render(runner)
+    elif isinstance(value, list):
+        return [x.render(runner) for x in value]
     return value
