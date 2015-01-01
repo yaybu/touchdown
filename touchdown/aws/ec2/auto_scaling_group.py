@@ -48,7 +48,7 @@ class AutoScalingGroup(Resource):
 
     availability_zones = argument.List(aws_field="AvailabilityZones")
 
-    load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames")
+    load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames", aws_update=False)
 
     health_check_type = argument.String(max=32, aws_field="HealthCheckType")
 
