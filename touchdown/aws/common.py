@@ -159,7 +159,7 @@ class SimpleApply(object):
         self.object = self.describe_object()
 
         if not self.object:
-            logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resoure))
+            logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resource))
             self.object = {}
             yield self.create_object()
 
@@ -180,7 +180,7 @@ class SimpleApply(object):
                 if v != self.object[k]:
                     logger.debug("Resource field {} has changed ({} != {})".format(k, v, self.object[k]))
                     # FIXME: Make this smarter... Where referring to
-                    # renderables can show a hint
+                    # renderables can show a hint
                     # Instead of Foo => None it should show
                     # Foo => ResourceId(some_subnet)
                     description.append("{} => {}".format(k, v))
