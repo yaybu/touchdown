@@ -25,12 +25,16 @@ from touchdown.core.target import Present
 logger = logging.getLogger(__name__)
 
 
-def resource_to_dict(runner, resource):
+def resource_to_dict(runner, resource, mode="create"):
     params = {}
     for name, arg in resource.arguments:
         if not arg.present(resource):
             continue
         if not hasattr(arg, "aws_field"):
+            continue
+        if mode == "create" and not getattr(arg, "aws_create", True):
+            continue
+        if mode == "update" and not getattr(arg, "aws_update", True):
             continue
 
         value = getattr(resource, name)
@@ -172,7 +176,7 @@ class SimpleApply(object):
             logger.debug("Checking resource {} for changes".format(self.resource))
 
             description = ["Updating {}".format(self.resource)]
-            local = resource_to_dict(self.runner, self.resource)
+            local = resource_to_dict(self.runner, self.resource, mode="update")
             for k, v in local.items():
                 if k not in self.object:
                     continue

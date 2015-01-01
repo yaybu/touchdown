@@ -40,7 +40,7 @@ class Database(Resource):
     instance_class = argument.String(aws_field="DBInstanceClass")
 
     """ The type of database to use, for example 'postgres' """
-    engine = argument.String(default='postgres', aws_field="Engine")
+    engine = argument.String(default='postgres', aws_field="Engine", aws_update=False)
 
     engine_version = argument.String(aws_field="EngineVersion")
 
@@ -55,17 +55,19 @@ class Database(Resource):
     """ A list of security groups to apply to this instance """
     security_groups = argument.List(aws_field="VpcSecurityGroupIds")
 
-    publically_accessible = argument.Boolean(aws_field="PubliclyAccessible")
+    publically_accessible = argument.Boolean(aws_field="PubliclyAccessible", aws_update=False)
 
     availability_zone = argument.String(aws_field="AvailabilityZone")
 
-    subnet_group = argument.Resource(SubnetGroup, aws_field="DBSubnetGroupName")
+    subnet_group = argument.Resource(SubnetGroup, aws_field="DBSubnetGroupName", aws_update=False)
 
     preferred_maintenance_window = argument.String(aws_field="PreferredMaintenanceWindow")
 
     multi_az = argument.Boolean(aws_field="MultiAZ")
 
     storage_type = argument.String(aws_field="StorageType")
+
+    allow_major_version_upgrade = argument.Boolean(aws_field="AllowMajorVersionUpgrade")
 
     auto_minor_version_upgrade = argument.Boolean(aws_field="AutoMinorVersionUpgrade")
 
@@ -82,6 +84,8 @@ class Database(Resource):
     # paramter_group = argument.Resource(ParameterGroup, aws_field="DBParameterGroupName")
     # option_group = argument.Resource(OptionGroup, aws_field="OptionGroupName")
 
+    apply_immediately = argument.Boolean(aws_field="ApplyImmediately", aws_create=False)
+
     tags = argument.Dict()
 
     account = argument.Resource(AWS)
@@ -91,6 +95,7 @@ class Apply(SimpleApply, Target):
 
     resource = Database
     create_action = "create_db_instance"
+    update_action = "modify_db_instance"
     describe_action = "describe_db_instances"
     describe_notfound_exception = "DBInstanceNotFound"
     describe_list_key = "DBInstances"

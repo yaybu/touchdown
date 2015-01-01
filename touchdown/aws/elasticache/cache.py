@@ -31,13 +31,13 @@ class BaseCacheCluster(object):
     instance_class = argument.String()
 
     """ The type of database to use, for example 'postgres' """
-    engine = argument.String(default='postgres', aws_field='Engine')
+    engine = argument.String(default='postgres', aws_field='Engine', aws_update=False)
 
     """ The version of the cache engine to run """
     engine_version = argument.String(aws_field='EngineVersion')
 
     """ The TCP/IP port to listen on. """
-    port = argument.Integer(min=1, max=32768, aws_field='Port')
+    port = argument.Integer(min=1, max=32768, aws_field='Port', aws_update=False)
 
     """ A list of security groups to apply to this instance """
     security_groups = argument.List(aws_field='SecurityGroups')
@@ -59,6 +59,8 @@ class BaseCacheCluster(object):
 
     # parameter_group = argument.Resource(ParamaterGroup, aws_field='CacheParameterGroupName')
 
+    apply_immediately = argument.Boolean(aws_field="ApplyImmediately", aws_create=False)
+
     tags = argument.Dict()
 
     account = argument.Resource(AWS)
@@ -75,6 +77,7 @@ class Apply(SimpleApply, Target):
 
     resource = CacheCluster
     create_action = "create_cache_cluster"
+    update_action = "modify_cache_cluster"
     describe_action = "describe_cache_clusters"
     describe_notfound_exception = "CacheClusterNotFound"
     describe_list_key = "CacheClusters"
