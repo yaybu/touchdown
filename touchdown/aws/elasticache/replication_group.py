@@ -33,6 +33,7 @@ class Apply(SimpleApply, Target):
 
     resource = ReplicationGroup
     create_action = "create_replication_group"
+    update_action = "modify_replication_group"
     describe_action = "describe_replication_groups"
     describe_list_key = "ReplicationGroups"
     key = 'ReplicationGroupId'
