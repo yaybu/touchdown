@@ -38,6 +38,7 @@ class Apply(SimpleApply, Target):
 
     resource = SubnetGroup
     create_action = "create_cache_subnet_group"
+    update_action = "modify_cache_subnet_group"
     describe_action = "describe_cache_subnet_groups"
     describe_list_key = "CacheSubnetGroups"
     key = 'CacheSubnetGroupId'
