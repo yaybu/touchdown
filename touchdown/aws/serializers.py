@@ -16,6 +16,12 @@ from touchdown.core import errors, target
 from touchdown.core.utils import force_str
 
 
+class hd(dict):
+
+    def __hash__(self):
+        return hash(frozenset(self.items()))
+
+
 class FieldNotPresent(Exception):
     pass
 
@@ -30,6 +36,12 @@ class Serializer(object):
         raise NotImplementedError(self.render)
 
 
+class Identity(Serializer):
+
+    def render(self, runner, object):
+        return object
+
+
 class Const(Serializer):
 
     def __init__(self, const):
@@ -41,10 +53,23 @@ class Const(Serializer):
 
 class Identifier(Serializer):
 
+    def __init__(self, inner=Identity()):
+        self.inner = inner
+
     def render(self, runner, object):
-        result = self.runner.get_target(object).resource_id
+        result = runner.get_target(object).resource_id
         if not result:
             return "pending ({})".format(object)
+
+
+class Property(Serializer):
+
+    def __init__(self, property, inner=Identity()):
+        self.property = property
+        self.inner = inner
+
+    def render(self, runner, object):
+        return runner.get_target(self.inner.render(runner, object)).object.get(self.property, "dummy")
 
 
 class Argument(Serializer):
@@ -86,7 +111,7 @@ class Required(Annotation):
 
 class Formatter(Serializer):
 
-    def __init__(self, inner):
+    def __init__(self, inner=Identity()):
         self.inner = inner
 
 
@@ -119,18 +144,22 @@ class Dict(Serializer):
         for key, value in self.kwargs.items():
             try:
                 result[key] = value.render(runner, object)
-            except NotPresent:
+            except FieldNotPresent:
                 continue
-        return result
+        return hd(result)
 
 
 class List(Serializer):
 
-    def __init__(self, inner):
+    def __init__(self, child, inner=Identity(), skip_empty=False):
         self.inner = inner
+        self.child = child
+        self.skip_empty = skip_empty
 
     def render(self, runner, object):
         result = []
-        for row in object:
-            result.append(self.inner.render(runner, row))
-        return result
+        for row in self.inner.render(runner, object):
+            result.append(self.child.render(runner, row))
+        if not result and self.skip_empty:
+            raise FieldNotPresent()
+        return tuple(result)

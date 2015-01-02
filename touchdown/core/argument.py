@@ -196,6 +196,13 @@ class Resource(Argument):
         With this form you don't have to pass the vpc argument (it is done
         implicitly).
         """
+        if isinstance(self.resource_class, basestring):
+            from .resource import ResourceType
+            if self.resource_class not in ResourceType.__all_resources__:
+                ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)
+                return
+            self.resource_class = ResourceType.__all_resources__[self.resource_class]
+
         argument_name = self.argument_name
 
         def _(self, **kwargs):
@@ -227,3 +234,12 @@ class ResourceList(Argument):
                 raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
             instance.add_dependency(val)
         setattr(instance, self.arg_id, value)
+
+    def contribute_to_class(self, cls):
+        if isinstance(self.resource_class, basestring):
+            from .resource import ResourceType
+            if self.resource_class not in ResourceType.__all_resources__:
+                ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)
+                return
+            self.resource_class = ResourceType.__all_resources__[self.resource_class]
+        super(ResourceList, self).contribute_to_class(cls)

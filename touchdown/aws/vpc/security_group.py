@@ -17,27 +17,18 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from .vpc import VPC
+from .. import serializers
 from ..common import SimpleApply
 
 class Rule(Resource):
 
     resource_name = "rule"
 
-    protocol = argument.String(
-        choices=['tcp', 'udp', 'icmp'],
-        aws_field="IpProtocol",
-    )
-
-    from_port = argument.Integer(min=-1, max=32768, aws_field="FromPort")
-
-    to_port = argument.Integer(min=-1, max=32768, aws_field="ToPort")
-
-    # security_groups = argument.ResourceList(SecurityGroup)
-    # FIXME: Need to fix the self-referencing problem with the models
-    # FIXME: How to serialize a resource to a compound type...
-
-    networks = argument.List(aws_field="IpRanges")
-    # FIXME: How to serialize a lsit of IP addresses to {"CidrIp": IP}
+    protocol = argument.String(choices=['tcp', 'udp', 'icmp'])
+    from_port = argument.Integer(min=-1, max=32768)
+    to_port = argument.Integer(min=-1, max=32768)
+    security_groups = argument.ResourceList("touchdown.aws.vpc.security_group.SecurityGroup")
+    networks = argument.List()
 
 
 class SecurityGroup(Resource):
@@ -60,6 +51,19 @@ class Apply(SimpleApply, Target):
     describe_list_key = "SecurityGroups"
     key = 'SecurityGroupId'
 
+    IPPermissionList = serializers.List(serializers.Dict(
+        IPProtocol=serializers.Argument("protocol"),
+        FromPort=serializers.Argument("from_port"),
+        ToPort=serializers.Argument("to_port"),
+        UserIdGroupPairs=serializers.List(serializers.Dict(
+            UserId=serializers.Property("OwnerId"),
+            GroupId=serializers.Identifier(),
+        ), inner=serializers.Argument("security_groups"), skip_empty=True),
+        IpRanges=serializers.List(serializers.Dict(
+            CidrIp=serializers.String(),
+        ), inner=serializers.Argument("networks"), skip_empty=True)
+    ))
+
     @property
     def client(self):
         return self.runner.get_target(self.resource.vpc).client
@@ -74,6 +78,25 @@ class Apply(SimpleApply, Target):
         }
 
     def update_object(self):
-        remote_rules = [hd(d) for d in self.object.get("IpPermissions", [])]
+        remote_rules = frozenset([hd(d) for d in self.object.get("IpPermissions", [])])
+        local_rules = frozenset(self.IPPermissionList.render(self.runner, self.resource.ingress))
 
-        remote_rules = self.objects.get("IpPermissionsEgress", [])
+        print "Local ingress rules not at remote"
+        for rule in (local_rules - remote_rules):
+            print rule
+
+        print "Remote ingress rules not at local"
+        for rule in (remote_rules - local_rules):
+            print rule
+
+        remote_rules = frozenset(self.object.get("IpPermissionsEgress", []))
+        local_rules = frozenset(self.IPPermissionList.render(self.runner, self.resource.egress))
+        print "Local egress rules not at remote"
+        for rule in (local_rules - remote_rules):
+            print rule
+
+        print "Remote egress rules not at local"
+        for rule in (remote_rules - local_rules):
+            print rule
+        return
+        yield rule

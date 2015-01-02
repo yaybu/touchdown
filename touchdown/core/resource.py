@@ -23,6 +23,9 @@ logger = logging.getLogger(__name__)
 
 class ResourceType(type):
 
+    __all_resources__ = {}
+    __lazy_lookups__ = {}
+
     def __new__(meta, class_name, bases, new_attrs):
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
@@ -34,7 +37,17 @@ class ResourceType(type):
                 value.argument_name = key
                 value.contribute_to_class(cls)
 
+        name = ".".join((cls.__module__, cls.__name__))
+        meta.__all_resources__[name] = cls
+
+        for callable, args, kwargs in meta.__lazy_lookups__.get(name, []):
+            callable(*args, **kwargs)
+
         return cls
+
+    @classmethod
+    def add_callback(cls, name, callback, *args, **kwargs):
+        cls.__lazy_lookups__.setdefault(name, []).append((callback, args, kwargs))
 
 
 class Resource(six.with_metaclass(ResourceType)):
