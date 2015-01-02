@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core.action import Action
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core import argument
+from touchdown.core import argument, errors
 
 from ..account import AWS
 from ..elb import LoadBalancer
@@ -50,7 +51,14 @@ class AutoScalingGroup(Resource):
 
     load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames", aws_update=False)
 
-    health_check_type = argument.String(max=32, aws_field="HealthCheckType")
+    """ The kind of health check to use to detect unhealthy instances. By
+    default if you are using ELB with the ASG it will use the same health
+    checks as ELB. """
+    health_check_type = argument.String(
+        max=32,
+        default=lambda instance: "ELB" if instance.load_balancers else None,
+        aws_field="HealthCheckType",
+    )
 
     health_check_grace_period = argument.String(aws_field="HealthCheckGracePeriod")
 
@@ -59,6 +67,118 @@ class AutoScalingGroup(Resource):
     termination_policies = argument.List(aws_field="TerminationPolicies")
 
     account = argument.Resource(AWS)
+
+
+class ReplaceInstance(Action):
+
+    scaling_processes = [
+        "AlarmNotification",
+        "AZRebalance",
+        "ReplaceUnhealthy",
+        "ScheduledActions",
+    ]
+
+    def __init__(self, runner, target, instance_id):
+        super(ReplaceInstance, self).__init__(runner, target)
+        self.instance_id = instance_id
+
+    def suspend_processes(self):
+        self.client.suspend_processes(
+            AutoScalingGroupName=self.resource.name,
+            ScalingProcesses=self.scaling_processes,
+        )
+
+    def scale(self):
+        raise NotImplementedError(self.scale)
+
+    # FIXME: If TerminateInstanceInAutoScalingGroup is graceful then we don't
+    # need to detach from the ASG.
+    """
+    def remove_from_balancer(self):
+        self.client.detach_instances(
+            AutoScalingGroupName=self.resource.name,
+            InstanceIds=[self.instance_id],
+            ShouldDecrementDesiredCapacity=False,
+        )
+    """
+
+    def terminate_instance(self):
+        self.client.terminate_instance_in_auto_scaling_group(
+            InstanceId=self.instance_id,
+            ShouldDecrementDesiredCapacity=False,
+        )
+
+    def wait_for_healthy_asg(self):
+        # FIXME: Consider the grace period of the ASG + few minutes for booting
+        # and use that as a timeout for the release process.
+        while True:
+            asg = self.target.describe_object()
+            if asg['DesiredCapacity'] == len(i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy'):
+                return True
+
+    def unscale(self):
+        raise NotImplementedError(self.unscale)
+
+    def resume_processes(self):
+        self.client.resume_processes(
+            AutoScalingGroupName=self.resource.name,
+            ScalingProcesses=self.scaling_processes,
+        )
+
+    def run(self):
+        self.suspend_processes()
+        try:
+            self.scale()
+            try:
+                # self.remove_from_balancer()
+                self.terminate_instance()
+                if not self.wait_for_healthy_asg():
+                    raise errors.Error("Auto scaling group {} is not returning to a healthy state".format(self.resource.name))
+            finally:
+                self.unscale()
+        finally:
+            self.resume_processes()
+
+
+class GracefulReplacement(ReplaceInstance):
+
+    @property
+    def description(self):
+        yield "Gracefully replace instance {} (by increasing ASG pool and then terminating)".format(self.instance_id)
+
+    def scale(self):
+        desired_capacity = self.target.object['DesiredCapacity']
+        desired_capacity += 1
+
+        max = self.resource.max
+        if desired_capacity > max:
+            max = desired_capacity
+
+        self.client.update_auto_scaling_group(
+            AutoScalingGroupName=self.resource.name,
+            Max=max,
+            DesiredCapacity=desired_capacity,
+        )
+
+    def unscale(self):
+        self.client.update_auto_scaling_group(
+            AutoScalingGroupName=self.resource.name,
+            Max=self.resource.max,
+            DesiredCapacity=self.object['DesiredCapacity'],
+        )
+
+
+class SingletonReplacement(Action):
+
+    @property
+    def description(self):
+        yield "Replace singleton instance {}".format(self.instance_id)
+
+    def scale(self):
+        pass
+
+    def unscale(self):
+        pass
 
 
 class Apply(SimpleApply, Target):
@@ -74,3 +194,11 @@ class Apply(SimpleApply, Target):
     def client(self):
         account = self.runner.get_target(self.resource.acount)
         return account.get_client('autoscale')
+
+    def update_object(self):
+        launch_config_name = self.runner.get_target(self.resource.launch_configuration).resource_id
+        for instance in self.object.get("Instances", []):
+            if instance['LifecycleState'] in ('Terminating', ):
+                continue
+            if instance['LaunchConfigurationName'] != launch_config_name:
+                yield GracefulReplacement(self.runner, self, instance['InstanceId'])
