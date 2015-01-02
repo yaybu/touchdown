@@ -42,6 +42,8 @@ def resource_to_dict(runner, resource, mode="create"):
             value = ResourceId(resource)
         elif isinstance(arg, argument.ResourceList):
             value = [ResourceId(r) for r in value]
+        elif isinstance(arg, argument.IPNetwork):
+            value = str(value)
 
         params[arg.aws_field] = value
 

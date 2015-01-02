@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.renderable import ResourceId
+from touchdown.core.renderable import Renderable, ResourceId
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -28,7 +28,7 @@ class Route(Resource):
     resource_name = "route"
 
     destination_cidr = argument.IPNetwork(aws_field="DestinationCidrBlock")
-    gateway = argument.Resource(InternetGateway, aws_field="GatewayId")
+    internet_gateway = argument.Resource(InternetGateway, aws_field="GatewayId")
     # instance = argument.Resource(Instance, aws_field="InstanceId")
     # network_interface = argument.Resource(NetworkInterface, aws_field="NetworkInterfaceId")
     # vpc_peering_connection = argument.Resource(VpcPeeringConnection, aws_field="VpcPeeringConnectionId")
@@ -37,7 +37,7 @@ class Route(Resource):
 class hd(dict):
 
     def __hash__(self):
-        return frozenset(self.items)
+        return hash(frozenset(self.items()))
 
 
 class RouteTable(Resource):
@@ -105,8 +105,16 @@ class Apply(SimpleApply, Target):
                 )
 
     def update_routes(self):
+        """
+        Compare the individual routes listed in the RouteTable to the ones
+        defined in the current workspace, creating and removing routes as
+        needed.
+
+        Old routes are removed *before* new routes are added. This may cause
+        connection glitches when applied, but it avoids route collisions.
+        """
         remote_routes = frozenset(hd(d) for d in self.object.get("routes", []))
-        local_routes = frozenset(hd(resource_to_dict(self.runner, d)) for d in self.resource.routes)
+        local_routes = frozenset(hd(**resource_to_dict(self.runner, d)) for d in self.resource.routes)
 
         for route in (remote_routes - local_routes):
             yield self.generic_action(

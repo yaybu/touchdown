@@ -58,7 +58,8 @@ class Resource(six.with_metaclass(ResourceType)):
 
     @property
     def workspace(self):
-        return self.parent.workspace
+        if self.parent:
+            return self.parent.workspace
 
     def add_dependency(self, dependency):
         if self.workspace != dependency:

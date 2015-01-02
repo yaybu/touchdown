@@ -22,7 +22,7 @@ from ..common import SimpleApply
 
 class InternetGateway(Resource):
 
-    resource_name = "internet-gateway"
+    resource_name = "internet_gateway"
 
     name = argument.String()
     vpc = argument.Resource(VPC)
@@ -40,3 +40,10 @@ class Apply(SimpleApply, Target):
     @property
     def client(self):
         return self.runner.get_target(self.resource.vpc).client
+
+    def get_describe_filters(self):
+        return {
+            "Filters": [
+                {'Name': 'tag:name', 'Values': [self.resource.name]},
+            ],
+        }
