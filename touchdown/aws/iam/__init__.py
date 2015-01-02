@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .role import Role
 from .instance_profile import InstanceProfile
+from .role import Role
+from .server_certificate import ServerCertificate
 
 
 __all__ = [
+    'InstanceProfile',
     'Role',
-    'InstanceProfile'
+    'ServerCertificate',
 ]

@@ -26,7 +26,7 @@ class InstanceProfile(Resource):
     resource_name = "instance_profile"
 
     name = argument.String(aws_field="InstanceProfileName")
-    path = argument.String(aws_file='Path')
+    path = argument.String(aws_field='Path')
     roles = argument.ResourceList(Role)
     account = argument.Resource(AWS)
 

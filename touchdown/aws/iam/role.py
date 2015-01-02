@@ -27,7 +27,7 @@ class Role(Resource):
     resource_name = "role"
 
     name = argument.String(aws_field="Name")
-    path = argument.String(aws_file='Path')
+    path = argument.String(aws_field='Path')
     policies = argument.Dict()
     account = argument.Resource(AWS)
 

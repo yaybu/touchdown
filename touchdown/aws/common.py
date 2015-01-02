@@ -105,6 +105,7 @@ class SimpleApply(object):
     name = "apply"
     default = True
 
+    get_action = None
     update_action = None
     describe_notfound_exception = None
 
@@ -118,6 +119,10 @@ class SimpleApply(object):
         }
 
     def describe_object(self):
+        if self.get_action:
+            logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.get_action))
+            return getattr(self.client, self.get_action)(**{self.key: self.resource.name})
+
         logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
 
         filters = self.get_describe_filters()
