@@ -12,28 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    ec2,
-    elasticache,
-    elastictranscoder,
-    elb,
-    iam,
-    rds,
-    route53,
-    s3,
-)
+from .pipeline import Pipeline
 
 __all__ = [
-    'account',
-    'vpc',
-    'ec2',
-    'elasticache',
-    'elastictranscoder',
-    'elb',
-    'iam',
-    'rds',
-    'route53',
-    's3',
+    'Pipeline',
 ]
