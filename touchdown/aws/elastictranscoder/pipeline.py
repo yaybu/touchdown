@@ -47,7 +47,7 @@ class Apply(SimpleApply, Target):
     @property
     def client(self):
         account = self.runner.get_target(self.resource.account)
-        return account.get_client('s3')
+        return account.get_client('elastictranscoder')
 
     def describe_object(self):
         for pipeline in self.client.list_buckets()['Pipelines']:
