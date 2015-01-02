@@ -25,6 +25,12 @@ from touchdown.core.target import Present
 logger = logging.getLogger(__name__)
 
 
+class hd(dict):
+
+    def __hash__(self):
+        return hash(frozenset(self.items()))
+
+
 def resource_to_dict(runner, resource, mode="create"):
     params = {}
     for name, arg in resource.arguments:

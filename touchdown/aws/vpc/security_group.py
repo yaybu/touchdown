@@ -19,6 +19,26 @@ from touchdown.core import argument
 from .vpc import VPC
 from ..common import SimpleApply
 
+class Rule(Resource):
+
+    resource_name = "rule"
+
+    protocol = argument.String(
+        choices=['tcp', 'udp', 'icmp'],
+        aws_field="IpProtocol",
+    )
+
+    from_port = argument.Integer(min=-1, max=32768, aws_field="FromPort")
+
+    to_port = argument.Integer(min=-1, max=32768, aws_field="ToPort")
+
+    # security_groups = argument.ResourceList(SecurityGroup)
+    # FIXME: Need to fix the self-referencing problem with the models
+    # FIXME: How to serialize a resource to a compound type...
+
+    networks = argument.List(aws_field="IpRanges")
+    # FIXME: How to serialize a lsit of IP addresses to {"CidrIp": IP}
+
 
 class SecurityGroup(Resource):
 
@@ -27,6 +47,8 @@ class SecurityGroup(Resource):
     name = argument.String(aws_field="GroupName")
     description = argument.String(aws_field="Description")
     vpc = argument.Resource(VPC, aws_field="VpcId")
+    ingress = argument.ResourceList(Rule)
+    egress = argument.ResourceList(Rule)
     tags = argument.Dict()
 
 
@@ -50,3 +72,8 @@ class Apply(SimpleApply, Target):
                 {'Name': 'vpc-id', 'Values': [vpc.resource_id]}
             ],
         }
+
+    def update_object(self):
+        remote_rules = [hd(d) for d in self.object.get("IpPermissions", [])]
+
+        remote_rules = self.objects.get("IpPermissionsEgress", [])

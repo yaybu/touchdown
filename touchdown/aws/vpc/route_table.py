@@ -20,7 +20,7 @@ from touchdown.core import argument
 from .vpc import VPC
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
-from ..common import SimpleApply, resource_to_dict
+from ..common import SimpleApply, resource_to_dict, hd
 
 
 class Route(Resource):
@@ -32,12 +32,6 @@ class Route(Resource):
     # instance = argument.Resource(Instance, aws_field="InstanceId")
     # network_interface = argument.Resource(NetworkInterface, aws_field="NetworkInterfaceId")
     # vpc_peering_connection = argument.Resource(VpcPeeringConnection, aws_field="VpcPeeringConnectionId")
-
-
-class hd(dict):
-
-    def __hash__(self):
-        return hash(frozenset(self.items()))
 
 
 class RouteTable(Resource):

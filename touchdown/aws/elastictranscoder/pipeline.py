@@ -19,6 +19,9 @@ from touchdown.core import argument
 from ..account import AWS
 from ..common import SimpleApply
 
+from ..s3 import Bucket
+from ..iam import Role
+
 
 class Pipeline(Resource):
 
