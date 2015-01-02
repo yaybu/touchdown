@@ -49,12 +49,13 @@ class Runner(object):
         self._resolve(self.node, resolved, [])
 
         plan = []
-        for resource in resolved:
-            actions = tuple(self.get_target(resource).get_actions())
-            if not actions:
-                logger.debug("No actions for {} - skipping".format(resource))
-                continue
-            plan.append((resource, actions))
+        with self.ui.progress(resolved, label="Creating change plan") as resolved:
+            for resource in resolved:
+                actions = tuple(self.get_target(resource).get_actions())
+                if not actions:
+                    logger.debug("No actions for {} - skipping".format(resource))
+                    continue
+                plan.append((resource, actions))
 
         return plan
 
@@ -64,8 +65,9 @@ class Runner(object):
         if not self.ui.confirm_plan(plan):
             return
 
-        for resource, actions in plan:
-            for action in actions:
-                # if not ui.confirm_action(action):
-                #     continue
-                action.run()
+        with self.ui.progress(plan, label="Apply changes") as plan:
+            for resource, actions in plan:
+                for action in actions:
+                    # if not ui.confirm_action(action):
+                    #     continue
+                    action.run()

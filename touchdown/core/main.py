@@ -21,6 +21,9 @@ from . import errors
 
 class ConsoleInterface(object):
 
+    def progress(self, iterable, label=None, length=None):
+        return click.progressbar(iterable, label=label, length=length)
+
     def render_plan(self, plan):
         for resource, actions in plan:
             if actions:

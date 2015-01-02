@@ -91,7 +91,7 @@ class ReplaceInstance(Action):
     def scale(self):
         raise NotImplementedError(self.scale)
 
-    # FIXME: If TerminateInstanceInAutoScalingGroup is graceful then we don't
+    # FIXME: If TerminateInstanceInAutoScalingGroup is graceful then we don't
     # need to detach from the ASG.
     """
     def remove_from_balancer(self):
