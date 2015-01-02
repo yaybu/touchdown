@@ -50,10 +50,11 @@ def resource_to_dict(runner, resource, mode="create"):
 
 class GenericAction(Action):
 
-    def __init__(self, runner, target, description, func, *args, **kwargs):
+    def __init__(self, runner, target, description, func, waiter, *args, **kwargs):
         super(GenericAction, self).__init__(runner, target)
         self.func = func
         self._description = description
+        self.waiter = waiter
         self.args = args
         self.kwargs = kwargs
 
@@ -66,6 +67,10 @@ class GenericAction(Action):
         for k, v in self.kwargs.items():
             params[k] = render(self.runner, v)
         self.func(**params)
+
+        if self.waiter:
+            waiter = self.target.client.get_waiter(self.waiter)
+            waiter.wait(**self.target.get_describe_filters())
 
 
 class SetTags(Action):
@@ -105,6 +110,7 @@ class SimpleApply(object):
     name = "apply"
     default = True
 
+    waiter = None
     get_action = None
     update_action = None
     describe_notfound_exception = None
@@ -151,6 +157,7 @@ class SimpleApply(object):
         return self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
+            self.waiter,
             **self.get_create_args()
         )
 
@@ -160,6 +167,7 @@ class SimpleApply(object):
             self,
             description,
             callable,
+            None,
             *args,
             **kwargs
         )

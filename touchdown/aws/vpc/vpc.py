@@ -37,6 +37,7 @@ class Apply(SimpleApply, Target):
     describe_action = "describe_vpcs"
     describe_list_key = "Vpcs"
     key = 'VpcId'
+    waiter = 'vpc_available'
 
     @property
     def client(self):

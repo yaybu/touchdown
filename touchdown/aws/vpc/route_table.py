@@ -19,7 +19,25 @@ from touchdown.core import argument
 
 from .vpc import VPC
 from .subnet import Subnet
-from ..common import SimpleApply
+from .internet_gateway import InternetGateway
+from ..common import SimpleApply, resource_to_dict
+
+
+class Route(Resource):
+
+    resource_name = "route"
+
+    destination_cidr = argument.IPNetwork(aws_field="DestinationCidrBlock")
+    gateway = argument.Resource(InternetGateway, aws_field="GatewayId")
+    # instance = argument.Resource(Instance, aws_field="InstanceId")
+    # network_interface = argument.Resource(NetworkInterface, aws_field="NetworkInterfaceId")
+    # vpc_peering_connection = argument.Resource(VpcPeeringConnection, aws_field="VpcPeeringConnectionId")
+
+
+class hd(dict):
+
+    def __hash__(self):
+        return frozenset(self.items)
 
 
 class RouteTable(Resource):
@@ -29,6 +47,7 @@ class RouteTable(Resource):
     name = argument.String()
     vpc = argument.Resource(VPC, aws_field='VpcId')
     subnets = argument.ResourceList(Subnet)
+    routes = argument.List()
     tags = argument.Dict()
 
 
@@ -51,10 +70,7 @@ class Apply(SimpleApply, Target):
             ],
         }
 
-    def update_object(self):
-        for action in super(Apply, self).update_object():
-            yield action
-
+    def update_associations(self):
         remote_subnets = {}
         for association in self.object.get("Associations", []):
             remote_subnets[association['SubnetId']] = association['RouteTableAssociationId']
@@ -87,3 +103,30 @@ class Apply(SimpleApply, Target):
                     self.client.disassociate_route_table,
                     AssociationId=association,
                 )
+
+    def update_routes(self):
+        remote_routes = frozenset(hd(d) for d in self.object.get("routes", []))
+        local_routes = frozenset(hd(resource_to_dict(self.runner, d)) for d in self.resource.routes)
+
+        for route in (remote_routes - local_routes):
+            yield self.generic_action(
+                "Remove route for {}".format(route['DestinationCidrBlock']),
+                RouteTableId=ResourceId(self),
+                **route
+            )
+
+        for route in (local_routes - remote_routes):
+            yield self.generic_action(
+                "Adding route for {}".format(route['DestinationCidrBlock']),
+                self.client.create_route,
+                RouteTableId=ResourceId(self),
+                **route
+            )
+
+    def update_object(self):
+        for action in super(Apply, self).update_object():
+            yield action
+        for action in self.update_associations():
+            yield action
+        for action in self.update_routes():
+            yield action

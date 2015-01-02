@@ -30,7 +30,7 @@ class TestGenericAction(unittest.TestCase):
 
         params = resource_to_dict(runner, target.resource)
 
-        g = GenericAction(runner, target, "I am an action", api, **params)
+        g = GenericAction(runner, target, "I am an action", api, None, **params)
         self.assertEqual(tuple(g.description), ("I am an action", ))
         g.run()
 
