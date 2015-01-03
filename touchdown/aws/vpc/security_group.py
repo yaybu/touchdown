@@ -14,6 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
+from touchdown.core.renderable import ResourceId
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -80,23 +81,36 @@ class Apply(SimpleApply, Target):
     def update_object(self):
         remote_rules = frozenset([hd(d) for d in self.object.get("IpPermissions", [])])
         local_rules = frozenset(self.IPPermissionList.render(self.runner, self.resource.ingress))
-
-        print "Local ingress rules not at remote"
         for rule in (local_rules - remote_rules):
-            print rule
+            yield self.generic_action(
+                "Authorize ingress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
+                self.client.authorize_security_group_ingress,
+                GroupId=ResourceId(self.resource),
+                #FIXME
+            )
 
-        print "Remote ingress rules not at local"
         for rule in (remote_rules - local_rules):
-            print rule
+            yield self.generic_action(
+                "Deauthorize ingress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
+                self.client.authorize_security_group_ingress,
+                GroupId=ResourceId(self.resource),
+                #FIXME
+            )
 
         remote_rules = frozenset(self.object.get("IpPermissionsEgress", []))
         local_rules = frozenset(self.IPPermissionList.render(self.runner, self.resource.egress))
-        print "Local egress rules not at remote"
         for rule in (local_rules - remote_rules):
-            print rule
+            yield self.generic_action(
+                "Authorize egress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
+                self.client.authorize_security_group_egress,
+                GroupId=ResourceId(self.resource),
+                #FIXME
+            )
 
-        print "Remote egress rules not at local"
         for rule in (remote_rules - local_rules):
-            print rule
-        return
-        yield rule
+            yield self.generic_action(
+                "Deauthorize egress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
+                self.client.authorize_security_group_egress,
+                GroupId=ResourceId(self.resource),
+                #FIXME
+            )

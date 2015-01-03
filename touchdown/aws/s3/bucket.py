@@ -18,7 +18,7 @@ from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleApply
-
+from .. import serializers
 
 # FIXME: Figure out how to bind CreateBucketConfiguration.LocationConstraint
 
@@ -38,6 +38,13 @@ class Apply(SimpleApply, Target):
     describe_action = "list_buckets"
     describe_list_key = "Buckets"
     key = 'Name'
+
+    create_serializer = serializers.Dict(
+        Bucket = serializers.Argument("name"),
+        CreateBucketConfiguration = serializers.Dict(
+            LocationConstraint = serializers.Argument("region"),
+        )
+    )
 
     @property
     def client(self):

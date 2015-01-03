@@ -122,6 +122,7 @@ class SimpleApply(object):
     get_action = None
     update_action = None
     describe_notfound_exception = None
+    create_serializer = None
 
     signature = (
         Present('name'),
