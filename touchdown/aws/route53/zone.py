@@ -56,7 +56,9 @@ class Apply(SimpleApply, Target):
                 if zone['Name'] == zone_name:
                     return zone
 
-    def get_create_extra_args(self):
-        return {
+    def get_create_args(self):
+        args = {
             "CallerReference": str(uuid.uuid4()),
         }
+        args.update(super(Apple, self).get_create_args())
+        return args
