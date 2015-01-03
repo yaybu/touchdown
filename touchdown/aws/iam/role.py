@@ -77,10 +77,7 @@ class Apply(SimpleApply, Target):
                     PolicyName=name,
                 )
 
-                # Decode the json and compare 2 python dictionaries. This is to
-                # because the sort order isn't stable - in theory 2 identical
-                # dictionaries might yield different json.
-                if json.loads(policy['PolicyDocument']) != document:
+                if policy['PolicyDocument'] != document:
                     changed = True
 
             if changed:
@@ -93,7 +90,7 @@ class Apply(SimpleApply, Target):
                 )
 
         for name in policy_names:
-            if name not in self.policies:
+            if name not in self.resource.policies:
                 yield self.generic_action(
                     "Delete policy {}".format(name),
                     self.client.delete_role_policy,

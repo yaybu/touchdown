@@ -22,11 +22,12 @@ from .cache import BaseCacheCluster
 
 class ReplicationGroup(BaseCacheCluster, Resource):
 
-    resource_name = "cache_replication_group"
+    resource_name = "replication_group"
 
     name = argument.String(regex=r"[a-z1-9\-]{1,20}", aws_field="CacheClusterId")
-    # primary_cluster = argument.Resouce("touchdown.aws.elasticache.cache.CacheCluster", aws_field="PrimaryClusterId")
+    primary_cluster = argument.Resource("touchdown.aws.elasticache.cache.CacheCluster", aws_field="PrimaryClusterId")
     automatic_failover = argument.Boolean(aws_field="AutomaticFailoverEnabled")
+    num_cache_clusters = argument.Integer(aws_field="NumCacheClusters")
 
 
 class Apply(SimpleApply, Target):
@@ -40,4 +41,6 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
+        if self.resource.primary_cluster:
+            return self.runner.get_target(self.resource.primary_cluster).client
         return self.runner.get_target(self.resource.account).get_client('elasticache')

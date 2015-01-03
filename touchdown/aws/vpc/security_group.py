@@ -73,7 +73,7 @@ class Apply(SimpleApply, Target):
         return {
             "Filters": [
                 {'Name': 'group-name', 'Values': [self.resource.name]},
-                {'Name': 'vpc-id', 'Values': [vpc.resource_id]}
+                {'Name': 'vpc-id', 'Values': [vpc.resource_id or '']}
             ],
         }
 

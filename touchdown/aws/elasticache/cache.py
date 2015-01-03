@@ -19,6 +19,7 @@ from touchdown.core import argument
 from ..account import AWS
 from ..common import SimpleApply
 
+from ..vpc import SecurityGroup
 from .subnet_group import SubnetGroup
 
 
@@ -40,7 +41,7 @@ class BaseCacheCluster(object):
     port = argument.Integer(min=1, max=32768, aws_field='Port', aws_update=False)
 
     """ A list of security groups to apply to this instance """
-    security_groups = argument.List(aws_field='SecurityGroups')
+    security_groups = argument.ResourceList(SecurityGroup, aws_field='SecurityGroups')
 
     """ The preferred availability zone to start this CacheCluster in """
     availability_zone = argument.String(aws_field='PreferredAvailabilityZone')

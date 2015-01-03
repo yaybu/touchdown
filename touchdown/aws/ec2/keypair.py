@@ -15,8 +15,13 @@
 from touchdown.core.resource import Resource
 from touchdown.core import argument
 
+from ..account import AWS
+
 
 class KeyPair(Resource):
     resource_name = "keypair"
 
     name = argument.String()
+    private_key = argument.String()
+
+    account = argument.Resource(AWS)

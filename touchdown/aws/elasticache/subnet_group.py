@@ -41,7 +41,7 @@ class Apply(SimpleApply, Target):
     update_action = "modify_cache_subnet_group"
     describe_action = "describe_cache_subnet_groups"
     describe_list_key = "CacheSubnetGroups"
-    key = 'CacheSubnetGroupId'
+    key = 'CacheSubnetGroupName'
 
     @property
     def client(self):

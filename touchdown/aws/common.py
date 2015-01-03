@@ -146,7 +146,7 @@ class SimpleApply(object):
             results = getattr(self.client, self.describe_action)(**filters)
         except ClientError as e:
             if e.response['Error']['Code'] == self.describe_notfound_exception:
-                return
+                return {}
             raise
 
         objects = results[self.describe_list_key]
@@ -157,6 +157,8 @@ class SimpleApply(object):
         if len(objects) == 1:
             logger.debug("Found object {}".format(objects[0][self.key]))
             return objects[0]
+
+        return {}
 
     def get_create_args(self):
         return resource_to_dict(self.runner, self.resource)
@@ -201,7 +203,7 @@ class SimpleApply(object):
             for k, v in local.items():
                 if k not in self.object:
                     continue
-                v = render(v)
+                v = render(self.runner, v)
                 if v != self.object[k]:
                     logger.debug("Resource field {} has changed ({} != {})".format(k, v, self.object[k]))
                     # FIXME: Make this smarter... Where referring to

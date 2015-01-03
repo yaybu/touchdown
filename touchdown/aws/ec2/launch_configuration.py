@@ -18,6 +18,7 @@ from touchdown.core import argument
 
 from ..account import AWS
 from ..vpc import SecurityGroup
+from ..iam import InstanceProfile
 from ..common import SimpleApply
 
 
@@ -48,7 +49,7 @@ class LaunchConfiguration(Resource):
 
     spot_price = argument.String(aws_field="SpotPrice")
 
-    instance_profile = argument.String(max=1600, aws_field="IamInstanceProfile")
+    instance_profile = argument.Resource(InstanceProfile, aws_field="IamInstanceProfile")
 
     ebs_optimized = argument.Boolean(aws_field="EbsOptimized")
 
@@ -76,5 +77,8 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        account = self.runner.get_target(self.resource.acount)
-        return account.get_client('autoscale')
+        account = self.runner.get_target(self.resource.account)
+        return account.get_client('autoscaling')
+
+    def get_describe_filters(self):
+        return {"LaunchConfigurationNames": [self.resource.name]}

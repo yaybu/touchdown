@@ -73,7 +73,7 @@ class Database(Resource):
 
     character_set_name = argument.String(aws_field="CharacterSetName")
 
-    backup_retention_period = argument.String(aws_field="BackupRetentionPeriod")
+    backup_retention_period = argument.Integer(aws_field="BackupRetentionPeriod")
 
     preferred_backup_window = argument.String(aws_field="PreferredBackupWindow")
 

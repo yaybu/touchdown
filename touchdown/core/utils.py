@@ -22,7 +22,7 @@ def force_str(s):
         return s.encode("utf-8")
     elif isinstance(s, six.binary_type):
         return s.decode("utf-8")
-    raise ValueError("Not a string")
+    raise ValueError("{} Not a string".format(s))
 
 
 def force_unicode(s):

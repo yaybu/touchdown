@@ -41,8 +41,8 @@ class Apply(SimpleApply, Target):
     resource = LoadBalancer
     create_action = "create_load_balancer"
     describe_action = "describe_load_balancers"
-    describe_list_key = "LoadBalancers"
-    key = 'Name'
+    describe_list_key = "LoadBalancerDescriptions"
+    key = 'LoadBalancerName'
 
     signature = [
         Present('name'),
@@ -53,3 +53,6 @@ class Apply(SimpleApply, Target):
     def client(self):
         account = self.runner.get_target(self.resource.account)
         return account.get_client('elb')
+
+    def get_describe_filters(self):
+        return {"LoadBalancerNames": [self.resource.name]}

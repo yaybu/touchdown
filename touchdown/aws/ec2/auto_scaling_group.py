@@ -192,8 +192,11 @@ class Apply(SimpleApply, Target):
 
     @property
     def client(self):
-        account = self.runner.get_target(self.resource.acount)
-        return account.get_client('autoscale')
+        account = self.runner.get_target(self.resource.account)
+        return account.get_client('autoscaling')
+
+    def get_describe_filters(self):
+        return {"AutoScalingGroupNames": [self.resource.name]}
 
     def update_object(self):
         launch_config_name = self.runner.get_target(self.resource.launch_configuration).resource_id
