@@ -49,6 +49,10 @@ class AutoScalingGroup(Resource):
 
     availability_zones = argument.List(aws_field="AvailabilityZones")
 
+    # FIXME: This needs a custom serializer: Instead of a list, botocore expects
+    # a comma separated string!
+    subnets = argument.List(Subnet, aws_field="VpcZoneIdentifier")
+
     load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames", aws_update=False)
 
     """ The kind of health check to use to detect unhealthy instances. By
