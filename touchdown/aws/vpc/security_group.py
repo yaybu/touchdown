@@ -14,12 +14,11 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.renderable import ResourceId
 from touchdown.core import argument
 
 from .vpc import VPC
 from .. import serializers
-from ..common import SimpleApply, hd
+from ..common import SimpleApply
 
 
 class Rule(Resource):
@@ -93,6 +92,19 @@ class Apply(SimpleApply, Target):
     describe_list_key = "SecurityGroups"
     key = 'GroupId'
 
+    rule_serializer = IPPermissionList = serializers.List(serializers.Dict(
+        IPProtocol=serializers.Argument("protocol"),
+        FromPort=serializers.Argument("from_port"),
+        ToPort=serializers.Argument("to_port"),
+        UserIdGroupPairs=serializers.List(serializers.Dict(
+            UserId=serializers.Property("OwnerId"),
+            GroupId=serializers.Identifier(),
+        ), inner=serializers.Argument("security_groups"), skip_empty=True),
+        IpRanges=serializers.List(serializers.Dict(
+            CidrIp=serializers.String(),
+        ), inner=serializers.Argument("networks"), skip_empty=True)
+    ))
+
     def get_describe_filters(self):
         vpc = self.runner.get_target(self.resource.vpc)
         return {
@@ -108,28 +120,14 @@ class Apply(SimpleApply, Target):
                 if local_rule.matches(self.runner, remote_rule):
                     break
             else:
-                params = dict(
-                    IpProtocol=local_rule.protocol,
-                    FromPort=local_rule.from_port,
-                    ToPort=local_rule.to_port,
-                )
-                if local_rule.security_group:
-                    params['UserIdGroupPairs'] = [
-                        dict(UserId=Property(local_rule.security_group, 'OwnerId'), GroupId=ResourceId(local_rule.security_group))
-                    ]
-                if local_rule.network:
-                    params['IpRanges'] = [
-                        dict(CidrIp=str(local_rule.network)),
-                    ]
-
                 yield self.generic_action(
                     "Authorize ingress {}".format(local_rule),
                     self.client.authorize_security_group_ingress,
-                    GroupId=ResourceId(self.resource),
-                    IpPermissions=[
-                        params,
-                    ],
+                    GroupId=serializers.Identifier(),
+                    IpPermissions=self.rule_serializer,
                 )
+
+        return
 
         """
         for remote_rule in self.object.get("IpPermissions", []):
@@ -153,6 +151,6 @@ class Apply(SimpleApply, Target):
                 yield self.generic_action(
                     "Authorize egress {}".format(local_rule),
                     self.client.authorize_security_group_egress,
-                    GroupId=ResourceId(self.resource),
-                    #FIXME
+                    GroupId=serializers.Identifier(),
+                    IpPermissions=self.rule_serializer,
                 )

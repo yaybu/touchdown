@@ -71,6 +71,8 @@ class AutoScalingGroup(Resource):
 
     termination_policies = argument.List(aws_field="TerminationPolicies")
 
+    replacement_policy = argument.String(choices=['singleton', 'graceful'], default='graceful')
+
     account = argument.Resource(AWS)
 
 
@@ -201,8 +203,14 @@ class Apply(SimpleApply, Target):
 
     def update_object(self):
         launch_config_name = self.runner.get_target(self.resource.launch_configuration).resource_id
+
         for instance in self.object.get("Instances", []):
             if instance['LifecycleState'] in ('Terminating', ):
                 continue
             if instance.get('LaunchConfigurationName', '') != launch_config_name:
-                yield GracefulReplacement(self.runner, self, instance['InstanceId'])
+                klass = {
+                    'graceful': GracefulReplacement,
+                    'singleton': SingletonReplacement,
+                }[self.resource.replacement_policy]
+
+                yield klass(self, instance['InstanceId'])

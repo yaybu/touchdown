@@ -16,10 +16,11 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from touchdown.core import argument, errors
+from touchdown.core import errors
 from touchdown.core.action import Action
-from touchdown.core.renderable import ResourceId, render
 from touchdown.core.target import Present
+
+from . import serializers
 
 
 logger = logging.getLogger(__name__)
@@ -31,49 +32,22 @@ class hd(dict):
         return hash(frozenset(self.items()))
 
 
-def resource_to_dict(runner, resource, mode="create"):
-    params = {}
-    for name, arg in resource.arguments:
-        if not arg.present(resource):
-            continue
-        if not hasattr(arg, "aws_field"):
-            continue
-        if mode == "create" and not getattr(arg, "aws_create", True):
-            continue
-        if mode == "update" and not getattr(arg, "aws_update", True):
-            continue
-
-        value = getattr(resource, name)
-        if isinstance(arg, argument.Resource):
-            value = ResourceId(resource)
-        elif isinstance(arg, argument.ResourceList):
-            value = [ResourceId(r) for r in value]
-        elif isinstance(arg, argument.IPNetwork):
-            value = str(value)
-
-        params[arg.aws_field] = value
-
-    return params
-
-
 class GenericAction(Action):
 
-    def __init__(self, runner, target, description, func, waiter, *args, **kwargs):
-        super(GenericAction, self).__init__(runner, target)
+    def __init__(self, target, description, func, waiter, **kwargs):
+        super(GenericAction, self).__init__(target)
         self.func = func
         self._description = description
         self.waiter = waiter
-        self.args = args
-        self.kwargs = kwargs
+        self.kwargs = serializers.Dict(**{(k, v if isinstance(serializers.Serializer) else serializers.Const(v)) for (k, v) in kwargs.items()})
 
     @property
     def description(self):
         yield self._description
 
     def run(self):
-        params = {}
-        for k, v in self.kwargs.items():
-            params[k] = render(self.runner, v)
+        params = self.kwargs.render(self.runner, self.resource)
+
         self.func(**params)
 
         if self.waiter:
@@ -83,8 +57,8 @@ class GenericAction(Action):
 
 class SetTags(Action):
 
-    def __init__(self, runner, target, tags):
-        super(SetTags, self).__init__(runner, target)
+    def __init__(self, target, tags):
+        super(SetTags, self).__init__(target)
         self.tags = tags
 
     @property
@@ -180,25 +154,20 @@ class SimpleApply(object):
 
         return {}
 
-    def get_create_args(self):
-        return resource_to_dict(self.runner, self.resource)
-
     def create_object(self):
         return self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
             self.waiter,
-            **self.get_create_args()
+            **serializers.Resource(self.resource).kwargs
         )
 
-    def generic_action(self, description, callable, *args, **kwargs):
+    def generic_action(self, description, callable, **kwargs):
         return GenericAction(
-            self.runner,
             self,
             description,
             callable,
             None,
-            *args,
             **kwargs
         )
 
@@ -219,11 +188,10 @@ class SimpleApply(object):
             logger.debug("Checking resource {} for changes".format(self.resource))
 
             description = ["Updating {}".format(self.resource)]
-            local = resource_to_dict(self.runner, self.resource, mode="update")
-            for k, v in local.items():
+            local = serializers.Resource(self.resource, mode="update")
+            for k, v in local.render(self.runner, self.resource).items():
                 if k not in self.object:
                     continue
-                v = render(self.runner, v)
                 if v != self.object[k]:
                     logger.debug("Resource field {} has changed ({} != {})".format(k, v, self.object[k]))
                     # FIXME: Make this smarter... Where referring to
@@ -238,7 +206,7 @@ class SimpleApply(object):
                 yield self.generic_action(
                     description,
                     getattr(self.client, self.update_action),
-                    **local
+                    **local.kwargs
                 )
 
         if hasattr(self.resource, "tags"):
@@ -253,7 +221,6 @@ class SimpleApply(object):
 
             if tags:
                 yield SetTags(
-                    self.runner,
                     self,
                     tags=tags,
                 )

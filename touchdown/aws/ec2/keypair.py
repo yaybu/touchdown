@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2014-2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,15 +13,30 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
+from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
+from ..common import SimpleApply
 
 
 class KeyPair(Resource):
     resource_name = "keypair"
 
-    name = argument.String()
-    private_key = argument.String()
+    name = argument.String(aws_field="KeyName")
+    public_key = argument.String(aws_field="PublicKeyMaterial")
 
     account = argument.Resource(AWS)
+
+
+class Apply(SimpleApply, Target):
+
+    resource = KeyPair
+    service_name = 'ec2'
+    create_action = "import_key_pair"
+    describe_action = "describe_key_pairs"
+    describe_list_key = "KeyPairs"
+    key = 'KeyName'
+
+    def get_describe_filters(self):
+        return {"KeyNames": [self.resource.name]}

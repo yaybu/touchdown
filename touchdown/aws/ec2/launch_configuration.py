@@ -66,7 +66,7 @@ class LaunchConfiguration(Resource):
 
     account = argument.Resource(AWS)
 
-    def matches(self, object):
+    def matches(self, runner, object):
         if object['ImageId'] != self.image:
             return False
         if object['KeyName'] != self.key_name:
@@ -90,5 +90,5 @@ class Apply(SimpleApply, Target):
 
     def describe_object(self):
         for launch_config in self.client.describe_launch_configurations()['LaunchConfigurations']:
-            if self.resource.matches(launch_config):
+            if self.resource.matches(self.runner, launch_config):
                 return launch_config

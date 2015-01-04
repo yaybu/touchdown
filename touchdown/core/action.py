@@ -15,9 +15,9 @@
 
 class Action(object):
 
-    def __init__(self, runner, target):
-        self.runner = runner
+    def __init__(self, target):
         self.target = target
+        self.runner = target.runner
         self.resource = target.resource
 
     def get_target(self, resource):

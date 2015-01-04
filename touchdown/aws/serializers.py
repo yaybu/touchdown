@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core import argument
 from touchdown.core.utils import force_str
 
 
@@ -146,6 +147,33 @@ class Dict(Serializer):
             except FieldNotPresent:
                 continue
         return hd(result)
+
+
+class Resource(Dict):
+
+    """ Automatically generate a Dict definition by inspect the aws_field
+    paramters of a resource """
+
+    def __init__(self, resource, mode="create"):
+        kwargs = {}
+        for arg in resource.arguments:
+            if not arg.present(resource):
+                continue
+            if not hasattr(arg, "aws_field"):
+                continue
+            if mode == "create" and not getattr(arg, "aws_create", True):
+                continue
+            if mode == "update" and not getattr(arg, "aws_update", True):
+                continue
+
+            value = Argument(arg.argument_name)
+            if isinstance(arg, argument.Resource):
+                value = Identifier(inner=value)
+            elif isinstance(arg, argument.ResourceList):
+                value = List(inner=value, child=Identifier())
+            kwargs[arg.aws_field] = value
+
+        super(Resource, self).__init__(**kwargs)
 
 
 class List(Serializer):

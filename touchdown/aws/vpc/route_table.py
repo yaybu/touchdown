@@ -14,9 +14,9 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.renderable import ResourceId
 from touchdown.core import argument
 
+from . import serializers
 from .vpc import VPC
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
@@ -72,8 +72,8 @@ class Apply(SimpleApply, Target):
                 yield self.generic_action(
                     "Associate with subnet {}".format(subnet.name),
                     self.client.associate_route_table,
-                    SubnetId=ResourceId(subnet),
-                    RouteTableId=ResourceId(self),
+                    SubnetId=serializers.Identifier(inner=serializers.Const(subnet)),
+                    RouteTableId=serializers.Identifier(self),
                 )
 
         # If we are the main table then we may be associated with non-managed
@@ -110,7 +110,7 @@ class Apply(SimpleApply, Target):
         for route in (remote_routes - local_routes):
             yield self.generic_action(
                 "Remove route for {}".format(route['DestinationCidrBlock']),
-                RouteTableId=ResourceId(self),
+                RouteTableId=serializers.Identifier(self),
                 **route
             )
 
@@ -118,7 +118,7 @@ class Apply(SimpleApply, Target):
             yield self.generic_action(
                 "Adding route for {}".format(route['DestinationCidrBlock']),
                 self.client.create_route,
-                RouteTableId=ResourceId(self),
+                RouteTableId=serializers.Identifier(self),
                 **route
             )
 
