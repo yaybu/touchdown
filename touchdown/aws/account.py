@@ -36,14 +36,13 @@ class Info(Target):
     resource = AWS
     default = True
     name = "info"
-    session = None
+    _session = None
 
-    def get_client(self, service_name):
-        if not self.session:
-            self.session = session.get_session()
-            if self.resource.access_key_id and self.resource.secret_access_key:
-                self.session.set_credentials(
-                    self.resource.access_key_id,
-                    self.resource.secret_access_key,
-                )
-        return self.session.create_client(service_name, self.resource.region)
+    @property
+    def session(self):
+        if not self._session:
+            self._session = session.get_session()
+            self._session.access_key_id = self.resource.access_key_id or None
+            self._session.secret_access_key = self.resource.secret_access_key or None
+            self._session.region = self.resource.region
+        return self._session

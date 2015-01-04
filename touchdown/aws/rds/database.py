@@ -94,6 +94,7 @@ class Database(Resource):
 class Apply(SimpleApply, Target):
 
     resource = Database
+    service_name = 'rds'
     create_action = "create_db_instance"
     update_action = "modify_db_instance"
     describe_action = "describe_db_instances"
@@ -109,11 +110,3 @@ class Apply(SimpleApply, Target):
         Present("master_username"),
         Present("master_password"),
     )
-
-    @property
-    def client(self):
-        if self.resource.subnet_group:
-            return self.runner.get_target(self.resource.subnet_group).client
-        else:
-            account = self.runner.get_target(self.resource.acount)
-            return account.get_client('rds')

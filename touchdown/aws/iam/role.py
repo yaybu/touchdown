@@ -35,14 +35,11 @@ class Role(Resource):
 class Apply(SimpleApply, Target):
 
     resource = Role
+    service_name = 'iam'
     create_action = "create_role"
     describe_action = "list_roles"
     describe_list_key = "Roles"
     key = 'Role'
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.account).get_client('iam')
 
     def describe_object(self):
         paginator = self.client.get_paginator("list_roles")

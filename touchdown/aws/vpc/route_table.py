@@ -48,14 +48,11 @@ class RouteTable(Resource):
 class Apply(SimpleApply, Target):
 
     resource = RouteTable
+    service_name = 'ec2'
     create_action = "create_route_table"
     describe_action = "describe_route_tables"
     describe_list_key = "RouteTables"
     key = "RouteTableId"
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.vpc).client
 
     def get_describe_filters(self):
         return {

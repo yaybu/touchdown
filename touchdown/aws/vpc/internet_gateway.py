@@ -32,14 +32,11 @@ class InternetGateway(Resource):
 class Apply(SimpleApply, Target):
 
     resource = InternetGateway
+    service_name = 'ec2'
     create_action = "create_internet_gateway"
     describe_action = "describe_internet_gateways"
     describe_list_key = "InternetGateways"
     key = "InternetGatewayId"
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.vpc).client
 
     def get_describe_filters(self):
         return {

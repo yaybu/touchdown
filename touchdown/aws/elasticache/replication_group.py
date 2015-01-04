@@ -33,14 +33,9 @@ class ReplicationGroup(BaseCacheCluster, Resource):
 class Apply(SimpleApply, Target):
 
     resource = ReplicationGroup
+    service_name = 'elasticache'
     create_action = "create_replication_group"
     update_action = "modify_replication_group"
     describe_action = "describe_replication_groups"
     describe_list_key = "ReplicationGroups"
     key = 'ReplicationGroupId'
-
-    @property
-    def client(self):
-        if self.resource.primary_cluster:
-            return self.runner.get_target(self.resource.primary_cluster).client
-        return self.runner.get_target(self.resource.account).get_client('elasticache')

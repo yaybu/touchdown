@@ -36,10 +36,7 @@ class ServerCertificate(Resource):
 class Apply(SimpleApply, Target):
 
     resource = ServerCertificate
+    service_name = 'iam'
     create_action = "upload_server_certificate"
     get_action = "get_server_certificate"
     key = 'ServerCertificateName'
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.account).get_client('iam')

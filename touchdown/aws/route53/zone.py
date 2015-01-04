@@ -38,15 +38,12 @@ class HostedZone(Resource):
 class Apply(SimpleApply, Target):
 
     resource = HostedZone
+    service_name = 'route53'
     create_action = "create_hosted_zone"
     # update_action = "update_hosted_zone_comment"
     describe_action = "list_hosted_zones"
     describe_list_key = "HostedZone"
     key = 'HostedZoneId'
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.account).get_client('route53')
 
     def describe_object(self):
         zone_name = self.resource.name.rstrip(".") + "."

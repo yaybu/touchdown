@@ -53,6 +53,10 @@ class Target(six.with_metaclass(TargetType)):
         super(Target, self).__init__()
         self.runner = runner
         self.resource = resource
+        if resource.parent:
+            self.parent = runner.get_target(resource.parent)
+        else:
+            self.parent = None
 
     def validate(self):
         a = AND(*self.signature)

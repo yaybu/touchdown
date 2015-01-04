@@ -34,14 +34,11 @@ class InstanceProfile(Resource):
 class Apply(SimpleApply, Target):
 
     resource = InstanceProfile
+    service_name = 'iam'
     create_action = "create_instance_profile"
     describe_action = "list_instance_profiles"
     describe_list_key = "InstanceProfiles"
     key = 'InstanceProfile'
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.account).get_client('iam')
 
     def describe_object(self):
         paginator = self.client.get_paginator("list_instance_profiles")

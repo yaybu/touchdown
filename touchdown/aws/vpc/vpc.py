@@ -33,15 +33,12 @@ class VPC(Resource):
 class Apply(SimpleApply, Target):
 
     resource = VPC
+    service_name = 'ec2'
     create_action = "create_vpc"
     describe_action = "describe_vpcs"
     describe_list_key = "Vpcs"
     key = 'VpcId'
     waiter = 'vpc_available'
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.account).get_client('ec2')
 
     def describe_object(self):
         for vpc in self.client.describe_vpcs()['Vpcs']:

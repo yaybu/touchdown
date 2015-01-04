@@ -34,6 +34,7 @@ class Subnet(Resource):
 class Apply(SimpleApply, Target):
 
     resource = Subnet
+    service_name = 'ec2'
     create_action = "create_subnet"
     describe_action = "describe_subnets"
     describe_list_key = "Subnets"
@@ -44,10 +45,6 @@ class Apply(SimpleApply, Target):
         Present('vpc'),
         Present('cidr_block'),
     )
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.vpc).client
 
     def get_describe_filters(self):
         return {

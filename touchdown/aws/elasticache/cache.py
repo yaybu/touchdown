@@ -77,17 +77,10 @@ class CacheCluster(BaseCacheCluster, Resource):
 class Apply(SimpleApply, Target):
 
     resource = CacheCluster
+    service_name = 'elasticache'
     create_action = "create_cache_cluster"
     update_action = "modify_cache_cluster"
     describe_action = "describe_cache_clusters"
     describe_notfound_exception = "CacheClusterNotFound"
     describe_list_key = "CacheClusters"
     key = 'CacheClusterId'
-
-    @property
-    def client(self):
-        if self.resource.subnet_group:
-            return self.runner.get_target(self.resource.subnet_group).client
-        else:
-            account = self.runner.get_target(self.resource.account)
-            return account.get_client('elasticache')

@@ -34,6 +34,7 @@ class Bucket(Resource):
 class Apply(SimpleApply, Target):
 
     resource = Bucket
+    service_name = 's3'
     create_action = "create_bucket"
     describe_action = "list_buckets"
     describe_list_key = "Buckets"
@@ -45,11 +46,6 @@ class Apply(SimpleApply, Target):
             LocationConstraint = serializers.Argument("region"),
         )
     )
-
-    @property
-    def client(self):
-        account = self.runner.get_target(self.resource.account)
-        return account.get_client('s3')
 
     def describe_object(self):
         for bucket in self.client.list_buckets()['Buckets']:

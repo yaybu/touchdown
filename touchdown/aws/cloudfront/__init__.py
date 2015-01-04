@@ -12,30 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    ec2,
-    cloudfront,
-    elasticache,
-    elastictranscoder,
-    elb,
-    iam,
-    rds,
-    route53,
-    s3,
-)
+from .distribution import Distribution
 
 __all__ = [
-    'account',
-    'vpc',
-    'ec2',
-    'cloudfront',
-    'elasticache',
-    'elastictranscoder',
-    'elb',
-    'iam',
-    'rds',
-    'route53',
-    's3',
+    'Distribution',
 ]

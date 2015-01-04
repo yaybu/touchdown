@@ -37,12 +37,9 @@ class SubnetGroup(Resource):
 class Apply(SimpleApply, Target):
 
     resource = SubnetGroup
+    service_name = 'elasticache'
     create_action = "create_cache_subnet_group"
     update_action = "modify_cache_subnet_group"
     describe_action = "describe_cache_subnet_groups"
     describe_list_key = "CacheSubnetGroups"
     key = 'CacheSubnetGroupName'
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.account).get_client('elasticache')

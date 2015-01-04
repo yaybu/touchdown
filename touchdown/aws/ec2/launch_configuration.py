@@ -70,15 +70,11 @@ class LaunchConfiguration(Resource):
 class Apply(SimpleApply, Target):
 
     resource = LaunchConfiguration
+    service_name = 'autoscaling'
     create_action = "create_auto_scaling_group"
     describe_action = "describe_launch_configurations"
     describe_list_key = "LaunchConfigurations"
     key = 'LaunchConfigurationName'
-
-    @property
-    def client(self):
-        account = self.runner.get_target(self.resource.account)
-        return account.get_client('autoscaling')
 
     def get_describe_filters(self):
         return {"LaunchConfigurationNames": [self.resource.name]}

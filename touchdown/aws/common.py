@@ -128,6 +128,25 @@ class SimpleApply(object):
         Present('name'),
     )
 
+    _client = None
+
+    @property
+    def session(self):
+        return self.parent.session
+
+    @property
+    def client(self):
+        session = self.session
+        if not self._client:
+            self._client = session.create_client(
+                service_name=self.service_name,
+                region_name=session.region,
+                aws_access_key_id=session.access_key_id,
+                aws_secret_access_key=session.secret_access_key,
+                # aws_session_token
+            )
+        return self._client
+
     def get_describe_filters(self):
         return {
             self.key: self.resource.name

@@ -39,6 +39,7 @@ class LoadBalancer(Resource):
 class Apply(SimpleApply, Target):
 
     resource = LoadBalancer
+    service_name = 'elb'
     create_action = "create_load_balancer"
     describe_action = "describe_load_balancers"
     describe_list_key = "LoadBalancerDescriptions"
@@ -48,11 +49,6 @@ class Apply(SimpleApply, Target):
         Present('name'),
         Present('listeners'),
     ]
-
-    @property
-    def client(self):
-        account = self.runner.get_target(self.resource.account)
-        return account.get_client('elb')
 
     def get_describe_filters(self):
         return {"LoadBalancerNames": [self.resource.name]}

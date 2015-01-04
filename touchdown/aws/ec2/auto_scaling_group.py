@@ -184,16 +184,12 @@ class SingletonReplacement(Action):
 class Apply(SimpleApply, Target):
 
     resource = AutoScalingGroup
+    service_name = 'autoscaling'
     create_action = "create_auto_scaling_group"
     update_action = "update_auto_scaling_group"
     describe_action = "describe_auto_scaling_groups"
     describe_list_key = "AutoScalingGroups"
     key = 'AutoScalingGroupName'
-
-    @property
-    def client(self):
-        account = self.runner.get_target(self.resource.account)
-        return account.get_client('autoscaling')
 
     def get_describe_filters(self):
         return {"AutoScalingGroupNames": [self.resource.name]}

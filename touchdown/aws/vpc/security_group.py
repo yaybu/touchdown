@@ -47,6 +47,7 @@ class SecurityGroup(Resource):
 class Apply(SimpleApply, Target):
 
     resource = SecurityGroup
+    service_name = 'ec2'
     create_action = "create_security_group"
     describe_action = "describe_security_groups"
     describe_list_key = "SecurityGroups"
@@ -64,10 +65,6 @@ class Apply(SimpleApply, Target):
             CidrIp=serializers.String(),
         ), inner=serializers.Argument("networks"), skip_empty=True)
     ))
-
-    @property
-    def client(self):
-        return self.runner.get_target(self.resource.vpc).client
 
     def get_describe_filters(self):
         vpc = self.runner.get_target(self.resource.vpc)
