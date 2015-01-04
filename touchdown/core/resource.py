@@ -79,4 +79,6 @@ class Resource(six.with_metaclass(ResourceType)):
             self.dependencies.add(dependency)
 
     def __str__(self):
+        if hasattr(self, "name"):
+            return "{} '{}'".format(self.resource_name, self.name)
         return self.resource_name
