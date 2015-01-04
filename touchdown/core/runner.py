@@ -44,6 +44,33 @@ class Runner(object):
             self.resources[resource] = resource.target(self, resource)
         return self.resources[resource]
 
+    def dot(self):
+        graph = ["digraph ast {"]
+
+        queue = [self.node]
+        visiting = set()
+        visited = set()
+
+        while queue:
+            node = queue.pop(0)
+            visiting.add(node)
+
+            graph.append('{} [label="{}"];'.format(id(node), node))
+            for dep in node.dependencies:
+                if dep in visiting:
+                    raise CycleError(
+                        'Circular reference between %s and %s' % (node, dep)
+                    )
+                graph.append("{} -> {};".format(id(node), id(dep)))
+                if dep not in visited:
+                    queue.append(dep)
+
+            visiting.remove(node)
+            visited.add(node)
+
+        graph.append("}")
+        return "\n".join(graph)
+
     def plan(self):
         resolved = []
         self._resolve(self.node, resolved, [])

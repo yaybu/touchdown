@@ -69,6 +69,12 @@ def plan(ctx):
     r = Runner(ctx.obj, ConsoleInterface())
     r.ui.render_plan(r.plan())
 
+@main.command()
+@click.pass_context
+def dot(ctx):
+    r = Runner(ctx.obj, ConsoleInterface())
+    click.echo(r.dot())
+
 
 if __name__ == "__main__":
     main()
