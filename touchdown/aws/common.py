@@ -26,12 +26,6 @@ from . import serializers
 logger = logging.getLogger(__name__)
 
 
-class hd(dict):
-
-    def __hash__(self):
-        return hash(frozenset(self.items()))
-
-
 class GenericAction(Action):
 
     def __init__(self, target, description, func, waiter, **kwargs):

@@ -20,7 +20,7 @@ from .. import serializers
 from .vpc import VPC
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
-from ..common import SimpleApply, resource_to_dict, hd
+from ..common import SimpleApply
 
 
 class Route(Resource):
@@ -105,7 +105,7 @@ class Apply(SimpleApply, Target):
         connection glitches when applied, but it avoids route collisions.
         """
         remote_routes = frozenset(hd(d) for d in self.object.get("routes", []))
-        local_routes = frozenset(hd(**resource_to_dict(self.runner, d)) for d in self.resource.routes)
+        local_routes = frozenset(serializers.Resource(d).render(self.runner, d) for d in self.resource.routes)
 
         for route in (remote_routes - local_routes):
             yield self.generic_action(
