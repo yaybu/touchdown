@@ -156,7 +156,7 @@ class Resource(Dict):
 
     def __init__(self, resource, mode="create"):
         kwargs = {}
-        for arg in resource.arguments:
+        for argument_name, arg in resource.arguments:
             if not arg.present(resource):
                 continue
             if not hasattr(arg, "aws_field"):
@@ -166,7 +166,7 @@ class Resource(Dict):
             if mode == "update" and not getattr(arg, "aws_update", True):
                 continue
 
-            value = Argument(arg.argument_name)
+            value = Argument(argument_name)
             if isinstance(arg, argument.Resource):
                 value = Identifier(inner=value)
             elif isinstance(arg, argument.ResourceList):

@@ -33,7 +33,7 @@ class GenericAction(Action):
         self.func = func
         self._description = description
         self.waiter = waiter
-        self.kwargs = serializers.Dict(**{(k, v if isinstance(serializers.Serializer) else serializers.Const(v)) for (k, v) in kwargs.items()})
+        self.kwargs = serializers.Dict(**{k: v if isinstance(v, serializers.Serializer) else serializers.Const(v) for (k, v) in kwargs.items()})
 
     @property
     def description(self):
@@ -156,12 +156,12 @@ class SimpleApply(object):
             **serializers.Resource(self.resource).kwargs
         )
 
-    def generic_action(self, description, callable, **kwargs):
+    def generic_action(self, description, callable, waiter=None, **kwargs):
         return GenericAction(
             self,
             description,
             callable,
-            None,
+            waiter,
             **kwargs
         )
 
