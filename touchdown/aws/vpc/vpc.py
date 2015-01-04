@@ -40,7 +40,9 @@ class Apply(SimpleApply, Target):
     key = 'VpcId'
     waiter = 'vpc_available'
 
-    def describe_object(self):
-        for vpc in self.client.describe_vpcs()['Vpcs']:
-            if vpc['CidrBlock'] == str(self.resource.cidr_block):
-                return vpc
+    def get_describe_filters(self):
+        return {
+            "Filters": [
+                {'Name': 'tag:Name', 'Values': [self.resource.name]},
+            ],
+        }

@@ -29,8 +29,44 @@ class Rule(Resource):
     protocol = argument.String(choices=['tcp', 'udp', 'icmp'])
     from_port = argument.Integer(min=-1, max=32768)
     to_port = argument.Integer(min=-1, max=32768)
-    security_groups = argument.ResourceList("touchdown.aws.vpc.security_group.SecurityGroup")
-    networks = argument.List()
+    security_group = argument.Resource("touchdown.aws.vpc.security_group.SecurityGroup")
+    network = argument.IPNetwork()
+
+    def matches(self, runner, rule):
+        sg = None
+        if self.security_group:
+            sg = runner.get_target(self.security_group)
+            # If the SecurityGroup doesn't exist yet then this rule can't exist
+            # yet - so we can bail early!
+            if not sg.resource_id:
+                return False
+
+        if self.protocol != rule['IpProtocol']:
+            return False
+        if self.from_port != rule.get('FromPort', None):
+            return False
+        if self.to_port != rule.get('ToPort', None):
+            return False
+
+        if sg and sg.object:
+            for group in rule.get('UserIdGroupPairs', []):
+                if group['GroupId'] == sg.resource_id and group['UserId'] == sg.object['OwnerId']:
+                    return True
+
+        if self.network:
+            for network in rule.get('IpRanges', []):
+                if network['CidrIp'] == str(self.network):
+                    return True
+
+        return False
+
+    def __str__(self):
+        name = super(Rule, self).__str__()
+        if self.from_port == self.to_port:
+            ports = "port {}".format(self.from_port)
+        else:
+            ports = "ports {} to {}".format(self.from_port, self.to_port)
+        return "{}: {} {} from {}".format(name, self.protocol, ports, self.network if self.network else self.security_group)
 
 
 class SecurityGroup(Resource):
@@ -41,7 +77,10 @@ class SecurityGroup(Resource):
     description = argument.String(aws_field="Description")
     vpc = argument.Resource(VPC, aws_field="VpcId")
     ingress = argument.ResourceList(Rule)
-    egress = argument.ResourceList(Rule)
+    egress = argument.ResourceList(
+        Rule,
+        default=lambda instance: [dict(protocol=-1, network=['0.0.0.0/0'])],
+    )
     tags = argument.Dict()
 
 
@@ -52,20 +91,7 @@ class Apply(SimpleApply, Target):
     create_action = "create_security_group"
     describe_action = "describe_security_groups"
     describe_list_key = "SecurityGroups"
-    key = 'SecurityGroupId'
-
-    IPPermissionList = serializers.List(serializers.Dict(
-        IPProtocol=serializers.Argument("protocol"),
-        FromPort=serializers.Argument("from_port"),
-        ToPort=serializers.Argument("to_port"),
-        UserIdGroupPairs=serializers.List(serializers.Dict(
-            UserId=serializers.Property("OwnerId"),
-            GroupId=serializers.Identifier(),
-        ), inner=serializers.Argument("security_groups"), skip_empty=True),
-        IpRanges=serializers.List(serializers.Dict(
-            CidrIp=serializers.String(),
-        ), inner=serializers.Argument("networks"), skip_empty=True)
-    ))
+    key = 'GroupId'
 
     def get_describe_filters(self):
         vpc = self.runner.get_target(self.resource.vpc)
@@ -77,38 +103,56 @@ class Apply(SimpleApply, Target):
         }
 
     def update_object(self):
-        remote_rules = frozenset([hd(d) for d in self.object.get("IpPermissions", [])])
-        local_rules = frozenset(self.IPPermissionList.render(self.runner, self.resource.ingress))
-        for rule in (local_rules - remote_rules):
-            yield self.generic_action(
-                "Authorize ingress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
-                self.client.authorize_security_group_ingress,
-                GroupId=ResourceId(self.resource),
-                #FIXME
-            )
+        for local_rule in self.resource.ingress:
+            for remote_rule in self.object.get("IpPermissions", []):
+                if local_rule.matches(self.runner, remote_rule):
+                    break
+            else:
+                params = dict(
+                    IpProtocol=local_rule.protocol,
+                    FromPort=local_rule.from_port,
+                    ToPort=local_rule.to_port,
+                )
+                if local_rule.security_group:
+                    params['UserIdGroupPairs'] = [
+                        dict(UserId=Property(local_rule.security_group, 'OwnerId'), GroupId=ResourceId(local_rule.security_group))
+                    ]
+                if local_rule.network:
+                    params['IpRanges'] = [
+                        dict(CidrIp=str(local_rule.network)),
+                    ]
 
-        for rule in (remote_rules - local_rules):
-            yield self.generic_action(
-                "Deauthorize ingress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
-                self.client.authorize_security_group_ingress,
-                GroupId=ResourceId(self.resource),
-                #FIXME
-            )
+                yield self.generic_action(
+                    "Authorize ingress {}".format(local_rule),
+                    self.client.authorize_security_group_ingress,
+                    GroupId=ResourceId(self.resource),
+                    IpPermissions=[
+                        params,
+                    ],
+                )
 
-        remote_rules = frozenset(self.object.get("IpPermissionsEgress", []))
-        local_rules = frozenset(self.IPPermissionList.render(self.runner, self.resource.egress))
-        for rule in (local_rules - remote_rules):
-            yield self.generic_action(
-                "Authorize egress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
-                self.client.authorize_security_group_egress,
-                GroupId=ResourceId(self.resource),
-                #FIXME
-            )
+        """
+        for remote_rule in self.object.get("IpPermissions", []):
+            for local_rule in self.resource.ingress:
+                if local_rule.matches(self.runner, remote_rule):
+                    break
+            else:
+                yield self.generic_action(
+                    "Deauthorize ingress for {}".format(_describe(remote_rule)),
+                    self.client.authorize_security_group_ingress,
+                    GroupId=ResourceId(self.resource),
+                    #FIXME
+                )
+        """
 
-        for rule in (remote_rules - local_rules):
-            yield self.generic_action(
-                "Deauthorize egress for port {} to {}".format(rule['FromPort'], rule['ToPort']),
-                self.client.authorize_security_group_egress,
-                GroupId=ResourceId(self.resource),
-                #FIXME
-            )
+        for local_rule in self.resource.egress:
+            for remote_rule in self.object.get("IpPermissionsEgress", []):
+                if local_rule.matches(self.runner, remote_rule):
+                    break
+            else:
+                yield self.generic_action(
+                    "Authorize egress {}".format(local_rule),
+                    self.client.authorize_security_group_egress,
+                    GroupId=ResourceId(self.resource),
+                    #FIXME
+                )

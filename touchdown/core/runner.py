@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class Runner(object):
     def dot(self):
         graph = ["digraph ast {"]
 
-        queue = [self.node]
+        queue = list(self.node.dependencies)
         visiting = set()
         visited = set()
 

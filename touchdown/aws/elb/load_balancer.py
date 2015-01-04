@@ -31,7 +31,7 @@ class LoadBalancer(Resource):
     scheme = argument.String(aws_field="Scheme")
     subnets = argument.ResourceList(Subnet, aws_field="Subnets")
     security_groups = argument.ResourceList(SecurityGroup, aws_field="SecurityGroups")
-    tags = argument.Dict()
+    # tags = argument.Dict()
 
     account = argument.Resource(AWS)
 

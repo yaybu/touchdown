@@ -66,15 +66,29 @@ class LaunchConfiguration(Resource):
 
     account = argument.Resource(AWS)
 
+    def matches(self, object):
+        if object['ImageId'] != self.image:
+            return False
+        if object['KeyName'] != self.key_name:
+            return False
+        if object['UserData'] != self.user_data:
+            return False
+        if object['IamInstanceProfile'] != runner.get_target(self.instance_profile).resource_id:
+            return False
+        # FIXME: Match more things
+        return True
+
 
 class Apply(SimpleApply, Target):
 
     resource = LaunchConfiguration
     service_name = 'autoscaling'
-    create_action = "create_auto_scaling_group"
+    create_action = "create_launch_configuration"
     describe_action = "describe_launch_configurations"
     describe_list_key = "LaunchConfigurations"
     key = 'LaunchConfigurationName'
 
-    def get_describe_filters(self):
-        return {"LaunchConfigurationNames": [self.resource.name]}
+    def describe_object(self):
+        for launch_config in self.client.describe_launch_configurations()['LaunchConfigurations']:
+            if self.resource.matches(launch_config):
+                return launch_config

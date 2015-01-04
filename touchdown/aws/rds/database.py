@@ -86,7 +86,7 @@ class Database(Resource):
 
     apply_immediately = argument.Boolean(aws_field="ApplyImmediately", aws_create=False)
 
-    tags = argument.Dict()
+    # tags = argument.Dict()
 
     account = argument.Resource(AWS)
 

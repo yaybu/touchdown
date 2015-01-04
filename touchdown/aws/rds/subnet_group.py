@@ -29,7 +29,7 @@ class SubnetGroup(Resource):
     name = argument.String(aws_field="DBSubnetGroupName")
     description = argument.String(aws_field="DBSubnetGroupDescription")
     subnets = argument.ResourceList(Subnet, aws_field="SubnetIds")
-    tags = argument.Dict()
+    # tags = argument.Dict()
 
     account = argument.Resource(AWS)
 

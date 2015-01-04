@@ -62,7 +62,7 @@ class BaseCacheCluster(object):
 
     apply_immediately = argument.Boolean(aws_field="ApplyImmediately", aws_create=False)
 
-    tags = argument.Dict()
+    # tags = argument.Dict()
 
     account = argument.Resource(AWS)
 
@@ -79,7 +79,7 @@ class Apply(SimpleApply, Target):
     resource = CacheCluster
     service_name = 'elasticache'
     create_action = "create_cache_cluster"
-    update_action = "modify_cache_cluster"
+    # update_action = "modify_cache_cluster"
     describe_action = "describe_cache_clusters"
     describe_notfound_exception = "CacheClusterNotFound"
     describe_list_key = "CacheClusters"

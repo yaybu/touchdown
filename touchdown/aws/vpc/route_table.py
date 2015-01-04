@@ -57,7 +57,7 @@ class Apply(SimpleApply, Target):
     def get_describe_filters(self):
         return {
             "Filters": [
-                {'Name': 'tag:name', 'Values': [self.resource.name]},
+                {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
 

@@ -139,7 +139,7 @@ class Dict(Serializer):
         self.kwargs = kwargs
 
     def render(self, runner, object):
-        result = {}
+        result = hd()
         for key, value in self.kwargs.items():
             try:
                 result[key] = value.render(runner, object)

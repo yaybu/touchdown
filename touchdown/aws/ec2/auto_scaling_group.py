@@ -204,5 +204,5 @@ class Apply(SimpleApply, Target):
         for instance in self.object.get("Instances", []):
             if instance['LifecycleState'] in ('Terminating', ):
                 continue
-            if instance['LaunchConfigurationName'] != launch_config_name:
+            if instance.get('LaunchConfigurationName', '') != launch_config_name:
                 yield GracefulReplacement(self.runner, self, instance['InstanceId'])

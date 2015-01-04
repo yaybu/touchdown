@@ -243,8 +243,7 @@ class SimpleApply(object):
 
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)
-            local_tags['name'] = self.resource.name
-
+            local_tags['Name'] = self.resource.name
             remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
 
             tags = {}
@@ -256,7 +255,7 @@ class SimpleApply(object):
                 yield SetTags(
                     self.runner,
                     self,
-                    tags={"name": self.resource.name}
+                    tags=tags,
                 )
 
     @property
