@@ -181,7 +181,7 @@ class Resource(Argument):
         the correct type. We also mark self as depending on the resource.
         """
         if isinstance(value, dict):
-            value = self.resource_class(self, **value)
+            value = self.resource_class(instance, **value)
         elif not isinstance(value, self.resource_class):
             raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
         instance.add_dependency(value)
@@ -231,13 +231,15 @@ class ResourceList(Argument):
         self.default = lambda x: []
 
     def __set__(self, instance, value):
+        value2 = []
         for val in value:
             if isinstance(val, dict):
-                val = self.resoure_class(self, **val)
+                val = self.resource_class(instance, **val)
             elif not isinstance(val, self.resource_class):
                 raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
             instance.add_dependency(val)
-        setattr(instance, self.arg_id, value)
+            value2.append(val)
+        setattr(instance, self.arg_id, value2)
 
     def contribute_to_class(self, cls):
         if isinstance(self.resource_class, basestring):
