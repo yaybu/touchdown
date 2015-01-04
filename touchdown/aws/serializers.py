@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import errors, target
 from touchdown.core.utils import force_str
 
 

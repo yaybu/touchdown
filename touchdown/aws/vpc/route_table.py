@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core.renderable import Renderable, ResourceId
+from touchdown.core.renderable import ResourceId
 from touchdown.core import argument
 
 from .vpc import VPC

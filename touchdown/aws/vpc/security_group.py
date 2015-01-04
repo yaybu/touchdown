@@ -19,7 +19,8 @@ from touchdown.core import argument
 
 from .vpc import VPC
 from .. import serializers
-from ..common import SimpleApply
+from ..common import SimpleApply, hd
+
 
 class Rule(Resource):
 

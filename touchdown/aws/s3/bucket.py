@@ -22,6 +22,7 @@ from .. import serializers
 
 # FIXME: Figure out how to bind CreateBucketConfiguration.LocationConstraint
 
+
 class Bucket(Resource):
 
     resource_name = "bucket"
@@ -41,9 +42,9 @@ class Apply(SimpleApply, Target):
     key = 'Name'
 
     create_serializer = serializers.Dict(
-        Bucket = serializers.Argument("name"),
-        CreateBucketConfiguration = serializers.Dict(
-            LocationConstraint = serializers.Argument("region"),
+        Bucket=serializers.Argument("name"),
+        CreateBucketConfiguration=serializers.Dict(
+            LocationConstraint=serializers.Argument("region"),
         )
     )
 

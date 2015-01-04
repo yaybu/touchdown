@@ -57,5 +57,5 @@ class Apply(SimpleApply, Target):
         args = {
             "CallerReference": str(uuid.uuid4()),
         }
-        args.update(super(Apple, self).get_create_args())
+        args.update(super(Apply, self).get_create_args())
         return args
