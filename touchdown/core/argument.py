@@ -180,7 +180,9 @@ class Resource(Argument):
         Every time you assign a value to a Resource argument we validate it is
         the correct type. We also mark self as depending on the resource.
         """
-        if not isinstance(value, self.resource_class):
+        if isinstance(value, dict):
+            value = self.resource_class(self, **value)
+        elif not isinstance(value, self.resource_class):
             raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
         instance.add_dependency(value)
         setattr(instance, self.arg_id, value)
@@ -230,7 +232,9 @@ class ResourceList(Argument):
 
     def __set__(self, instance, value):
         for val in value:
-            if not isinstance(val, self.resource_class):
+            if isinstance(val, dict):
+                val = self.resoure_class(self, **val)
+            elif not isinstance(val, self.resource_class):
                 raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
             instance.add_dependency(val)
         setattr(instance, self.arg_id, value)
