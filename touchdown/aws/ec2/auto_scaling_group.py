@@ -19,6 +19,7 @@ from touchdown.core import argument, errors
 
 from ..account import AWS
 from ..elb import LoadBalancer
+from ..vpc import Subnet
 from ..common import SimpleApply
 from .launch_configuration import LaunchConfiguration
 
