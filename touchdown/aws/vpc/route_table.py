@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from . import serializers
+from .. import serializers
 from .vpc import VPC
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
