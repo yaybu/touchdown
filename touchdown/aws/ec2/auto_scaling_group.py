@@ -18,6 +18,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument, errors
 
 from ..account import AWS
+from .. import serializers
 from ..elb import LoadBalancer
 from ..vpc import Subnet
 from ..common import SimpleApply
@@ -52,8 +53,11 @@ class AutoScalingGroup(Resource):
 
     # FIXME: This needs a custom serializer: Instead of a list, botocore expects
     # a comma separated string!
-    subnets = argument.List(Subnet, aws_field="VpcZoneIdentifier")
-
+    subnets = argument.List(
+        Subnet,
+        aws_field="VPCZoneIdentifier",
+        aws_serializer=serializers.CommaSeperatedList(serializers.List()),
+    )
     load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames", aws_update=False)
 
     """ The kind of health check to use to detect unhealthy instances. By

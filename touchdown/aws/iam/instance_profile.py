@@ -38,7 +38,7 @@ class Apply(SimpleApply, Target):
     create_action = "create_instance_profile"
     describe_action = "list_instance_profiles"
     describe_list_key = "InstanceProfiles"
-    key = 'InstanceProfile'
+    key = 'Arn'
 
     def describe_object(self):
         paginator = self.client.get_paginator("list_instance_profiles")

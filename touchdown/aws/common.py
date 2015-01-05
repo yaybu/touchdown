@@ -28,25 +28,40 @@ logger = logging.getLogger(__name__)
 
 class GenericAction(Action):
 
-    def __init__(self, target, description, func, waiter, **kwargs):
+    is_creation_action = False
+
+    def __init__(self, target, description, func, waiter=None, serializer=None, **kwargs):
         super(GenericAction, self).__init__(target)
         self.func = func
         self._description = description
         self.waiter = waiter
-        self.kwargs = serializers.Dict(**{k: v if isinstance(v, serializers.Serializer) else serializers.Const(v) for (k, v) in kwargs.items()})
+        if serializer:
+            self.serializer = serializer
+        else:
+            self.serializer = serializers.Dict(**{k: v if isinstance(v, serializers.Serializer) else serializers.Const(v) for (k, v) in kwargs.items()})
 
     @property
     def description(self):
         yield self._description
 
     def run(self):
-        params = self.kwargs.render(self.runner, self.resource)
+        logger.debug("Calling {}".format(self.func))
 
-        self.func(**params)
+        params = self.serializer.render(self.runner, self.resource)
+        logger.debug("Invoking with params {}".format(params))
+
+        object = self.func(**params)
 
         if self.waiter:
+            filters = self.target.get_describe_filters()
+            logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
             waiter = self.target.client.get_waiter(self.waiter)
-            waiter.wait(**self.target.get_describe_filters())
+            waiter.wait(**filters)
+
+        if self.is_creation_action:
+            self.target.object = self.target.describe_object()
+            if not self.target.object:
+                raise errors.Error("Object creation failed")
 
 
 class SetTags(Action):
@@ -149,19 +164,22 @@ class SimpleApply(object):
         return {}
 
     def create_object(self):
-        return self.generic_action(
+        g = self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
             self.waiter,
-            **serializers.Resource(self.resource).kwargs
+            serializers.Resource()
         )
+        g.is_creation_action = True
+        return g
 
-    def generic_action(self, description, callable, waiter=None, **kwargs):
+    def generic_action(self, description, callable, waiter=None, serializer=None, **kwargs):
         return GenericAction(
             self,
             description,
             callable,
             waiter,
+            serializer,
             **kwargs
         )
 
@@ -173,6 +191,8 @@ class SimpleApply(object):
             self.object = {}
             yield self.create_object()
 
+        logger.debug("Current state for {} is {}".format(self.resource, self.object))
+
         logger.debug("Looking for changes to apply")
         for action in self.update_object():
             yield action
@@ -182,7 +202,7 @@ class SimpleApply(object):
             logger.debug("Checking resource {} for changes".format(self.resource))
 
             description = ["Updating {}".format(self.resource)]
-            local = serializers.Resource(self.resource, mode="update")
+            local = serializers.Resource(mode="update")
             for k, v in local.render(self.runner, self.resource).items():
                 if k not in self.object:
                     continue
@@ -200,7 +220,7 @@ class SimpleApply(object):
                 yield self.generic_action(
                     description,
                     getattr(self.client, self.update_action),
-                    **local.kwargs
+                    serializer=local
                 )
 
         if hasattr(self.resource, "tags"):

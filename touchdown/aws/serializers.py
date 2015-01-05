@@ -57,9 +57,10 @@ class Identifier(Serializer):
         self.inner = inner
 
     def render(self, runner, object):
-        result = runner.get_target(object).resource_id
+        result = runner.get_target(self.inner.render(runner, object)).resource_id
         if not result:
             return "pending ({})".format(object)
+        return result
 
 
 class Property(Serializer):
@@ -134,6 +135,16 @@ class Integer(Formatter):
         return int(self.inner.render(runner, object))
 
 
+class ListOfOne(Formatter):
+    def render(self, runner, object):
+        return [self.inner.render(runner, object)]
+
+
+class CommaSeperatedList(Formatter):
+    def render(self, runner, object):
+        return ",".join(self.inner.render(runner, object))
+
+
 class Dict(Serializer):
 
     def __init__(self, **kwargs):
@@ -146,7 +157,7 @@ class Dict(Serializer):
                 result[key] = value.render(runner, object)
             except FieldNotPresent:
                 continue
-        return hd(result)
+        return result
 
 
 class Resource(Dict):
@@ -154,39 +165,54 @@ class Resource(Dict):
     """ Automatically generate a Dict definition by inspect the aws_field
     paramters of a resource """
 
-    def __init__(self, resource, mode="create"):
-        kwargs = {}
-        for argument_name, arg in resource.arguments:
-            if not arg.present(resource):
+    def __init__(self, mode="create"):
+        self.mode = mode
+        self.kwargs = {}
+
+    def render(self, runner, object):
+        for argument_name, arg in object.arguments:
+            if not arg.present(object):
                 continue
             if not hasattr(arg, "aws_field"):
                 continue
-            if mode == "create" and not getattr(arg, "aws_create", True):
+            if self.mode == "create" and not getattr(arg, "aws_create", True):
                 continue
-            if mode == "update" and not getattr(arg, "aws_update", True):
+            if self.mode == "update" and not getattr(arg, "aws_update", True):
                 continue
 
             value = Argument(argument_name)
+            if hasattr(arg, "aws_serializer"):
+                value = Context(value, arg.aws_serializer)
             if isinstance(arg, argument.Resource):
                 value = Identifier(inner=value)
             elif isinstance(arg, argument.ResourceList):
-                value = List(inner=value, child=Identifier())
-            kwargs[arg.aws_field] = value
+                value = Context(value, List(Identifier()))
+            self.kwargs[arg.aws_field] = value
 
-        super(Resource, self).__init__(**kwargs)
+        return super(Resource, self).render(runner, object)
 
 
 class List(Serializer):
 
-    def __init__(self, child, inner=Identity(), skip_empty=False):
-        self.inner = inner
+    def __init__(self, child=Identity(), skip_empty=False):
         self.child = child
         self.skip_empty = skip_empty
 
     def render(self, runner, object):
         result = []
-        for row in self.inner.render(runner, object):
+        for row in object:
             result.append(self.child.render(runner, row))
         if not result and self.skip_empty:
             raise FieldNotPresent()
         return tuple(result)
+
+
+class Context(Serializer):
+
+    def __init__(self, serializer, inner):
+        self.serializer = serializer
+        self.inner = inner
+
+    def render(self, runner, object):
+        object = self.serializer.render(runner, object)
+        return self.inner.render(runner, object)

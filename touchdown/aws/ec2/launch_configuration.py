@@ -71,10 +71,10 @@ class LaunchConfiguration(Resource):
             return False
         if object['KeyName'] != self.key_name:
             return False
-        if object['UserData'] != self.user_data:
-            return False
-        if object['IamInstanceProfile'] != runner.get_target(self.instance_profile).resource_id:
-            return False
+        #if object['UserData'] != self.user_data:
+        #    return False
+        #if object['IamInstanceProfile'] != runner.get_target(self.instance_profile).resource_id:
+        #    return False
         # FIXME: Match more things
         return True
 

@@ -25,11 +25,23 @@ class Rule(Resource):
 
     resource_name = "rule"
 
-    protocol = argument.String(choices=['tcp', 'udp', 'icmp'])
-    from_port = argument.Integer(min=-1, max=32768)
-    to_port = argument.Integer(min=-1, max=32768)
-    security_group = argument.Resource("touchdown.aws.vpc.security_group.SecurityGroup")
-    network = argument.IPNetwork()
+    protocol = argument.String(choices=['tcp', 'udp', 'icmp'], aws_field="IpProtocol")
+    from_port = argument.Integer(min=-1, max=32768, aws_field="FromPort")
+    to_port = argument.Integer(min=-1, max=32768, aws_field="ToPort")
+    security_group = argument.Resource(
+        "touchdown.aws.vpc.security_group.SecurityGroup",
+        aws_field="UserIdGroupPairs",
+        aws_serializer=serializers.ListOfOne(serializers.Dict(
+            UserId=serializers.Property("OwnerId"),
+            GroupId=serializers.Identifier(),
+        )),
+    )
+    network = argument.IPNetwork(
+        aws_field="IpRanges",
+        aws_serializer=serializers.ListOfOne(serializers.Dict(
+            CidrIp=serializers.String(),
+        )),
+    )
 
     def matches(self, runner, rule):
         sg = None
@@ -92,19 +104,6 @@ class Apply(SimpleApply, Target):
     describe_list_key = "SecurityGroups"
     key = 'GroupId'
 
-    rule_serializer = IPPermissionList = serializers.List(serializers.Dict(
-        IPProtocol=serializers.Argument("protocol"),
-        FromPort=serializers.Argument("from_port"),
-        ToPort=serializers.Argument("to_port"),
-        UserIdGroupPairs=serializers.List(serializers.Dict(
-            UserId=serializers.Property("OwnerId"),
-            GroupId=serializers.Identifier(),
-        ), inner=serializers.Argument("security_groups"), skip_empty=True),
-        IpRanges=serializers.List(serializers.Dict(
-            CidrIp=serializers.String(),
-        ), inner=serializers.Argument("networks"), skip_empty=True)
-    ))
-
     def get_describe_filters(self):
         vpc = self.runner.get_target(self.resource.vpc)
         return {
@@ -124,7 +123,7 @@ class Apply(SimpleApply, Target):
                     "Authorize ingress {}".format(local_rule),
                     self.client.authorize_security_group_ingress,
                     GroupId=serializers.Identifier(),
-                    IpPermissions=self.rule_serializer,
+                    IpPermissions=serializers.ListOfOne(serializers.Context(serializers.Const(local_rule), serializers.Resource())),
                 )
 
         return
@@ -152,5 +151,5 @@ class Apply(SimpleApply, Target):
                     "Authorize egress {}".format(local_rule),
                     self.client.authorize_security_group_egress,
                     GroupId=serializers.Identifier(),
-                    IpPermissions=self.rule_serializer,
+                    IpPermissions=serializers.ListOfOne(serializers.Context(serializers.Const(local_rule), serializers.Resource())),
                 )
