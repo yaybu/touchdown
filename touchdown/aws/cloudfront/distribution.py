@@ -90,6 +90,31 @@ class LoggingConfig(Resource):
     prefix = argument.String(aws_field="Prefix")
 
 
+class ViewerCertificate(Resource):
+
+    resource_name = "viewer_certificate"
+
+    certificate = argument.Resource(
+        ServerCertificate,
+        aws_field="IAMCertificateId",
+        aws_serializers=serializers.Property("IAMCertificateId"),
+    )
+
+    default_certificate = argument.Boolean(aws_field="CloudFrontDefaultCertificate")
+
+    ssl_support_method = argument.String(
+        default="sni-only",
+        choices=["sni-only", "vip"],
+        aws_field="SSLSupportMethod",
+    )
+
+    minimum_protocol_version = argument.String(
+        default="TLSv1",
+        choices=["TLSv1", "SSLv3"],
+        aws_field="MinimumProtocolVersion",
+    )
+
+
 class Distribution(Resource):
 
     resource_name = "distributions"
@@ -112,18 +137,48 @@ class Distribution(Resource):
     """ Whether or not this distribution is active """
     enabled = argument.Boolean(default=True, aws_field="Enabled")
 
-    origins = argument.ResourceList(Origin)
+    origins = argument.ResourceList(
+        Origin,
+        aws_field="Origins",
+        aws_serializer=CloudFrontList(serializers.Resource()),
+    )
 
-    default_cache_behavior = argument.Resource(DefaultCacheBehavior)
+    default_cache_behavior = argument.Resource(
+        DefaultCacheBehavior,
+        aws_field="DefaultCacheBehavior",
+        aws_serializer=serializers.Resource(),
+    )
 
-    behaviors = argument.ResourceList(CacheBehavior)
+    behaviors = argument.ResourceList(
+        CacheBehavior,
+        aws_field="CacheBehaviors",
+        aws_serializer=CloudFrontList(serializers.Resource()),
+    )
 
-    error_responses = argument.ResourceList(ErrorResponse)
+    """ Customize the content that is served for various error conditions """
+    error_responses = argument.ResourceList(
+        ErrorResponse,
+        aws_field="CustomErrorResponses",
+        aws_serializer=CloudFrontList(serializers.Resource()),
+    )
 
-    logging = argument.Resource(LoggingConfig)
+    logging = argument.Resource(
+        LoggingConfig,
+        aws_field="Logging",
+        aws_serializer=serializers.Resource(),
+    )
 
-    price_class = argument.String(default="PriceClass_100", choices=['PriceClass_100', 'PriceClass_200', 'PriceClass_All'], aws_field="PriceClass")
-    certificate = argument.Resource(ServerCertificate)
+    price_class = argument.String(
+        default="PriceClass_100",
+        choices=['PriceClass_100', 'PriceClass_200', 'PriceClass_All'],
+        aws_field="PriceClass",
+    )
+
+    certificate = argument.Resource(
+        ViewerCertificate,
+        aws_field="ViewerCertificate",
+        aws_serializers=serializers.Resource(),
+    )
 
     """
     "Restrictions": {
