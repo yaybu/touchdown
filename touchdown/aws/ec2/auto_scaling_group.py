@@ -89,8 +89,8 @@ class ReplaceInstance(Action):
         "ScheduledActions",
     ]
 
-    def __init__(self, runner, target, instance_id):
-        super(ReplaceInstance, self).__init__(runner, target)
+    def __init__(self, target, instance_id):
+        super(ReplaceInstance, self).__init__(target)
         self.instance_id = instance_id
 
     def suspend_processes(self):
