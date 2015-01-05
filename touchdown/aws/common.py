@@ -208,10 +208,6 @@ class SimpleApply(object):
                     continue
                 if v != self.object[k]:
                     logger.debug("Resource field {} has changed ({} != {})".format(k, v, self.object[k]))
-                    # FIXME: Make this smarter... Where referring to
-                    # renderables can show a hint
-                    # Instead of Foo => None it should show
-                    # Foo => ResourceId(some_subnet)
                     description.append("{} => {}".format(k, v))
 
             logger.debug("Resource has {} differences".format(len(description) - 1))
