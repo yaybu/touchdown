@@ -12,7 +12,9 @@ Touchdown
     :target: https://pypi.python.org/pypi/touchdown/
 
 
-Touchdown is a service orchestration framework for python.
+Touchdown is a service orchestration framework for python. It provides a python
+"DSL" for declaring complicated cloud infrastructures and provisioning those
+blueprints in an idempotent way.
 
 You can find us in #yaybu on irc.oftc.net.
 
