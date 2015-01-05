@@ -95,7 +95,10 @@ class DefaultCacheBehavior(Resource):
     forwarded_values = argument.Resource(ForwardedValues, aws_field="ForwardedValues")
     viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all')
     min_ttl = argument.Integer(aws_field="MinTTL")
-    allowed_methods = argument.List(aws_field='AllowedMethods')
+    allowed_methods = argument.List(
+        aws_field='AllowedMethods',
+        aws_serializer=CloudFrontList(),
+    )
     smooth_streaming = argument.Boolean(aws_field='SmoothStreaming')
 
 
