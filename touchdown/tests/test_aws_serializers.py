@@ -16,7 +16,7 @@ import unittest
 import mock
 
 from touchdown.aws.vpc import SecurityGroup
-from touchdown.aws.serializers import *
+from touchdown.aws import serializers
 
 
 class TestSerializing(unittest.TestCase):
@@ -26,44 +26,44 @@ class TestSerializing(unittest.TestCase):
         self.runner = mock.Mock()
 
     def test_const(self):
-        serializer = Const("FOO")
+        serializer = serializers.Const("FOO")
         self.assertEqual(serializer.render(self.runner, None), "FOO")
 
     def test_attribute(self):
-        serializer = Argument("name")
+        serializer = serializers.Argument("name")
         result = serializer.render(self.runner, self.resource)
         self.assertEqual(result, "test")
 
     def test_expression(self):
-        serializer = Expression(lambda runner, object: object.name)
+        serializer = serializers.Expression(lambda runner, object: object.name)
         result = serializer.render(self.runner, self.resource)
         self.assertEqual(result, "test")
 
     def test_required(self):
-        serializer = Required(Argument("description"))
-        self.assertRaises(RequiredFieldNotPresent, serializer.render, self.runner, self.resource)
+        serializer = serializers.Required(serializers.Argument("description"))
+        self.assertRaises(serializers.RequiredFieldNotPresent, serializer.render, self.runner, self.resource)
 
     def test_boolean(self):
-        serializer = Boolean(Const(1))
+        serializer = serializers.Boolean(serializers.Const(1))
         result = serializer.render(self.runner, self.resource)
         self.assertEqual(result, True)
 
     def test_string(self):
-        serializer = String(Const(1))
+        serializer = serializers.String(serializers.Const(1))
         result = serializer.render(self.runner, self.resource)
         self.assertEqual(result, "1")
 
     def test_integer(self):
-        serializer = Integer(Const("1"))
+        serializer = serializers.Integer(serializers.Const("1"))
         result = serializer.render(self.runner, self.resource)
         self.assertEqual(result, 1)
 
     def test_dict(self):
-        serializer = Dict(Name=Argument("name"))
+        serializer = serializers.Dict(Name=serializers.Argument("name"))
         result = serializer.render(self.runner, self.resource)
         self.assertEqual(result, {"Name": "test"})
 
     def test_list(self):
-        serializer = List(Dict(Name=Argument("name")))
+        serializer = serializers.List(serializers.Dict(Name=serializers.Argument("name")))
         result = serializer.render(self.runner, [self.resource])
-        self.assertEqual(result, [{"Name": "test"}])
+        self.assertEqual(result, ({"Name": "test"}, ))

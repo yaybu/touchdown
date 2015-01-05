@@ -104,7 +104,7 @@ class Apply(SimpleApply, Target):
         Old routes are removed *before* new routes are added. This may cause
         connection glitches when applied, but it avoids route collisions.
         """
-        remote_routes = frozenset(hd(d) for d in self.object.get("routes", []))
+        remote_routes = frozenset(serializers.hd(d) for d in self.object.get("routes", []))
         local_routes = frozenset(serializers.Resource(d).render(self.runner, d) for d in self.resource.routes)
 
         for route in (remote_routes - local_routes):

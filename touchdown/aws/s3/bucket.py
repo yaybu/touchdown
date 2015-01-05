@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2014-2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,13 @@ class Bucket(Resource):
     resource_name = "bucket"
 
     name = argument.String(aws_field="Bucket")
-    region = argument.String(default=lambda instance: instance.account.region)
+    region = argument.String(
+        default=lambda instance: instance.account.region,
+        aws_field="CreateBucketConfiguration",
+        aws_serializer=serializers.Dict(
+            LocationConstraint=serializers.Identity(),
+        ),
+    )
     account = argument.Resource(AWS)
 
 
@@ -40,13 +46,6 @@ class Apply(SimpleApply, Target):
     describe_action = "list_buckets"
     describe_list_key = "Buckets"
     key = 'Name'
-
-    create_serializer = serializers.Dict(
-        Bucket=serializers.Argument("name"),
-        CreateBucketConfiguration=serializers.Dict(
-            LocationConstraint=serializers.Argument("region"),
-        )
-    )
 
     def describe_object(self):
         for bucket in self.client.list_buckets()['Buckets']:

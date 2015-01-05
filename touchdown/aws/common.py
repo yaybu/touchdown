@@ -50,7 +50,7 @@ class GenericAction(Action):
         params = self.serializer.render(self.runner, self.resource)
         logger.debug("Invoking with params {}".format(params))
 
-        object = self.func(**params)
+        self.func(**params)
 
         if self.waiter:
             filters = self.target.get_describe_filters()
