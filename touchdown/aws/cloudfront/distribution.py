@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2014-2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ from ..iam import ServerCertificate
 from ..s3 import Bucket
 
 
-class CloudFrontList(serializers.List):
+class CloudFrontList(serializers.Formatter):
 
     def render(self, runner, object):
-        result = super(CloudFrontList, self).render(runner, object)
+        result = self.inner.render(runner, object)
         return {
             "Quantity": len(result),
             "Items": result,
@@ -37,6 +37,17 @@ class CloudFrontList(serializers.List):
 class Origin(Resource):
 
     resource_name = "origin"
+
+    extra_serializers = {
+        "S3OriginConfig": serializers.Dict(
+            OriginAccessIdentity=serializers.Argument("origin_access_identity"),
+        ),
+        "CustomOriginConfig": serializers.Dict(
+            HttpPort=serializers.Argument("http_port"),
+            HttpsPort=serializers.Argument("https_port"),
+            OriginProtocol=serializers.Argument("origin_protocol"),
+        )
+    }
 
     name = argument.String(aws_field='Id')
     origin_type = argument.String(choices=['s3', 'custom'])
@@ -51,13 +62,37 @@ class Origin(Resource):
     origin_protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
 
 
+class ForwardedValues(Resource):
+
+    resource_name = "forwarded_values"
+
+    extra_serializers = {
+        "CookiePreference": dict(
+            Forward=serializers.Argument("forward_cookies"),
+            WhitelistedNames=CloudFrontList(serializers.Argument("cookie_whitelist")),
+        )
+    }
+    query_string = argument.Boolean(aws_field="QueryString")
+    headers = argument.List(aws_field="Headers", aws_serializer=CloudFrontList())
+
+    forward_cookies = argument.String()
+    cookie_whitelist = argument.List()
+
+
 class DefaultCacheBehavior(Resource):
 
     resource_name = "default_cache_behaviour"
 
+    extra_serializers = {
+        # TrustedSigners are not supported yet, so include stub in serialized form
+        "TrustedSigners": serializers.Const({
+            "Enabled": False,
+            "Quantity": 0,
+        })
+    }
+
     target_origin = argument.String(aws_field='TargetOriginId')
-    forwarded_values = "...."
-    trusted_signers = "...."
+    forwarded_values = argument.Resource(ForwardedValues, aws_field="ForwardedValues")
     viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all')
     min_ttl = argument.Integer(aws_field="MinTTL")
     allowed_methods = argument.List(aws_field='AllowedMethods')
@@ -119,6 +154,20 @@ class Distribution(Resource):
 
     resource_name = "distributions"
 
+    extra_serializers = {
+        "Aliases": CloudFrontList(serializers.Chain(
+            serializers.Context(serializers.Argument("name"), serializers.ListOfOne()),
+            serializers.Context(serializers.Argument("aliases"), serializers.List()),
+        )),
+        # We don't support GeoRestrictions yet - so include a stubbed default
+        # when serializing
+        "Restrictions": serializers.Const({
+            "GeoRestriction": {
+                "RestrictionType": "none",
+            },
+        }),
+    }
+
     """ The name of the distribution. This should be the primary domain that it
     responds to. """
     name = argument.String()
@@ -179,16 +228,6 @@ class Distribution(Resource):
         aws_field="ViewerCertificate",
         aws_serializers=serializers.Resource(),
     )
-
-    """
-    "Restrictions": {
-        "GeoRestriction": {
-            "RestrictionType": "none" (or "blacklist" or "whitelist"),
-            "Quanity": 1,
-            "Items": ["dunno"]
-        }
-    }
-    """
 
     account = argument.Resource(AWS)
 

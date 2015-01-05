@@ -42,6 +42,24 @@ class Identity(Serializer):
         return object
 
 
+class Chain(Serializer):
+
+    def __init__(self, *children, **kwargs):
+        self.skip_empty = kwargs.get('skip_empty', False)
+        self.children = children
+
+    def render(self, runner, object):
+        result = []
+        for child in self.children:
+            try:
+                result.extend(child.render(runner, object))
+            except FieldNotPresent:
+                pass
+        if not len(result) and self.skip_empty:
+            raise FieldNotPresent()
+        return tuple(result)
+
+
 class Const(Serializer):
 
     def __init__(self, const):
@@ -157,6 +175,8 @@ class Dict(Serializer):
                 result[key] = value.render(runner, object)
             except FieldNotPresent:
                 continue
+        if not len(result):
+            raise FieldNotPresent()
         return result
 
 
@@ -170,6 +190,9 @@ class Resource(Dict):
         self.kwargs = {}
 
     def render(self, runner, object):
+        for name, serializer in getattr(object, "extra_serializers", {}).items():
+            self.kwargs[name] = serializer
+
         for argument_name, arg in object.arguments:
             if not arg.present(object):
                 continue
