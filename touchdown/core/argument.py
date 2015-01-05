@@ -64,7 +64,7 @@ class Boolean(Argument):
     to be True boolean values. Anything else is False. """
 
     def __set__(self, instance, value):
-        if isinstance(value, six.text_type):
+        if isinstance(value, six.string_types):
             if value.lower() in ("1", "yes", "on", "true"):
                 value = True
             else:
@@ -198,7 +198,7 @@ class Resource(Argument):
         With this form you don't have to pass the vpc argument (it is done
         implicitly).
         """
-        if isinstance(self.resource_class, basestring):
+        if isinstance(self.resource_class, six.string_types):
             from .resource import ResourceType
             if self.resource_class not in ResourceType.__all_resources__:
                 ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)
@@ -242,7 +242,7 @@ class ResourceList(Argument):
         setattr(instance, self.arg_id, value2)
 
     def contribute_to_class(self, cls):
-        if isinstance(self.resource_class, basestring):
+        if isinstance(self.resource_class, six.string_types):
             from .resource import ResourceType
             if self.resource_class not in ResourceType.__all_resources__:
                 ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)

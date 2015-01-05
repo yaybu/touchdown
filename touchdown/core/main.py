@@ -49,7 +49,9 @@ class ConsoleInterface(object):
 @click.pass_context
 def main(ctx, debug):
     g = {"workspace": Workspace()}
-    execfile("Touchdownfile", g)
+    with open("Touchdownfile") as f:
+        code = compile(f.read(), "Touchdownfile", "exec")
+        exec(code, g)
     ctx.obj = g['workspace']
 
 
