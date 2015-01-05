@@ -33,5 +33,6 @@ class TestGenericAction(unittest.TestCase):
         g.run()
 
         api.assert_called_with(
+            Engine='redis',
             CacheClusterId='freddy',
         )

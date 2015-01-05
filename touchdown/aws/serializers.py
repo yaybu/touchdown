@@ -97,9 +97,11 @@ class Argument(Serializer):
         self.attribute = attribute
 
     def render(self, runner, object):
+        result = getattr(object, self.attribute)
         if not object.__args__[self.attribute].present(object):
-            raise FieldNotPresent(self.attribute)
-        return getattr(object, self.attribute)
+            if result is None:
+                raise FieldNotPresent(self.attribute)
+        return result
 
 
 class Expression(Serializer):
@@ -194,7 +196,7 @@ class Resource(Dict):
             self.kwargs[name] = serializer
 
         for argument_name, arg in object.arguments:
-            if not arg.present(object):
+            if not (arg.present(object) or arg.default is not None):
                 continue
             if not hasattr(arg, "aws_field"):
                 continue
@@ -206,10 +208,10 @@ class Resource(Dict):
             value = Argument(argument_name)
             if hasattr(arg, "aws_serializer"):
                 value = Context(value, arg.aws_serializer)
-            if isinstance(arg, argument.Resource):
+            elif isinstance(arg, argument.Resource):
                 value = Identifier(inner=value)
             elif isinstance(arg, argument.ResourceList):
-                value = Context(value, List(Identifier()))
+                value = Context(value, List(Identifier(), skip_empty=True))
             self.kwargs[arg.aws_field] = value
 
         return super(Resource, self).render(runner, object)

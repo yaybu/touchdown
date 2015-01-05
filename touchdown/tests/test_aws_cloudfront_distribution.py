@@ -19,7 +19,7 @@ from touchdown.aws import serializers
 from touchdown.aws.cloudfront import Distribution
 
 
-class TestCloudFrontDistribution(unittest.TestCase):
+class TestCloudFrontDistributionSerializing(unittest.TestCase):
 
     def test_simple_distribution(self):
         distribution = Distribution(
@@ -28,6 +28,12 @@ class TestCloudFrontDistribution(unittest.TestCase):
         )
         result = serializers.Resource().render(mock.Mock(), distribution)
         self.assertEqual(result, {
-            "Aliases": {'Items': ('example.com',), 'Quantity': 1},
-            "Restrictions": {'GeoRestriction': {'RestrictionType': 'none'}},
+            'Origins': {'Items': (), 'Quantity': 0},
+            'Restrictions': {'GeoRestriction': {'RestrictionType': 'none'}},
+            'DefaultRootObject': '/',
+            'PriceClass': 'PriceClass_100',
+            'Enabled': True,
+            'CustomErrorResponses': {'Items': (), 'Quantity': 0},
+            'CacheBehaviors': {'Items': (), 'Quantity': 0},
+            'Aliases': {'Items': ('example.com',), 'Quantity': 1},
         })

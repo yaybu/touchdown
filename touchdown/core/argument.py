@@ -138,8 +138,12 @@ class Dict(Argument):
 
 
 class List(Argument):
+
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
+
+    def default(self, instance):
+        return []
 
 
 class TargetArgument(Argument):
@@ -228,7 +232,9 @@ class ResourceList(Argument):
     def __init__(self, resource_class, **kwargs):
         super(ResourceList, self).__init__(**kwargs)
         self.resource_class = resource_class
-        self.default = lambda x: []
+
+    def default(self, instance):
+        return []
 
     def __set__(self, instance, value):
         value2 = []

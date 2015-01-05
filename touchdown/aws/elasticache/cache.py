@@ -31,8 +31,8 @@ class BaseCacheCluster(object):
     """ The kind of hardware to use, for example 'db.t1.micro' """
     instance_class = argument.String()
 
-    """ The type of database to use, for example 'postgres' """
-    engine = argument.String(default='postgres', aws_field='Engine', aws_update=False)
+    """ The type of database to use, for example 'redis' """
+    engine = argument.String(default='redis', aws_field='Engine', aws_update=False)
 
     """ The version of the cache engine to run """
     engine_version = argument.String(aws_field='EngineVersion')

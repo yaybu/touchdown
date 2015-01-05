@@ -34,6 +34,10 @@ class CloudFrontList(serializers.Formatter):
         }
 
 
+def CloudFrontResourceList():
+    return CloudFrontList(serializers.List(serializers.Resource()))
+
+
 class Origin(Resource):
 
     resource_name = "origin"
@@ -73,7 +77,7 @@ class ForwardedValues(Resource):
         )
     }
     query_string = argument.Boolean(aws_field="QueryString")
-    headers = argument.List(aws_field="Headers", aws_serializer=CloudFrontList())
+    headers = argument.List(aws_field="Headers", aws_serializer=CloudFrontList(serializers.List()))
 
     forward_cookies = argument.String()
     cookie_whitelist = argument.List()
@@ -94,12 +98,13 @@ class DefaultCacheBehavior(Resource):
     target_origin = argument.String(aws_field='TargetOriginId')
     forwarded_values = argument.Resource(ForwardedValues, aws_field="ForwardedValues")
     viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all')
-    min_ttl = argument.Integer(aws_field="MinTTL")
+    min_ttl = argument.Integer(default=0, aws_field="MinTTL")
     allowed_methods = argument.List(
+        default=lambda x: ["GET", "HEAD"],
         aws_field='AllowedMethods',
         aws_serializer=CloudFrontList(),
     )
-    smooth_streaming = argument.Boolean(aws_field='SmoothStreaming')
+    smooth_streaming = argument.Boolean(default=False, aws_field='SmoothStreaming')
 
 
 class CacheBehavior(DefaultCacheBehavior):
@@ -192,26 +197,26 @@ class Distribution(Resource):
     origins = argument.ResourceList(
         Origin,
         aws_field="Origins",
-        aws_serializer=CloudFrontList(serializers.Resource()),
+        aws_serializer=CloudFrontResourceList(),
     )
 
     default_cache_behavior = argument.Resource(
         DefaultCacheBehavior,
         aws_field="DefaultCacheBehavior",
-        aws_serializer=serializers.Resource(),
+        aws_serializer=CloudFrontResourceList(),
     )
 
     behaviors = argument.ResourceList(
         CacheBehavior,
         aws_field="CacheBehaviors",
-        aws_serializer=CloudFrontList(serializers.Resource()),
+        aws_serializer=CloudFrontResourceList(),
     )
 
     """ Customize the content that is served for various error conditions """
     error_responses = argument.ResourceList(
         ErrorResponse,
         aws_field="CustomErrorResponses",
-        aws_serializer=CloudFrontList(serializers.Resource()),
+        aws_serializer=CloudFrontResourceList(),
     )
 
     logging = argument.Resource(
