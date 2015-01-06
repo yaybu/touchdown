@@ -20,8 +20,13 @@ class TestKeypair(TestCase):
             </DescribeKeyPairsResponse>
         """))
 
-        self.aws.add_keypair(name='my-key-pair')
+        kp = self.aws.add_keypair(name='my-key-pair')
         self.assertRaises(errors.NothingChanged, self.runner.apply)
+
+        self.assertEqual(
+            self.runner.get_target(kp).object['KeyName'],
+            "my-key-pair",
+        )
 
     def test_create(self):
         self.responses.add("POST", 'https://ec2.eu-west-1.amazonaws.com/', body=textwrap.dedent("""
@@ -51,5 +56,10 @@ class TestKeypair(TestCase):
             </DescribeKeyPairsResponse>
         """))
 
-        self.aws.add_keypair(name='my-key-pair', public_key="")
+        kp = self.aws.add_keypair(name='my-key-pair', public_key="")
         self.runner.apply()
+
+        self.assertEqual(
+            self.runner.get_target(kp).object['KeyName'],
+            "my-key-pair",
+        )
