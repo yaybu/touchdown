@@ -17,6 +17,10 @@ class Error(Exception):
     pass
 
 
+class NothingChanged(Exception):
+    pass
+
+
 class InvalidParameter(Exception):
     pass
 

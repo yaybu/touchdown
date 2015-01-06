@@ -14,7 +14,7 @@
 
 import logging
 
-from .errors import CycleError
+from . import errors
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class Runner(object):
         for dep in node.dependencies:
             if dep not in resolved:
                 if dep in unresolved:
-                    raise CycleError(
+                    raise error.CycleError(
                         'Circular reference between %s and %s' % (node, dep)
                     )
                 self._resolve(dep, resolved, unresolved)
@@ -88,6 +88,9 @@ class Runner(object):
 
     def apply(self):
         plan = self.plan()
+
+        if not plan:
+            raise errors.NothingChanged()
 
         if not self.ui.confirm_plan(plan):
             return

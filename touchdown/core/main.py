@@ -14,12 +14,15 @@
 
 import click
 
-from .runner import Runner
-from .workspace import Workspace
-from . import errors
+from touchdown.core.runner import Runner
+from touchdown.core.workspace import Workspace
+from touchdown.core import errors
 
 
 class ConsoleInterface(object):
+
+    def __init__(self, interactive=True):
+        self.interactive = interactive
 
     def progress(self, iterable, label=None, length=None):
         return click.progressbar(iterable, label=label, length=length)
@@ -40,6 +43,9 @@ class ConsoleInterface(object):
         click.echo()
 
         self.render_plan(plan)
+
+        if not self.interactive:
+            return True
 
         return click.confirm("Do you want to continue?")
 

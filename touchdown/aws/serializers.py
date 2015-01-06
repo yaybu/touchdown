@@ -252,6 +252,8 @@ class Resource(Dict):
             value = Argument(argument_name)
             if hasattr(arg, "aws_serializer"):
                 value = Context(value, arg.aws_serializer)
+            elif isinstance(arg, argument.IPNetwork):
+                value = String(value)
             elif isinstance(arg, argument.Resource):
                 value = Identifier(inner=value)
             elif isinstance(arg, argument.ResourceList):
