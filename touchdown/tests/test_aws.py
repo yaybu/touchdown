@@ -97,7 +97,7 @@ class TestCase(unittest.TestCase):
         self._patcher.start()
 
         self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', region='eu-west-1')
+        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
         self.runner = Runner(self.workspace, ConsoleInterface(interactive=False))
 
     def tearDown(self):
