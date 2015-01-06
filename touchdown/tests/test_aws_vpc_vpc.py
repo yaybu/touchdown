@@ -1,10 +1,6 @@
-import mock
 import textwrap
 
 from touchdown.core import errors
-from touchdown.core import workspace
-from touchdown.core.runner import Runner
-from touchdown.core.main import ConsoleInterface
 
 from .test_aws import TestCase
 
@@ -51,7 +47,7 @@ class TestVpc(TestCase):
              <vpc>
                <vpcId>vpc-1a2b3c4d</vpcId>
                <state>pending</state>
-               <cidrBlock>10.0.0.0/16</cidrBlock>   
+               <cidrBlock>10.0.0.0/16</cidrBlock>
                <dhcpOptionsId>dopt-1a2b3c4d2</dhcpOptionsId>
                <instanceTenancy>default</instanceTenancy>
                <tagSet/>

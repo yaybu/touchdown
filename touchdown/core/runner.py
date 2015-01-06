@@ -32,7 +32,7 @@ class Runner(object):
         for dep in node.dependencies:
             if dep not in resolved:
                 if dep in unresolved:
-                    raise error.CycleError(
+                    raise errors.CycleError(
                         'Circular reference between %s and %s' % (node, dep)
                     )
                 self._resolve(dep, resolved, unresolved)
@@ -58,7 +58,7 @@ class Runner(object):
             graph.append('{} [label="{}"];'.format(id(node), node))
             for dep in node.dependencies:
                 if dep in visiting:
-                    raise CycleError(
+                    raise errors.CycleError(
                         'Circular reference between %s and %s' % (node, dep)
                     )
                 graph.append("{} -> {};".format(id(node), id(dep)))

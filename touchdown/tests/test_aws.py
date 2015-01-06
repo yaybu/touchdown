@@ -1,8 +1,6 @@
 import unittest
 import mock
-import textwrap
 
-from touchdown.core import errors
 from touchdown.core import workspace
 from touchdown.core.runner import Runner
 from touchdown.core.main import ConsoleInterface
@@ -36,44 +34,44 @@ class TestAdapter(HTTPAdapter):
             expires=expires,
         ))
 
-    def matches(self, request, mock):
-        if callable(mock['match']):
-            return mock['match'](request, mock)
-        if request.url == mock['match']:
+    def matches(self, request, m):
+        if callable(m['match']):
+            return m['match'](request, m)
+        if request.url == m['match']:
             return True
 
-    def render(self, request, mock):
-        if callable(mock['body']):
-            mock = mock['body'](request, mock)
+    def render(self, request, m):
+        if callable(m['body']):
+            m = m['body'](request, m)
 
-        body = BufferIO(mock['body'])
+        body = BufferIO(m['body'])
 
         headers = {
-            "Content-Type": mock['content_type'],
+            "Content-Type": m['content_type'],
         }
-        headers.update(mock.get('headers', {}))
+        headers.update(m.get('headers', {}))
 
         response = self.build_response(request, HTTPResponse(
-            status=mock['status'],
+            status=m['status'],
             body=body,
             headers=headers,
             preload_content=False,
         ))
 
-        if not mock.get('stream'):
+        if not m.get('stream'):
             response.content  # noqa
 
-        if mock['expires']:
-            mock['expires'] = mock['expires'] - 1
-            if not mock['expires']:
-                self.mocks.remove(mock)
+        if m['expires']:
+            m['expires'] = m['expires'] - 1
+            if not m['expires']:
+                self.mocks.remove(m)
 
         return response
 
     def send(self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None):
-        for mock in self.mocks:
-            if self.matches(request, mock):
-                response = self.render(request, mock)
+        for m in self.mocks:
+            if self.matches(request, m):
+                response = self.render(request, m)
                 self.calls.append((request, response))
                 return response
 
