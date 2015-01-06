@@ -37,3 +37,21 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
             'CacheBehaviors': {'Items': (), 'Quantity': 0},
             'Aliases': {'Items': ('example.com',), 'Quantity': 1},
         })
+
+    def test_simple_distribution_with_aliases(self):
+        distribution = Distribution(
+            None,
+            name="example.com",
+            aliases=['www.example.com'],
+        )
+        result = serializers.Resource().render(mock.Mock(), distribution)
+        self.assertEqual(result, {
+            'Origins': {'Items': (), 'Quantity': 0},
+            'Restrictions': {'GeoRestriction': {'RestrictionType': 'none'}},
+            'DefaultRootObject': '/',
+            'PriceClass': 'PriceClass_100',
+            'Enabled': True,
+            'CustomErrorResponses': {'Items': (), 'Quantity': 0},
+            'CacheBehaviors': {'Items': (), 'Quantity': 0},
+            'Aliases': {'Items': ('example.com', 'www.example.com'), 'Quantity': 2},
+        })
