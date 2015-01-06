@@ -35,7 +35,7 @@ class LaunchConfiguration(Resource):
 
     security_groups = argument.ResourceList(SecurityGroup, aws_field="SecurityGroups")
 
-    user_data = argument.String()
+    user_data = argument.Serializer(aws_field="UserData")
 
     instance_type = argument.String(max=255, aws_field="InstanceType")
 

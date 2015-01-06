@@ -255,3 +255,9 @@ class ResourceList(Argument):
                 return
             self.resource_class = ResourceType.__all_resources__[self.resource_class]
         super(ResourceList, self).contribute_to_class(cls)
+
+
+class Serializer(Argument):
+
+    def __set__(self, instance, value):
+        setattr(instance, self.arg_id, value)

@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import itertools
+import json
+
+from touchdown.core import resource
 from touchdown.core import argument
 from touchdown.core.utils import force_str
 
@@ -35,11 +39,19 @@ class Serializer(object):
     def render(self, runner, object):
         raise NotImplementedError(self.render)
 
+    def dependencies(self, object):
+        return frozenset()
+
 
 class Identity(Serializer):
 
     def render(self, runner, object):
         return object
+
+    def dependencies(self, object):
+        if isinstance(object, resource.Resource):
+            return frozenset((object, ))
+        return frozenset()
 
 
 class Chain(Serializer):
@@ -59,6 +71,9 @@ class Chain(Serializer):
             raise FieldNotPresent()
         return tuple(result)
 
+    def dependencies(self, object):
+        return frozenset(itertools.chain(*(c.dependencies(object) for c in self.children)))
+
 
 class Const(Serializer):
 
@@ -67,6 +82,11 @@ class Const(Serializer):
 
     def render(self, runner, object):
         return self.const
+
+    def dependencies(self, object):
+        if isinstance(object, resource.Resource):
+            return frozenset((object, ))
+        return frozenset()
 
 
 class Identifier(Serializer):
@@ -80,6 +100,9 @@ class Identifier(Serializer):
             return "pending ({})".format(object)
         return result
 
+    def dependencies(self, object):
+        return self.inner.dependencies(object)
+
 
 class Property(Serializer):
 
@@ -89,6 +112,9 @@ class Property(Serializer):
 
     def render(self, runner, object):
         return runner.get_target(self.inner.render(runner, object)).object.get(self.property, "dummy")
+
+    def dependencies(self, object):
+        return self.inner.dependencies(object)
 
 
 class Argument(Serializer):
@@ -120,6 +146,9 @@ class Annotation(Serializer):
     def __init__(self, inner):
         self.inner = inner
 
+    def dependencies(self, object):
+        return self.inner.dependencies(object)
+
 
 class Required(Annotation):
 
@@ -134,6 +163,9 @@ class Formatter(Serializer):
 
     def __init__(self, inner=Identity()):
         self.inner = inner
+
+    def dependencies(self, object):
+        return self.inner.dependencies(object)
 
 
 class Boolean(Formatter):
@@ -165,10 +197,19 @@ class CommaSeperatedList(Formatter):
         return ",".join(self.inner.render(runner, object))
 
 
+class Json(Formatter):
+    def render(self, runner, object):
+        return json.dumps(self.inner.render(runner, object))
+
+
 class Dict(Serializer):
 
     def __init__(self, **kwargs):
-        self.kwargs = kwargs
+        self.kwargs = {}
+        for k, v in kwargs.items():
+            if not isinstance(v, Serializer):
+                v = Const(v)
+            self.kwargs[k] = v
 
     def render(self, runner, object):
         result = hd()
@@ -180,6 +221,9 @@ class Dict(Serializer):
         if not len(result):
             raise FieldNotPresent()
         return result
+
+    def dependencies(self, object):
+        frozenset(itertools.chain(*(c.dependencies(object) for c in self.kwargs.values())))
 
 
 class Resource(Dict):
@@ -212,9 +256,14 @@ class Resource(Dict):
                 value = Identifier(inner=value)
             elif isinstance(arg, argument.ResourceList):
                 value = Context(value, List(Identifier(), skip_empty=True))
+            elif isinstance(arg, argument.Serializer):
+                value = Context(object, getattr(object, argument_name))
             self.kwargs[arg.aws_field] = value
 
         return super(Resource, self).render(runner, object)
+
+    def dependencies(self, object):
+        raise NotImplementedError(self.dependencies, object)
 
 
 class List(Serializer):
@@ -231,6 +280,9 @@ class List(Serializer):
             raise FieldNotPresent()
         return tuple(result)
 
+    def dependencies(self, object):
+        frozenset((self.child.dependencies(object), ))
+
 
 class Context(Serializer):
 
@@ -241,3 +293,6 @@ class Context(Serializer):
     def render(self, runner, object):
         object = self.serializer.render(runner, object)
         return self.inner.render(runner, object)
+
+    def dependencies(self, object):
+        frozenset((self.inner.dependencies(object), self.child.dependencies(object)))
