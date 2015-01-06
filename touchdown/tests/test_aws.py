@@ -1,11 +1,11 @@
 import unittest
 import mock
+import six
 
 from touchdown.core import workspace
 from touchdown.core.runner import Runner
 from touchdown.core.main import ConsoleInterface
-
-from six import StringIO as BufferIO
+from touchdown.core.utils import force_bytes
 
 from botocore.vendored.requests.exceptions import ConnectionError
 from botocore.vendored.requests.adapters import HTTPAdapter
@@ -44,7 +44,7 @@ class TestAdapter(HTTPAdapter):
         if callable(m['body']):
             m = m['body'](request, m)
 
-        body = BufferIO(m['body'])
+        body = six.BytesIO(force_bytes(m['body']))
 
         headers = {
             "Content-Type": m['content_type'],
