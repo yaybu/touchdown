@@ -1,6 +1,6 @@
 botocore==0.80.0
 click==3.3
-netaddr==0.7.12
+netaddr==0.7.13
 
 six
 pytest
