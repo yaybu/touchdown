@@ -1,3 +1,4 @@
+import os
 import unittest
 import mock
 import six
@@ -14,6 +15,15 @@ try:
 except ImportError:
     from urllib3.response import HTTPResponse
 from botocore.endpoint import Endpoint as OldEndpoint
+
+
+class Buffer(object):
+
+    def __init__(self, contents):
+        self.contents = contents
+
+    def makefile(self, *args, **kwargs):
+        return six.BytesIO(self.contents)
 
 
 class TestAdapter(HTTPAdapter):
@@ -33,6 +43,21 @@ class TestAdapter(HTTPAdapter):
             content_type=content_type,
             expires=expires,
         ))
+
+    def add_fixture(self, method, match, fixture, stream=False, expires=None):
+        with open(os.path.join(os.path.dirname(__file__), "fixtures", fixture)) as fp:
+            response = six.moves.http_client.HTTPResponse(Buffer(fp.read()))
+            response.begin()
+
+        self.add(
+            method,
+            match,
+            body=response.read(),
+            status=response.status,
+            stream=stream,
+            content_type=response.getheader('Content-Type', 'text/plain'),
+            expires=expires,
+        )
 
     def matches(self, request, m):
         if callable(m['match']):
