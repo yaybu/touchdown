@@ -1,65 +1,25 @@
-import textwrap
+# Copyright 2015 Isotoma Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from touchdown.core import errors
-
-from .test_aws import TestCase
+from . import aws
 
 
-class TestKeypair(TestCase):
+class TestKeyPair(aws.TestBasicUsage):
 
-    def test_no_change(self):
-        self.responses.add("POST", 'https://ec2.eu-west-1.amazonaws.com/', body=textwrap.dedent("""
-            <DescribeKeyPairsResponse xmlns="http://ec2.amazonaws.com/doc/2014-10-01/">
-                <requestId>59dbff89-35bd-4eac-99ed-be587EXAMPLE</requestId>
-                <keySet>
-                  <item>
-                     <keyName>my-key-pair</keyName>
-                     <keyFingerprint>1f:51:ae:28:bf:89:e9:d8:1f:25:5d:37:2d:7d:b8:ca:9f:f5:f1:6f</keyFingerprint>
-                  </item>
-               </keySet>
-            </DescribeKeyPairsResponse>
-        """))
-
-        kp = self.aws.add_keypair(name='my-key-pair')
-        self.assertRaises(errors.NothingChanged, self.runner.apply)
-
-        self.assertEqual(
-            self.runner.get_target(kp).object['KeyName'],
-            "my-key-pair",
-        )
-
-    def test_create(self):
-        self.responses.add("POST", 'https://ec2.eu-west-1.amazonaws.com/', body=textwrap.dedent("""
-            <DescribeKeyPairsResponse xmlns="http://ec2.amazonaws.com/doc/2014-10-01/">
-                <requestId>59dbff89-35bd-4eac-99ed-be587EXAMPLE</requestId>
-                <keySet/>
-            </DescribeKeyPairsResponse>
-        """), expires=1)
-
-        self.responses.add("POST", 'https://ec2.eu-west-1.amazonaws.com/', body=textwrap.dedent("""
-            <ImportKeyPairResponse xmlns="http://ec2.amazonaws.com/doc/2014-10-01/">
-                <requestId>7a62c49f-347e-4fc4-9331-6e8eEXAMPLE</requestId>
-                <keyName>my-key-pair</keyName>
-                <keyFingerprint>1f:51:ae:28:bf:89:e9:d8:1f:25:5d:37:2d:7d:b8:ca:9f:f5:f1:6f</keyFingerprint>
-            </ImportKeyPairResponse>
-        """), expires=1)
-
-        self.responses.add("POST", 'https://ec2.eu-west-1.amazonaws.com/', body=textwrap.dedent("""
-            <DescribeKeyPairsResponse xmlns="http://ec2.amazonaws.com/doc/2014-10-01/">
-                <requestId>59dbff89-35bd-4eac-99ed-be587EXAMPLE</requestId>
-                <keySet>
-                  <item>
-                     <keyName>my-key-pair</keyName>
-                     <keyFingerprint>1f:51:ae:28:bf:89:e9:d8:1f:25:5d:37:2d:7d:b8:ca:9f:f5:f1:6f</keyFingerprint>
-                  </item>
-               </keySet>
-            </DescribeKeyPairsResponse>
-        """))
-
-        kp = self.aws.add_keypair(name='my-key-pair', public_key="")
-        self.runner.apply()
-
-        self.assertEqual(
-            self.runner.get_target(kp).object['KeyName'],
-            "my-key-pair",
+    def setUpResource(self):
+        self.expected_resource_id = 'my-key-pair'
+        self.resource = self.aws.add_keypair(
+            name='my-test-lc',
+            public_key='',
         )

@@ -1,30 +1,25 @@
-from touchdown.core import errors
+# Copyright 2015 Isotoma Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from .test_aws import TestCase
+from . import aws
 
 
-class TestLaunchConfiguration(TestCase):
+class TestLaunchConfiguration(aws.TestBasicUsage):
 
-    def test_no_change(self):
-        self.responses.add_fixture("POST", 'https://autoscaling.eu-west-1.amazonaws.com/', 'aws_ec2_launch_configuration_describe')
-
-        lc = self.aws.add_launch_configuration(name='my-test-lc', image='ami-514ac838')
-        self.assertRaises(errors.NothingChanged, self.runner.apply)
-
-        self.assertEqual(
-            self.runner.get_target(lc).object['LaunchConfigurationName'],
-            "my-test-lc",
-        )
-
-    def test_create(self):
-        self.responses.add_fixture("POST", 'https://autoscaling.eu-west-1.amazonaws.com/', 'aws_ec2_launch_configuration_describe_404', expires=1)
-        self.responses.add_fixture("POST", 'https://autoscaling.eu-west-1.amazonaws.com/', 'aws_ec2_launch_configuration_create', expires=1)
-        self.responses.add_fixture("POST", 'https://autoscaling.eu-west-1.amazonaws.com/', 'aws_ec2_launch_configuration_describe')
-
-        lc = self.aws.add_launch_configuration(name='my-test-lc', image='ami-514ac838')
-        self.runner.apply()
-
-        self.assertEqual(
-            self.runner.get_target(lc).object['LaunchConfigurationName'],
-            "my-test-lc",
+    def setUpResource(self):
+        self.expected_resource_id = 'my-test-lc'
+        self.resource = self.aws.add_launch_configuration(
+            name='my-test-lc',
+            image='ami-514ac838'
         )
