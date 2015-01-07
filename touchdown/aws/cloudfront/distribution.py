@@ -260,7 +260,6 @@ class Apply(SimpleApply, Target):
     def describe_object(self):
         paginator = self.client.get_paginator("list_distributions")
         for page in paginator.paginate():
-            print page
             for distribution in page['DistributionList'].get('Items', []):
                 if self.resource.name in distribution['Aliases'].get('Items', []):
                     return distribution
