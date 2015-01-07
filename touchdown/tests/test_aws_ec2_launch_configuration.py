@@ -1,5 +1,3 @@
-import textwrap
-
 from touchdown.core import errors
 
 from .test_aws import TestCase
