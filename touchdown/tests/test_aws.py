@@ -23,7 +23,7 @@ class Buffer(object):
         self.contents = contents
 
     def makefile(self, *args, **kwargs):
-        return six.BytesIO(self.contents)
+        return six.BytesIO(six.force_bytes(self.contents))
 
 
 class TestAdapter(HTTPAdapter):
