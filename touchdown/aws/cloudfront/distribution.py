@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import uuid
+
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
@@ -47,9 +49,9 @@ class Origin(Resource):
             OriginAccessIdentity=serializers.Argument("origin_access_identity"),
         ),
         "CustomOriginConfig": serializers.Dict(
-            HttpPort=serializers.Argument("http_port"),
-            HttpsPort=serializers.Argument("https_port"),
-            OriginProtocol=serializers.Argument("origin_protocol"),
+            HTTPPort=serializers.Argument("http_port"),
+            HTTPSPort=serializers.Argument("https_port"),
+            OriginProtocolPolicy=serializers.Argument("origin_protocol"),
         )
     }
 
@@ -71,15 +73,15 @@ class ForwardedValues(Resource):
     resource_name = "forwarded_values"
 
     extra_serializers = {
-        "CookiePreference": dict(
+        "Cookies": serializers.Dict(
             Forward=serializers.Argument("forward_cookies"),
             WhitelistedNames=CloudFrontList(serializers.Argument("cookie_whitelist")),
         )
     }
-    query_string = argument.Boolean(aws_field="QueryString")
+    query_string = argument.Boolean(aws_field="QueryString", default=False)
     headers = argument.List(aws_field="Headers", aws_serializer=CloudFrontList(serializers.List()))
 
-    forward_cookies = argument.String()
+    forward_cookies = argument.String(default="whitelist")
     cookie_whitelist = argument.List()
 
 
@@ -96,8 +98,13 @@ class DefaultCacheBehavior(Resource):
     }
 
     target_origin = argument.String(aws_field='TargetOriginId')
-    forwarded_values = argument.Resource(ForwardedValues, aws_field="ForwardedValues")
-    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all')
+    forwarded_values = argument.Resource(
+        ForwardedValues,
+        default=lambda instance: dict(),
+        aws_field="ForwardedValues",
+        aws_serializer=serializers.Resource(),
+    )
+    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', aws_field="ViewerProtocolPolicy")
     min_ttl = argument.Integer(default=0, aws_field="MinTTL")
     allowed_methods = argument.List(
         default=lambda x: ["GET", "HEAD"],
@@ -127,10 +134,10 @@ class LoggingConfig(Resource):
 
     resource_name = "logging_config"
 
-    enabled = argument.Boolean(aws_field="Enabled")
-    include_cookies = argument.Boolean(aws_field="IncludeCookies")
-    bucket = argument.Resource(Bucket, aws_field="Bucket")
-    prefix = argument.String(aws_field="Prefix")
+    enabled = argument.Boolean(aws_field="Enabled", default=False)
+    include_cookies = argument.Boolean(aws_field="IncludeCookies", default=False)
+    bucket = argument.Resource(Bucket, aws_field="Bucket", aws_serializer=serializers.Default(default=None), default="")
+    prefix = argument.String(aws_field="Prefix", default="")
 
 
 class ViewerCertificate(Resource):
@@ -160,9 +167,10 @@ class ViewerCertificate(Resource):
 
 class Distribution(Resource):
 
-    resource_name = "distributions"
+    resource_name = "distribution"
 
     extra_serializers = {
+        "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
         "Aliases": CloudFrontList(serializers.Chain(
             serializers.Context(serializers.Argument("name"), serializers.ListOfOne()),
             serializers.Context(serializers.Argument("aliases"), serializers.List()),
@@ -172,6 +180,7 @@ class Distribution(Resource):
         "Restrictions": serializers.Const({
             "GeoRestriction": {
                 "RestrictionType": "none",
+                "Quantity": 0,
             },
         }),
     }
@@ -181,7 +190,7 @@ class Distribution(Resource):
     name = argument.String()
 
     """ Any comments you want to include about the distribution. """
-    comment = argument.String(aws_field='Comment')
+    comment = argument.String(aws_field='Comment', default=lambda instance: instance.name)
 
     """ Alternative names that the distribution should respond to. """
     aliases = argument.List()
@@ -203,7 +212,7 @@ class Distribution(Resource):
     default_cache_behavior = argument.Resource(
         DefaultCacheBehavior,
         aws_field="DefaultCacheBehavior",
-        aws_serializer=CloudFrontResourceList(),
+        aws_serializer=serializers.Resource(),
     )
 
     behaviors = argument.ResourceList(
@@ -221,6 +230,7 @@ class Distribution(Resource):
 
     logging = argument.Resource(
         LoggingConfig,
+        default=lambda instance: dict(enabled=False),
         aws_field="Logging",
         aws_serializer=serializers.Resource(),
     )
@@ -245,5 +255,17 @@ class Apply(SimpleApply, Target):
     resource = Distribution
     service_name = 'cloudfront'
     create_action = "create_distribution"
-    get_action = "get_distribution"
     key = 'Id'
+
+    def describe_object(self):
+        paginator = self.client.get_paginator("list_distributions")
+        for page in paginator.paginate():
+            print page
+            for distribution in page['DistributionList'].get('Items', []):
+                if self.resource.name in distribution['Aliases'].get('Items', []):
+                    return distribution
+
+    def get_create_serializer(self):
+        return serializers.Dict(
+            DistributionConfig=serializers.Resource(),
+        )

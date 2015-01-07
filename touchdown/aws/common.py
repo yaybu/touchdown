@@ -163,12 +163,15 @@ class SimpleApply(object):
 
         return {}
 
+    def get_create_serializer(self):
+        return serializers.Resource()
+
     def create_object(self):
         g = self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
             self.waiter,
-            serializers.Resource()
+            self.get_create_serializer(),
         )
         g.is_creation_action = True
         return g

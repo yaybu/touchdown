@@ -95,7 +95,10 @@ class Identifier(Serializer):
         self.inner = inner
 
     def render(self, runner, object):
-        result = runner.get_target(self.inner.render(runner, object)).resource_id
+        resource = self.inner.render(runner, object)
+        if not resource:
+            raise FieldNotPresent()
+        result = runner.get_target(resource).resource_id
         if not result:
             return "pending ({})".format(object)
         return result
@@ -157,6 +160,19 @@ class Required(Annotation):
             return self.inner.render(runner, object)
         except FieldNotPresent:
             raise RequiredFieldNotPresent()
+
+
+class Default(Annotation):
+
+    def __init__(self, inner=Identity(), default=None):
+        super(Default, self).__init__(inner)
+        self.default = default
+
+    def render(self, runner, object):
+        try:
+            return self.inner.render(runner, object)
+        except FieldNotPresent:
+            return self.default
 
 
 class Formatter(Serializer):
@@ -260,6 +276,7 @@ class Resource(Dict):
                 value = Context(value, List(Identifier(), skip_empty=True))
             elif isinstance(arg, argument.Serializer):
                 value = Context(object, getattr(object, argument_name))
+
             self.kwargs[arg.aws_field] = value
 
         return super(Resource, self).render(runner, object)

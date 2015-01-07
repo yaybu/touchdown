@@ -31,7 +31,7 @@ class Argument(object):
 
     def __init__(self, default=None, help=None, **kwargs):
         self.__doc__ = help
-        if default:
+        if default is not None:
             self.default = default
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -43,10 +43,12 @@ class Argument(object):
             return self
         elif self.present(instance):
             return getattr(instance, self.arg_id)
-        elif callable(self.default):
+        return self.get_default(instance)
+
+    def get_default(self, instance):
+        if callable(self.default):
             return self.default(instance)
-        else:
-            return self.default
+        return self.default
 
     def present(self, instance):
         return hasattr(instance, self.arg_id)
@@ -178,6 +180,12 @@ class Resource(Argument):
     def __init__(self, resource_class, **kwargs):
         super(Resource, self).__init__(**kwargs)
         self.resource_class = resource_class
+
+    def get_default(self, instance):
+        default = super(Resource, self).get_default(instance)
+        if isinstance(default, dict):
+            return self.resource_class(instance, **default)
+        return default
 
     def __set__(self, instance, value):
         """

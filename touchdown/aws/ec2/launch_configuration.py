@@ -20,6 +20,7 @@ from ..account import AWS
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
 from ..common import SimpleApply
+from .. import serializers
 
 
 class LaunchConfiguration(Resource):
@@ -45,7 +46,7 @@ class LaunchConfiguration(Resource):
 
     # block_devices = argument.Dict(aws_field="BlockDeviceMappings")
 
-    instance_monitoring = argument.Boolean(default=False, aws_field="InstanceMonitoring")
+    instance_monitoring = argument.Boolean(default=False, aws_field="InstanceMonitoring", aws_serializer=serializers.Dict(Enabled=serializers.Identity()))
 
     spot_price = argument.String(aws_field="SpotPrice")
 
