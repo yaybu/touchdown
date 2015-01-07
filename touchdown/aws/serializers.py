@@ -84,8 +84,8 @@ class Const(Serializer):
         return self.const
 
     def dependencies(self, object):
-        if isinstance(object, resource.Resource):
-            return frozenset((object, ))
+        if isinstance(self.const, resource.Resource):
+            return frozenset((self.const, ))
         return frozenset()
 
 
@@ -218,6 +218,15 @@ class Json(Formatter):
         return json.dumps(self.inner.render(runner, object))
 
 
+class Format(Formatter):
+    def __init__(self, format_string, inner=Identity()):
+        super(Format, self).__init__(inner)
+        self.format_string = format_string
+
+    def render(self, runner, object):
+        return self.format_string.format(self.inner.render(runner, object))
+
+
 class Dict(Serializer):
 
     def __init__(self, **kwargs):
@@ -239,7 +248,7 @@ class Dict(Serializer):
         return result
 
     def dependencies(self, object):
-        frozenset(itertools.chain(*(c.dependencies(object) for c in self.kwargs.values())))
+        return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))
 
 
 class Resource(Dict):
@@ -300,7 +309,7 @@ class List(Serializer):
         return tuple(result)
 
     def dependencies(self, object):
-        frozenset((self.child.dependencies(object), ))
+        return frozenset((self.child.dependencies(object), ))
 
 
 class Context(Serializer):
@@ -314,4 +323,4 @@ class Context(Serializer):
         return self.inner.render(runner, object)
 
     def dependencies(self, object):
-        frozenset((self.inner.dependencies(object), self.child.dependencies(object)))
+        return self.inner.dependencies(object).union(self.serializer.dependencies(object))

@@ -269,3 +269,6 @@ class Serializer(Argument):
 
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
+        for dep in value.dependencies(instance):
+            if dep != instance:
+                instance.add_dependency(dep)
