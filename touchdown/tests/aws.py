@@ -138,7 +138,6 @@ class TestCase(unittest.TestCase):
         self.workspace = workspace.Workspace()
         self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
         self.runner = Runner(self.workspace, ConsoleInterface(interactive=False))
-        self.target = self.runner.get_target(self.resource)
 
     def tearDown(self):
         self._patcher.stop()
@@ -155,6 +154,7 @@ class TestBasicUsage(TestCase):
         self.fixture_404 = "aws_{}_describe_404".format(self.resource.resource_name)
         self.fixture_create = "aws_{}_create".format(self.resource.resource_name)
 
+        self.target = self.runner.get_target(self.resource)
         self.base_url = 'https://{}.eu-west-1.amazonaws.com/'.format(self.target.service_name)
 
     def setUpResource(self):
