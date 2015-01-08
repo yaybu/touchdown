@@ -241,7 +241,7 @@ class Distribution(Resource):
         aws_field="PriceClass",
     )
 
-    certificate = argument.Resource(
+    viewer_certificate = argument.Resource(
         ViewerCertificate,
         aws_field="ViewerCertificate",
         aws_serializers=serializers.Resource(),
