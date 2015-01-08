@@ -242,3 +242,30 @@ class SimpleApply(SimpleDescribe):
         logger.debug("Looking for changes to apply")
         for action in self.update_object():
             yield action
+
+
+class SimpleDestroy(SimpleDescribe):
+
+    name = "destroy"
+
+    waiter = None
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(**{self.key: self.resource_id})
+
+    def destroy_object(self):
+        return self.generic_action(
+            "Destroying {}".format(self.resource),
+            getattr(self.client, self.destroy_action),
+            self.waiter,
+            self.get_destroy_serializer(),
+        )
+
+    def get_actions(self):
+        self.object = self.describe_object()
+
+        if not self.object:
+            logger.object("Resource '{}' not found - assuming already destroyed")
+            return
+
+        yield self.destroy_object()
