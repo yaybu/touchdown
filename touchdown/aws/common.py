@@ -83,29 +83,12 @@ class SetTags(Action):
         )
 
 
-class SimpleApply(object):
+class SimpleDescribe(object):
 
-    """
-    A simple data-driven resource for AWS api's that a moderately well behaved.
+    name = "describe"
 
-    For example::
-
-        cache CacheClusterApply(SimplyApply, Target):
-            resource = CacheCluster
-            create_action = "create_cache_cluster"
-            describe_action = "describe_cache_cluster"
-            describe_list_key = "CacheClusters"
-            key = 'CacheClusterId'
-    """
-
-    name = "apply"
-    default = True
-
-    waiter = None
     get_action = None
-    update_action = None
     describe_notfound_exception = None
-    create_serializer = None
 
     signature = (
         Present('name'),
@@ -163,19 +146,6 @@ class SimpleApply(object):
 
         return {}
 
-    def get_create_serializer(self):
-        return serializers.Resource()
-
-    def create_object(self):
-        g = self.generic_action(
-            "Creating {}".format(self.resource),
-            getattr(self.client, self.create_action),
-            self.waiter,
-            self.get_create_serializer(),
-        )
-        g.is_creation_action = True
-        return g
-
     def generic_action(self, description, callable, waiter=None, serializer=None, **kwargs):
         return GenericAction(
             self,
@@ -190,15 +160,36 @@ class SimpleApply(object):
         self.object = self.describe_object()
 
         if not self.object:
-            logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resource))
-            self.object = {}
-            yield self.create_object()
+            raise errors.NotFound("Object '{}' could not be found, and is not scheduled to be created")
 
-        logger.debug("Current state for {} is {}".format(self.resource, self.object))
+    @property
+    def resource_id(self):
+        if self.key in self.object:
+            return self.object[self.key]
+        return None
 
-        logger.debug("Looking for changes to apply")
-        for action in self.update_object():
-            yield action
+
+class SimpleApply(SimpleDescribe):
+
+    name = "apply"
+    default = True
+
+    waiter = None
+    update_action = None
+    create_serializer = None
+
+    def get_create_serializer(self):
+        return serializers.Resource()
+
+    def create_object(self):
+        g = self.generic_action(
+            "Creating {}".format(self.resource),
+            getattr(self.client, self.create_action),
+            self.waiter,
+            self.get_create_serializer(),
+        )
+        g.is_creation_action = True
+        return g
 
     def update_object(self):
         if self.update_action and self.object:
@@ -238,8 +229,16 @@ class SimpleApply(object):
                     tags=tags,
                 )
 
-    @property
-    def resource_id(self):
-        if self.key in self.object:
-            return self.object[self.key]
-        return None
+    def get_actions(self):
+        self.object = self.describe_object()
+
+        if not self.object:
+            logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resource))
+            self.object = {}
+            yield self.create_object()
+
+        logger.debug("Current state for {} is {}".format(self.resource, self.object))
+
+        logger.debug("Looking for changes to apply")
+        for action in self.update_object():
+            yield action
