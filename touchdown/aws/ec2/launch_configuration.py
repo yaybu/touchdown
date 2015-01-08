@@ -72,7 +72,7 @@ class LaunchConfiguration(Resource):
     def matches(self, runner, object):
         if object['ImageId'] != self.image:
             return False
-        if object['KeyName'] != self.key_name:
+        if self.key_pair and self.key_pair.name != object['KeyName']:
             return False
         #if object['UserData'] != self.user_data:
         #    return False
