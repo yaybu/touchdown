@@ -27,7 +27,7 @@ class Rule(Resource):
 
     @property
     def dot_ignore(self):
-        return self.security_group == None
+        return self.security_group is None
 
     protocol = argument.String(choices=['tcp', 'udp', 'icmp'], aws_field="IpProtocol")
     from_port = argument.Integer(min=-1, max=32768, aws_field="FromPort")
