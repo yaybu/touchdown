@@ -25,6 +25,10 @@ class Rule(Resource):
 
     resource_name = "rule"
 
+    @property
+    def dot_ignore(self):
+        return self.security_group == None
+
     protocol = argument.String(choices=['tcp', 'udp', 'icmp'], aws_field="IpProtocol")
     from_port = argument.Integer(min=-1, max=32768, aws_field="FromPort")
     to_port = argument.Integer(min=-1, max=32768, aws_field="ToPort")

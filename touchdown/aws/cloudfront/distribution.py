@@ -43,6 +43,7 @@ def CloudFrontResourceList():
 class Origin(Resource):
 
     resource_name = "origin"
+    dot_ignore = True
 
     extra_serializers = {
         "S3OriginConfig": serializers.Dict(
@@ -71,6 +72,7 @@ class Origin(Resource):
 class ForwardedValues(Resource):
 
     resource_name = "forwarded_values"
+    dot_ignore = True
 
     extra_serializers = {
         "Cookies": serializers.Dict(
@@ -88,6 +90,7 @@ class ForwardedValues(Resource):
 class DefaultCacheBehavior(Resource):
 
     resource_name = "default_cache_behaviour"
+    dot_ignore = True
 
     extra_serializers = {
         # TrustedSigners are not supported yet, so include stub in serialized form
@@ -123,6 +126,7 @@ class CacheBehavior(DefaultCacheBehavior):
 class ErrorResponse(Resource):
 
     resource_name = "error_response"
+    dot_ignore = True
 
     error_code = argument.Integer(aws_field="ErrorCode")
     response_page_path = argument.String(aws_field="ResponsePagePath")
@@ -133,6 +137,7 @@ class ErrorResponse(Resource):
 class LoggingConfig(Resource):
 
     resource_name = "logging_config"
+    dot_ignore = True
 
     enabled = argument.Boolean(aws_field="Enabled", default=False)
     include_cookies = argument.Boolean(aws_field="IncludeCookies", default=False)
