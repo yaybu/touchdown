@@ -24,6 +24,7 @@ from touchdown.core.workspace import Workspace
 class AWS(Resource):
 
     resource_name = "aws"
+    dot_ignore = True
 
     region = argument.String()
     access_key_id = argument.String()

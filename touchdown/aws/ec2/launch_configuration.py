@@ -22,6 +22,8 @@ from ..iam import InstanceProfile
 from ..common import SimpleApply
 from .. import serializers
 
+from .keypair import KeyPair
+
 
 class LaunchConfiguration(Resource):
 
@@ -32,7 +34,7 @@ class LaunchConfiguration(Resource):
 
     image = argument.String(max=255, aws_field="ImageId")
 
-    key_name = argument.String(max=255, aws_field="KeyName")
+    key_pair = argument.Resource(KeyPair, aws_field="KeyName")
 
     security_groups = argument.ResourceList(SecurityGroup, aws_field="SecurityGroups")
 

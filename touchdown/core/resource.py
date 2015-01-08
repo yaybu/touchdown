@@ -52,6 +52,7 @@ class ResourceType(type):
 
 class Resource(six.with_metaclass(ResourceType)):
 
+    dot_ignore = False
     default_target = None
     targets = {}
 

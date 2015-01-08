@@ -47,7 +47,7 @@ class Runner(object):
     def dot(self):
         graph = ["digraph ast {"]
 
-        queue = list(self.node.dependencies)
+        queue = list(d for d in self.node.dependencies if not d.dot_ignore)
         visiting = set()
         visited = set()
 
@@ -57,12 +57,14 @@ class Runner(object):
 
             graph.append('{} [label="{}"];'.format(id(node), node))
             for dep in node.dependencies:
+                if dep.dot_ignore:
+                    continue
                 if dep in visiting:
                     raise errors.CycleError(
                         'Circular reference between %s and %s' % (node, dep)
                     )
                 graph.append("{} -> {};".format(id(node), id(dep)))
-                if dep not in visited:
+                if dep not in visited and dep not in queue:
                     queue.append(dep)
 
             visiting.remove(node)
