@@ -20,7 +20,7 @@ from .. import serializers
 from .vpc import VPC
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Route(Resource):
@@ -45,11 +45,10 @@ class RouteTable(Resource):
     tags = argument.Dict()
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = RouteTable
     service_name = 'ec2'
-    create_action = "create_route_table"
     describe_action = "describe_route_tables"
     describe_list_key = "RouteTables"
     key = "RouteTableId"
@@ -60,6 +59,11 @@ class Apply(SimpleApply, Target):
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_route_table"
 
     def update_associations(self):
         remote_subnets = {}
@@ -129,3 +133,8 @@ class Apply(SimpleApply, Target):
             yield action
         for action in self.update_routes():
             yield action
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_route_table"

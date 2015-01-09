@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class KeyPair(Resource):
@@ -29,14 +29,23 @@ class KeyPair(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = KeyPair
     service_name = 'ec2'
-    create_action = "import_key_pair"
     describe_action = "describe_key_pairs"
     describe_list_key = "KeyPairs"
     key = 'KeyName'
 
     def get_describe_filters(self):
         return {"KeyNames": [self.resource.name]}
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "import_key_pair"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_key_pair"

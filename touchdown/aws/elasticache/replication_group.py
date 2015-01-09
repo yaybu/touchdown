@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .cache import BaseCacheCluster
 
 
@@ -30,12 +30,21 @@ class ReplicationGroup(BaseCacheCluster, Resource):
     num_cache_clusters = argument.Integer(aws_field="NumCacheClusters")
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = ReplicationGroup
     service_name = 'elasticache'
-    create_action = "create_replication_group"
-    update_action = "modify_replication_group"
     describe_action = "describe_replication_groups"
     describe_list_key = "ReplicationGroups"
     key = 'ReplicationGroupId'
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_replication_group"
+    update_action = "modify_replication_group"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_replication_group"

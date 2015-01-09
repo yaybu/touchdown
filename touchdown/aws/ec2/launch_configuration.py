@@ -19,7 +19,7 @@ from touchdown.core import argument
 from ..account import AWS
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .. import serializers
 
 from .keypair import KeyPair
@@ -82,11 +82,10 @@ class LaunchConfiguration(Resource):
         return True
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = LaunchConfiguration
     service_name = 'autoscaling'
-    create_action = "create_launch_configuration"
     describe_action = "describe_launch_configurations"
     describe_list_key = "LaunchConfigurations"
     key = 'LaunchConfigurationName'
@@ -95,3 +94,13 @@ class Apply(SimpleApply, Target):
         for launch_config in self.client.describe_launch_configurations()['LaunchConfigurations']:
             if self.resource.matches(self.runner, launch_config):
                 return launch_config
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_launch_configuration"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_launch_configuration"

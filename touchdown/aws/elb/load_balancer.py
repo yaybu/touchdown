@@ -17,7 +17,7 @@ from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import Subnet, SecurityGroup
 
 
@@ -36,19 +36,28 @@ class LoadBalancer(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = LoadBalancer
     service_name = 'elb'
-    create_action = "create_load_balancer"
     describe_action = "describe_load_balancers"
     describe_list_key = "LoadBalancerDescriptions"
     key = 'LoadBalancerName'
+
+    def get_describe_filters(self):
+        return {"LoadBalancerNames": [self.resource.name]}
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_load_balancer"
 
     signature = [
         Present('name'),
         Present('listeners'),
     ]
 
-    def get_describe_filters(self):
-        return {"LoadBalancerNames": [self.resource.name]}
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_load_balancer"

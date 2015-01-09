@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 from ..vpc import SecurityGroup
 from .subnet_group import SubnetGroup
@@ -74,13 +74,22 @@ class CacheCluster(BaseCacheCluster, Resource):
     # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", aws_field='ReplicationGroupId')
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = CacheCluster
     service_name = 'elasticache'
-    create_action = "create_cache_cluster"
-    # update_action = "modify_cache_cluster"
     describe_action = "describe_cache_clusters"
     describe_notfound_exception = "CacheClusterNotFound"
     describe_list_key = "CacheClusters"
     key = 'CacheClusterId'
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_cache_cluster"
+    # update_action = "modify_cache_cluster"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_cache_cluster"

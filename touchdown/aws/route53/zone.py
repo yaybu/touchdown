@@ -19,7 +19,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 # FIXME: Figure out how to pass comment
@@ -35,12 +35,10 @@ class HostedZone(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = HostedZone
     service_name = 'route53'
-    create_action = "create_hosted_zone"
-    # update_action = "update_hosted_zone_comment"
     describe_action = "list_hosted_zones"
     describe_list_key = "HostedZone"
     key = 'HostedZoneId'
@@ -53,9 +51,20 @@ class Apply(SimpleApply, Target):
                 if zone['Name'] == zone_name:
                     return zone
 
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_hosted_zone"
+    # update_action = "update_hosted_zone_comment"
+
     def get_create_args(self):
         args = {
             "CallerReference": str(uuid.uuid4()),
         }
         args.update(super(Apply, self).get_create_args())
         return args
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_hosted_zone"

@@ -19,7 +19,7 @@ from touchdown.core import argument
 from touchdown.aws.vpc import Subnet
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class SubnetGroup(Resource):
@@ -34,12 +34,21 @@ class SubnetGroup(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = SubnetGroup
     service_name = 'elasticache'
-    create_action = "create_cache_subnet_group"
-    update_action = "modify_cache_subnet_group"
     describe_action = "describe_cache_subnet_groups"
     describe_list_key = "CacheSubnetGroups"
     key = 'CacheSubnetGroupName'
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_cache_subnet_group"
+    update_action = "modify_cache_subnet_group"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_cache_subnet_group"

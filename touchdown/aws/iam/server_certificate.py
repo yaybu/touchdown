@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class ServerCertificate(Resource):
@@ -33,10 +33,19 @@ class ServerCertificate(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = ServerCertificate
     service_name = 'iam'
-    create_action = "upload_server_certificate"
     get_action = "get_server_certificate"
     key = 'ServerCertificateName'
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "upload_server_certificate"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_server_certificate"

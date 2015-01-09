@@ -17,7 +17,7 @@ from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
 from .vpc import VPC
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Subnet(Resource):
@@ -31,20 +31,13 @@ class Subnet(Resource):
     tags = argument.Dict()
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = Subnet
     service_name = 'ec2'
-    create_action = "create_subnet"
     describe_action = "describe_subnets"
     describe_list_key = "Subnets"
     key = 'SubnetId'
-
-    signature = (
-        Present('name'),
-        Present('vpc'),
-        Present('cidr_block'),
-    )
 
     def get_describe_filters(self):
         return {
@@ -52,3 +45,13 @@ class Apply(SimpleApply, Target):
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
             ],
         }
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_subnet"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_vpc"

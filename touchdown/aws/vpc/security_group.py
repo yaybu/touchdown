@@ -18,7 +18,7 @@ from touchdown.core import argument
 
 from .vpc import VPC
 from .. import serializers
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Rule(Resource):
@@ -99,11 +99,10 @@ class SecurityGroup(Resource):
     tags = argument.Dict()
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = SecurityGroup
     service_name = 'ec2'
-    create_action = "create_security_group"
     describe_action = "describe_security_groups"
     describe_list_key = "SecurityGroups"
     key = 'GroupId'
@@ -116,6 +115,11 @@ class Apply(SimpleApply, Target):
                 {'Name': 'vpc-id', 'Values': [vpc.resource_id or '']}
             ],
         }
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_security_group"
 
     def update_object(self):
         for local_rule in self.resource.ingress:
@@ -132,20 +136,6 @@ class Apply(SimpleApply, Target):
 
         return
 
-        """
-        for remote_rule in self.object.get("IpPermissions", []):
-            for local_rule in self.resource.ingress:
-                if local_rule.matches(self.runner, remote_rule):
-                    break
-            else:
-                yield self.generic_action(
-                    "Deauthorize ingress for {}".format(_describe(remote_rule)),
-                    self.client.authorize_security_group_ingress,
-                    GroupId=ResourceId(self.resource),
-                    #FIXME
-                )
-        """
-
         for local_rule in self.resource.egress:
             for remote_rule in self.object.get("IpPermissionsEgress", []):
                 if local_rule.matches(self.runner, remote_rule):
@@ -157,3 +147,8 @@ class Apply(SimpleApply, Target):
                     GroupId=serializers.Identifier(),
                     IpPermissions=serializers.ListOfOne(serializers.Context(serializers.Const(local_rule), serializers.Resource())),
                 )
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_security_group"

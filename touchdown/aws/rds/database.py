@@ -17,7 +17,7 @@ from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 from .subnet_group import SubnetGroup
 
@@ -91,16 +91,20 @@ class Database(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = Database
     service_name = 'rds'
-    create_action = "create_db_instance"
-    update_action = "modify_db_instance"
     describe_action = "describe_db_instances"
     describe_notfound_exception = "DBInstanceNotFound"
     describe_list_key = "DBInstances"
     key = 'DBInstanceIdentifier'
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_db_instance"
+    update_action = "modify_db_instance"
 
     signature = (
         Present("name"),
@@ -110,3 +114,8 @@ class Apply(SimpleApply, Target):
         Present("master_username"),
         Present("master_password"),
     )
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_db_instance"

@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .. import serializers
 
 # FIXME: Figure out how to bind CreateBucketConfiguration.LocationConstraint
@@ -38,11 +38,10 @@ class Bucket(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = Bucket
     service_name = 's3'
-    create_action = "create_bucket"
     describe_action = "list_buckets"
     describe_list_key = "Buckets"
     key = 'Name'
@@ -51,3 +50,13 @@ class Apply(SimpleApply, Target):
         for bucket in self.client.list_buckets()['Buckets']:
             if bucket['Name'] == self.resource.name:
                 return bucket
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_bucket"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_bucket"

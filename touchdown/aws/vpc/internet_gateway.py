@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from .vpc import VPC
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class InternetGateway(Resource):
@@ -29,11 +29,10 @@ class InternetGateway(Resource):
     tags = argument.Dict()
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = InternetGateway
     service_name = 'ec2'
-    create_action = "create_internet_gateway"
     describe_action = "describe_internet_gateways"
     describe_list_key = "InternetGateways"
     key = "InternetGatewayId"
@@ -44,3 +43,13 @@ class Apply(SimpleApply, Target):
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_internet_gateway"
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "delete_internet_gateway"

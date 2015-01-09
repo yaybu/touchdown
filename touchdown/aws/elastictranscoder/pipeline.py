@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 from ..s3 import Bucket
 from ..iam import Role
@@ -38,17 +38,26 @@ class Pipeline(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = Pipeline
     service_name = 'elastictranscoder'
-    create_action = "create_pipeline"
     describe_action = "list_pipelines"
     describe_list_key = "Pipelines"
-    update_action = "update_pipeline"
     key = 'Id'
 
     def describe_object(self):
         for pipeline in self.client.list_buckets()['Pipelines']:
             if pipeline['Name'] == self.resource.name:
                 return pipeline
+
+
+class Apply(SimpleApply, Target):
+
+    create_action = "create_pipeline"
+    update_action = "update_pipeline"
+
+
+class Destroy(SimpleDestroy, Target):
+
+    destroy_action = "destroy_pipeline"

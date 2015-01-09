@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .role import Role
 
 
@@ -31,11 +31,10 @@ class InstanceProfile(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = InstanceProfile
     service_name = 'iam'
-    create_action = "create_instance_profile"
     describe_action = "list_instance_profiles"
     describe_list_key = "InstanceProfiles"
     key = 'Arn'
@@ -46,6 +45,11 @@ class Apply(SimpleApply, Target):
             for ip in page['InstanceProfiles']:
                 if ip['InstanceProfileName'] == self.resource.name:
                     return ip
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_instance_profile"
 
     def update_object(self):
         # Make sure all roles in the workspace are linked up to the
@@ -71,3 +75,8 @@ class Apply(SimpleApply, Target):
                     InstanceProfileName=self.resource.name,
                     RoleName=role,
                 )
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_instance_profile"

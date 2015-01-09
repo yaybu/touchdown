@@ -21,7 +21,7 @@ from ..account import AWS
 from .. import serializers
 from ..elb import LoadBalancer
 from ..vpc import Subnet
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .launch_configuration import LaunchConfiguration
 
 
@@ -192,18 +192,22 @@ class SingletonReplacement(Action):
         pass
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = AutoScalingGroup
     service_name = 'autoscaling'
-    create_action = "create_auto_scaling_group"
-    update_action = "update_auto_scaling_group"
     describe_action = "describe_auto_scaling_groups"
     describe_list_key = "AutoScalingGroups"
     key = 'AutoScalingGroupName'
 
     def get_describe_filters(self):
         return {"AutoScalingGroupNames": [self.resource.name]}
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_auto_scaling_group"
+    update_action = "update_auto_scaling_group"
 
     def update_object(self):
         launch_config_name = self.runner.get_target(self.resource.launch_configuration).resource_id
@@ -218,3 +222,8 @@ class Apply(SimpleApply, Target):
                 }[self.resource.replacement_policy]
 
                 yield klass(self, instance['InstanceId'])
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_auto_scaling_group"

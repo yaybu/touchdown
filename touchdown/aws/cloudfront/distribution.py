@@ -19,7 +19,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .. import serializers
 
 from ..iam import ServerCertificate
@@ -255,11 +255,10 @@ class Distribution(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = Distribution
     service_name = 'cloudfront'
-    create_action = "create_distribution"
     key = 'Id'
 
     def describe_object(self):
@@ -269,7 +268,17 @@ class Apply(SimpleApply, Target):
                 if self.resource.name in distribution['Aliases'].get('Items', []):
                     return distribution
 
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_distribution"
+
     def get_create_serializer(self):
         return serializers.Dict(
             DistributionConfig=serializers.Resource(),
         )
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_distribution"

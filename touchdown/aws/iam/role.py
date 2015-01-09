@@ -19,7 +19,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Role(Resource):
@@ -32,11 +32,10 @@ class Role(Resource):
     account = argument.Resource(AWS)
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = Role
     service_name = 'iam'
-    create_action = "create_role"
     describe_action = "list_roles"
     describe_list_key = "Roles"
     key = 'Role'
@@ -47,6 +46,11 @@ class Apply(SimpleApply, Target):
             for role in page['Roles']:
                 if role['RoleName'] == self.resource.name:
                     return role
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_role"
 
     def update_object(self):
         policy_names = []
@@ -96,3 +100,8 @@ class Apply(SimpleApply, Target):
                     RoleName=self.resource.name,
                     PolicyName=name,
                 )
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_role"

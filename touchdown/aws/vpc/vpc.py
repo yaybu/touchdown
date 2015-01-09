@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from ..account import AWS
-from ..common import SimpleApply
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class VPC(Resource):
@@ -30,15 +30,13 @@ class VPC(Resource):
     tags = argument.Dict()
 
 
-class Apply(SimpleApply, Target):
+class Describe(SimpleDescribe, Target):
 
     resource = VPC
     service_name = 'ec2'
-    create_action = "create_vpc"
     describe_action = "describe_vpcs"
     describe_list_key = "Vpcs"
     key = 'VpcId'
-    waiter = 'vpc_available'
 
     def get_describe_filters(self):
         return {
@@ -46,3 +44,15 @@ class Apply(SimpleApply, Target):
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
+
+
+class Apply(SimpleApply, Describe):
+
+    create_action = "create_vpc"
+    waiter = 'vpc_available'
+
+
+class Destroy(SimpleDestroy, Describe):
+
+    destroy_action = "destroy_vpc"
+    waiter = 'vpc_terminated'
