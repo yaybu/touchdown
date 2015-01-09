@@ -32,11 +32,11 @@ class AWS(Resource):
     root = argument.Resource(Workspace)
 
 
-class Info(Target):
+class Describe(Target):
 
     resource = AWS
     default = True
-    name = "info"
+    name = "describe"
     _session = None
 
     @property

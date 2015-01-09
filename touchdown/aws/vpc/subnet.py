@@ -60,4 +60,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_vpc"
+    destroy_action = "delete_subnet"

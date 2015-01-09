@@ -60,4 +60,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_load_balancer"
+    destroy_action = "delete_load_balancer"

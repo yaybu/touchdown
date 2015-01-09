@@ -79,4 +79,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_instance_profile"
+    destroy_action = "delete_instance_profile"

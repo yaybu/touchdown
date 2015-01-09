@@ -265,7 +265,7 @@ class SimpleDestroy(SimpleDescribe):
         self.object = self.describe_object()
 
         if not self.object:
-            logger.object("Resource '{}' not found - assuming already destroyed")
+            logger.debug("Resource '{}' not found - assuming already destroyed".format(self.resource))
             return
 
         yield self.destroy_object()

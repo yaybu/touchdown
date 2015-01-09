@@ -103,4 +103,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_launch_configuration"
+    destroy_action = "delete_launch_configuration"

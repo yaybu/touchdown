@@ -14,7 +14,7 @@
 
 import logging
 
-from . import errors
+from . import errors, target
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 
 class Runner(object):
 
-    def __init__(self, node, ui):
+    def __init__(self, target, node, ui):
+        self.target = target
         self.node = node
         self.ui = ui
         self.resources = {}
@@ -41,7 +42,14 @@ class Runner(object):
 
     def get_target(self, resource):
         if resource not in self.resources:
-            self.resources[resource] = resource.target(self, resource)
+            klass = resource.target
+            if not klass:
+                #FIXME: This needs to be less rubbish
+                klass = resource.targets.get(
+                    self.target,
+                    resource.targets.get("describe", target.NullTarget),
+                )
+            self.resources[resource] = klass(self, resource)
         return self.resources[resource]
 
     def dot(self):

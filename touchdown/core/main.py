@@ -64,24 +64,32 @@ def main(ctx, debug):
 @main.command()
 @click.pass_context
 def apply(ctx):
-    r = Runner(ctx.obj, ConsoleInterface())
+    r = Runner("apply", ctx.obj, ConsoleInterface())
     try:
         r.apply()
     except errors.Error as e:
         raise click.ClickException(str(e))
 
+@main.command()
+@click.pass_context
+def destroy(ctx):
+    r = Runner("destroy", ctx.obj, ConsoleInterface())
+    try:
+        r.apply()
+    except errors.Error as e:
+        raise click.ClickException(str(e))
 
 @main.command()
 @click.pass_context
 def plan(ctx):
-    r = Runner(ctx.obj, ConsoleInterface())
+    r = Runner("apply", ctx.obj, ConsoleInterface())
     r.ui.render_plan(r.plan())
 
 
 @main.command()
 @click.pass_context
 def dot(ctx):
-    r = Runner(ctx.obj, ConsoleInterface())
+    r = Runner("apply", ctx.obj, ConsoleInterface())
     click.echo(r.dot())
 
 

@@ -27,6 +27,8 @@ class ResourceType(type):
     __lazy_lookups__ = {}
 
     def __new__(meta, class_name, bases, new_attrs):
+        new_attrs['targets'] = {}
+
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
         cls.__args__ = {}
@@ -54,7 +56,6 @@ class Resource(six.with_metaclass(ResourceType)):
 
     dot_ignore = False
     default_target = None
-    targets = {}
 
     target = TargetArgument()
 

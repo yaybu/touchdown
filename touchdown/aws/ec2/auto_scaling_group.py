@@ -226,4 +226,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_auto_scaling_group"
+    destroy_action = "delete_auto_scaling_group"

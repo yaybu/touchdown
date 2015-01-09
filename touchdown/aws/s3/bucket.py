@@ -59,4 +59,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_bucket"
+    destroy_action = "delete_bucket"

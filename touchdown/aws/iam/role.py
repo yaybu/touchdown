@@ -104,4 +104,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_role"
+    destroy_action = "delete_role"

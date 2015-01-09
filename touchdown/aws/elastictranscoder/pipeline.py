@@ -60,4 +60,4 @@ class Apply(SimpleApply, Target):
 
 class Destroy(SimpleDestroy, Target):
 
-    destroy_action = "destroy_pipeline"
+    destroy_action = "delete_pipeline"

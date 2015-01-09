@@ -92,4 +92,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_cache_cluster"
+    destroy_action = "delete_cache_cluster"

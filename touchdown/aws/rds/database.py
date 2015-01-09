@@ -118,4 +118,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_db_instance"
+    destroy_action = "delete_db_instance"

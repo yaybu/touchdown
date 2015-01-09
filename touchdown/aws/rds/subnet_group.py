@@ -52,4 +52,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_db_subnet_group"
+    destroy_action = "delete_db_subnet_group"

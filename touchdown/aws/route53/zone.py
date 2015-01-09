@@ -67,4 +67,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_hosted_zone"
+    destroy_action = "delete_hosted_zone"

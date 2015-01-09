@@ -47,4 +47,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_replication_group"
+    destroy_action = "delete_replication_group"

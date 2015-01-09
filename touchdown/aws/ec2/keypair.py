@@ -48,4 +48,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_key_pair"
+    destroy_action = "delete_key_pair"

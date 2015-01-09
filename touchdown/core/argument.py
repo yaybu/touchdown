@@ -159,7 +159,7 @@ class TargetArgument(Argument):
     def default(self, instance):
         if not instance.default_target:
             return target.NullTarget
-        return instance.default_target
+        return None
 
 
 class Resource(Argument):

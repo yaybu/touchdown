@@ -151,4 +151,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_security_group"
+    destroy_action = "delete_security_group"

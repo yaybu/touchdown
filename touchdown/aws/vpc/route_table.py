@@ -137,4 +137,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_route_table"
+    destroy_action = "delete_route_table"

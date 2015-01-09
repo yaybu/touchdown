@@ -48,4 +48,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "destroy_server_certificate"
+    destroy_action = "delete_server_certificate"
