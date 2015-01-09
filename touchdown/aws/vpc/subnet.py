@@ -51,6 +51,12 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_subnet"
 
+    signature = (
+        Present('name'),
+        Present('vpc'),
+        Present('cidr_block'),
+    )
+
 
 class Destroy(SimpleDestroy, Describe):
 
