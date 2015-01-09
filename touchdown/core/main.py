@@ -70,6 +70,7 @@ def apply(ctx):
     except errors.Error as e:
         raise click.ClickException(str(e))
 
+
 @main.command()
 @click.pass_context
 def destroy(ctx):
@@ -78,6 +79,7 @@ def destroy(ctx):
         r.apply()
     except errors.Error as e:
         raise click.ClickException(str(e))
+
 
 @main.command()
 @click.pass_context

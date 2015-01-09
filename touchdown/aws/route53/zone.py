@@ -20,9 +20,31 @@ from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..vpc import VPC
+from .. import serializers
 
 
-# FIXME: Figure out how to pass comment
+class Record(Resource):
+
+    resource_name = "record"
+
+    name = argument.String(aws_field="Name")
+    type = argument.String(aws_field="Type")
+    values = argument.List(
+        aws_field="ResourceRecords",
+        aws_serializer=serializers.List(serializers.Dict(
+            Value=serializers.Identity),
+        ))
+    ttl = argument.Integer(min=0, aws_field="TTL")
+
+    set_identifier = argument.Integer(min=1, max=128, aws_field="SetIdentifier")
+    #weight = argument.Integer(min=1, max=255, aws_field="Weight")
+    #region = argument.String(aws_field="Region")
+    #geo_location = argument.String(aws_field="GeoLocation")
+    #failover = argument.String(choices=["PRIMARY", "SECONDARY"], aws_field="Failover")
+    #alias_target = argument.Resource(aws_field="AliasTarget")
+    #health_check = argument.Resource(aws_field="HealthCheckId")
+
 
 class HostedZone(Resource):
 
@@ -31,7 +53,15 @@ class HostedZone(Resource):
     resource_name = "hosted_zone"
 
     name = argument.String(aws_field="Name")
-    comment = argument.String()
+    vpc = argument.Resource(VPC, aws_field="VPC")
+    comment = argument.String(
+        aws_field="HostedZoneConfig",
+        aws_serializer=serializers.Dict(
+            Comment=serializers.Identity(),
+        ),
+    )
+
+    records = argument.ResourceList(Record)
     account = argument.Resource(AWS)
 
 
@@ -63,6 +93,47 @@ class Apply(SimpleApply, Describe):
         }
         args.update(super(Apply, self).get_create_args())
         return args
+
+    def _get_remote_records(self):
+        if not self.object:
+            return {}
+        records = {}
+        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id):
+            records[(record['Name'], record['Type'], record.get('SetIdentifier', ''))] = record
+        return records
+
+    def _get_local_records(self):
+        records = {}
+        for record in self.resource.records:
+            records[(record.name, record.type, record.set_identifier)] = serializers.Resource().render(self.runner, record)
+        return records
+
+    def update_object(self):
+        local = self._get_local_records()
+        remote = self._get_remote_records()
+        changes = []
+
+        for key, record in local.items():
+            if record != remote.get(key, {}):
+                changes.append({"Action": "UPSERT", "ResourceRecordSet": record})
+
+        for key, record in remote.items():
+            if record != local.get(key, {}):
+                changes.append({"Action": "DELETE", "ResourceRecordSet": record})
+
+        if changes:
+            yield self.generic_action(
+                "Update resource record sets",
+                self.client.change_resource_record_sets,
+                None,
+                serializers.Dict(
+                    HostedZoneId=serializers.Identifier(),
+                    ChangeBatch=serializers.Dict(
+                        #Comment="",
+                        Changes=serializers.Context(serializers.Const(changes), serializers.List()),
+                    )
+                ),
+            )
 
 
 class Destroy(SimpleDestroy, Describe):
