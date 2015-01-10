@@ -33,7 +33,7 @@ class Record(Resource):
     values = argument.List(
         aws_field="ResourceRecords",
         aws_serializer=serializers.List(serializers.Dict(
-            Value=serializers.Identity),
+            Value=serializers.Identity()),
         ))
     ttl = argument.Integer(min=0, aws_field="TTL")
 
@@ -91,25 +91,20 @@ class Apply(SimpleApply, Describe):
     create_action = "create_hosted_zone"
     # update_action = "update_hosted_zone_comment"
 
-    def get_create_args(self):
-        args = {
-            "CallerReference": str(uuid.uuid4()),
-        }
-        args.update(super(Apply, self).get_create_args())
-        return args
-
     def _get_remote_records(self):
         if not self.object:
             return {}
         records = {}
         for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
+            record = dict(record)
+            record['ResourceRecords'] = tuple(record['ResourceRecords'])
             records[(record['Name'], record['Type'], record.get('SetIdentifier', ''))] = record
         return records
 
     def _get_local_records(self):
         records = {}
         for record in self.resource.records:
-            records[(record.name, record.type, record.set_identifier)] = serializers.Resource().render(self.runner, record)
+            records[(record.name, record.type, record.set_identifier or '')] = serializers.Resource().render(self.runner, record)
         return records
 
     def update_object(self):

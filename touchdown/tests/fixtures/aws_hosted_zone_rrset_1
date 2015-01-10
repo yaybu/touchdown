@@ -8,11 +8,11 @@ Connection: close
    <ResourceRecordSets>
       <ResourceRecordSet>
          <Name>example.com.</Name>
-         <Type>SOA</Type>
+         <Type>A</Type>
          <TTL>900</TTL>
          <ResourceRecords>
             <ResourceRecord>
-               <Value>ns-2048.awsdns-64.net. hostmaster.awsdns.com. 1 7200 900 1209600 86400</Value>
+               <Value>127.0.0.1</Value>
             </ResourceRecord>
          </ResourceRecords>
       </ResourceRecordSet>
