@@ -112,8 +112,6 @@ class TestHostedZone(aws.TestCase):
             "aws_hosted_zone_rrset_change",
             expires=1,
         )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_404, expires=1)
-        self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
         self.assertEqual(self.target.resource_id, self.expected_resource_id)
@@ -137,8 +135,6 @@ class TestHostedZone(aws.TestCase):
             "aws_hosted_zone_rrset_change",
             expires=1,
         )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_404, expires=1)
-        self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
         self.assertEqual(self.target.resource_id, self.expected_resource_id)
@@ -168,8 +164,6 @@ class TestHostedZone(aws.TestCase):
             "aws_hosted_zone_rrset_change",
             expires=1,
         )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_404, expires=1)
-        self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
         self.assertEqual(self.target.resource_id, self.expected_resource_id)
