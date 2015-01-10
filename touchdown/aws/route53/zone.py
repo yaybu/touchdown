@@ -52,6 +52,10 @@ class HostedZone(Resource):
 
     resource_name = "hosted_zone"
 
+    extra_serializers = {
+        "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
+    }
+
     name = argument.String(aws_field="Name")
     vpc = argument.Resource(VPC, aws_field="VPC")
     comment = argument.String(
@@ -71,7 +75,7 @@ class Describe(SimpleDescribe, Target):
     service_name = 'route53'
     describe_action = "list_hosted_zones"
     describe_list_key = "HostedZone"
-    key = 'HostedZoneId'
+    key = 'Id'
 
     def describe_object(self):
         zone_name = self.resource.name.rstrip(".") + "."
@@ -98,7 +102,7 @@ class Apply(SimpleApply, Describe):
         if not self.object:
             return {}
         records = {}
-        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id):
+        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
             records[(record['Name'], record['Type'], record.get('SetIdentifier', ''))] = record
         return records
 

@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Tue, 6 Jan 2015 23:58:40 GMT
+Content-Type: text/xml; charset="utf-8"
+Connection: close
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ListResourceRecordSetsResponse xmlns="https://route53.amazonaws.com/doc/2013-04-01/">
+   <ResourceRecordSets>
+      <ResourceRecordSet>
+         <Name>example.com.</Name>
+         <Type>SOA</Type>
+         <TTL>900</TTL>
+         <ResourceRecords>
+            <ResourceRecord>
+               <Value>ns-2048.awsdns-64.net. hostmaster.awsdns.com. 1 7200 900 1209600 86400</Value>
+            </ResourceRecord>
+         </ResourceRecords>
+      </ResourceRecordSet>
+   </ResourceRecordSets>
+   <IsTruncated>false</IsTruncated>
+   <MaxItems>1</MaxItems>
+</ListResourceRecordSetsResponse>

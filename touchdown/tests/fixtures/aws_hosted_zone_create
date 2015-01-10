@@ -1,0 +1,34 @@
+HTTP/1.1 201 Created
+Date: Tue, 6 Jan 2015 23:58:40 GMT
+Content-Type: text/xml; charset="utf-8"
+Connection: close
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CreateHostedZoneResponse xmlns="https://route53.amazonaws.com/doc/
+2013-04-01/">
+   <HostedZone>
+      <Id>/hostedzone/Z1PA6795UKMFR9</Id>
+      <Name>example.com.</Name>
+      <CallerReference>myUniqueIdentifier</CallerReference>
+      <Config>
+         <Comment>This is my first hosted zone.</Comment>
+         <PrivateZone>false</PrivateZone>
+      </Config>
+      <ResourceRecordSetCount>2</ResourceRecordSetCount>
+   </HostedZone>
+   <ChangeInfo>
+      <Id>/change/C1PA6795UKMFR9</Id>
+      <Status>PENDING</Status>
+      <SubmittedAt>2014-10-15T01:36:41.958Z</SubmittedAt>
+   </ChangeInfo>
+   <DelegationSet>
+      <Id>NZ8X2CISAMPLE</Id>
+      <CallerReference>2014-10-14T11:44:14.448Z</Id>
+      <NameServers>
+         <NameServer>ns-2048.awsdns-64.com</NameServer>
+         <NameServer>ns-2049.awsdns-65.net</NameServer>
+         <NameServer>ns-2050.awsdns-66.org</NameServer>
+         <NameServer>ns-2051.awsdns-67.co.uk</NameServer>
+      </NameServers>
+   </DelegationSet>
+</CreateHostedZoneResponse>
