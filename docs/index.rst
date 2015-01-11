@@ -13,8 +13,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   defining_configuration
-   aws
+   config/index
    contrib
 
 Contributing
