@@ -50,5 +50,6 @@ class Describe(Target):
             self._session = session.get_session()
             self._session.access_key_id = self.resource.access_key_id or None
             self._session.secret_access_key = self.resource.secret_access_key or None
+            self._session.session_token = None
             self._session.region = self.resource.region
         return self._session

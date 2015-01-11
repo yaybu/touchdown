@@ -107,7 +107,7 @@ class SimpleDescribe(object):
                 region_name=session.region,
                 aws_access_key_id=session.access_key_id,
                 aws_secret_access_key=session.secret_access_key,
-                # aws_session_token
+                aws_session_token=session.session_token,
             )
         return self._client
 
