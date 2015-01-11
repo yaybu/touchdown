@@ -9,7 +9,7 @@ Contents:
    :maxdepth: 2
 
    defining_configuration
-   resources
+   aws
    contrib
 
 Contributing
