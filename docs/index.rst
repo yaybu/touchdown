@@ -1,7 +1,12 @@
 Touchdown
 =========
 
-Touchdown is a service orchestration framework for python.
+Touchdown is a tool for launching and managing infrastrucutre services - be
+they physical servers, virtual subnets or private dns records.
+
+Define your infrastructure as python and deploy it wih::
+
+    $ touchdown apply
 
 Contents:
 
