@@ -25,7 +25,7 @@ class VPC(Resource):
     resource_name = "vpc"
 
     name = argument.String()
-    cidr_block = argument.IPNetwork(aws_field='CidrBlock')
+    cidr_block = argument.IPNetwork(field='CidrBlock')
     account = argument.Resource(AWS)
     tags = argument.Dict()
 

@@ -20,7 +20,7 @@ from ..account import AWS
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from .. import serializers
+from touchdown.core import serializers
 
 from .keypair import KeyPair
 
@@ -30,33 +30,33 @@ class LaunchConfiguration(Resource):
     resource_name = "launch_configuration"
 
     """ A name for this AutoScalingGroup. Unique within an AWS account """
-    name = argument.String(max=255, aws_field="LaunchConfigurationName")
+    name = argument.String(max=255, field="LaunchConfigurationName")
 
-    image = argument.String(max=255, aws_field="ImageId")
+    image = argument.String(max=255, field="ImageId")
 
-    key_pair = argument.Resource(KeyPair, aws_field="KeyName")
+    key_pair = argument.Resource(KeyPair, field="KeyName")
 
-    security_groups = argument.ResourceList(SecurityGroup, aws_field="SecurityGroups")
+    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
 
-    user_data = argument.Serializer(aws_field="UserData")
+    user_data = argument.Serializer(field="UserData")
 
-    instance_type = argument.String(max=255, aws_field="InstanceType")
+    instance_type = argument.String(max=255, field="InstanceType")
 
-    kernel = argument.String(max=255, aws_field="KernelId")
+    kernel = argument.String(max=255, field="KernelId")
 
-    ramdisk = argument.String(max=255, aws_field="RamdiskId")
+    ramdisk = argument.String(max=255, field="RamdiskId")
 
-    # block_devices = argument.Dict(aws_field="BlockDeviceMappings")
+    # block_devices = argument.Dict(field="BlockDeviceMappings")
 
-    instance_monitoring = argument.Boolean(default=False, aws_field="InstanceMonitoring", aws_serializer=serializers.Dict(Enabled=serializers.Identity()))
+    instance_monitoring = argument.Boolean(default=False, field="InstanceMonitoring", serializer=serializers.Dict(Enabled=serializers.Identity()))
 
-    spot_price = argument.String(aws_field="SpotPrice")
+    spot_price = argument.String(field="SpotPrice")
 
-    instance_profile = argument.Resource(InstanceProfile, aws_field="IamInstanceProfile")
+    instance_profile = argument.Resource(InstanceProfile, field="IamInstanceProfile")
 
-    ebs_optimized = argument.Boolean(aws_field="EbsOptimized")
+    ebs_optimized = argument.Boolean(field="EbsOptimized")
 
-    associate_public_ip_address = argument.Boolean(aws_field="AssociatePublicIpAddress")
+    associate_public_ip_address = argument.Boolean(field="AssociatePublicIpAddress")
 
     placement_tenancy = argument.String(
         max=64,
@@ -64,7 +64,7 @@ class LaunchConfiguration(Resource):
             "default",
             "dedicated",
         ],
-        aws_field="PlacementTenancy",
+        field="PlacementTenancy",
     )
 
     account = argument.Resource(AWS)

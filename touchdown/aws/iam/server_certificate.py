@@ -24,11 +24,11 @@ class ServerCertificate(Resource):
 
     resource_name = "server_certificate"
 
-    name = argument.String(aws_field="ServerCertificateName")
-    path = argument.String(aws_field='Path')
-    certificate_body = argument.String(aws_field="CertificateBody")
-    private_key = argument.String(aws_field="PrivateKey", secret=True)
-    certificate_chain = argument.String(aws_field="CertificateChain")
+    name = argument.String(field="ServerCertificateName")
+    path = argument.String(field='Path')
+    certificate_body = argument.String(field="CertificateBody")
+    private_key = argument.String(field="PrivateKey", secret=True)
+    certificate_chain = argument.String(field="CertificateChain")
 
     account = argument.Resource(AWS)
 

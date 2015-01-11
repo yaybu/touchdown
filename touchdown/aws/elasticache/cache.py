@@ -26,41 +26,41 @@ from .subnet_group import SubnetGroup
 class BaseCacheCluster(object):
 
     """ The name of the cache cluster. Stored as a lowercase string """
-    name = argument.String(regex=r"[a-z1-9\-]{1,20}", aws_field="CacheClusterId")
+    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
 
     """ The kind of hardware to use, for example 'db.t1.micro' """
     instance_class = argument.String()
 
     """ The type of database to use, for example 'redis' """
-    engine = argument.String(default='redis', aws_field='Engine', aws_update=False)
+    engine = argument.String(default='redis', field='Engine', aws_update=False)
 
     """ The version of the cache engine to run """
-    engine_version = argument.String(aws_field='EngineVersion')
+    engine_version = argument.String(field='EngineVersion')
 
     """ The TCP/IP port to listen on. """
-    port = argument.Integer(min=1, max=32768, aws_field='Port', aws_update=False)
+    port = argument.Integer(min=1, max=32768, field='Port', aws_update=False)
 
     """ A list of security groups to apply to this instance """
-    security_groups = argument.ResourceList(SecurityGroup, aws_field='SecurityGroups')
+    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroups')
 
     """ The preferred availability zone to start this CacheCluster in """
-    availability_zone = argument.String(aws_field='PreferredAvailabilityZone')
+    availability_zone = argument.String(field='PreferredAvailabilityZone')
 
     """ Whether or not to enable mutli-availability-zone features """
-    multi_az = argument.Boolean(aws_field='AZMode')
+    multi_az = argument.Boolean(field='AZMode')
 
     """ Automatically deploy cache minor server upgrades """
-    auto_minor_version_upgrade = argument.Boolean(aws_field='AutoMinorVersionUpgrade')
+    auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade')
 
     """ The number of nodes to run in this cache cluster """
-    num_cache_nodes = argument.Integer(aws_field='NumCacheNodes')
+    num_cache_nodes = argument.Integer(field='NumCacheNodes')
 
     """ The subnets to start the cache cluster in """
-    subnet_group = argument.Resource(SubnetGroup, aws_field='CacheSubnetGroupName')
+    subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName')
 
-    # parameter_group = argument.Resource(ParamaterGroup, aws_field='CacheParameterGroupName')
+    # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
 
-    apply_immediately = argument.Boolean(aws_field="ApplyImmediately", aws_create=False)
+    apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
 
     # tags = argument.Dict()
 
@@ -71,7 +71,7 @@ class CacheCluster(BaseCacheCluster, Resource):
 
     resource_name = "cache_cluster"
 
-    # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", aws_field='ReplicationGroupId')
+    # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", field='ReplicationGroupId')
 
 
 class Describe(SimpleDescribe, Target):

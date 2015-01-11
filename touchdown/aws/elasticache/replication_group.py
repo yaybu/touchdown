@@ -24,10 +24,10 @@ class ReplicationGroup(BaseCacheCluster, Resource):
 
     resource_name = "replication_group"
 
-    name = argument.String(regex=r"[a-z1-9\-]{1,20}", aws_field="CacheClusterId")
-    primary_cluster = argument.Resource("touchdown.aws.elasticache.cache.CacheCluster", aws_field="PrimaryClusterId")
-    automatic_failover = argument.Boolean(aws_field="AutomaticFailoverEnabled")
-    num_cache_clusters = argument.Integer(aws_field="NumCacheClusters")
+    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
+    primary_cluster = argument.Resource("touchdown.aws.elasticache.cache.CacheCluster", field="PrimaryClusterId")
+    automatic_failover = argument.Boolean(field="AutomaticFailoverEnabled")
+    num_cache_clusters = argument.Integer(field="NumCacheClusters")
 
 
 class Describe(SimpleDescribe, Target):

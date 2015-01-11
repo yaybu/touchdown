@@ -26,9 +26,9 @@ class SubnetGroup(Resource):
 
     resource_name = "cache_subnet_group"
 
-    name = argument.String(aws_field="CacheSubnetGroupName")
-    description = argument.String(aws_field="CacheSubnetGroupDescription")
-    subnets = argument.ResourceList(Subnet, aws_field="SubnetIds")
+    name = argument.String(field="CacheSubnetGroupName")
+    description = argument.String(field="CacheSubnetGroupDescription")
+    subnets = argument.ResourceList(Subnet, field="SubnetIds")
     # tags = argument.Dict()
 
     account = argument.Resource(AWS)

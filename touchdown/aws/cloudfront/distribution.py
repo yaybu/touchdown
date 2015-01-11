@@ -20,7 +20,7 @@ from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from .. import serializers
+from touchdown.core import serializers
 
 from ..iam import ServerCertificate
 from ..s3 import Bucket
@@ -56,9 +56,9 @@ class Origin(Resource):
         )
     }
 
-    name = argument.String(aws_field='Id')
+    name = argument.String(field='Id')
     origin_type = argument.String(choices=['s3', 'custom'])
-    domain_name = argument.String(aws_field='DomainName')
+    domain_name = argument.String(field='DomainName')
 
     # Only valid for S3 origins...
     origin_access_identity = argument.String()
@@ -80,8 +80,8 @@ class ForwardedValues(Resource):
             WhitelistedNames=CloudFrontList(serializers.Argument("cookie_whitelist")),
         )
     }
-    query_string = argument.Boolean(aws_field="QueryString", default=False)
-    headers = argument.List(aws_field="Headers", aws_serializer=CloudFrontList(serializers.List()))
+    query_string = argument.Boolean(field="QueryString", default=False)
+    headers = argument.List(field="Headers", serializer=CloudFrontList(serializers.List()))
 
     forward_cookies = argument.String(default="whitelist")
     cookie_whitelist = argument.List()
@@ -100,27 +100,27 @@ class DefaultCacheBehavior(Resource):
         })
     }
 
-    target_origin = argument.String(aws_field='TargetOriginId')
+    target_origin = argument.String(field='TargetOriginId')
     forwarded_values = argument.Resource(
         ForwardedValues,
         default=lambda instance: dict(),
-        aws_field="ForwardedValues",
-        aws_serializer=serializers.Resource(),
+        field="ForwardedValues",
+        serializer=serializers.Resource(),
     )
-    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', aws_field="ViewerProtocolPolicy")
-    min_ttl = argument.Integer(default=0, aws_field="MinTTL")
+    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', field="ViewerProtocolPolicy")
+    min_ttl = argument.Integer(default=0, field="MinTTL")
     allowed_methods = argument.List(
         default=lambda x: ["GET", "HEAD"],
-        aws_field='AllowedMethods',
-        aws_serializer=CloudFrontList(),
+        field='AllowedMethods',
+        serializer=CloudFrontList(),
     )
-    smooth_streaming = argument.Boolean(default=False, aws_field='SmoothStreaming')
+    smooth_streaming = argument.Boolean(default=False, field='SmoothStreaming')
 
 
 class CacheBehavior(DefaultCacheBehavior):
 
     resource_name = "cache_behaviour"
-    path_pattern = argument.String(aws_field='PathPattern')
+    path_pattern = argument.String(field='PathPattern')
 
 
 class ErrorResponse(Resource):
@@ -128,10 +128,10 @@ class ErrorResponse(Resource):
     resource_name = "error_response"
     dot_ignore = True
 
-    error_code = argument.Integer(aws_field="ErrorCode")
-    response_page_path = argument.String(aws_field="ResponsePagePath")
-    response_code = argument.Integer(aws_field="ResponseCode")
-    min_ttl = argument.Integer(aws_field="ErrorCachingMinTTL")
+    error_code = argument.Integer(field="ErrorCode")
+    response_page_path = argument.String(field="ResponsePagePath")
+    response_code = argument.Integer(field="ResponseCode")
+    min_ttl = argument.Integer(field="ErrorCachingMinTTL")
 
 
 class LoggingConfig(Resource):
@@ -139,10 +139,10 @@ class LoggingConfig(Resource):
     resource_name = "logging_config"
     dot_ignore = True
 
-    enabled = argument.Boolean(aws_field="Enabled", default=False)
-    include_cookies = argument.Boolean(aws_field="IncludeCookies", default=False)
-    bucket = argument.Resource(Bucket, aws_field="Bucket", aws_serializer=serializers.Default(default=None), default="")
-    prefix = argument.String(aws_field="Prefix", default="")
+    enabled = argument.Boolean(field="Enabled", default=False)
+    include_cookies = argument.Boolean(field="IncludeCookies", default=False)
+    bucket = argument.Resource(Bucket, field="Bucket", serializer=serializers.Default(default=None), default="")
+    prefix = argument.String(field="Prefix", default="")
 
 
 class ViewerCertificate(Resource):
@@ -151,22 +151,22 @@ class ViewerCertificate(Resource):
 
     certificate = argument.Resource(
         ServerCertificate,
-        aws_field="IAMCertificateId",
-        aws_serializers=serializers.Property("IAMCertificateId"),
+        field="IAMCertificateId",
+        serializer=serializers.Property("IAMCertificateId"),
     )
 
-    default_certificate = argument.Boolean(aws_field="CloudFrontDefaultCertificate")
+    default_certificate = argument.Boolean(field="CloudFrontDefaultCertificate")
 
     ssl_support_method = argument.String(
         default="sni-only",
         choices=["sni-only", "vip"],
-        aws_field="SSLSupportMethod",
+        field="SSLSupportMethod",
     )
 
     minimum_protocol_version = argument.String(
         default="TLSv1",
         choices=["TLSv1", "SSLv3"],
-        aws_field="MinimumProtocolVersion",
+        field="MinimumProtocolVersion",
     )
 
 
@@ -195,7 +195,7 @@ class Distribution(Resource):
     name = argument.String()
 
     """ Any comments you want to include about the distribution. """
-    comment = argument.String(aws_field='Comment', default=lambda instance: instance.name)
+    comment = argument.String(field='Comment', default=lambda instance: instance.name)
 
     """ Alternative names that the distribution should respond to. """
     aliases = argument.List()
@@ -203,53 +203,53 @@ class Distribution(Resource):
     """ The default URL to serve when the users hits the root URL. For example
     if you want to serve index.html when the user hits www.yoursite.com then
     set this to '/index.html' """
-    root_object = argument.String(default='/', aws_field="DefaultRootObject")
+    root_object = argument.String(default='/', field="DefaultRootObject")
 
     """ Whether or not this distribution is active """
-    enabled = argument.Boolean(default=True, aws_field="Enabled")
+    enabled = argument.Boolean(default=True, field="Enabled")
 
     origins = argument.ResourceList(
         Origin,
-        aws_field="Origins",
-        aws_serializer=CloudFrontResourceList(),
+        field="Origins",
+        serializer=CloudFrontResourceList(),
     )
 
     default_cache_behavior = argument.Resource(
         DefaultCacheBehavior,
-        aws_field="DefaultCacheBehavior",
-        aws_serializer=serializers.Resource(),
+        field="DefaultCacheBehavior",
+        serializer=serializers.Resource(),
     )
 
     behaviors = argument.ResourceList(
         CacheBehavior,
-        aws_field="CacheBehaviors",
-        aws_serializer=CloudFrontResourceList(),
+        field="CacheBehaviors",
+        serializer=CloudFrontResourceList(),
     )
 
     """ Customize the content that is served for various error conditions """
     error_responses = argument.ResourceList(
         ErrorResponse,
-        aws_field="CustomErrorResponses",
-        aws_serializer=CloudFrontResourceList(),
+        field="CustomErrorResponses",
+        serializer=CloudFrontResourceList(),
     )
 
     logging = argument.Resource(
         LoggingConfig,
         default=lambda instance: dict(enabled=False),
-        aws_field="Logging",
-        aws_serializer=serializers.Resource(),
+        field="Logging",
+        serializer=serializers.Resource(),
     )
 
     price_class = argument.String(
         default="PriceClass_100",
         choices=['PriceClass_100', 'PriceClass_200', 'PriceClass_All'],
-        aws_field="PriceClass",
+        field="PriceClass",
     )
 
     viewer_certificate = argument.Resource(
         ViewerCertificate,
-        aws_field="ViewerCertificate",
-        aws_serializers=serializers.Resource(),
+        field="ViewerCertificate",
+        serializer=serializers.Resource(),
     )
 
     account = argument.Resource(AWS)

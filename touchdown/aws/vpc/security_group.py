@@ -17,7 +17,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument
 
 from .vpc import VPC
-from .. import serializers
+from touchdown.core import serializers
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -29,20 +29,20 @@ class Rule(Resource):
     def dot_ignore(self):
         return self.security_group is None
 
-    protocol = argument.String(choices=['tcp', 'udp', 'icmp'], aws_field="IpProtocol")
-    from_port = argument.Integer(min=-1, max=32768, aws_field="FromPort")
-    to_port = argument.Integer(min=-1, max=32768, aws_field="ToPort")
+    protocol = argument.String(choices=['tcp', 'udp', 'icmp'], field="IpProtocol")
+    from_port = argument.Integer(min=-1, max=32768, field="FromPort")
+    to_port = argument.Integer(min=-1, max=32768, field="ToPort")
     security_group = argument.Resource(
         "touchdown.aws.vpc.security_group.SecurityGroup",
-        aws_field="UserIdGroupPairs",
-        aws_serializer=serializers.ListOfOne(serializers.Dict(
+        field="UserIdGroupPairs",
+        serializer=serializers.ListOfOne(serializers.Dict(
             UserId=serializers.Property("OwnerId"),
             GroupId=serializers.Identifier(),
         )),
     )
     network = argument.IPNetwork(
-        aws_field="IpRanges",
-        aws_serializer=serializers.ListOfOne(serializers.Dict(
+        field="IpRanges",
+        serializer=serializers.ListOfOne(serializers.Dict(
             CidrIp=serializers.String(),
         )),
     )
@@ -88,9 +88,9 @@ class SecurityGroup(Resource):
 
     resource_name = "security_group"
 
-    name = argument.String(aws_field="GroupName")
-    description = argument.String(aws_field="Description")
-    vpc = argument.Resource(VPC, aws_field="VpcId")
+    name = argument.String(field="GroupName")
+    description = argument.String(field="Description")
+    vpc = argument.Resource(VPC, field="VpcId")
     ingress = argument.ResourceList(Rule)
     egress = argument.ResourceList(
         Rule,

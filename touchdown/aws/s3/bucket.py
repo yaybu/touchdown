@@ -18,7 +18,7 @@ from touchdown.core import argument
 
 from ..account import AWS
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from .. import serializers
+from touchdown.core import serializers
 
 # FIXME: Figure out how to bind CreateBucketConfiguration.LocationConstraint
 
@@ -27,11 +27,11 @@ class Bucket(Resource):
 
     resource_name = "bucket"
 
-    name = argument.String(aws_field="Bucket")
+    name = argument.String(field="Bucket")
     region = argument.String(
         default=lambda instance: instance.account.region,
-        aws_field="CreateBucketConfiguration",
-        aws_serializer=serializers.Dict(
+        field="CreateBucketConfiguration",
+        serializer=serializers.Dict(
             LocationConstraint=serializers.Identity(),
         ),
     )

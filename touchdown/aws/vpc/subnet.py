@@ -25,9 +25,9 @@ class Subnet(Resource):
     resource_name = "subnet"
 
     name = argument.String()
-    cidr_block = argument.IPNetwork(aws_field='CidrBlock')
-    availability_zone = argument.String(aws_field='AvailabilityZone')
-    vpc = argument.Resource(VPC, aws_field='VpcId')
+    cidr_block = argument.IPNetwork(field='CidrBlock')
+    availability_zone = argument.String(field='AvailabilityZone')
+    vpc = argument.Resource(VPC, field='VpcId')
     tags = argument.Dict()
 
 

@@ -21,29 +21,29 @@ from touchdown.core import argument
 from ..account import AWS
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import VPC
-from .. import serializers
+from touchdown.core import serializers
 
 
 class Record(Resource):
 
     resource_name = "record"
 
-    name = argument.String(aws_field="Name")
-    type = argument.String(aws_field="Type")
+    name = argument.String(field="Name")
+    type = argument.String(field="Type")
     values = argument.List(
-        aws_field="ResourceRecords",
-        aws_serializer=serializers.List(serializers.Dict(
+        field="ResourceRecords",
+        serializer=serializers.List(serializers.Dict(
             Value=serializers.Identity()),
         ))
-    ttl = argument.Integer(min=0, aws_field="TTL")
+    ttl = argument.Integer(min=0, field="TTL")
 
-    set_identifier = argument.Integer(min=1, max=128, aws_field="SetIdentifier")
-    #weight = argument.Integer(min=1, max=255, aws_field="Weight")
-    #region = argument.String(aws_field="Region")
-    #geo_location = argument.String(aws_field="GeoLocation")
-    #failover = argument.String(choices=["PRIMARY", "SECONDARY"], aws_field="Failover")
-    #alias_target = argument.Resource(aws_field="AliasTarget")
-    #health_check = argument.Resource(aws_field="HealthCheckId")
+    set_identifier = argument.Integer(min=1, max=128, field="SetIdentifier")
+    #weight = argument.Integer(min=1, max=255, field="Weight")
+    #region = argument.String(field="Region")
+    #geo_location = argument.String(field="GeoLocation")
+    #failover = argument.String(choices=["PRIMARY", "SECONDARY"], field="Failover")
+    #alias_target = argument.Resource(field="AliasTarget")
+    #health_check = argument.Resource(field="HealthCheckId")
 
 
 class HostedZone(Resource):
@@ -56,11 +56,11 @@ class HostedZone(Resource):
         "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
     }
 
-    name = argument.String(aws_field="Name")
-    vpc = argument.Resource(VPC, aws_field="VPC")
+    name = argument.String(field="Name")
+    vpc = argument.Resource(VPC, field="VPC")
     comment = argument.String(
-        aws_field="HostedZoneConfig",
-        aws_serializer=serializers.Dict(
+        field="HostedZoneConfig",
+        serializer=serializers.Dict(
             Comment=serializers.Identity(),
         ),
     )

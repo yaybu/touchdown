@@ -23,8 +23,8 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 class KeyPair(Resource):
     resource_name = "keypair"
 
-    name = argument.String(aws_field="KeyName")
-    public_key = argument.String(aws_field="PublicKeyMaterial")
+    name = argument.String(field="KeyName")
+    public_key = argument.String(field="PublicKeyMaterial")
 
     account = argument.Resource(AWS)
 

@@ -18,7 +18,7 @@ from touchdown.core.target import Target
 from touchdown.core import argument, errors
 
 from ..account import AWS
-from .. import serializers
+from touchdown.core import serializers
 from ..elb import LoadBalancer
 from ..vpc import Subnet
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -30,35 +30,35 @@ class AutoScalingGroup(Resource):
     resource_name = "auto_scaling_group"
 
     """ A name for this AutoScalingGroup. Unique within an AWS account """
-    name = argument.String(aws_field="AutoScalingGroupName")
+    name = argument.String(field="AutoScalingGroupName")
 
     """ A launch configuration """
-    launch_configuration = argument.Resource(LaunchConfiguration, aws_field="LaunchConfigurationName")
+    launch_configuration = argument.Resource(LaunchConfiguration, field="LaunchConfigurationName")
 
     """ The minimum number of EC2 instances that must be running """
-    min_size = argument.Integer(aws_field="MinSize")
+    min_size = argument.Integer(field="MinSize")
 
     """ The maximum number of EC2 instances that can be started by this
     AutoScalingGroup """
-    max_size = argument.Integer(aws_field="MaxSize")
+    max_size = argument.Integer(field="MaxSize")
 
     """ The number of EC2 instances that should be running. Must be between
     min_size and max_size. """
-    desired_capacity = argument.Integer(aws_field="DesiredCapacity")
+    desired_capacity = argument.Integer(field="DesiredCapacity")
 
     """ The amount of time (in seconds) between scaling activities. """
-    default_cooldown = argument.Integer(default=300, aws_field="DefaultCooldown")
+    default_cooldown = argument.Integer(default=300, field="DefaultCooldown")
 
-    availability_zones = argument.List(aws_field="AvailabilityZones")
+    availability_zones = argument.List(field="AvailabilityZones")
 
     # FIXME: This needs a custom serializer: Instead of a list, botocore expects
     # a comma separated string!
     subnets = argument.List(
         Subnet,
-        aws_field="VPCZoneIdentifier",
-        aws_serializer=serializers.CommaSeperatedList(serializers.List()),
+        field="VPCZoneIdentifier",
+        serializer=serializers.CommaSeperatedList(serializers.List()),
     )
-    load_balancers = argument.ResourceList(LoadBalancer, aws_field="LoadBalancerNames", aws_update=False)
+    load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", aws_update=False)
 
     """ The kind of health check to use to detect unhealthy instances. By
     default if you are using ELB with the ASG it will use the same health
@@ -66,14 +66,14 @@ class AutoScalingGroup(Resource):
     health_check_type = argument.String(
         max=32,
         default=lambda instance: "ELB" if instance.load_balancers else None,
-        aws_field="HealthCheckType",
+        field="HealthCheckType",
     )
 
-    health_check_grace_period = argument.String(aws_field="HealthCheckGracePeriod")
+    health_check_grace_period = argument.String(field="HealthCheckGracePeriod")
 
-    placement_group = argument.String(max=255, aws_field="PlacementGroup")
+    placement_group = argument.String(max=255, field="PlacementGroup")
 
-    termination_policies = argument.List(aws_field="TerminationPolicies")
+    termination_policies = argument.List(field="TerminationPolicies")
 
     replacement_policy = argument.String(choices=['singleton', 'graceful'], default='graceful')
 

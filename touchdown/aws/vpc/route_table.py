@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from .. import serializers
+from touchdown.core import serializers
 from .vpc import VPC
 from .subnet import Subnet
 from .internet_gateway import InternetGateway
@@ -27,11 +27,11 @@ class Route(Resource):
 
     resource_name = "route"
 
-    destination_cidr = argument.IPNetwork(aws_field="DestinationCidrBlock")
-    internet_gateway = argument.Resource(InternetGateway, aws_field="GatewayId")
-    # instance = argument.Resource(Instance, aws_field="InstanceId")
-    # network_interface = argument.Resource(NetworkInterface, aws_field="NetworkInterfaceId")
-    # vpc_peering_connection = argument.Resource(VpcPeeringConnection, aws_field="VpcPeeringConnectionId")
+    destination_cidr = argument.IPNetwork(field="DestinationCidrBlock")
+    internet_gateway = argument.Resource(InternetGateway, field="GatewayId")
+    # instance = argument.Resource(Instance, field="InstanceId")
+    # network_interface = argument.Resource(NetworkInterface, field="NetworkInterfaceId")
+    # vpc_peering_connection = argument.Resource(VpcPeeringConnection, field="VpcPeeringConnectionId")
 
 
 class RouteTable(Resource):
@@ -39,7 +39,7 @@ class RouteTable(Resource):
     resource_name = "route_table"
 
     name = argument.String()
-    vpc = argument.Resource(VPC, aws_field='VpcId')
+    vpc = argument.Resource(VPC, field='VpcId')
     subnets = argument.ResourceList(Subnet)
     routes = argument.List()
     tags = argument.Dict()

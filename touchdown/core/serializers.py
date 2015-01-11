@@ -253,7 +253,7 @@ class Dict(Serializer):
 
 class Resource(Dict):
 
-    """ Automatically generate a Dict definition by inspect the aws_field
+    """ Automatically generate a Dict definition by inspect the 'field'
     paramters of a resource """
 
     def __init__(self, mode="create"):
@@ -267,7 +267,7 @@ class Resource(Dict):
         for argument_name, arg in object.arguments:
             if not (arg.present(object) or arg.default is not None):
                 continue
-            if not hasattr(arg, "aws_field"):
+            if not hasattr(arg, "field"):
                 continue
             if self.mode == "create" and not getattr(arg, "aws_create", True):
                 continue
@@ -275,8 +275,8 @@ class Resource(Dict):
                 continue
 
             value = Argument(argument_name)
-            if hasattr(arg, "aws_serializer"):
-                value = Context(value, arg.aws_serializer)
+            if hasattr(arg, "serializer"):
+                value = Context(value, arg.serializer)
             elif isinstance(arg, argument.IPNetwork):
                 value = String(value)
             elif isinstance(arg, argument.Resource):
@@ -286,7 +286,7 @@ class Resource(Dict):
             elif isinstance(arg, argument.Serializer):
                 value = Context(object, getattr(object, argument_name))
 
-            self.kwargs[arg.aws_field] = value
+            self.kwargs[arg.field] = value
 
         return super(Resource, self).render(runner, object)
 

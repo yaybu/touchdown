@@ -105,8 +105,8 @@ An AWS resource implementation might look like this::
     class KeyPair(Resource):
         resource_name = "keypair"
 
-        name = argument.String(aws_field="KeyName")
-        public_key = argument.String(aws_field="PublicKeyMaterial")
+        name = argument.String(field="KeyName")
+        public_key = argument.String(field="PublicKeyMaterial")
 
 This maps the touchdown model to the AWS fields ``KeyName`` and
 ``PublicKeyMaterial``. To actually allow idempotent CRUD for this resource we
@@ -148,16 +148,15 @@ In S3 the location field is weirdly in a sub-dictionary. We need to generate JSO
         }
     }
 
-We can write a resource that handles this with the ``aws_serializer`` annotations::
+We can write a resource that handles this with the ``serializer`` annotations::
 
     class Bucket(Resource):
         resource_name = "bucket"
 
-        name = argument.String(aws_field="Bucket")
+        name = argument.String(field="Bucket")
         region = argument.String(
-            aws_field="CreateBucketConfiguration",
-            aws_serializer=serializers.Dict(
+            field="CreateBucketConfiguration",
+            serializer=serializers.Dict(
                 LocationConstraint=serializers.Identity(),
             )
         )
-

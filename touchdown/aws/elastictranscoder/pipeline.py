@@ -27,14 +27,14 @@ class Pipeline(Resource):
 
     resource_name = "pipeline"
 
-    name = argument.String(aws_field="Name")
-    input_bucket = argument.Resource(Bucket, aws_field="InputBucket")
-    output_bucket = argument.Resource(Bucket, aws_field="OutputBucket")
-    role = argument.Resource(Role, aws_field="Role")
-    # key = argument.Resource(KmsKey, aws_field="AwsKmsKeyArn")
-    # notifications = argument.Resource(Topic, aws_field="Notifications")
-    content_config = argument.Dict(aws_field="ContentConfig")
-    thumbnail_config = argument.Dict(aws_field="ThumbnailConfig")
+    name = argument.String(field="Name")
+    input_bucket = argument.Resource(Bucket, field="InputBucket")
+    output_bucket = argument.Resource(Bucket, field="OutputBucket")
+    role = argument.Resource(Role, field="Role")
+    # key = argument.Resource(KmsKey, field="AwsKmsKeyArn")
+    # notifications = argument.Resource(Topic, field="Notifications")
+    content_config = argument.Dict(field="ContentConfig")
+    thumbnail_config = argument.Dict(field="ThumbnailConfig")
     account = argument.Resource(AWS)
 
 

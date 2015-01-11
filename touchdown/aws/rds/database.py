@@ -26,65 +26,65 @@ class Database(Resource):
 
     resource_name = "database"
 
-    name = argument.String(aws_field="DBInstanceIdentifier")
+    name = argument.String(field="DBInstanceIdentifier")
 
     """ The name of a database to create in the database instance """
-    db_name = argument.String(aws_field="DBName")
+    db_name = argument.String(field="DBName")
 
     """ The amount of storage to be allocated (in GB). """
-    allocated_storage = argument.Integer(min=5, max=3072, aws_field="AllocatedStorage")
+    allocated_storage = argument.Integer(min=5, max=3072, field="AllocatedStorage")
 
-    iops = argument.Integer(aws_field="Iops")
+    iops = argument.Integer(field="Iops")
 
     """ The kind of hardware to use, for example 'db.t1.micro' """
-    instance_class = argument.String(aws_field="DBInstanceClass")
+    instance_class = argument.String(field="DBInstanceClass")
 
     """ The type of database to use, for example 'postgres' """
-    engine = argument.String(default='postgres', aws_field="Engine", aws_update=False)
+    engine = argument.String(default='postgres', field="Engine", aws_update=False)
 
-    engine_version = argument.String(aws_field="EngineVersion")
+    engine_version = argument.String(field="EngineVersion")
 
     license_model = argument.String()
 
     """ The username of the main client user """
-    master_username = argument.String(aws_field="MasterUsername")
+    master_username = argument.String(field="MasterUsername")
 
     """ The password of the main client user """
-    master_password = argument.String(aws_field="MasterPassword")
+    master_password = argument.String(field="MasterPassword")
 
     """ A list of security groups to apply to this instance """
-    security_groups = argument.List(aws_field="VpcSecurityGroupIds")
+    security_groups = argument.List(field="VpcSecurityGroupIds")
 
-    publically_accessible = argument.Boolean(aws_field="PubliclyAccessible", aws_update=False)
+    publically_accessible = argument.Boolean(field="PubliclyAccessible", aws_update=False)
 
-    availability_zone = argument.String(aws_field="AvailabilityZone")
+    availability_zone = argument.String(field="AvailabilityZone")
 
-    subnet_group = argument.Resource(SubnetGroup, aws_field="DBSubnetGroupName", aws_update=False)
+    subnet_group = argument.Resource(SubnetGroup, field="DBSubnetGroupName", aws_update=False)
 
-    preferred_maintenance_window = argument.String(aws_field="PreferredMaintenanceWindow")
+    preferred_maintenance_window = argument.String(field="PreferredMaintenanceWindow")
 
-    multi_az = argument.Boolean(aws_field="MultiAZ")
+    multi_az = argument.Boolean(field="MultiAZ")
 
-    storage_type = argument.String(aws_field="StorageType")
+    storage_type = argument.String(field="StorageType")
 
-    allow_major_version_upgrade = argument.Boolean(aws_field="AllowMajorVersionUpgrade")
+    allow_major_version_upgrade = argument.Boolean(field="AllowMajorVersionUpgrade")
 
-    auto_minor_version_upgrade = argument.Boolean(aws_field="AutoMinorVersionUpgrade")
+    auto_minor_version_upgrade = argument.Boolean(field="AutoMinorVersionUpgrade")
 
-    character_set_name = argument.String(aws_field="CharacterSetName")
+    character_set_name = argument.String(field="CharacterSetName")
 
-    backup_retention_period = argument.Integer(aws_field="BackupRetentionPeriod")
+    backup_retention_period = argument.Integer(field="BackupRetentionPeriod")
 
-    preferred_backup_window = argument.String(aws_field="PreferredBackupWindow")
+    preferred_backup_window = argument.String(field="PreferredBackupWindow")
 
-    license_model = argument.String(aws_field="LicenseModel")
+    license_model = argument.String(field="LicenseModel")
 
-    port = argument.Integer(min=1, max=32768, aws_field="Port")
+    port = argument.Integer(min=1, max=32768, field="Port")
 
-    # paramter_group = argument.Resource(ParameterGroup, aws_field="DBParameterGroupName")
-    # option_group = argument.Resource(OptionGroup, aws_field="OptionGroupName")
+    # paramter_group = argument.Resource(ParameterGroup, field="DBParameterGroupName")
+    # option_group = argument.Resource(OptionGroup, field="OptionGroupName")
 
-    apply_immediately = argument.Boolean(aws_field="ApplyImmediately", aws_create=False)
+    apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
 
     # tags = argument.Dict()
 

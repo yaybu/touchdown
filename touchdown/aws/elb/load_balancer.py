@@ -25,12 +25,12 @@ class LoadBalancer(Resource):
 
     resource_name = "load_balancer"
 
-    name = argument.String(aws_field="LoadBalancerName")
-    listeners = argument.List(aws_field="Listeners")
-    availability_zones = argument.List(aws_field="AvailabilityZones")
-    scheme = argument.String(aws_field="Scheme")
-    subnets = argument.ResourceList(Subnet, aws_field="Subnets")
-    security_groups = argument.ResourceList(SecurityGroup, aws_field="SecurityGroups")
+    name = argument.String(field="LoadBalancerName")
+    listeners = argument.List(field="Listeners")
+    availability_zones = argument.List(field="AvailabilityZones")
+    scheme = argument.String(field="Scheme")
+    subnets = argument.ResourceList(Subnet, field="Subnets")
+    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
     # tags = argument.Dict()
 
     account = argument.Resource(AWS)
