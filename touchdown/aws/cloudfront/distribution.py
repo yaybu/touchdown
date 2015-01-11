@@ -16,11 +16,10 @@ import uuid
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import AWS
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from touchdown.core import serializers
 
 from ..iam import ServerCertificate
 from ..s3 import Bucket
@@ -61,7 +60,7 @@ class Origin(Resource):
     domain_name = argument.String(field='DomainName')
 
     # Only valid for S3 origins...
-    origin_access_identity = argument.String()
+    origin_access_identity = argument.String(default='')
 
     # Only valid for Custom origins
     http_port = argument.Integer(default=80)

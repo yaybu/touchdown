@@ -15,7 +15,8 @@
 import unittest
 import mock
 
-from touchdown.aws import serializers
+from touchdown.core import serializers
+
 from touchdown.aws.common import GenericAction
 from touchdown.aws.elasticache import CacheCluster
 

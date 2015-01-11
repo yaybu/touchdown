@@ -16,11 +16,9 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from touchdown.core import errors
+from touchdown.core import errors, serializers
 from touchdown.core.action import Action
 from touchdown.core.target import Present
-
-from . import serializers
 
 
 logger = logging.getLogger(__name__)

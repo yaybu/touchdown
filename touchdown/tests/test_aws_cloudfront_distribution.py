@@ -15,9 +15,8 @@
 import unittest
 import mock
 
-from touchdown.core import errors
+from touchdown.core import errors, serializers
 
-from touchdown.aws import serializers
 from touchdown.aws.cloudfront import Distribution
 
 from . import aws

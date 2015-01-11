@@ -15,8 +15,6 @@
 import itertools
 import json
 
-from touchdown.core import resource
-from touchdown.core import argument
 from touchdown.core.utils import force_str
 
 
@@ -49,8 +47,6 @@ class Identity(Serializer):
         return object
 
     def dependencies(self, object):
-        if isinstance(object, resource.Resource):
-            return frozenset((object, ))
         return frozenset()
 
 
@@ -84,7 +80,7 @@ class Const(Serializer):
         return self.const
 
     def dependencies(self, object):
-        if isinstance(self.const, resource.Resource):
+        if hasattr(self.const, "add_dependency"):
             return frozenset((self.const, ))
         return frozenset()
 
@@ -130,6 +126,7 @@ class Argument(Serializer):
         if not object.__args__[self.attribute].present(object):
             if result is None:
                 raise FieldNotPresent(self.attribute)
+            pass
         return result
 
 
@@ -274,19 +271,10 @@ class Resource(Dict):
             if self.mode == "update" and not getattr(arg, "aws_update", True):
                 continue
 
-            value = Argument(argument_name)
-            if hasattr(arg, "serializer"):
-                value = Context(value, arg.serializer)
-            elif isinstance(arg, argument.IPNetwork):
-                value = String(value)
-            elif isinstance(arg, argument.Resource):
-                value = Identifier(inner=value)
-            elif isinstance(arg, argument.ResourceList):
-                value = Context(value, List(Identifier(), skip_empty=True))
-            elif isinstance(arg, argument.Serializer):
-                value = Context(object, getattr(object, argument_name))
-
-            self.kwargs[arg.field] = value
+            self.kwargs[arg.field] = Context(
+                Argument(argument_name),
+                arg.serializer
+            )
 
         return super(Resource, self).render(runner, object)
 

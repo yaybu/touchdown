@@ -16,7 +16,7 @@ import unittest
 import mock
 
 from touchdown.aws.vpc import SecurityGroup
-from touchdown.aws import serializers
+from touchdown.core import serializers
 
 
 class TestSerializing(unittest.TestCase):

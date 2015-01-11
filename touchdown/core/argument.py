@@ -16,7 +16,7 @@ import six
 
 import netaddr
 
-from . import errors, target
+from . import errors, target, serializers
 from .utils import force_str
 
 
@@ -28,6 +28,7 @@ class Argument(object):
 
     argument_id = 0
     default = None
+    serializer = serializers.Identity()
 
     def __init__(self, default=None, help=None, **kwargs):
         self.__doc__ = help
@@ -65,6 +66,8 @@ class Boolean(Argument):
     """ Represents a boolean. "1", "yes", "on" and "true" are all considered
     to be True boolean values. Anything else is False. """
 
+    serializer = serializers.Boolean()
+
     def __set__(self, instance, value):
         if isinstance(value, six.string_types):
             if value.lower() in ("1", "yes", "on", "true"):
@@ -80,6 +83,8 @@ class String(Argument):
 
     """ Represents a string. """
 
+    serializer = serializers.String()
+
     def __set__(self, instance, value):
         if value is not None:
             value = force_str(value)
@@ -91,6 +96,8 @@ class Integer(Argument):
     """ Represents an integer argument taken from the source file. This can
     throw an :py:exc:errors.ParseError if the passed in value cannot represent
     a base-10 integer. """
+
+    serializer = serializers.Integer()
 
     def __set__(self, instance, value):
         if not isinstance(value, int):
@@ -111,6 +118,8 @@ class Octal(Integer):
 
 class IPAddress(String):
 
+    serializer = serializers.String()
+
     def __set__(self, instance, value):
         try:
             value = netaddr.IPAddress(value)
@@ -120,6 +129,8 @@ class IPAddress(String):
 
 
 class IPNetwork(String):
+
+    serializer = serializers.String()
 
     def __set__(self, instance, value):
         try:
@@ -132,6 +143,7 @@ class IPNetwork(String):
 
 
 class Dict(Argument):
+
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
 
@@ -163,6 +175,8 @@ class TargetArgument(Argument):
 
 
 class Resource(Argument):
+
+    serializer = serializers.Identifier()
 
     """
     An argument that represents a resource that we depend on. For example,
@@ -237,6 +251,8 @@ class ResourceList(Argument):
     mutate a resource list in place as it does not update the dependencies.
     """
 
+    serializer = serializers.List(serializers.Identifier(), skip_empty=True)
+
     def __init__(self, resource_class, **kwargs):
         super(ResourceList, self).__init__(**kwargs)
         self.resource_class = resource_class
@@ -266,6 +282,8 @@ class ResourceList(Argument):
 
 
 class Serializer(Argument):
+
+    serializer = serializers.Expression(lambda runner, object: object.render(runner, object))
 
     def __set__(self, instance, value):
         setattr(instance, self.arg_id, value)
