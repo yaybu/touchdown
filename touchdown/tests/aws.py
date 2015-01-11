@@ -162,6 +162,7 @@ class TestBasicUsage(TestCase):
 
     def test_no_change(self):
         self.responses.add_fixture("POST", self.base_url, self.fixture_found, expires=1)
+        self.runner.dot()
         self.assertRaises(errors.NothingChanged, self.runner.apply)
         self.assertEqual(self.target.resource_id, self.expected_resource_id)
 
@@ -169,5 +170,6 @@ class TestBasicUsage(TestCase):
         self.responses.add_fixture("POST", self.base_url, self.fixture_404, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_found)
+        self.runner.dot()
         self.runner.apply()
         self.assertEqual(self.target.resource_id, self.expected_resource_id)
