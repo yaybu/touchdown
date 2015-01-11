@@ -16,7 +16,7 @@ import json
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -26,8 +26,10 @@ class Role(Resource):
 
     resource_name = "role"
 
-    name = argument.String(field="Name")
+    name = argument.String(field="RoleName")
     path = argument.String(field='Path')
+    assume_role_policy = argument.Dict(field="AssumeRolePolicyDocument", serializer=serializers.Json())
+
     policies = argument.Dict()
     account = argument.Resource(Account)
 
@@ -38,7 +40,7 @@ class Describe(SimpleDescribe, Target):
     service_name = 'iam'
     describe_action = "list_roles"
     describe_list_key = "Roles"
-    key = 'Role'
+    key = 'RoleName'
 
     def describe_object(self):
         paginator = self.client.get_paginator("list_roles")
