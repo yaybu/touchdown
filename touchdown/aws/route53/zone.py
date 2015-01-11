@@ -18,7 +18,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from ..account import AWS
+from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import VPC
 from touchdown.core import serializers
@@ -66,7 +66,7 @@ class HostedZone(Resource):
     )
 
     records = argument.ResourceList(Record)
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
 
 
 class Describe(SimpleDescribe, Target):

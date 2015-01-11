@@ -24,6 +24,7 @@ from . import (
     rds,
     route53,
     s3,
+    external_account,
 )
 
 __all__ = [
@@ -38,4 +39,5 @@ __all__ = [
     'rds',
     'route53',
     's3',
+    'external_account',
 ]

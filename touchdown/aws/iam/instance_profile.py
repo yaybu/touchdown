@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from ..account import AWS
+from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .role import Role
 
@@ -28,7 +28,7 @@ class InstanceProfile(Resource):
     name = argument.String(field="InstanceProfileName")
     path = argument.String(field='Path')
     roles = argument.ResourceList(Role)
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
 
 
 class Describe(SimpleDescribe, Target):

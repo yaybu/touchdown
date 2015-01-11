@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
-from ..account import AWS
+from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import Subnet, SecurityGroup
 
@@ -33,7 +33,7 @@ class LoadBalancer(Resource):
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
     # tags = argument.Dict()
 
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
 
 
 class Describe(SimpleDescribe, Target):

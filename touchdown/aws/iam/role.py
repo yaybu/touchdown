@@ -18,7 +18,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from ..account import AWS
+from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -29,7 +29,7 @@ class Role(Resource):
     name = argument.String(field="Name")
     path = argument.String(field='Path')
     policies = argument.Dict()
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
 
 
 class Describe(SimpleDescribe, Target):

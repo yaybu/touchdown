@@ -21,20 +21,25 @@ from touchdown.core import argument
 from touchdown.core.workspace import Workspace
 
 
-class AWS(Resource):
+class BaseAccount(Resource):
 
-    resource_name = "aws"
     dot_ignore = True
 
     region = argument.String()
     access_key_id = argument.String()
     secret_access_key = argument.String()
+
+
+class Account(BaseAccount):
+
+    resource_name = "aws"
+
     root = argument.Resource(Workspace)
 
 
 class Describe(Target):
 
-    resource = AWS
+    resource = Account
     default = True
     name = "describe"
     _session = None

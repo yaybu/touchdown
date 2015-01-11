@@ -17,7 +17,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument, errors
 
-from ..account import AWS
+from ..account import Account
 from touchdown.core import serializers
 from ..elb import LoadBalancer
 from ..vpc import Subnet
@@ -77,7 +77,7 @@ class AutoScalingGroup(Resource):
 
     replacement_policy = argument.String(choices=['singleton', 'graceful'], default='graceful')
 
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
 
 
 class ReplaceInstance(Action):

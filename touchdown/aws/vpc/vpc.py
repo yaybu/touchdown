@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from ..account import AWS
+from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -26,7 +26,7 @@ class VPC(Resource):
 
     name = argument.String()
     cidr_block = argument.IPNetwork(field='CidrBlock')
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
     tags = argument.Dict()
 
 

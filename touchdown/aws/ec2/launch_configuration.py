@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.target import Target
 from touchdown.core import argument
 
-from ..account import AWS
+from ..account import Account
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -67,7 +67,7 @@ class LaunchConfiguration(Resource):
         field="PlacementTenancy",
     )
 
-    account = argument.Resource(AWS)
+    account = argument.Resource(Account)
 
     def matches(self, runner, object):
         if object['ImageId'] != self.image:
