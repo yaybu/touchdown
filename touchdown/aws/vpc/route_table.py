@@ -19,6 +19,7 @@ from touchdown.core import argument
 from touchdown.core import serializers
 from .vpc import VPC
 from .internet_gateway import InternetGateway
+from .vpn_gateway import VpnGateway
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -83,6 +84,10 @@ class RouteTable(Resource):
     """ A list of :py:class:`Route` resources to ensure exist in the route
     table """
 
+    propagating_vpn_gateways = argument.ResourceList(VpnGateway)
+    """ A list of :py:class:`VpnGateway` resources that should propagate their
+    routes into this route table """
+
     tags = argument.Dict()
     """ A dictionary of tags to associate with this VPC. A common use of tags
     is to group components by environment (e.g. "dev1", "staging", etc) or to
@@ -110,6 +115,29 @@ class Describe(SimpleDescribe, Target):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_route_table"
+
+    def update_vpgw_associations(self):
+        remote = set(r['GatewayId'] for r in self.object.get("PropagatingsVgws", []))
+        local = set()
+        for vgw in self.propagating_vpn_gateways:
+            id = self.runner.get_target(vgw).resource_id
+            if not id or id not in remote:
+                yield self.generic_action(
+                    "Enable route propagation from vpn gateway {}".format(vgw.name),
+                    self.client.enable_vgw_route_propagation,
+                    RouteTableId=serializers.Identifier(),
+                    GatewayId=serializers.Identifier(inner=serializers.Const(vgw)),
+                )
+            if id:
+                local.add(id)
+
+        for vgw in remote.difference(local):
+            yield self.generic_action(
+                "Disable route propagation from vpn gateway {}".format(vgw),
+                self.client.disable_vgw_route_propagation,
+                RouteTableId=serializers.Identifier(),
+                GatewayId=serializers.Const(inner=serializers.Const(vgw)),
+            )
 
     def update_associations(self):
         return
@@ -180,6 +208,8 @@ class Apply(SimpleApply, Describe):
         for action in self.update_associations():
             yield action
         for action in self.update_routes():
+            yield action
+        for action in self.update_vpgw_associations():
             yield action
 
 
