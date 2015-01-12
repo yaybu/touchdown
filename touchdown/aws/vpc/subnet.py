@@ -22,13 +22,40 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class Subnet(Resource):
 
+    """
+    Subnets let you logically split application reponsibilities across
+    different network zones with different routing rules and ACL's. You can
+    also associate a subnet with an availability zone when building H/A
+    solutions.
+
+    You can add a subnet to any VPC::
+
+        subnet = vpc.add_subnet(
+            name='my-first-subnet',
+            cidr_block='10.0.0.0/24',
+        )
+    """
+
     resource_name = "subnet"
 
     name = argument.String()
+    """ The name of the subnet. This field is required. """
+
     cidr_block = argument.IPNetwork(field='CidrBlock')
+    """ A network range specified in CIDR form. This field is required and must
+    be a subset of the network range covered by the VPC. For example, it cannot
+    be 192.168.0.0/24 if the parent VPC covers 10.0.0.0/24.
+    """
+
     availability_zone = argument.String(field='AvailabilityZone')
-    vpc = argument.Resource(VPC, field='VpcId')
+    """ The AWS availability zone this subnet is created in. """
+
     tags = argument.Dict()
+    """ A dictionary of tags to associate with this VPC. A common use of tags
+    is to group components by environment (e.g. "dev1", "staging", etc) or to
+    map components to cost centres for billing purposes. """
+
+    vpc = argument.Resource(VPC, field='VpcId')
 
 
 class Describe(SimpleDescribe, Target):

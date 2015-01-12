@@ -22,11 +22,30 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class InternetGateway(Resource):
 
+    """
+    An internet gateway is the AWS component that allows you to physically
+    connect your VPC to the internet. Without an internet gateawy connected to
+    your VPC then traffic will not reach it, even if assigned public IP
+    addresses.
+
+    You can create an internet gateway in any VPC::
+
+        internet_gateway = vpc.add_internet_gateway(
+            name='my-internet-gateway',
+        )
+    """
+
     resource_name = "internet_gateway"
 
     name = argument.String()
-    vpc = argument.Resource(VPC)
+    """ The name of the internet gateway. This field is required."""
+
     tags = argument.Dict()
+    """ A dictionary of tags to associate with this VPC. A common use of tags
+    is to group components by environment (e.g. "dev1", "staging", etc) or to
+    map components to cost centres for billing purposes. """
+
+    vpc = argument.Resource(VPC)
 
 
 class Describe(SimpleDescribe, Target):

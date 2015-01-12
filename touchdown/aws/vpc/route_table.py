@@ -25,10 +25,29 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class Route(Resource):
 
+    """
+    Represents a route in a route table.
+
+    You shouldn't create Route resources directly, they are created
+    implicitly when defining a :py:class:`RouteTable`. For example::
+
+        vpc.add_route_table(
+            name="internet_access",
+            routes=[
+                {"destionation_cidr": "8.8.8.8/32", "internet_gateway": ig},
+                {"destionation_cidr": "8.8.4.4/32", "internet_gateway": ig},
+            ]
+        )
+    """
+
     resource_name = "route"
 
     destination_cidr = argument.IPNetwork(field="DestinationCidrBlock")
+    """ A network range that this rule applies to in CIDR form. You can specificy a single IP address with /32. For example, ``8.8.8.8/32``. To apply a default catch all rule you can specify ``0.0.0.0/32``. """
+
     internet_gateway = argument.Resource(InternetGateway, field="GatewayId")
+    """ A :py:class:`InternetGateway` resource """
+
     # instance = argument.Resource(Instance, field="InstanceId")
     # network_interface = argument.Resource(NetworkInterface, field="NetworkInterfaceId")
     # vpc_peering_connection = argument.Resource(VpcPeeringConnection, field="VpcPeeringConnectionId")
@@ -36,13 +55,45 @@ class Route(Resource):
 
 class RouteTable(Resource):
 
+    """
+    A route table contains a list of routes. These are rules that are used to
+    determine where to direct network traffic.
+
+    A route table entry consists of a destination cidr and a component to use
+    when to route that traffic. It is represented in touchdown by a
+    :py:class:`Route` resource.
+
+    You can create a route table in any vpc::
+
+        vpc.add_route_table(
+            name="internet_access",
+            subnets=[subnet],
+            routes=[dict(
+                destination_cidr='0.0.0.0/0',
+                internet_gateway=internet_gateway,
+            )]
+        )
+    """
+
     resource_name = "route_table"
 
     name = argument.String()
-    vpc = argument.Resource(VPC, field='VpcId')
+    """ The name of the route table. This field is required."""
+
     subnets = argument.ResourceList(Subnet)
-    routes = argument.List()
+    """ A list of :py:class:`Subnet` resources to associate this route table
+    with """
+
+    routes = argument.ResourceList(Route)
+    """ A list of :py:class:`Route` resources to ensure exist in the route
+    table """
+
     tags = argument.Dict()
+    """ A dictionary of tags to associate with this VPC. A common use of tags
+    is to group components by environment (e.g. "dev1", "staging", etc) or to
+    map components to cost centres for billing purposes. """
+
+    vpc = argument.Resource(VPC, field='VpcId')
 
 
 class Describe(SimpleDescribe, Target):
