@@ -169,6 +169,9 @@ class Apply(SimpleApply, Describe):
         return remote_rules
 
     def update_object(self):
+        for action in super(Apply, self).update_object():
+            yield action
+
         local_rules = self._get_local_rules()
         remote_rules = self._get_remote_rules()
 
@@ -181,8 +184,6 @@ class Apply(SimpleApply, Describe):
             if rule not in local_rules:
                 #FIXME: Delete remote rule not present @ local
                 print("DELETE", remote_rules[rule])
-
-        return []
 
 
 class Destroy(SimpleDestroy, Describe):

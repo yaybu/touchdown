@@ -79,6 +79,39 @@ class Describe(SimpleDescribe, Target):
             ],
         }
 
+    def describe_object(self):
+        object = super(Describe, self).describe_object()
+        if not object or not object.get(self.key, None):
+            return object
+
+        subnet_id = object[self.key]
+
+        network_acl = self.client.describe_network_acls(
+            Filters=[
+                {'Name': 'association.subnet-id', 'Values': [subnet_id]},
+            ],
+        )
+        if network_acl:
+            for assoc in network_acl[0].get('Associations', []):
+                if assoc['SubnetId'] == subnet_id:
+                    object['NetworkAclId'] = assoc['NetworkAclId']
+                    object['NetworkAclAssociationId'] = assoc['NetworkAclAssociationId']
+                    break
+
+        route_tables = self.client.describe_route_tables(
+            Filters=[
+                {'Name': 'association.subnet-id', 'Values': [subnet_id]},
+            ],
+        )
+        if route_tables:
+            for assoc in route_tables[0].get('Associations', []):
+                if assoc['SubnetId'] == subnet_id:
+                    object['RouteTableId'] = assoc['RouteTableId']
+                    object['RouteTableAssociationId'] = assoc['RouteTableAssociationId']
+                    break
+
+        return object
+
 
 class Apply(SimpleApply, Describe):
 
@@ -91,11 +124,6 @@ class Apply(SimpleApply, Describe):
     )
 
     def update_object(self):
-        # FIXME
-        # API wise it makes sense to do this here, alas it's really awkward!
-        # Would need extra calls to describe route table and network acl
-        # And that doesn't really fit into our flow
-
         return
         if self.route_table:
             if not self.object:
