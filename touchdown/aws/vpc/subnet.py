@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target, Present
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from .vpc import VPC
 from .route_table import RouteTable
@@ -89,6 +89,31 @@ class Apply(SimpleApply, Describe):
         Present('vpc'),
         Present('cidr_block'),
     )
+
+    def update_object(self):
+        # FIXME
+        # API wise it makes sense to do this here, alas it's really awkward!
+        # Would need extra calls to describe route table and network acl
+        # And that doesn't really fit into our flow
+
+        return
+        if self.route_table:
+            if not self.object:
+                yield self.generic_action(
+                    "Associate route table",
+                    self.client.associate_route_table,
+                    SubnetId=serializers.Identifier(),
+                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
+                )
+
+        if self.network_acl:
+            if not self.object:
+                yield self.generic_action(
+                    "Replace Network ACL association",
+                    self.client.replace_network_acl_association,
+                    AssociationId=serializers.Identifier(),
+                    NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifer()),
+                )
 
 
 class Destroy(SimpleDestroy, Describe):
