@@ -175,12 +175,12 @@ class Apply(SimpleApply, Describe):
         for key, rule in local_rules.items():
             if key not in self.remote_rules or self.remote_rules[key] != rule:
                 #FIXME: Rule stale or out of date
-                print "UPSERT", rule
+                print("UPSERT", rule)
 
         for rule in remote_rules.keys():
             if rule not in local_rules:
                 #FIXME: Delete remote rule not present @ local
-                print "DELETE", remote_rules[rule]
+                print("DELETE", remote_rules[rule])
 
         return []
 
