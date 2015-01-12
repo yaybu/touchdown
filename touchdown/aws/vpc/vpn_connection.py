@@ -52,6 +52,9 @@ class VpnConnection(Resource):
         serializer=serializers.Dict(StaticRoutesOnly=serializers.Boolean()),
     )
 
+    static_routes = argument.List()
+    # FIXME: This should somehow be a list of argument.IPNetwork
+
     tags = argument.Dict()
     """ A dictionary of tags to associate with this VPC. A common use of tags
     is to group components by environment (e.g. "dev1", "staging", etc) or to
@@ -79,6 +82,26 @@ class Describe(SimpleDescribe, Target):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_vpn_connection"
+
+    def update_object(self):
+        remote_routes = set(r['DestinationCidrBlock'] for r in self.object.get('Routes', []) if r['State'] != 'deleted')
+        local_routes = set(self.resource.static_routes)
+
+        for route in local_routes.difference(remote_routes):
+            yield self.generic_action(
+                "Add missing route {}".format(route),
+                self.client.create_vpn_connection_route,
+                VpnConnectionId=serializers.Identifier(),
+                DestinationCidrBlock=route,
+            )
+
+        for route in remote_routes.difference(local_routes):
+            yield self.generic_action(
+                "Remove stale route {}".format(route),
+                self.client.create_vpn_connection_route,
+                VpnConnectionId=serializers.Identifier(),
+                DestinationCidrBlock=route,
+            )
 
 
 class Destroy(SimpleDestroy, Describe):

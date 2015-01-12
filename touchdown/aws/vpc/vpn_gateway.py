@@ -69,6 +69,15 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_vpn_gateway"
 
+    def update_object(self):
+        if not self.object:
+            yield self.generic_action(
+                "Attach gateway to vpc",
+                self.client.attach_vpn_gateway,
+                VpnGatewayId=serializers.Identifier(),
+                VpcId=serializers.Context(serializers.Argument("vpc"), serializers.Identifer()),
+            )
+
 
 class Destroy(SimpleDestroy, Describe):
 
