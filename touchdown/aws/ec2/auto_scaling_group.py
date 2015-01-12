@@ -29,48 +29,51 @@ class AutoScalingGroup(Resource):
 
     resource_name = "auto_scaling_group"
 
-    """ A name for this AutoScalingGroup. Unique within an AWS account """
     name = argument.String(field="AutoScalingGroupName")
+    """ A name for this AutoScalingGroup. Unique within an AWS account """
 
-    """ A launch configuration """
     launch_configuration = argument.Resource(LaunchConfiguration, field="LaunchConfigurationName")
+    """ A :py:class:`LaunchConfiguration`. """
 
-    """ The minimum number of EC2 instances that must be running """
     min_size = argument.Integer(field="MinSize")
+    """ The minimum number of EC2 instances that must be running """
 
+    max_size = argument.Integer(field="MaxSize")
     """ The maximum number of EC2 instances that can be started by this
     AutoScalingGroup """
-    max_size = argument.Integer(field="MaxSize")
 
+    desired_capacity = argument.Integer(field="DesiredCapacity")
     """ The number of EC2 instances that should be running. Must be between
     min_size and max_size. """
-    desired_capacity = argument.Integer(field="DesiredCapacity")
 
-    """ The amount of time (in seconds) between scaling activities. """
     default_cooldown = argument.Integer(default=300, field="DefaultCooldown")
+    """ The amount of time (in seconds) between scaling activities. """
 
     availability_zones = argument.List(field="AvailabilityZones")
 
-    # FIXME: This needs a custom serializer: Instead of a list, botocore expects
-    # a comma separated string!
     subnets = argument.List(
         Subnet,
         field="VPCZoneIdentifier",
         serializer=serializers.CommaSeperatedList(serializers.List()),
     )
-    load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", aws_update=False)
+    """ A list of :py:class:`touchdown.aws.vpc.Subnet` resources """
 
-    """ The kind of health check to use to detect unhealthy instances. By
-    default if you are using ELB with the ASG it will use the same health
-    checks as ELB. """
+    load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", aws_update=False)
+    """ A list of :py:class:`touchdown.aws.elb.LoadBalancer` resources. As
+    instances are created by the auto scaling group they are added to these
+    load balancers. """
+
     health_check_type = argument.String(
         max=32,
         default=lambda instance: "ELB" if instance.load_balancers else None,
         field="HealthCheckType",
     )
+    """ The kind of health check to use to detect unhealthy instances. By
+    default if you are using ELB with the ASG it will use the same health
+    checks as ELB. """
 
     health_check_grace_period = argument.String(field="HealthCheckGracePeriod")
-
+    
     placement_group = argument.String(max=255, field="PlacementGroup")
 
     termination_policies = argument.List(field="TerminationPolicies")

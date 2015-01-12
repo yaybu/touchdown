@@ -1,0 +1,13 @@
+======================
+Simple storage service
+======================
+
+.. module:: touchdown.aws.s3
+   :synopsis: Simple Storage Services resources.
+
+
+Bucket
+======
+
+.. autoclass:: Bucket
+   :members:

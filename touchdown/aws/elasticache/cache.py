@@ -25,38 +25,38 @@ from .subnet_group import SubnetGroup
 
 class BaseCacheCluster(object):
 
-    """ The name of the cache cluster. Stored as a lowercase string """
     name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
+    """ The name of the cache cluster. Stored as a lowercase string """
 
-    """ The kind of hardware to use, for example 'db.t1.micro' """
     instance_class = argument.String()
+    """ The kind of hardware to use, for example 'db.t1.micro' """
 
-    """ The type of database to use, for example 'redis' """
     engine = argument.String(default='redis', field='Engine', aws_update=False)
+    """ The type of database to use, for example 'redis' """
 
-    """ The version of the cache engine to run """
     engine_version = argument.String(field='EngineVersion')
+    """ The version of the cache engine to run """
 
-    """ The TCP/IP port to listen on. """
     port = argument.Integer(min=1, max=32768, field='Port', aws_update=False)
+    """ The TCP/IP port to listen on. """
 
-    """ A list of security groups to apply to this instance """
     security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroups')
+    """ A list of security groups to apply to this instance """
 
-    """ The preferred availability zone to start this CacheCluster in """
     availability_zone = argument.String(field='PreferredAvailabilityZone')
+    """ The preferred availability zone to start this CacheCluster in """
 
-    """ Whether or not to enable mutli-availability-zone features """
     multi_az = argument.Boolean(field='AZMode')
+    """ Whether or not to enable mutli-availability-zone features """
 
-    """ Automatically deploy cache minor server upgrades """
     auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade')
+    """ Automatically deploy cache minor server upgrades """
 
-    """ The number of nodes to run in this cache cluster """
     num_cache_nodes = argument.Integer(field='NumCacheNodes')
+    """ The number of nodes to run in this cache cluster """
 
-    """ The subnets to start the cache cluster in """
     subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName')
+    """ The subnets to start the cache cluster in """
 
     # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
 

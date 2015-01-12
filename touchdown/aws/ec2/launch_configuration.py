@@ -29,8 +29,8 @@ class LaunchConfiguration(Resource):
 
     resource_name = "launch_configuration"
 
-    """ A name for this AutoScalingGroup. Unique within an AWS account """
     name = argument.String(max=255, field="LaunchConfigurationName")
+    """ A name for this AutoScalingGroup. This field is required. It must be unique within an AWS account """
 
     image = argument.String(max=255, field="ImageId")
 

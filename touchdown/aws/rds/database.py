@@ -28,32 +28,33 @@ class Database(Resource):
 
     name = argument.String(field="DBInstanceIdentifier")
 
-    """ The name of a database to create in the database instance """
-    db_name = argument.String(field="DBName")
 
-    """ The amount of storage to be allocated (in GB). """
+    db_name = argument.String(field="DBName")
+    """ The name of a database to create in the database instance """
+
     allocated_storage = argument.Integer(min=5, max=3072, field="AllocatedStorage")
+    """ The amount of storage to be allocated (in GB). """
 
     iops = argument.Integer(field="Iops")
 
-    """ The kind of hardware to use, for example 'db.t1.micro' """
     instance_class = argument.String(field="DBInstanceClass")
+    """ The kind of hardware to use, for example 'db.t1.micro' """
 
-    """ The type of database to use, for example 'postgres' """
     engine = argument.String(default='postgres', field="Engine", aws_update=False)
+    """ The type of database to use, for example 'postgres' """
 
     engine_version = argument.String(field="EngineVersion")
 
     license_model = argument.String()
 
-    """ The username of the main client user """
     master_username = argument.String(field="MasterUsername")
+    """ The username of the main client user """
 
-    """ The password of the main client user """
     master_password = argument.String(field="MasterPassword")
+    """ The password of the main client user """
 
-    """ A list of security groups to apply to this instance """
     security_groups = argument.List(field="VpcSecurityGroupIds")
+    """ A list of security groups to apply to this instance """
 
     publically_accessible = argument.Boolean(field="PubliclyAccessible", aws_update=False)
 

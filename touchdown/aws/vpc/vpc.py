@@ -29,6 +29,10 @@ class VPC(Resource):
     defined VPC allows you to run most of your backend components on private IP
     addresses - shielding it from the public internet.
 
+    You define the IP's available in your VPC with a `CIDR`_-form IP address.
+
+    .. _CIDR: http://en.wikipedia.org/wiki/CIDR
+
     You can add a VPC to your workspace from any Amazon account resource::
 
         account = workspace.add_aws(

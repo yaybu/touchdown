@@ -189,48 +189,55 @@ class Distribution(Resource):
         }),
     }
 
+    name = argument.String()
     """ The name of the distribution. This should be the primary domain that it
     responds to. """
-    name = argument.String()
 
-    """ Any comments you want to include about the distribution. """
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
+    """ Any comments you want to include about the distribution. """
 
-    """ Alternative names that the distribution should respond to. """
     aliases = argument.List()
+    """ Alternative names that the distribution should respond to. """
 
+    root_object = argument.String(default='/', field="DefaultRootObject")
     """ The default URL to serve when the users hits the root URL. For example
     if you want to serve index.html when the user hits www.yoursite.com then
     set this to '/index.html' """
-    root_object = argument.String(default='/', field="DefaultRootObject")
 
-    """ Whether or not this distribution is active """
     enabled = argument.Boolean(default=True, field="Enabled")
+    """ Whether or not this distribution is active """
 
     origins = argument.ResourceList(
         Origin,
         field="Origins",
         serializer=CloudFrontResourceList(),
     )
+    """ A list of :py:class:`Origin` resources that the Distribution acts as a
+    front-end for """
 
     default_cache_behavior = argument.Resource(
         DefaultCacheBehavior,
         field="DefaultCacheBehavior",
         serializer=serializers.Resource(),
     )
+    """ How the proxy should behave when none of the rules in ``behaviors``
+    have been applied """
 
     behaviors = argument.ResourceList(
         CacheBehavior,
         field="CacheBehaviors",
         serializer=CloudFrontResourceList(),
     )
+    """ A list of :py:class`CacheBehavior` rules about how to map incoming
+    requests to ``origins``. """
 
-    """ Customize the content that is served for various error conditions """
     error_responses = argument.ResourceList(
         ErrorResponse,
         field="CustomErrorResponses",
         serializer=CloudFrontResourceList(),
     )
+    """ A list of :py:class:`ErrorResponse` rules that customize the content
+    that is served for various error conditions """
 
     logging = argument.Resource(
         LoggingConfig,
@@ -238,18 +245,24 @@ class Distribution(Resource):
         field="Logging",
         serializer=serializers.Resource(),
     )
+    """ A :py:class:`LoggingConfig` resource that describes how CloudFront
+    should log. """
 
     price_class = argument.String(
         default="PriceClass_100",
         choices=['PriceClass_100', 'PriceClass_200', 'PriceClass_All'],
         field="PriceClass",
     )
+    """ The price class. By default ``PriceClass_100`` is used, which is the
+    cheapest. """
 
     viewer_certificate = argument.Resource(
         ViewerCertificate,
         field="ViewerCertificate",
         serializer=serializers.Resource(),
     )
+    """ A :py:class:`ViewerCertificate` resource that describes the SSL
+    configuration for the front end. """
 
     account = argument.Resource(Account)
 
