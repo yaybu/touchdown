@@ -51,7 +51,7 @@ class AutoScalingGroup(Resource):
 
     availability_zones = argument.List(field="AvailabilityZones")
 
-    subnets = argument.List(
+    subnets = argument.ResourceList(
         Subnet,
         field="VPCZoneIdentifier",
         serializer=serializers.CommaSeperatedList(serializers.List()),
@@ -73,7 +73,7 @@ class AutoScalingGroup(Resource):
     checks as ELB. """
 
     health_check_grace_period = argument.String(field="HealthCheckGracePeriod")
-    
+
     placement_group = argument.String(max=255, field="PlacementGroup")
 
     termination_policies = argument.List(field="TerminationPolicies")

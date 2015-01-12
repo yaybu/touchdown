@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .internet_gateway import InternetGateway
+from .network_acl import NetworkACL
 from .route_table import RouteTable
 from .subnet import Subnet
 from .security_group import SecurityGroup
@@ -22,6 +23,7 @@ from .vpc import VPC
 __all__ = [
     'VPC',
     'InternetGateway',
+    'NetworkACL',
     'RouteTable',
     'Subnet',
     'SecurityGroup',

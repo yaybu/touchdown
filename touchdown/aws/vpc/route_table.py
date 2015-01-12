@@ -18,7 +18,6 @@ from touchdown.core import argument
 
 from touchdown.core import serializers
 from .vpc import VPC
-from .subnet import Subnet
 from .internet_gateway import InternetGateway
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
@@ -80,10 +79,6 @@ class RouteTable(Resource):
     name = argument.String()
     """ The name of the route table. This field is required."""
 
-    subnets = argument.ResourceList(Subnet)
-    """ A list of :py:class:`Subnet` resources to associate this route table
-    with """
-
     routes = argument.ResourceList(Route)
     """ A list of :py:class:`Route` resources to ensure exist in the route
     table """
@@ -117,6 +112,8 @@ class Apply(SimpleApply, Describe):
     create_action = "create_route_table"
 
     def update_associations(self):
+        return
+
         remote_subnets = {}
         for association in self.object.get("Associations", []):
             remote_subnets[association['SubnetId']] = association['RouteTableAssociationId']

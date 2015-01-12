@@ -17,6 +17,8 @@ from touchdown.core.target import Target, Present
 from touchdown.core import argument
 
 from .vpc import VPC
+from .route_table import RouteTable
+from .network_acl import NetworkACL
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -49,6 +51,10 @@ class Subnet(Resource):
 
     availability_zone = argument.String(field='AvailabilityZone')
     """ The AWS availability zone this subnet is created in. """
+
+    route_table = argument.Resource(RouteTable)
+
+    network_acl = argument.Resource(NetworkACL)
 
     tags = argument.Dict()
     """ A dictionary of tags to associate with this VPC. A common use of tags

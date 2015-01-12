@@ -39,15 +39,25 @@ def CloudFrontResourceList():
     return CloudFrontList(serializers.List(serializers.Resource()))
 
 
-class Origin(Resource):
+class S3Origin(Resource):
 
-    resource_name = "origin"
-    dot_ignore = True
-
+    resource_name = "s3_origin"
     extra_serializers = {
         "S3OriginConfig": serializers.Dict(
             OriginAccessIdentity=serializers.Argument("origin_access_identity"),
         ),
+    }
+
+    name = argument.String(field='Id')
+    bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identity()))
+    origin_access_identity = argument.String(default='')
+
+
+class CustomOrigin(Resource):
+
+    resource_name = "custom_origin"
+    dot_ignore = True
+    extra_serializers = {
         "CustomOriginConfig": serializers.Dict(
             HTTPPort=serializers.Argument("http_port"),
             HTTPSPort=serializers.Argument("https_port"),
@@ -56,13 +66,7 @@ class Origin(Resource):
     }
 
     name = argument.String(field='Id')
-    origin_type = argument.String(choices=['s3', 'custom'])
     domain_name = argument.String(field='DomainName')
-
-    # Only valid for S3 origins...
-    origin_access_identity = argument.String(default='')
-
-    # Only valid for Custom origins
     http_port = argument.Integer(default=80)
     https_port = argument.Integer(default=443)
     origin_protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
@@ -208,7 +212,7 @@ class Distribution(Resource):
     """ Whether or not this distribution is active """
 
     origins = argument.ResourceList(
-        Origin,
+        (S3Origin, CustomOrigin),
         field="Origins",
         serializer=CloudFrontResourceList(),
     )

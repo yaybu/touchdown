@@ -28,7 +28,6 @@ class Database(Resource):
 
     name = argument.String(field="DBInstanceIdentifier")
 
-
     db_name = argument.String(field="DBName")
     """ The name of a database to create in the database instance """
 
