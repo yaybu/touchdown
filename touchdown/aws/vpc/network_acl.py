@@ -184,6 +184,7 @@ class Apply(SimpleApply, Describe):
 
         return []
 
+
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_network_acl"
