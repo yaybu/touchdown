@@ -37,6 +37,18 @@ class Listener(Resource):
     )
 
 
+class HealthCheck(Resource):
+
+    resource_name = "health_check"
+    dot_ignore = True
+
+    interval = argument.Integer(field="Interval")
+    target = argument.String(field="Target")
+    healthy_threshold = argument.Integer(field="HealthyThreshold")
+    unhealthy_threshold = argument.Integer(field="UnhealthyThreshold")
+    timeout = argument.Integer(field="Timeout")
+
+
 class LoadBalancer(Resource):
 
     resource_name = "load_balancer"
@@ -52,6 +64,8 @@ class LoadBalancer(Resource):
     subnets = argument.ResourceList(Subnet, field="Subnets")
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
     # tags = argument.Dict()
+
+    health_check = argument.Resource(HealthCheck)
 
     account = argument.Resource(Account)
 
@@ -76,6 +90,18 @@ class Apply(SimpleApply, Describe):
         Present('name'),
         Present('listeners'),
     ]
+
+    def update_object(self):
+        if not self.object and self.health_check:
+            yield self.generic_action(
+                "Configure health check",
+                self.client.configure_health_check,
+                LoadBalancerName=self.resource.name,
+                HealthCheck=serializers.Context(
+                    serializers.Const(self.health_check),
+                    serializers.Resource(),
+                ),
+            )
 
 
 class Destroy(SimpleDestroy, Describe):
