@@ -18,6 +18,7 @@ from touchdown.core import argument, serializers
 
 from ..account import Account
 from ..iam import ServerCertificate
+from ..s3 import Bucket
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import Subnet, SecurityGroup
 
@@ -49,6 +50,47 @@ class HealthCheck(Resource):
     timeout = argument.Integer(field="Timeout")
 
 
+class Attributes(Resource):
+
+    resource_name = "attributes"
+    dot_ignore = True
+
+    idle_timeout = argument.Integer(
+        default=30,
+        field="ConnectionSettings",
+        serializer=serializers.Dict(
+            IdleTimeout=serializers.Identity(),
+        ),
+    )
+
+    connection_draining = argument.Integer(
+        default=0,
+        field="ConnectionDraining",
+        serializer=serializers.Dict(
+            Enabled=serializers.Expression(lambda runner, object: object > 0),
+            Timeout=serializers.Identity(),
+        )
+    )
+
+    cross_zone_load_balancing = argument.Boolean(
+        default=True,
+        field="CrossZoneLoadBalancing",
+        serializer=serializers.Dict(
+            Enabled=serializers.Identity(),
+        )
+    )
+
+    access_log = argument.Resource(
+        Bucket,
+        field="AccessLog",
+        serializer=serializers.Dict(
+            Enabled=serializers.Expression(lambda runner, object: object is not None),
+            S3BucketName=serializers.Identifier(),
+        )
+    )
+    # FIXME Support EmitInterval and S3BucketPrefix
+
+
 class LoadBalancer(Resource):
 
     resource_name = "load_balancer"
@@ -66,6 +108,7 @@ class LoadBalancer(Resource):
     # tags = argument.Dict()
 
     health_check = argument.Resource(HealthCheck)
+    attributes = argument.Resource(Attributes)
 
     account = argument.Resource(Account)
 
@@ -91,10 +134,41 @@ class Apply(SimpleApply, Describe):
         Present('listeners'),
     ]
 
-    def update_object(self):
-        for action in super(Apply, self).update_object():
-            yield action
+    def update_attributes(self):
+        if not self.resource.attributes:
+            return
 
+        a = self.resource.attributes
+
+        changed = False
+        if not self.object:
+            changed = True
+        else:
+            attributes = self.client.describe_load_balancer_attributes(
+                Name=self.resource_id
+            )
+
+            if attributes['ConnectionSettings']['IdleTimeout'] != a.idle_timeout:
+                changed = True
+            if attributes['ConnectionDraining']['Timeout'] != a.connection_draining:
+                changed = True
+            if attributes['CrossZoneLoadBalancing']['Enabled'] != a.cross_zone_load_balancing:
+                changed = True
+            if attributes['AccessLog'].get('S3BucketName', None) != a.access_log:
+                changed = True
+
+        if changed:
+            yield self.generic_action(
+                "Configure attributes",
+                self.client.modify_load_balancer_attributes,
+                LoadBalancerName=self.resource.name,
+                LoadBalancerAttributes=serializers.Context(
+                    serializers.Const(a),
+                    serializers.Resource()
+                ),
+            )
+
+    def update_health_check(self):
         if not self.object and self.health_check:
             yield self.generic_action(
                 "Configure health check",
@@ -105,6 +179,13 @@ class Apply(SimpleApply, Describe):
                     serializers.Resource(),
                 ),
             )
+
+    def update_object(self):
+        for action in super(Apply, self).update_object():
+            yield action
+
+        yield self.update_attributes()
+        yield self.update_health_check()
 
 
 class Destroy(SimpleDestroy, Describe):
