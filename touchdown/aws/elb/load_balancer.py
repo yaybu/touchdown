@@ -92,6 +92,9 @@ class Apply(SimpleApply, Describe):
     ]
 
     def update_object(self):
+        for action in super(Apply, self).update_object():
+            yield action
+
         if not self.object and self.health_check:
             yield self.generic_action(
                 "Configure health check",
