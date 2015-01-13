@@ -16,7 +16,7 @@ import logging
 import six
 
 from . import errors
-from .argument import Argument, TargetArgument
+from .argument import Argument, List
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class ResourceType(type):
     __lazy_lookups__ = {}
 
     def __new__(meta, class_name, bases, new_attrs):
-        new_attrs['targets'] = {}
+        new_attrs['plans'] = {}
 
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
@@ -55,9 +55,9 @@ class ResourceType(type):
 class Resource(six.with_metaclass(ResourceType)):
 
     dot_ignore = False
-    default_target = None
+    default_plan = None
 
-    target = TargetArgument()
+    policies = List()
 
     def __init__(self, parent, **kwargs):
         self.parent = parent

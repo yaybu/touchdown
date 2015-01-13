@@ -15,7 +15,7 @@
 import uuid
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
 from ..account import BaseAccount
@@ -83,7 +83,7 @@ class HostedZone(Resource):
     account = argument.Resource(BaseAccount)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = HostedZone
     service_name = 'route53'

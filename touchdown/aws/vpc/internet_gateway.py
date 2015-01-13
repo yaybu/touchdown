@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -48,7 +48,7 @@ class InternetGateway(Resource):
     vpc = argument.Resource(VPC)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = InternetGateway
     service_name = 'ec2'

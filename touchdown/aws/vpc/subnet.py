@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target, Present
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 
 from .vpc import VPC
@@ -64,7 +64,7 @@ class Subnet(Resource):
     vpc = argument.Resource(VPC, field='VpcId')
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = Subnet
     service_name = 'ec2'
@@ -134,7 +134,7 @@ class Apply(SimpleApply, Describe):
                     SubnetId=serializers.Identifier(),
                     RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
                 )
-            elif self.object['RouteTableId'] != self.runner.get_target(self.resource.route_table).resource_id:
+            elif self.object['RouteTableId'] != self.runner.get_plan(self.resource.route_table).resource_id:
                 yield self.generic_action(
                     "Replace route table association",
                     self.client.associate_route_table,
@@ -149,7 +149,7 @@ class Apply(SimpleApply, Describe):
             )
 
         if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
-            if self.runner.get_target(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
+            if self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
                 yield self.generic_action(
                     "Replace Network ACL association",
                     self.client.replace_network_acl_association,

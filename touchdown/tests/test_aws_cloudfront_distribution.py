@@ -95,7 +95,7 @@ class TestCloudFront(aws.TestBasicUsage):
     def test_no_change(self):
         self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-10-21/distribution", self.fixture_found, expires=1)
         self.assertRaises(errors.NothingChanged, self.runner.apply)
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     # FIXME: Refactor tests so matching can be done in a generic way
     def test_create(self):
@@ -103,4 +103,4 @@ class TestCloudFront(aws.TestBasicUsage):
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-10-21/distribution", self.fixture_found)
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from ..account import Account
@@ -76,13 +76,13 @@ class LaunchConfiguration(Resource):
             return False
         #if object['UserData'] != self.user_data:
         #    return False
-        #if object['IamInstanceProfile'] != runner.get_target(self.instance_profile).resource_id:
+        #if object['IamInstanceProfile'] != runner.get_plan(self.instance_profile).resource_id:
         #    return False
         # FIXME: Match more things
         return True
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = LaunchConfiguration
     service_name = 'autoscaling'

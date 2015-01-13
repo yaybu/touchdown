@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from touchdown.core import serializers
@@ -96,7 +96,7 @@ class RouteTable(Resource):
     vpc = argument.Resource(VPC, field='VpcId')
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = RouteTable
     service_name = 'ec2'
@@ -120,7 +120,7 @@ class Apply(SimpleApply, Describe):
         remote = set(r['GatewayId'] for r in self.object.get("PropagatingsVgws", []))
         local = set()
         for vgw in self.resource.propagating_vpn_gateways:
-            id = self.runner.get_target(vgw).resource_id
+            id = self.runner.get_plan(vgw).resource_id
             if not id or id not in remote:
                 yield self.generic_action(
                     "Enable route propagation from vpn gateway {}".format(vgw.name),
@@ -147,7 +147,7 @@ class Apply(SimpleApply, Describe):
             remote_subnets[association['SubnetId']] = association['RouteTableAssociationId']
 
         for subnet in self.resource.subnets:
-            subnet_id = self.runner.get_target(subnet).resource_id
+            subnet_id = self.runner.get_plan(subnet).resource_id
             if not subnet_id or subnet_id not in remote_subnets:
                 yield self.generic_action(
                     "Associate with subnet {}".format(subnet.name),
@@ -163,7 +163,7 @@ class Apply(SimpleApply, Describe):
 
         local_subnets = []
         for subnet in self.subnets:
-            subnet_id = self.runner.get_target(subnet).resource_id
+            subnet_id = self.runner.get_plan(subnet).resource_id
             if subnet_id:
                 local_subnets.append(subnet_id)
 

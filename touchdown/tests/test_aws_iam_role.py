@@ -34,11 +34,11 @@ class TestRole(aws.TestBasicUsage):
         self.responses.add_fixture("POST", self.base_url, "aws_role_policies_0")
         self.runner.dot()
         self.assertRaises(errors.NothingChanged, self.runner.apply)
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_delete_role_policy(self):
         self.responses.add_fixture("POST", self.base_url, self.fixture_found, expires=1)
         self.responses.add_fixture("POST", self.base_url, "aws_role_policies_1")
         self.runner.dot()
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)

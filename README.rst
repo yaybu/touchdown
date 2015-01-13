@@ -112,7 +112,7 @@ This maps the touchdown model to the AWS fields ``KeyName`` and
 ``PublicKeyMaterial``. To actually allow idempotent CRUD for this resource we
 use the ``SimpleApply`` mixin::
 
-    class Apply(SimpleApply, Target):
+    class Apply(SimpleApply, Plan):
         resource = KeyPair
         service_name = 'ec2'
         create_action = "import_key_pair"

@@ -25,7 +25,7 @@ class InvalidParameter(Exception):
     pass
 
 
-class InvalidTarget(Error):
+class InvalidPlan(Error):
     pass
 
 

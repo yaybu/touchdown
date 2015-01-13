@@ -94,7 +94,7 @@ class Identifier(Serializer):
         resource = self.inner.render(runner, object)
         if not resource:
             raise FieldNotPresent()
-        result = runner.get_target(resource).resource_id
+        result = runner.get_plan(resource).resource_id
         if not result:
             return "pending ({})".format(object)
         return result
@@ -110,7 +110,7 @@ class Property(Serializer):
         self.inner = inner
 
     def render(self, runner, object):
-        return runner.get_target(self.inner.render(runner, object)).object.get(self.property, "dummy")
+        return runner.get_plan(self.inner.render(runner, object)).object.get(self.property, "dummy")
 
     def dependencies(self, object):
         return self.inner.dependencies(object)

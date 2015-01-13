@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
 from .vpc import VPC
@@ -63,7 +63,7 @@ class VpnConnection(Resource):
     vpc = argument.Resource(VPC)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = CustomerGateway
     service_name = 'ec2'

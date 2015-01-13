@@ -14,120 +14,34 @@
 
 import logging
 
-from . import errors, target
+from . import errors, goals
 
 
 logger = logging.getLogger(__name__)
 
 
-class Plan(object):
-
-    tips_first = False
-    """ If ``tips_first`` is set then the least dependended up nodes will be
-    visited first. This is useful if you are deleting all nodes - for example,
-    you need to delete subnets before you can delete the VPC they are in.
-
-    If ``tips_first`` is False then the most dependended upon nodes will be
-    visited first. This is the default, and is used when creating and apply
-    changes - a VPC needs to exist before you can create a subnet in it.
-    """
-
-    def __init__(self, node):
-        self.node = node
-        self.map = {}
-        self._prepare()
-
-    def _add_dependency(self, node, dep):
-        if self.tips_first:
-            self.map.setdefault(dep, set()).add(node)
-        else:
-            self.map.setdefault(node, set()).add(dep)
-
-    def _prepare(self):
-        queue = [self.node]
-        visiting = set()
-        visited = set()
-
-        while queue:
-            node = queue.pop(0)
-            visiting.add(node)
-
-            self.map.setdefault(node, set())
-
-            for dep in node.dependencies:
-                if dep in visiting:
-                    raise errors.CycleError(
-                        'Circular reference between %s and %s' % (node, dep)
-                    )
-                self._add_dependency(node, dep)
-                if dep not in visited and dep not in queue:
-                    queue.append(dep)
-
-            visiting.remove(node)
-            visited.add(node)
-
-    def get_ready(self):
-        """ Yields resources that are ready to be applied """
-        for node, deps in self.map.iteritems():
-            if not deps:
-                yield node
-
-    def complete(self, node):
-        """ Marks a node as complete - it's dependents may proceed """
-        del self.map[node]
-        for deps in self.map.itervalues():
-            deps.difference_update((node,))
-
-    def all(self):
-        """ Visits all remaining nodes in order immediately """
-        while self.map:
-            ready = list(self.get_ready())
-            if not ready:
-                return
-
-            for node in ready:
-                print node
-                yield node
-                self.complete(node)
-
-
-class Describe(Plan):
-    pass
-
-
-class Apply(Plan):
-    pass
-
-
-class Destroy(Plan):
-    tips_first = True
-
-
 class Runner(object):
 
-    def __init__(self, target, node, ui):
-        self.target = target
-        self._plan = Plan(node)
+    def __init__(self, goal, node, ui):
+        try:
+            self.goal = goals.Goal.goals[goal]()
+        except KeyError:
+            raise errors.Error("No such goal '{}'".format(goal))
+
         self.node = node
         self.ui = ui
         self.resources = {}
 
-    def get_target(self, resource):
+    def get_plan(self, resource):
         if resource not in self.resources:
-            klass = resource.target
-            if not klass:
-                #FIXME: This needs to be less rubbish
-                klass = resource.targets.get(
-                    self.target,
-                    resource.targets.get("describe", target.NullTarget),
-                )
+            klass = self.goal.get_planner(resource)
             self.resources[resource] = klass(self, resource)
         return self.resources[resource]
 
     def dot(self):
         graph = ["digraph ast {"]
 
-        for node, deps in self._plan.map.items():
+        for node, deps in self.goal.get_dependency_map(self.node).items():
             if not node.dot_ignore:
                 graph.append('{} [label="{}"];'.format(id(node), node))
                 for dep in deps:
@@ -138,10 +52,11 @@ class Runner(object):
         return "\n".join(graph)
 
     def plan(self):
+        resolved = list(self.goal.get_dependency_map(self.node).all())
         plan = []
-        with self.ui.progress(list(self._plan.all()), label="Creating change plan") as resolved:
+        with self.ui.progress(resolved, label="Creating change plan") as resolved:
             for resource in resolved:
-                actions = tuple(self.get_target(resource).get_actions())
+                actions = tuple(self.get_plan(resource).get_actions())
                 if not actions:
                     logger.debug("No actions for {} - skipping".format(resource))
                     continue

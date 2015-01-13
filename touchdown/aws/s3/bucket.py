@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from ..account import Account
@@ -53,7 +53,7 @@ class Bucket(Resource):
     account = argument.Resource(Account)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = Bucket
     service_name = 's3'

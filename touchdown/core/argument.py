@@ -16,7 +16,7 @@ import six
 
 import netaddr
 
-from . import errors, target, serializers
+from . import errors, serializers
 from .utils import force_str
 
 
@@ -158,20 +158,6 @@ class List(Argument):
 
     def default(self, instance):
         return []
-
-
-class TargetArgument(Argument):
-
-    def __set__(self, instance, value):
-        try:
-            setattr(instance, self.arg_id, instance.targets[value])
-        except KeyError:
-            raise errors.InvalidTarget("'%s' not a valid target" % (value, ))
-
-    def default(self, instance):
-        if not instance.default_target:
-            return target.NullTarget
-        return None
 
 
 class Resource(Argument):

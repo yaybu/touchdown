@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target, Present
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
 from ..account import Account
@@ -91,7 +91,7 @@ class Database(Resource):
     account = argument.Resource(Account)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = Database
     service_name = 'rds'

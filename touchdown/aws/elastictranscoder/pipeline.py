@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from ..account import Account
@@ -38,7 +38,7 @@ class Pipeline(Resource):
     account = argument.Resource(Account)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = Pipeline
     service_name = 'elastictranscoder'
@@ -52,12 +52,12 @@ class Describe(SimpleDescribe, Target):
                 return pipeline
 
 
-class Apply(SimpleApply, Target):
+class Apply(SimpleApply, Plan):
 
     create_action = "create_pipeline"
     update_action = "update_pipeline"
 
 
-class Destroy(SimpleDestroy, Target):
+class Destroy(SimpleDestroy, Plan):
 
     destroy_action = "delete_pipeline"

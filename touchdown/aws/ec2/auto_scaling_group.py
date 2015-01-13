@@ -14,7 +14,7 @@
 
 from touchdown.core.action import Action
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument, errors
 
 from ..account import Account
@@ -92,8 +92,8 @@ class ReplaceInstance(Action):
         "ScheduledActions",
     ]
 
-    def __init__(self, target, instance_id):
-        super(ReplaceInstance, self).__init__(target)
+    def __init__(self, plan, instance_id):
+        super(ReplaceInstance, self).__init__(plan)
         self.instance_id = instance_id
 
     def suspend_processes(self):
@@ -126,7 +126,7 @@ class ReplaceInstance(Action):
         # FIXME: Consider the grace period of the ASG + few minutes for booting
         # and use that as a timeout for the release process.
         while True:
-            asg = self.target.describe_object()
+            asg = self.plan.describe_object()
             if asg['DesiredCapacity'] == len(i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy'):
                 return True
 
@@ -161,7 +161,7 @@ class GracefulReplacement(ReplaceInstance):
         yield "Gracefully replace instance {} (by increasing ASG pool and then terminating)".format(self.instance_id)
 
     def scale(self):
-        desired_capacity = self.target.object['DesiredCapacity']
+        desired_capacity = self.plan.object['DesiredCapacity']
         desired_capacity += 1
 
         max = self.resource.max
@@ -195,7 +195,7 @@ class SingletonReplacement(Action):
         pass
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = AutoScalingGroup
     service_name = 'autoscaling'
@@ -213,7 +213,7 @@ class Apply(SimpleApply, Describe):
     update_action = "update_auto_scaling_group"
 
     def update_object(self):
-        launch_config_name = self.runner.get_target(self.resource.launch_configuration).resource_id
+        launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
 
         for instance in self.object.get("Instances", []):
             if instance['LifecycleState'] in ('Terminating', ):

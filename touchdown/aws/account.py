@@ -15,7 +15,7 @@
 from botocore import session
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from touchdown.core.workspace import Workspace
@@ -37,7 +37,7 @@ class Account(BaseAccount):
     root = argument.Resource(Workspace)
 
 
-class Describe(Target):
+class Describe(Plan):
 
     resource = Account
     default = True

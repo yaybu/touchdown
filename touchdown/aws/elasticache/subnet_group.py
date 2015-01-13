@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from touchdown.aws.vpc import Subnet
@@ -34,7 +34,7 @@ class SubnetGroup(Resource):
     account = argument.Resource(Account)
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = SubnetGroup
     service_name = 'elasticache'

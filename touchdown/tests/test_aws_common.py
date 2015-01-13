@@ -25,11 +25,11 @@ class TestGenericAction(unittest.TestCase):
 
     def test_basic_call(self):
         api = mock.Mock()
-        target = mock.Mock()
+        plan = mock.Mock()
 
-        target.resource = CacheCluster(None, name='freddy')
+        plan.resource = CacheCluster(None, name='freddy')
 
-        g = GenericAction(target, "I am an action", api, None, serializer=serializers.Resource())
+        g = GenericAction(plan, "I am an action", api, None, serializer=serializers.Resource())
         self.assertEqual(tuple(g.description), ("I am an action", ))
         g.run()
 

@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError
 
 from touchdown.core import errors, serializers
 from touchdown.core.action import Action
-from touchdown.core.target import Present
+from touchdown.core.plan import Present
 
 
 logger = logging.getLogger(__name__)
@@ -28,8 +28,8 @@ class GenericAction(Action):
 
     is_creation_action = False
 
-    def __init__(self, target, description, func, waiter=None, serializer=None, **kwargs):
-        super(GenericAction, self).__init__(target)
+    def __init__(self, plan, description, func, waiter=None, serializer=None, **kwargs):
+        super(GenericAction, self).__init__(plan)
         self.func = func
         self._description = description
         self.waiter = waiter
@@ -51,21 +51,21 @@ class GenericAction(Action):
         self.func(**params)
 
         if self.waiter:
-            filters = self.target.get_describe_filters()
+            filters = self.plan.get_describe_filters()
             logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
-            waiter = self.target.client.get_waiter(self.waiter)
+            waiter = self.plan.client.get_waiter(self.waiter)
             waiter.wait(**filters)
 
         if self.is_creation_action:
-            self.target.object = self.target.describe_object()
-            if not self.target.object:
+            self.plan.object = self.plan.describe_object()
+            if not self.plan.object:
                 raise errors.Error("Object creation failed")
 
 
 class SetTags(Action):
 
-    def __init__(self, target, tags):
-        super(SetTags, self).__init__(target)
+    def __init__(self, plan, tags):
+        super(SetTags, self).__init__(plan)
         self.tags = tags
 
     @property
@@ -75,8 +75,8 @@ class SetTags(Action):
             yield "{} = {}".format(k, v)
 
     def run(self):
-        self.target.client.create_tags(
-            Resources=[self.target.resource_id],
+        self.plan.client.create_tags(
+            Resources=[self.plan.resource_id],
             Tags=[{"Key": k, "Value": v} for k, v in self.tags.items()],
         )
 

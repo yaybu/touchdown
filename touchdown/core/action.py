@@ -15,13 +15,13 @@
 
 class Action(object):
 
-    def __init__(self, target):
-        self.target = target
-        self.runner = target.runner
-        self.resource = target.resource
+    def __init__(self, plan):
+        self.plan = plan
+        self.runner = plan.runner
+        self.resource = plan.resource
 
-    def get_target(self, resource):
-        return self.runner.get_target(resource)
+    def get_plan(self, resource):
+        return self.runner.get_plan(resource)
 
     def __str__(self):
         return self.description

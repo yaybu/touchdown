@@ -14,7 +14,7 @@
 
 from botocore import session
 
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
 from .account import BaseAccount, Account
@@ -37,7 +37,7 @@ class ExternalRole(BaseAccount):
     account = argument.Resource(Account)
 
 
-class Describe(Target):
+class Describe(Plan):
 
     resource = ExternalRole
     default = True
@@ -66,7 +66,7 @@ class Describe(Target):
 
     @property
     def client(self):
-        session = self.runner.get_target(self.resource.account).session
+        session = self.runner.get_plan(self.resource.account).session
         if not self._client:
             self._client = session.create_client(
                 service_name="sts",

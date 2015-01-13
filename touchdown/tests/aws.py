@@ -154,8 +154,8 @@ class TestBasicUsage(TestCase):
         self.fixture_404 = "aws_{}_describe_404".format(self.resource.resource_name)
         self.fixture_create = "aws_{}_create".format(self.resource.resource_name)
 
-        self.target = self.runner.get_target(self.resource)
-        self.base_url = 'https://{}.eu-west-1.amazonaws.com/'.format(self.target.service_name)
+        self.plan = self.runner.get_plan(self.resource)
+        self.base_url = 'https://{}.eu-west-1.amazonaws.com/'.format(self.plan.service_name)
 
     def setUpResource(self):
         raise NotImplementedError(self.setUpResource)
@@ -164,7 +164,7 @@ class TestBasicUsage(TestCase):
         self.responses.add_fixture("POST", self.base_url, self.fixture_found, expires=1)
         self.runner.dot()
         self.assertRaises(errors.NothingChanged, self.runner.apply)
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_create(self):
         self.responses.add_fixture("POST", self.base_url, self.fixture_404, expires=1)
@@ -172,4 +172,4 @@ class TestBasicUsage(TestCase):
         self.responses.add_fixture("POST", self.base_url, self.fixture_found)
         self.runner.dot()
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)

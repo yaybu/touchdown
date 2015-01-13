@@ -16,45 +16,45 @@ import six
 from . import errors
 
 
-class TargetType(type):
+class PlanType(type):
 
-    """ Registers the target on the resource """
+    """ Registers the plan on the resource """
 
     def __new__(meta, class_name, bases, new_attrs):
         cls = type.__new__(meta, class_name, bases, new_attrs)
         if getattr(cls, "resource", None) is not None:
-            cls.resource.targets[cls.name] = cls
+            cls.resource.plans[cls.name] = cls
             if cls.default:
-                cls.resource.default_target = cls
+                cls.resource.default_plan = cls
         return cls
 
 
-class Target(six.with_metaclass(TargetType)):
+class Plan(six.with_metaclass(PlanType)):
 
     """
-    A goal state for infrastructure based on a resource. For example, a target
+    A goal state for infrastructure based on a resource. For example, a plan
     to move a resource towards existing or not existing.
     """
 
-    # specify true if you wish this target to be the default
+    # specify true if you wish this plan to be the default
     default = False
 
-    # the name of the target
+    # the name of the plan
 
     name = None
 
-    # specify the resource to which this target applies
+    # specify the resource to which this plan applies
     resource = None
 
     # Override this with a list of assertions
     signature = ()
 
     def __init__(self, runner, resource):
-        super(Target, self).__init__()
+        super(Plan, self).__init__()
         self.runner = runner
         self.resource = resource
         if resource.parent:
-            self.parent = runner.get_target(resource.parent)
+            self.parent = runner.get_plan(resource.parent)
         else:
             self.parent = None
 
@@ -63,7 +63,7 @@ class Target(six.with_metaclass(TargetType)):
         if a.test(self.resource):
             return
 
-        msg = ["Resource doesn't confirm to the target %s" % self.name]
+        msg = ["Resource doesn't confirm to the plan %s" % self.name]
         msg.extend(a.describe(self.resource))
         raise errors.NonConformingPolicy("\n".join(msg))
 
@@ -71,8 +71,8 @@ class Target(six.with_metaclass(TargetType)):
         return []
 
 
-class NullTarget(Target):
-    """ A target that doesn't do anything """
+class NullPlan(Plan):
+    """ A plan that doesn't do anything """
 
 
 class ArgumentAssertion(object):

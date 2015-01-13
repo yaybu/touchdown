@@ -32,7 +32,7 @@ class TestHostedZone(aws.TestCase):
         self.resource = self.aws.add_hosted_zone(
             name='example.com',
         )
-        self.target = self.runner.get_target(self.resource)
+        self.plan = self.runner.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -42,7 +42,7 @@ class TestHostedZone(aws.TestCase):
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found, expires=1)
         self.assertRaises(errors.NothingChanged, self.runner.apply)
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_no_change_1(self):
         self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
@@ -55,7 +55,7 @@ class TestHostedZone(aws.TestCase):
                 "values": ['127.0.0.1'],
             }]
         )
-        self.target = self.runner.get_target(self.resource)
+        self.plan = self.runner.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -65,7 +65,7 @@ class TestHostedZone(aws.TestCase):
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found, expires=1)
         self.assertRaises(errors.NothingChanged, self.runner.apply)
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     # FIXME: Refactor tests so matching can be done in a generic way
     def test_create(self):
@@ -73,7 +73,7 @@ class TestHostedZone(aws.TestCase):
         self.resource = self.aws.add_hosted_zone(
             name='example.com',
         )
-        self.target = self.runner.get_target(self.resource)
+        self.plan = self.runner.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -85,7 +85,7 @@ class TestHostedZone(aws.TestCase):
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_add_rrset(self):
         self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
@@ -98,7 +98,7 @@ class TestHostedZone(aws.TestCase):
                 "values": ['127.0.0.1'],
             }]
         )
-        self.target = self.runner.get_target(self.resource)
+        self.plan = self.runner.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -114,14 +114,14 @@ class TestHostedZone(aws.TestCase):
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_delete_rrset(self):
         self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
         self.resource = self.aws.add_hosted_zone(
             name='example.com',
         )
-        self.target = self.runner.get_target(self.resource)
+        self.plan = self.runner.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -137,7 +137,7 @@ class TestHostedZone(aws.TestCase):
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_update_rrset(self):
         self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
@@ -150,7 +150,7 @@ class TestHostedZone(aws.TestCase):
                 "values": ['192.168.0.1'],
             }]
         )
-        self.target = self.runner.get_target(self.resource)
+        self.plan = self.runner.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -166,4 +166,4 @@ class TestHostedZone(aws.TestCase):
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
-        self.assertEqual(self.target.resource_id, self.expected_resource_id)
+        self.assertEqual(self.plan.resource_id, self.expected_resource_id)

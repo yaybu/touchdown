@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from ..account import Account
@@ -74,7 +74,7 @@ class CacheCluster(BaseCacheCluster, Resource):
     # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", field='ReplicationGroupId')
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = CacheCluster
     service_name = 'elasticache'

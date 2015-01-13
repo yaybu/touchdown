@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -85,7 +85,7 @@ class Rule(Resource):
     def matches(self, runner, rule):
         sg = None
         if self.security_group:
-            sg = runner.get_target(self.security_group)
+            sg = runner.get_plan(self.security_group)
             # If the SecurityGroup doesn't exist yet then this rule can't exist
             # yet - so we can bail early!
             if not sg.resource_id:
@@ -165,7 +165,7 @@ class SecurityGroup(Resource):
     vpc = argument.Resource(VPC, field="VpcId")
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = SecurityGroup
     service_name = 'ec2'
@@ -174,7 +174,7 @@ class Describe(SimpleDescribe, Target):
     key = 'GroupId'
 
     def get_describe_filters(self):
-        vpc = self.runner.get_target(self.resource.vpc)
+        vpc = self.runner.get_plan(self.resource.vpc)
         return {
             "Filters": [
                 {'Name': 'group-name', 'Values': [self.resource.name]},

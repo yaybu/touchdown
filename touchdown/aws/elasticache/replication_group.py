@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.target import Target
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -30,7 +30,7 @@ class ReplicationGroup(BaseCacheCluster, Resource):
     num_cache_clusters = argument.Integer(field="NumCacheClusters")
 
 
-class Describe(SimpleDescribe, Target):
+class Describe(SimpleDescribe, Plan):
 
     resource = ReplicationGroup
     service_name = 'elasticache'
