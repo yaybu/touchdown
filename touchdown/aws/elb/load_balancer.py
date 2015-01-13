@@ -14,11 +14,27 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target, Present
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import Account
+from ..iam import ServerCertificate
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import Subnet, SecurityGroup
+
+
+class Listener(Resource):
+
+    resource_name = "listener"
+
+    protocol = argument.String(filed="Protocol")
+    port = argument.Integer(field="LoadBalancerPort")
+    instance_protocol = argument.String(field="InstanceProtocol")
+    instance_port = argument.Integer(field="InstancePort")
+    ssl_certificate = argument.Resource(
+        ServerCertificate,
+        field="SSLCertificiateId",
+        serializer=serializers.Property("Arn"),
+    )
 
 
 class LoadBalancer(Resource):
@@ -26,7 +42,11 @@ class LoadBalancer(Resource):
     resource_name = "load_balancer"
 
     name = argument.String(field="LoadBalancerName")
-    listeners = argument.List(field="Listeners")
+    listeners = argument.ResourceList(
+        Listener,
+        field="Listeners",
+        serializers=serializers.List(serializers.Resource()),
+    )
     availability_zones = argument.List(field="AvailabilityZones")
     scheme = argument.String(field="Scheme")
     subnets = argument.ResourceList(Subnet, field="Subnets")
