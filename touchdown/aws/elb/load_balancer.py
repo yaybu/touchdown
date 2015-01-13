@@ -48,7 +48,7 @@ class LoadBalancer(Resource):
         serializers=serializers.List(serializers.Resource()),
     )
     availability_zones = argument.List(field="AvailabilityZones")
-    scheme = argument.String(field="Scheme")
+    scheme = argument.String(choices=["internet-facing", "private"], field="Scheme")
     subnets = argument.ResourceList(Subnet, field="Subnets")
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
     # tags = argument.Dict()
