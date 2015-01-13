@@ -183,9 +183,10 @@ class Apply(SimpleApply, Describe):
     def update_object(self):
         for action in super(Apply, self).update_object():
             yield action
-
-        yield self.update_attributes()
-        yield self.update_health_check()
+        for action in self.update_attributes():
+            yield action
+        for action in self.update_health_check():
+            yield action
 
 
 class Destroy(SimpleDestroy, Describe):
