@@ -124,22 +124,34 @@ class Apply(SimpleApply, Describe):
     )
 
     def update_object(self):
-        return
         if self.route_table:
-            if not self.object:
+            if not self.object.get("RouteTableAssociationId", None):
                 yield self.generic_action(
                     "Associate route table",
                     self.client.associate_route_table,
                     SubnetId=serializers.Identifier(),
                     RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
                 )
+            elif self.object['RouteTableId'] != self.runner.get_target(self.route_table).resource_id:
+                yield self.generic_action(
+                    "Replace route table association",
+                    self.client.associate_route_table,
+                    AssociationId=self.object["RouteTableAssociationId"],
+                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
+                )
+        elif self.object.get("RouteTableAssociationId", None):
+            yield self.generic_action(
+                "Disassociate route table",
+                self.client.disassociate_route_table,
+                AssociationId=self.object["RouteTableAssociationId"],
+            )
 
-        if self.network_acl:
-            if not self.object:
+        if self.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
+            if self.runner.get_target(self.network_acl).resource_id != self.object.get('NetworkAclId', None):
                 yield self.generic_action(
                     "Replace Network ACL association",
                     self.client.replace_network_acl_association,
-                    AssociationId=serializers.Identifier(),
+                    AssociationId=self.object['NetworkAclAssociationId'],
                     NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifer()),
                 )
 
