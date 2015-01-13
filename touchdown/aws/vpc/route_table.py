@@ -119,7 +119,7 @@ class Apply(SimpleApply, Describe):
     def update_vpgw_associations(self):
         remote = set(r['GatewayId'] for r in self.object.get("PropagatingsVgws", []))
         local = set()
-        for vgw in self.propagating_vpn_gateways:
+        for vgw in self.resource.propagating_vpn_gateways:
             id = self.runner.get_target(vgw).resource_id
             if not id or id not in remote:
                 yield self.generic_action(

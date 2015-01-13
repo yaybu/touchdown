@@ -90,7 +90,8 @@ class Describe(SimpleDescribe, Target):
             Filters=[
                 {'Name': 'association.subnet-id', 'Values': [subnet_id]},
             ],
-        )
+        )['NetworkAcls']
+
         if network_acl:
             for assoc in network_acl[0].get('Associations', []):
                 if assoc['SubnetId'] == subnet_id:
@@ -102,7 +103,8 @@ class Describe(SimpleDescribe, Target):
             Filters=[
                 {'Name': 'association.subnet-id', 'Values': [subnet_id]},
             ],
-        )
+        )['RouteTables']
+
         if route_tables:
             for assoc in route_tables[0].get('Associations', []):
                 if assoc['SubnetId'] == subnet_id:
@@ -124,7 +126,7 @@ class Apply(SimpleApply, Describe):
     )
 
     def update_object(self):
-        if self.route_table:
+        if self.resource.route_table:
             if not self.object.get("RouteTableAssociationId", None):
                 yield self.generic_action(
                     "Associate route table",
@@ -132,7 +134,7 @@ class Apply(SimpleApply, Describe):
                     SubnetId=serializers.Identifier(),
                     RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
                 )
-            elif self.object['RouteTableId'] != self.runner.get_target(self.route_table).resource_id:
+            elif self.object['RouteTableId'] != self.runner.get_target(self.resource.route_table).resource_id:
                 yield self.generic_action(
                     "Replace route table association",
                     self.client.associate_route_table,
@@ -146,8 +148,8 @@ class Apply(SimpleApply, Describe):
                 AssociationId=self.object["RouteTableAssociationId"],
             )
 
-        if self.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
-            if self.runner.get_target(self.network_acl).resource_id != self.object.get('NetworkAclId', None):
+        if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
+            if self.runner.get_target(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
                 yield self.generic_action(
                     "Replace Network ACL association",
                     self.client.replace_network_acl_association,

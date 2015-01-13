@@ -43,7 +43,7 @@ class HealthCheck(Resource):
     dot_ignore = True
 
     interval = argument.Integer(field="Interval")
-    target = argument.String(field="Target")
+    check = argument.String(field="Target")
     healthy_threshold = argument.Integer(field="HealthyThreshold")
     unhealthy_threshold = argument.Integer(field="UnhealthyThreshold")
     timeout = argument.Integer(field="Timeout")
