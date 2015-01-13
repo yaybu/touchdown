@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2014-2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@ import uuid
 
 from touchdown.core.resource import Resource
 from touchdown.core.target import Target
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import VPC
-from touchdown.core import serializers
+from ..elb import LoadBalancer
 
 
 class Record(Resource):
@@ -38,6 +38,16 @@ class Record(Resource):
     ttl = argument.Integer(min=0, field="TTL")
 
     set_identifier = argument.Integer(min=1, max=128, field="SetIdentifier")
+
+    load_balancer = argument.Resource(
+        LoadBalancer,
+        field="AliasTarget",
+        serializer=serializers.Dict(
+            DNSName=serializers.Property("CanonicalHostedZoneName"),
+            HostedZoneId=serializers.Property("CanonicalHostedZoneNameID"),
+            EvaluateTargetHealth=False,
+        )
+    )
     #weight = argument.Integer(min=1, max=255, field="Weight")
     #region = argument.String(field="Region")
     #geo_location = argument.String(field="GeoLocation")
