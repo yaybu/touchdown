@@ -145,8 +145,8 @@ class Apply(SimpleApply, Describe):
             changed = True
         else:
             attributes = self.client.describe_load_balancer_attributes(
-                Name=self.resource_id
-            )
+                LoadBalancerName=self.resource_id
+            )['LoadBalancerAttributes']
 
             if attributes['ConnectionSettings']['IdleTimeout'] != a.idle_timeout:
                 changed = True
@@ -161,7 +161,7 @@ class Apply(SimpleApply, Describe):
             yield self.generic_action(
                 "Configure attributes",
                 self.client.modify_load_balancer_attributes,
-                LoadBalancerName=self.resource.name,
+                LoadBalancerName=serializers.Identity(),
                 LoadBalancerAttributes=serializers.Context(
                     serializers.Const(a),
                     serializers.Resource()
