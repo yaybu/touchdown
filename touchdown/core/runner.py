@@ -20,25 +20,97 @@ from . import errors, target
 logger = logging.getLogger(__name__)
 
 
+class Plan(object):
+
+    tips_first = False
+    """ If ``tips_first`` is set then the least dependended up nodes will be
+    visited first. This is useful if you are deleting all nodes - for example,
+    you need to delete subnets before you can delete the VPC they are in.
+
+    If ``tips_first`` is False then the most dependended upon nodes will be
+    visited first. This is the default, and is used when creating and apply
+    changes - a VPC needs to exist before you can create a subnet in it.
+    """
+
+    def __init__(self, node):
+        self.node = node
+        self.map = {}
+        self._prepare()
+
+    def _add_dependency(self, node, dep):
+        if self.tips_first:
+            self.map.setdefault(dep, set()).add(node)
+        else:
+            self.map.setdefault(node, set()).add(dep)
+
+    def _prepare(self):
+        queue = [self.node]
+        visiting = set()
+        visited = set()
+
+        while queue:
+            node = queue.pop(0)
+            visiting.add(node)
+
+            self.map.setdefault(node, set())
+
+            for dep in node.dependencies:
+                if dep in visiting:
+                    raise errors.CycleError(
+                        'Circular reference between %s and %s' % (node, dep)
+                    )
+                self._add_dependency(node, dep)
+                if dep not in visited and dep not in queue:
+                    queue.append(dep)
+
+            visiting.remove(node)
+            visited.add(node)
+
+    def get_ready(self):
+        """ Yields resources that are ready to be applied """
+        for node, deps in self.map.iteritems():
+            if not deps:
+                yield node
+
+    def complete(self, node):
+        """ Marks a node as complete - it's dependents may proceed """
+        del self.map[node]
+        for deps in self.map.itervalues():
+            deps.difference_update((node,))
+
+    def all(self):
+        """ Visits all remaining nodes in order immediately """
+        while self.map:
+            ready = list(self.get_ready())
+            if not ready:
+                return
+
+            for node in ready:
+                print node
+                yield node
+                self.complete(node)
+
+
+class Describe(Plan):
+    pass
+
+
+class Apply(Plan):
+    pass
+
+
+class Destroy(Plan):
+    tips_first = True
+
+
 class Runner(object):
 
     def __init__(self, target, node, ui):
         self.target = target
+        self._plan = Plan(node)
         self.node = node
         self.ui = ui
         self.resources = {}
-
-    def _resolve(self, node, resolved, unresolved):
-        unresolved.append(node)
-        for dep in node.dependencies:
-            if dep not in resolved:
-                if dep in unresolved:
-                    raise errors.CycleError(
-                        'Circular reference between %s and %s' % (node, dep)
-                    )
-                self._resolve(dep, resolved, unresolved)
-        resolved.append(node)
-        unresolved.remove(node)
 
     def get_target(self, resource):
         if resource not in self.resources:
@@ -55,38 +127,19 @@ class Runner(object):
     def dot(self):
         graph = ["digraph ast {"]
 
-        queue = list(d for d in self.node.dependencies if not d.dot_ignore)
-        visiting = set()
-        visited = set()
-
-        while queue:
-            node = queue.pop(0)
-            visiting.add(node)
-
-            graph.append('{} [label="{}"];'.format(id(node), node))
-            for dep in node.dependencies:
-                if dep.dot_ignore:
-                    continue
-                if dep in visiting:
-                    raise errors.CycleError(
-                        'Circular reference between %s and %s' % (node, dep)
-                    )
-                graph.append("{} -> {};".format(id(node), id(dep)))
-                if dep not in visited and dep not in queue:
-                    queue.append(dep)
-
-            visiting.remove(node)
-            visited.add(node)
+        for node, deps in self._plan.map.items():
+            if not node.dot_ignore:
+                graph.append('{} [label="{}"];'.format(id(node), node))
+                for dep in deps:
+                    if not dep.dot_ignore:
+                        graph.append("{} -> {};".format(id(node), id(dep)))
 
         graph.append("}")
         return "\n".join(graph)
 
     def plan(self):
-        resolved = []
-        self._resolve(self.node, resolved, [])
-
         plan = []
-        with self.ui.progress(resolved, label="Creating change plan") as resolved:
+        with self.ui.progress(list(self._plan.all()), label="Creating change plan") as resolved:
             for resource in resolved:
                 actions = tuple(self.get_target(resource).get_actions())
                 if not actions:
