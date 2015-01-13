@@ -76,6 +76,10 @@ class HostedZone(Resource):
     )
 
     records = argument.ResourceList(Record)
+
+    shared = argument.Boolean()
+    """ If a hosted zone is shared then it won't be destroyed and DNS records will never be deleted """
+
     account = argument.Resource(BaseAccount)
 
 
@@ -126,9 +130,10 @@ class Apply(SimpleApply, Describe):
             if record != remote.get(key, {}):
                 changes.append({"Action": "UPSERT", "ResourceRecordSet": record})
 
-        for key, record in remote.items():
-            if record != local.get(key, {}):
-                changes.append({"Action": "DELETE", "ResourceRecordSet": record})
+        if not self.resource.shared:
+            for key, record in remote.items():
+                if record != local.get(key, {}):
+                    changes.append({"Action": "DELETE", "ResourceRecordSet": record})
 
         if changes:
             yield self.generic_action(
@@ -148,3 +153,8 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_hosted_zone"
+
+    def destroy_object(self):
+        if not self.resource.shared:
+            for action in super(Destroy, self).destroy_object():
+                yield action

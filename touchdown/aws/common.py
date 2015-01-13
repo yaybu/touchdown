@@ -252,8 +252,8 @@ class SimpleDestroy(SimpleDescribe):
         return serializers.Dict(**{self.key: self.resource_id})
 
     def destroy_object(self):
-        return self.generic_action(
-            "Destroying {}".format(self.resource),
+        yield self.generic_action(
+            "Destroy {}".format(self.resource),
             getattr(self.client, self.destroy_action),
             self.waiter,
             self.get_destroy_serializer(),
@@ -266,4 +266,5 @@ class SimpleDestroy(SimpleDescribe):
             logger.debug("Resource '{}' not found - assuming already destroyed".format(self.resource))
             return
 
-        yield self.destroy_object()
+        for action in self.destroy_object():
+            yield action
