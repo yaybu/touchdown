@@ -1,0 +1,29 @@
+HTTP/1.1 200 OK
+Date: Tue, 6 Jan 2015 23:58:40 GMT
+ETag: E2QWRUHEXAMPLE
+x-amz-request-id: request_id
+Content-Type: text/xml; charset="utf-8"
+Connection: close
+
+<Distribution xmlns="http://cloudfront.amazonaws.com/doc/2012-03-15/">
+   <Id>EDFDVBD6EXAMPLE</Id>
+   <Status>Deployed</Status>
+   <LastModifiedTime>2009-11-19T19:37:58Z</LastModifiedTime>
+   <DomainName>d111111abcdef8.cloudfront.net</DomainName>
+   <DistributionConfig>
+      <S3Origin>
+         <DNSName>myawsbucket.s3.amazonaws.com;</DNSName>
+      </S3Origin>
+      <CallerReference>20120229090000</CallerReference>
+      <CNAME>beagles.com</CNAME>
+      <Comment>My comments</Comment>
+      <Enabled>true</Enabled>
+      <Logging>
+         <Bucket>myawslogbucket.s3.amazonaws.com</Bucket>
+         <Prefix>myprefix/</Prefix>
+      </Logging>
+      <CachingBehavior>
+         <MinTTL>0</MinTTL>
+      </CachingBehavior>
+   </DistributionConfig>
+</Distribution>

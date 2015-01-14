@@ -47,7 +47,7 @@ class TestAdapter(HTTPAdapter):
         self.mocks = []
         self.calls = []
 
-    def add(self, method, match, body, status=200, stream=False, content_type='text/plain', expires=None):
+    def add(self, method, match, body, status=200, stream=False, content_type='text/plain', headers=None, expires=None):
         self.mocks.append(dict(
             method=method,
             match=match,
@@ -55,6 +55,7 @@ class TestAdapter(HTTPAdapter):
             status=status,
             stream=stream,
             content_type=content_type,
+            headers=headers,
             expires=expires,
         ))
 
@@ -63,6 +64,8 @@ class TestAdapter(HTTPAdapter):
             response = six.moves.http_client.HTTPResponse(Buffer(fp.read()))
             response.begin()
 
+        headers = dict(response.getheaders())
+
         self.add(
             method,
             match,
@@ -70,6 +73,7 @@ class TestAdapter(HTTPAdapter):
             status=response.status,
             stream=stream,
             content_type=response.getheader('Content-Type', 'text/plain'),
+            headers=headers,
             expires=expires,
         )
 
