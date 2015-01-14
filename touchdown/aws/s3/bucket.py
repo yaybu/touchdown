@@ -59,12 +59,18 @@ class Describe(SimpleDescribe, Plan):
     service_name = 's3'
     describe_action = "list_buckets"
     describe_list_key = "Buckets"
-    key = 'Name'
+    key = 'Bucket'
 
     def describe_object(self):
         for bucket in self.client.list_buckets()['Buckets']:
             if bucket['Name'] == self.resource.name:
                 return bucket
+
+    @property
+    def resource_id(self):
+        if self.object:
+            return self.object['Name']
+        return None
 
 
 class Apply(SimpleApply, Describe):
