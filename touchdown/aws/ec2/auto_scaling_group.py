@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from touchdown.core.action import Action
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
@@ -170,14 +172,14 @@ class GracefulReplacement(ReplaceInstance):
 
         self.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
-            Max=max,
+            MaxSize=max,
             DesiredCapacity=desired_capacity,
         )
 
     def unscale(self):
         self.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
-            Max=self.resource.max,
+            MaxSize=self.resource.max,
             DesiredCapacity=self.object['DesiredCapacity'],
         )
 
@@ -227,6 +229,36 @@ class Apply(SimpleApply, Describe):
                 yield klass(self, instance['InstanceId'])
 
 
+class TerminateASGInstances(Action):
+
+    @property
+    def description(self):
+        yield "Scale down and wait for {} instances to terminate".format(
+            len(self.plan.object.get('Instances', []))
+        )
+        for instance in self.plan.object.get('Instances', []):
+            yield instance['InstanceId']
+
+    def run(self):
+        self.plan.client.update_auto_scaling_group(
+            AutoScalingGroupName=self.resource.name,
+            MinSize=0,
+            MaxSize=0,
+            DesiredCapacity=0,
+        )
+
+        while True:
+            asg = self.plan.describe_object()
+            if len(asg.get("Instances", [])) == 0:
+                break
+            time.sleep(30)
+
+
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_auto_scaling_group"
+
+    def destroy_object(self):
+        yield TerminateASGInstances(self)
+        for change in super(Destroy, self).destroy_object():
+            yield change
