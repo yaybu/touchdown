@@ -38,6 +38,8 @@ class Describe(SimpleDescribe, Plan):
     resource = ServerCertificate
     service_name = 'iam'
     get_action = "get_server_certificate"
+    get_key = "ServerCertificate"
+    get_notfound_exception = "NoSuchEntity"
     key = 'ServerCertificateName'
 
     @property

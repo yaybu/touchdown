@@ -119,6 +119,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'elb'
     describe_action = "describe_load_balancers"
     describe_list_key = "LoadBalancerDescriptions"
+    describe_notfound_exception = "LoadBalancerNotFound"
     key = 'LoadBalancerName'
 
     def get_describe_filters(self):

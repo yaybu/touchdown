@@ -54,6 +54,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'ec2'
     describe_action = "describe_key_pairs"
     describe_list_key = "KeyPairs"
+    describe_notfound_exception = "InvalidKeyPair.NotFound"
     key = 'KeyName'
 
     def get_describe_filters(self):
