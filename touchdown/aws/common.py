@@ -87,6 +87,7 @@ class SimpleDescribe(object):
 
     get_action = None
     describe_notfound_exception = None
+    get_notfound_exception = None
 
     signature = (
         Present('name'),
@@ -119,11 +120,21 @@ class SimpleDescribe(object):
     def describe_object(self):
         if self.get_action:
             logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.get_action))
-            return getattr(self.client, self.get_action)(**{self.key: self.resource.name})
+            try:
+                result = getattr(self.client, self.get_action)(**{self.key: self.resource.name})
+            except ClientError as e:
+                if e.response['Error']['Code'] == self.get_notfound_exception:
+                    return {}
+                raise
+            return result[self.get_key]
 
         logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
 
         filters = self.get_describe_filters()
+        if not filters:
+            logger.debug("Could not generate valid filters - this generally means we've determined the object cant exist!")
+            return {}
+
         logger.debug("Filters are: {}".format(filters))
 
         try:
