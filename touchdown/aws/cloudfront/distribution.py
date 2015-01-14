@@ -282,6 +282,9 @@ class Describe(SimpleDescribe, Plan):
         for page in paginator.paginate():
             for distribution in page['DistributionList'].get('Items', []):
                 if self.resource.name in distribution['Aliases'].get('Items', []):
+                    result = self.client.get_distribution(Id=distribution['Id'])
+                    distribution = {"ETag": result["ETag"]}
+                    distribution.update(result['Distribution'])
                     return distribution
 
 
@@ -298,3 +301,9 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_distribution"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            Id=self.resource_id,
+            IfMatch=self.object['ETag'],
+        )
