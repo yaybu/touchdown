@@ -48,11 +48,19 @@ class LaunchConfiguration(Resource):
 
     # block_devices = argument.Dict(field="BlockDeviceMappings")
 
-    instance_monitoring = argument.Boolean(default=False, field="InstanceMonitoring", serializer=serializers.Dict(Enabled=serializers.Identity()))
+    instance_monitoring = argument.Boolean(
+        default=False,
+        field="InstanceMonitoring",
+        serializer=serializers.Dict(Enabled=serializers.Identity()),
+    )
 
     spot_price = argument.String(field="SpotPrice")
 
-    instance_profile = argument.Resource(InstanceProfile, field="IamInstanceProfile")
+    instance_profile = argument.Resource(
+        InstanceProfile,
+        field="IamInstanceProfile",
+        serializers=serializers.Property("Arn"),
+    )
 
     ebs_optimized = argument.Boolean(field="EbsOptimized")
 
