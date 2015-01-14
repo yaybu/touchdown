@@ -19,6 +19,7 @@ from touchdown.core import argument
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
+from ..vpc import SecurityGroup
 from .subnet_group import SubnetGroup
 
 
@@ -52,7 +53,7 @@ class Database(Resource):
     master_password = argument.String(field="MasterPassword")
     """ The password of the main client user """
 
-    security_groups = argument.List(field="VpcSecurityGroupIds")
+    security_groups = argument.ResourceList(SecurityGroup, field="VpcSecurityGroupIds")
     """ A list of security groups to apply to this instance """
 
     publically_accessible = argument.Boolean(field="PubliclyAccessible", aws_update=False)
