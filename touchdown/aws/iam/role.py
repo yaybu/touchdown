@@ -107,3 +107,16 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_role"
+
+    def destroy_object(self):
+        result = self.client.list_role_policies(RoleName=self.resource.name)
+        for name in result.get('PolicyNames', []):
+            yield self.generic_action(
+                "Delete policy {}".format(name),
+                self.client.delete_role_policy,
+                RoleName=self.resource.name,
+                PolicyName=name,
+            )
+
+        for change in super(Destroy, self).destroy_object():
+            yield change
