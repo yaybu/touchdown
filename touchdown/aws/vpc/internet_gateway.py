@@ -72,3 +72,15 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_internet_gateway"
+
+    def destroy_object(self):
+        for attachment in self.object.get("Attachments", []):
+            yield self.generic_action(
+                "Detach from vpc {}".format(attachment['VpcId']),
+                self.client.detach_internet_gateway,
+                InternetGatewayId=self.resource_id,
+                VpcId=attachment['VpcId'],
+            )
+
+        for change in super(Destroy, self).destroy_object():
+            yield change
