@@ -14,7 +14,7 @@
 
 import six
 
-from . import dependencies, errors, plan
+from . import dependencies, plan
 
 
 class GoalType(type):
@@ -29,20 +29,58 @@ class GoalType(type):
 class Goal(six.with_metaclass(GoalType)):
 
     goals = {}
-    tips_first = False
+    execute_in_reverse = False
 
-    def get_dependency_map(self, resource):
-        return dependencies.DependencyMap(resource, tips_first=self.tips_first)
+    def __init__(self, workspace):
+        self.workspace = workspace
+        self.resources = {}
+        self.changes = {}
 
-    def get_planner(self, resource):
+    def get_plan_order(self):
+        return dependencies.DependencyMap(self.workspace, tips_first=False)
+
+    def get_plan_class(self, resource):
         raise NotImplementedError(self.get_planner)
+
+    def get_plan(self, resource):
+        if resource not in self.resources:
+            klass = self.get_plan_class(resource)
+            self.resources[resource] = klass(self, resource)
+        return self.resources[resource]
+
+    def get_changes(self, resource):
+        if not resource in self.changes:
+            self.changes[resource] = list(self.get_plan(resource).get_actions())
+        return self.changes[resource]
+
+    def plan(self, ui):
+        self.changes = {}
+        resolved = list(self.get_plan_order().all())
+        with ui.progress(resolved, label="Creating change plan") as resolved:
+            for resource in resolved:
+                self.get_changes(resource)
+
+    def is_stale(self):
+        return len(self.changes) != 0
+
+    def get_execution_order(self):
+        return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
+
+    def apply(self, ui):
+        plan = self.get_execution_order().all()
+        with ui.progress(plan, label="Apply changes") as plan:
+            for resource in plan:
+                for change in self.get_changes(resource):
+                    # if not ui.confirm_action(change):
+                    #     continue
+                    change.run()
 
 
 class Describe(Goal):
 
     name = "describe"
 
-    def get_planner(self, resource):
+    def get_plan_class(self, resource):
         return resource.plans["describe"]
 
 
@@ -50,10 +88,8 @@ class Apply(Goal):
 
     name = "apply"
 
-    def get_planner(self, resource):
+    def get_plan_class(self, resource):
         if "destroy" in resource.policies:
-            if not "destroy" in resource.planners:
-                raise errors.Error("Requested that {} should be destroyed, but this change is not supported".format(resource))
             return resource.plans["destroy"]
 
         if "never-create" in resource.policies:
@@ -65,9 +101,9 @@ class Apply(Goal):
 class Destroy(Goal):
 
     name = "destroy"
-    tips_first = True
+    execute_in_reverse = True
 
-    def get_planner(self, resource):
+    def get_plan_class(self, resource):
         if not "never-destroy" in resource.policies:
-            return resource.plans.get("destroy", plan.NullPlan)
-        return plan.NullPlan
+            return resource.plans.get("destroy", resource.plans.get("describe", plan.NullPlan))
+        return resource.plans.get("describe", plan.NullPlan)

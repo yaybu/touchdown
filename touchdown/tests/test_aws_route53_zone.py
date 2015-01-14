@@ -32,7 +32,7 @@ class TestHostedZone(aws.TestCase):
         self.resource = self.aws.add_hosted_zone(
             name='example.com',
         )
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -55,7 +55,7 @@ class TestHostedZone(aws.TestCase):
                 "values": ['127.0.0.1'],
             }]
         )
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -73,7 +73,7 @@ class TestHostedZone(aws.TestCase):
         self.resource = self.aws.add_hosted_zone(
             name='example.com',
         )
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -98,7 +98,7 @@ class TestHostedZone(aws.TestCase):
                 "values": ['127.0.0.1'],
             }]
         )
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -121,7 +121,7 @@ class TestHostedZone(aws.TestCase):
         self.resource = self.aws.add_hosted_zone(
             name='example.com',
         )
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",
@@ -150,7 +150,7 @@ class TestHostedZone(aws.TestCase):
                 "values": ['192.168.0.1'],
             }]
         )
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
 
         self.responses.add_fixture(
             "GET",

@@ -22,26 +22,20 @@ logger = logging.getLogger(__name__)
 
 class Runner(object):
 
-    def __init__(self, goal, node, ui):
+    def __init__(self, goal, workspace, ui):
         try:
-            self.goal = goals.Goal.goals[goal]()
+            self.goal = goals.Goal.goals[goal](workspace)
         except KeyError:
             raise errors.Error("No such goal '{}'".format(goal))
 
-        self.node = node
+        self.workspace = workspace
         self.ui = ui
         self.resources = {}
-
-    def get_plan(self, resource):
-        if resource not in self.resources:
-            klass = self.goal.get_planner(resource)
-            self.resources[resource] = klass(self, resource)
-        return self.resources[resource]
 
     def dot(self):
         graph = ["digraph ast {"]
 
-        for node, deps in self.goal.get_dependency_map(self.node).items():
+        for node, deps in self.goal.get_plan_order().items():
             if not node.dot_ignore:
                 graph.append('{} [label="{}"];'.format(id(node), node))
                 for dep in deps:
@@ -52,30 +46,20 @@ class Runner(object):
         return "\n".join(graph)
 
     def plan(self):
-        resolved = list(self.goal.get_dependency_map(self.node).all())
-        plan = []
-        with self.ui.progress(resolved, label="Creating change plan") as resolved:
-            for resource in resolved:
-                actions = tuple(self.get_plan(resource).get_actions())
-                if not actions:
-                    logger.debug("No actions for {} - skipping".format(resource))
-                    continue
-                plan.append((resource, actions))
+        self.goal.plan(self.ui)
 
-        return plan
+        for resource in self.goal.get_execution_order().all():
+            changes = self.goal.get_changes(resource)
+            if changes:
+                yield resource, changes
 
     def apply(self):
-        plan = self.plan()
+        plan = list(self.plan())
 
-        if not plan:
+        if not len(plan):
             raise errors.NothingChanged()
 
         if not self.ui.confirm_plan(plan):
             return
 
-        with self.ui.progress(plan, label="Apply changes") as plan:
-            for resource, actions in plan:
-                for action in actions:
-                    # if not ui.confirm_action(action):
-                    #     continue
-                    action.run()
+        self.goal.apply(self.ui)

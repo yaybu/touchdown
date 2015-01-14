@@ -29,14 +29,13 @@ class ConsoleInterface(object):
 
     def render_plan(self, plan):
         for resource, actions in plan:
-            if actions:
-                click.echo("%s:" % resource)
-                for action in actions:
-                    description = list(action.description)
-                    click.echo("  * %s" % description[0])
-                    for line in description[1:]:
-                        click.echo("      %s" % line)
-                click.echo("")
+            click.echo("%s:" % resource)
+            for action in actions:
+                description = list(action.description)
+                click.echo("  * %s" % description[0])
+                for line in description[1:]:
+                    click.echo("      %s" % line)
+            click.echo("")
 
     def confirm_plan(self, plan):
         click.echo("Generated a plan to update infrastructure configuration:")

@@ -154,7 +154,7 @@ class TestBasicUsage(TestCase):
         self.fixture_404 = "aws_{}_describe_404".format(self.resource.resource_name)
         self.fixture_create = "aws_{}_create".format(self.resource.resource_name)
 
-        self.plan = self.runner.get_plan(self.resource)
+        self.plan = self.runner.goal.get_plan(self.resource)
         self.base_url = 'https://{}.eu-west-1.amazonaws.com/'.format(self.plan.service_name)
 
     def setUpResource(self):
