@@ -40,6 +40,12 @@ class Describe(SimpleDescribe, Plan):
     get_action = "get_server_certificate"
     key = 'ServerCertificateName'
 
+    @property
+    def resource_id(self):
+        if self.object:
+            return self.object['ServerCertificateMetadata'][self.key]
+        return None
+
 
 class Apply(SimpleApply, Describe):
 
