@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -120,3 +120,9 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_db_instance"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            DBInstanceIdentifier=self.resource_id,
+            SkipFinalSnapshot=True,
+        )
