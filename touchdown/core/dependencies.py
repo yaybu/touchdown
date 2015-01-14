@@ -66,14 +66,14 @@ class DependencyMap(object):
 
     def get_ready(self):
         """ Yields resources that are ready to be applied """
-        for node, deps in self.map.iteritems():
+        for node, deps in self.map.items():
             if not deps:
                 yield node
 
     def complete(self, node):
         """ Marks a node as complete - it's dependents may proceed """
         del self.map[node]
-        for deps in self.map.itervalues():
+        for deps in self.map.values():
             deps.difference_update((node,))
 
     def all(self):
