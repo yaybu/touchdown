@@ -37,7 +37,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'iam'
     describe_action = "list_instance_profiles"
     describe_list_key = "InstanceProfiles"
-    key = 'Arn'
+    key = 'InstanceProfileName'
 
     def describe_object(self):
         paginator = self.client.get_paginator("list_instance_profiles")
@@ -80,3 +80,16 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_instance_profile"
+
+    def destroy_object(self):
+        remote_roles = [r['RoleName'] for r in self.object.get('Roles', [])]
+        for role in remote_roles:
+            yield self.generic_action(
+                "Remove role {}".format(role),
+                self.client.remove_role_from_instance_profile,
+                InstanceProfileName=self.resource.name,
+                RoleName=role,
+            )
+
+        for change in super(Destroy, self).destroy_object():
+            yield change
