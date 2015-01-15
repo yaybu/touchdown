@@ -51,6 +51,7 @@ class Describe(SimpleDescribe, Plan):
         result['CertificateChain'] = object['CertificateChain']
         return result
 
+
 class Apply(SimpleApply, Describe):
 
     create_action = "upload_server_certificate"

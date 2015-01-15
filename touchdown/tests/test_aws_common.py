@@ -29,11 +29,10 @@ class TestGenericAction(unittest.TestCase):
 
         plan.resource = CacheCluster(None, name='freddy')
 
-        g = GenericAction(plan, "I am an action", api, None, serializer=serializers.Resource())
+        g = GenericAction(plan, "I am an action", api, serializer=serializers.Resource())
         self.assertEqual(tuple(g.description), ("I am an action", ))
         g.run()
 
         api.assert_called_with(
-            Engine='redis',
             CacheClusterId='freddy',
         )

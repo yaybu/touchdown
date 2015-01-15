@@ -23,6 +23,7 @@ from touchdown.core.plan import Present
 
 logger = logging.getLogger(__name__)
 
+
 class Waiter(Action):
 
     description = ["Wait for resource to exist"]
@@ -66,6 +67,7 @@ class GenericAction(Action):
                 self.plan.object = {
                     self.plan.key: object[self.plan.key]
                 }
+
 
 class PostCreation(Action):
 

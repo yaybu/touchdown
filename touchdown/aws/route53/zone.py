@@ -105,6 +105,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_hosted_zone"
+    create_response = "not-that-useful"
     # update_action = "update_hosted_zone_comment"
 
     def _get_remote_records(self):

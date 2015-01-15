@@ -38,9 +38,8 @@ class TestHostedZone(aws.TestCase):
             "GET",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_0",
-            expires=1,
         )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found, expires=1)
+        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.assertRaises(errors.NothingChanged, self.runner.apply)
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
@@ -61,9 +60,8 @@ class TestHostedZone(aws.TestCase):
             "GET",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_1",
-            expires=1,
         )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found, expires=1)
+        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.assertRaises(errors.NothingChanged, self.runner.apply)
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
@@ -79,7 +77,6 @@ class TestHostedZone(aws.TestCase):
             "GET",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_0",
-            expires=1,
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_404, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
@@ -104,13 +101,11 @@ class TestHostedZone(aws.TestCase):
             "GET",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_0",
-            expires=1,
         )
         self.responses.add_fixture(
             "POST",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
             "aws_hosted_zone_rrset_change",
-            expires=1,
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
@@ -127,13 +122,11 @@ class TestHostedZone(aws.TestCase):
             "GET",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_1",
-            expires=1,
         )
         self.responses.add_fixture(
             "POST",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
             "aws_hosted_zone_rrset_change",
-            expires=1,
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()
@@ -156,13 +149,11 @@ class TestHostedZone(aws.TestCase):
             "GET",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_1",
-            expires=1,
         )
         self.responses.add_fixture(
             "POST",
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
             "aws_hosted_zone_rrset_change",
-            expires=1,
         )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.runner.apply()

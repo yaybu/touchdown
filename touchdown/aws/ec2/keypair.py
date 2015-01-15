@@ -64,6 +64,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "import_key_pair"
+    create_response = "id-only"
 
 
 class Destroy(SimpleDestroy, Describe):
