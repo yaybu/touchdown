@@ -22,30 +22,12 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class VpnGateway(Resource):
 
-    """
-    You can create an vpn gateway in any VPC::
-
-        customer_gateway = vpc.add_vpn_gateway(
-            name='my-vpn-gateway',
-        )
-    """
-
     resource_name = "vpn_gateway"
 
     name = argument.String()
-    """ The name of the internet gateway. This field is required."""
-
     type = argument.String(default="ipsec.1", choices=["ipsec.1"], field="Type")
-    """ The type of VPN connection that this VPN gateway supports """
-
     availability_zone = argument.String(field="AvailabilityZone")
-    """ The availability zone to place the Vpn Gateway in """
-
     tags = argument.Dict()
-    """ A dictionary of tags to associate with this VPC. A common use of tags
-    is to group components by environment (e.g. "dev1", "staging", etc) or to
-    map components to cost centres for billing purposes. """
-
     vpc = argument.Resource(VPC)
 
 

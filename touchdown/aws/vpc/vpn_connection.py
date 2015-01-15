@@ -24,27 +24,12 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class VpnConnection(Resource):
 
-    """
-    You can create a VPN Connection in any VPC::
-
-        vpn = vpn.add_vpn_connection(
-            name='my-vpn-connection',
-        )
-    """
-
     resource_name = "vpn_connection"
 
     name = argument.String()
-    """ The name of the vpn connection. This field is required."""
-
     customer_gateway = argument.Resource(CustomerGateway, field="CustomerGatewayId")
-    """ A :py:class:`CustomerGateway`. This field is required. """
-
     vpn_gateway = argument.Resource(VpnGateway, field="VpnGatewayId")
-    """ A :py:class:`VpnGateway`. This field is required. """
-
     type = argument.String(default="ipsec.1", choices=["ipsec.1"], field="Type")
-    """ The type of VPN connection to create """
 
     static_routes_only = argument.Boolean(
         default=True,
@@ -56,10 +41,6 @@ class VpnConnection(Resource):
     # FIXME: This should somehow be a list of argument.IPNetwork
 
     tags = argument.Dict()
-    """ A dictionary of tags to associate with this VPC. A common use of tags
-    is to group components by environment (e.g. "dev1", "staging", etc) or to
-    map components to cost centres for billing purposes. """
-
     vpc = argument.Resource(VPC)
 
 

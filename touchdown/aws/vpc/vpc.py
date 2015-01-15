@@ -22,52 +22,13 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class VPC(Resource):
 
-    """
-    Represents a Virtual Private Cloud in an amazon region.
-
-    VPC's let you logically isolate components of your system. A properly
-    defined VPC allows you to run most of your backend components on private IP
-    addresses - shielding it from the public internet.
-
-    You define the IP's available in your VPC with a `CIDR`_-form IP address.
-
-    .. _CIDR: http://en.wikipedia.org/wiki/CIDR
-
-    You can add a VPC to your workspace from any Amazon account resource::
-
-        account = workspace.add_aws(
-            access_key_id='....',
-            secret_access_key='....',
-            region='eu-west-1',
-        )
-
-        vpc = workspace.add_vpc(
-            name='my-first-vpc',
-            cidr_block='10.0.0.0/16',
-        )
-    """
-
     resource_name = "vpc"
 
     name = argument.String()
-    """ The name of the VPC. This field is required."""
-
     cidr_block = argument.IPNetwork(field='CidrBlock')
-    """ A network range in CIDR form. For example, 10.0.0.0/16. A VPC network
-    should only use private IPs, and not public addresses. This field is
-    required."""
-
     tenancy = argument.String(default="default", choices=["default", "dedicated"], field="InstanceTenancy")
-    """ This controls whether or not to enforce use of single-tenant hardware
-    for this VPC. If set to ``default`` then instances can be launched with any
-    tenancy options. If set to ``dedicated`` then all instances started in this
-    VPC will be launched as dedicated tenancy, regardless of the tenancy they
-    requsest. """
 
     tags = argument.Dict()
-    """ A dictionary of tags to associate with this VPC. A common use of tags
-    is to group components by environment (e.g. "dev1", "staging", etc) or to
-    map components to cost centres for billing purposes. """
 
     account = argument.Resource(Account)
 

@@ -23,23 +23,6 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class Rule(Resource):
 
-    """
-    Represents a rule in a security group.
-
-    You shouldn't create ``Rule`` resources directly, they are created
-    implicitly when defining a :py:class:`SecurityGroup`. For example::
-
-        security_group = vpc.add_security_group(
-            name='my-security-group',
-            ingress=[
-                {"port": 80, "network": "0.0.0.0/0"},
-                {"port": 443, "network": "0.0.0.0/0"},
-            ],
-        )
-
-    This will implicitly create 2 ``Rule`` resources.
-    """
-
     resource_name = "rule"
 
     @property
@@ -47,19 +30,9 @@ class Rule(Resource):
         return self.security_group is None
 
     protocol = argument.String(default='tcp', choices=['tcp', 'udp', 'icmp'], field="IpProtocol")
-    """ The network protocol to allow. By default this is ``tcp``. It can also
-    be set to ``udp`` or ``icmp``. """
-
     port = argument.Integer(min=-1, max=32768)
-    """ A port to allow access to. """
-
     from_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="FromPort")
-    """ Instead of specifying ``port``, you can specify a range of ports
-    starting at ``from_port`` """
-
     to_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="ToPort")
-    """ If specifying a ``from_port`` you also need to specify a
-    ``to_port``. """
 
     security_group = argument.Resource(
         "touchdown.aws.vpc.security_group.SecurityGroup",
@@ -69,8 +42,6 @@ class Rule(Resource):
             GroupId=serializers.Identifier(),
         )),
     )
-    """ A :py:class:`SecurityGroup`. This other security group will be allowed
-    access to members of the security group on the port/protocol specified. """
 
     network = argument.IPNetwork(
         field="IpRanges",
@@ -78,9 +49,6 @@ class Rule(Resource):
             CidrIp=serializers.String(),
         )),
     )
-    """ A network range specified in CIDR form. For example, you could specify
-    ``0.0.0.0/0`` to allow the entire internet to access the specified
-    port/protocol. """
 
     def matches(self, runner, rule):
         sg = None
@@ -121,47 +89,18 @@ class Rule(Resource):
 
 class SecurityGroup(Resource):
 
-    """
-    Resources can be placed in SecurityGroup resources. A SecurityGroup then
-    applies a set of rules about what incoming and outgoing traffic is allowed.
-
-    You can create a SecurityGroup in any VPC::
-
-        security_group = vpc.add_security_group(
-            name='my-security-group',
-            ingress=[dict(
-                protocol='tcp',
-                from_port=22,
-                to_port=22,
-                network='0.0.0.0/0',
-            )],
-        )
-    """
-
     resource_name = "security_group"
 
     name = argument.String(field="GroupName")
-    """ The name of the security group. This field is required."""
-
     description = argument.String(field="Description")
-    """ A short description of the SecurityGroup. This is shown in the AWS
-    console UI. """
 
-    """ A list of rules for what IP's or components are allowed to access
-    members of the security group."""
     ingress = argument.ResourceList(Rule)
-
-    """ A list of rules for what IP's/components are accessible by members of
-    this security group """
     egress = argument.ResourceList(
         Rule,
         default=lambda instance: [dict(protocol=-1, network=['0.0.0.0/0'])],
     )
-    tags = argument.Dict()
-    """ A dictionary of tags to associate with this VPC. A common use of tags
-    is to group components by environment (e.g. "dev1", "staging", etc) or to
-    map components to cost centres for billing purposes. """
 
+    tags = argument.Dict()
     vpc = argument.Resource(VPC, field="VpcId")
 
 
