@@ -130,9 +130,11 @@ Security Groups
         )
 
     .. attribute:: name
+
         The name of the security group. This field is required.
 
     .. attribute:: description
+
         A short description of the SecurityGroup. This is shown in the AWS
         console UI.
 
@@ -318,6 +320,7 @@ Route Tables
         The name of the route table. This field is required.
 
     .. attribute:: routes
+
         A list of :py:class:`Route` resources to ensure exist in the route
         table.
 
