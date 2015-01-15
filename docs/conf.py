@@ -43,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'touchdown'
-copyright = u'2011, John Carr'
+copyright = u'2014-2015, John Carr'
 
 # The full version, including alpha/beta/rc tags.
 release = pkg_resources.get_distribution('touchdown').version
@@ -76,7 +76,7 @@ exclude_trees = ['_build']
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
