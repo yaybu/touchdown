@@ -6,8 +6,22 @@ Simple storage service
    :synopsis: Simple Storage Services resources.
 
 
-Bucket
-======
+.. class:: Bucket
 
-.. autoclass:: Bucket
-   :members:
+    A bucket in the Amazon S3 service.
+
+    Can be added to any account resource::
+
+        bucket = aws.add_bucket(
+            name='my-bucket',
+        )
+
+    .. attribute:: name
+
+        The name of the bucket. This field is required, and it must be unique
+        for the whole of Amazon AWS.
+
+    .. attribute:: region
+
+        The region of the bucket. The default is to create the bucket in the
+        sane region as the region specified by the account.

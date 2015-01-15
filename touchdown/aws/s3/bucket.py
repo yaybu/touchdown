@@ -20,25 +20,12 @@ from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 
-# FIXME: Figure out how to bind CreateBucketConfiguration.LocationConstraint
-
 
 class Bucket(Resource):
-
-    """
-    A bucket in the Amazon S3 service.
-
-    Can be added to any account resource::
-
-        bucket = aws.add_bucket(
-            name='my-bucket',
-        )
-    """
 
     resource_name = "bucket"
 
     name = argument.String(field="Bucket")
-    """ The name of the bucket. Must be unique across the whole of the UK. """
 
     region = argument.String(
         default=lambda instance: instance.account.region,
@@ -47,8 +34,6 @@ class Bucket(Resource):
             LocationConstraint=serializers.Identity(),
         ),
     )
-    """ The region of the bucket. The default is to create the bucket in the
-    sane region as the region specified by the account. """
 
     account = argument.Resource(Account)
 
