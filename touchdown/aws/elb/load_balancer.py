@@ -27,7 +27,7 @@ class Listener(Resource):
 
     resource_name = "listener"
 
-    protocol = argument.String(filed="Protocol")
+    protocol = argument.String(field="Protocol")
     port = argument.Integer(field="LoadBalancerPort")
     instance_protocol = argument.String(field="InstanceProtocol")
     instance_port = argument.Integer(field="InstancePort")
@@ -99,7 +99,7 @@ class LoadBalancer(Resource):
     listeners = argument.ResourceList(
         Listener,
         field="Listeners",
-        serializers=serializers.List(serializers.Resource()),
+        serializer=serializers.List(serializers.Resource()),
     )
     availability_zones = argument.List(field="AvailabilityZones")
     scheme = argument.String(choices=["internet-facing", "private"], field="Scheme")
@@ -129,6 +129,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_load_balancer"
+    create_response = "not-that-useful"
 
     signature = [
         Present('name'),
@@ -162,7 +163,7 @@ class Apply(SimpleApply, Describe):
             yield self.generic_action(
                 "Configure attributes",
                 self.client.modify_load_balancer_attributes,
-                LoadBalancerName=serializers.Identity(),
+                LoadBalancerName=serializers.Identifier(),
                 LoadBalancerAttributes=serializers.Context(
                     serializers.Const(a),
                     serializers.Resource()
@@ -170,13 +171,13 @@ class Apply(SimpleApply, Describe):
             )
 
     def update_health_check(self):
-        if not self.object and self.health_check:
+        if not self.object and self.resource.health_check:
             yield self.generic_action(
                 "Configure health check",
                 self.client.configure_health_check,
                 LoadBalancerName=self.resource.name,
                 HealthCheck=serializers.Context(
-                    serializers.Const(self.health_check),
+                    serializers.Const(self.resource.health_check),
                     serializers.Resource(),
                 ),
             )

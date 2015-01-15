@@ -25,13 +25,10 @@ from .subnet_group import SubnetGroup
 
 class BaseCacheCluster(object):
 
-    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
-    """ The name of the cache cluster. Stored as a lowercase string """
-
-    instance_class = argument.String()
+    instance_class = argument.String(field="CacheNodeType")
     """ The kind of hardware to use, for example 'db.t1.micro' """
 
-    engine = argument.String(default='redis', field='Engine', aws_update=False)
+    engine = argument.String(field='Engine', aws_update=False)
     """ The type of database to use, for example 'redis' """
 
     engine_version = argument.String(field='EngineVersion')
@@ -40,7 +37,7 @@ class BaseCacheCluster(object):
     port = argument.Integer(min=1, max=32768, field='Port', aws_update=False)
     """ The TCP/IP port to listen on. """
 
-    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroups')
+    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds')
     """ A list of security groups to apply to this instance """
 
     availability_zone = argument.String(field='PreferredAvailabilityZone')
@@ -70,6 +67,9 @@ class BaseCacheCluster(object):
 class CacheCluster(BaseCacheCluster, Resource):
 
     resource_name = "cache_cluster"
+
+    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
+    """ The name of the cache cluster. Stored as a lowercase string """
 
     # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", field='ReplicationGroupId')
 

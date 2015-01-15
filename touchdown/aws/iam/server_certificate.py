@@ -42,12 +42,14 @@ class Describe(SimpleDescribe, Plan):
     get_notfound_exception = "NoSuchEntity"
     key = 'ServerCertificateName'
 
-    @property
-    def resource_id(self):
-        if self.object:
-            return self.object['ServerCertificateMetadata'][self.key]
-        return None
-
+    def describe_object(self):
+        object = super(Describe, self).describe_object()
+        if not object:
+            return object
+        result = dict(object['ServerCertificateMetadata'])
+        result['CertificateBody'] = object['CertificateBody']
+        result['CertificateChain'] = object['CertificateChain']
+        return result
 
 class Apply(SimpleApply, Describe):
 

@@ -33,8 +33,9 @@ class Record(Resource):
     values = argument.List(
         field="ResourceRecords",
         serializer=serializers.List(serializers.Dict(
-            Value=serializers.Identity()),
-        ))
+            Value=serializers.Identity(),
+        ), skip_empty=True)
+    )
     ttl = argument.Integer(min=0, field="TTL")
 
     set_identifier = argument.Integer(min=1, max=128, field="SetIdentifier")
@@ -89,6 +90,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'route53'
     describe_action = "list_hosted_zones"
     describe_list_key = "HostedZone"
+    singular = "HostedZone"
     key = 'Id'
 
     def describe_object(self):
@@ -111,7 +113,7 @@ class Apply(SimpleApply, Describe):
         records = {}
         for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
             record = dict(record)
-            record['ResourceRecords'] = tuple(record['ResourceRecords'])
+            # record['ResourceRecords'] = tuple(record['ResourceRecords'])
             records[(record['Name'], record['Type'], record.get('SetIdentifier', ''))] = record
         return records
 
@@ -139,7 +141,6 @@ class Apply(SimpleApply, Describe):
             yield self.generic_action(
                 "Update resource record sets",
                 self.client.change_resource_record_sets,
-                None,
                 serializers.Dict(
                     HostedZoneId=serializers.Identifier(),
                     ChangeBatch=serializers.Dict(

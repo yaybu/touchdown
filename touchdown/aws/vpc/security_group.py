@@ -125,6 +125,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_security_group"
+    create_response = "id-only"
 
     def update_object(self):
         for local_rule in self.resource.ingress:

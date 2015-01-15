@@ -51,7 +51,7 @@ class NetworkACL(Resource):
 
     resource_name = "network_acl"
 
-    name = argument.String(field="GroupName")
+    name = argument.String()
     inbound = argument.ResourceList(Rule)
     outbound = argument.ResourceList(Rule)
 

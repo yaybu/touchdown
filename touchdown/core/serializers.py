@@ -122,7 +122,10 @@ class Argument(Serializer):
         self.attribute = attribute
 
     def render(self, runner, object):
-        result = getattr(object, self.attribute)
+        try:
+            result = getattr(object, self.attribute)
+        except AttributeError:
+            raise FieldNotPresent(self.attribute)
         if not object.__args__[self.attribute].present(object):
             if result is None:
                 raise FieldNotPresent(self.attribute)

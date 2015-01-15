@@ -23,16 +23,25 @@ from touchdown.core.plan import Present
 
 logger = logging.getLogger(__name__)
 
+class Waiter(Action):
+
+    description = ["Wait for resource to exist"]
+
+    def run(self):
+        filters = self.plan.get_describe_filters()
+        logger.debug("Waiting with waiter {} and filters {}".format(self.plan.waiter, filters))
+        waiter = self.plan.client.get_waiter(self.plan.waiter)
+        waiter.wait(**filters)
+
 
 class GenericAction(Action):
 
     is_creation_action = False
 
-    def __init__(self, plan, description, func, waiter=None, serializer=None, **kwargs):
+    def __init__(self, plan, description, func, serializer=None, **kwargs):
         super(GenericAction, self).__init__(plan)
         self.func = func
         self._description = description
-        self.waiter = waiter
         if serializer:
             self.serializer = serializer
         else:
@@ -48,18 +57,24 @@ class GenericAction(Action):
         params = self.serializer.render(self.runner, self.resource)
         logger.debug("Invoking with params {}".format(params))
 
-        self.func(**params)
-
-        if self.waiter:
-            filters = self.plan.get_describe_filters()
-            logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
-            waiter = self.plan.client.get_waiter(self.waiter)
-            waiter.wait(**filters)
+        object = self.func(**params)
 
         if self.is_creation_action:
-            self.plan.object = self.plan.describe_object()
-            if not self.plan.object:
-                raise errors.Error("Object creation failed")
+            if self.plan.create_response == "full-description":
+                self.plan.object = object[self.plan.singular]
+            elif self.plan.create_response == "id-only":
+                self.plan.object = {
+                    self.plan.key: object[self.plan.key]
+                }
+
+class PostCreation(Action):
+
+    description = ["Sanity check created resource"]
+
+    def run(self):
+        self.plan.object = self.plan.describe_object()
+        if not self.plan.object:
+            raise errors.Error("Object creation failed")
 
 
 class SetTags(Action):
@@ -86,14 +101,26 @@ class SimpleDescribe(object):
     name = "describe"
 
     get_action = None
+    get_key = None
     describe_notfound_exception = None
     get_notfound_exception = None
+
+    # If singular is not then we will automatically trim the 's' off
+    singular = None
 
     signature = (
         Present('name'),
     )
 
     _client = None
+
+    def __init__(self, runner, resource):
+        super(SimpleDescribe, self).__init__(runner, resource)
+        if not self.singular:
+            if self.get_key:
+                self.singular = self.get_key
+            else:
+                self.singular = self.describe_list_key[:-1]
 
     @property
     def session(self):
@@ -155,12 +182,11 @@ class SimpleDescribe(object):
 
         return {}
 
-    def generic_action(self, description, callable, waiter=None, serializer=None, **kwargs):
+    def generic_action(self, description, callable, serializer=None, **kwargs):
         return GenericAction(
             self,
             description,
             callable,
-            waiter,
             serializer,
             **kwargs
         )
@@ -186,6 +212,7 @@ class SimpleApply(SimpleDescribe):
     waiter = None
     update_action = None
     create_serializer = None
+    create_response = "full-description"
 
     def get_create_serializer(self):
         return serializers.Resource()
@@ -194,11 +221,27 @@ class SimpleApply(SimpleDescribe):
         g = self.generic_action(
             "Creating {}".format(self.resource),
             getattr(self.client, self.create_action),
-            self.waiter,
             self.get_create_serializer(),
         )
         g.is_creation_action = True
         return g
+
+    def update_tags(self):
+        if hasattr(self.resource, "tags"):
+            local_tags = dict(self.resource.tags)
+            local_tags['Name'] = self.resource.name
+            remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
+
+            tags = {}
+            for k, v in local_tags.items():
+                if k not in remote_tags or remote_tags[k] != v:
+                    tags[k] = v
+
+            if tags:
+                yield SetTags(
+                    self,
+                    tags=tags,
+                )
 
     def update_object(self):
         if self.update_action and self.object:
@@ -222,29 +265,26 @@ class SimpleApply(SimpleDescribe):
                     serializer=local
                 )
 
-        if hasattr(self.resource, "tags"):
-            local_tags = dict(self.resource.tags)
-            local_tags['Name'] = self.resource.name
-            remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
-
-            tags = {}
-            for k, v in local_tags.items():
-                if k not in remote_tags or remote_tags[k] != v:
-                    tags[k] = v
-
-            if tags:
-                yield SetTags(
-                    self,
-                    tags=tags,
-                )
-
     def get_actions(self):
         self.object = self.describe_object()
+
+        created = False
 
         if not self.object:
             logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resource))
             self.object = {}
             yield self.create_object()
+            created = True
+
+        for change in self.update_tags():
+            yield change
+
+        if created:
+            if self.waiter:
+                yield Waiter(self)
+
+            if self.create_response != "full-description" and not self.waiter:
+                yield PostCreation(self)
 
         logger.debug("Current state for {} is {}".format(self.resource, self.object))
 
@@ -266,7 +306,6 @@ class SimpleDestroy(SimpleDescribe):
         yield self.generic_action(
             "Destroy {}".format(self.resource),
             getattr(self.client, self.destroy_action),
-            self.waiter,
             self.get_destroy_serializer(),
         )
 

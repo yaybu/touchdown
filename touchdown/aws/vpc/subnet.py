@@ -103,14 +103,14 @@ class Apply(SimpleApply, Describe):
                     "Associate route table",
                     self.client.associate_route_table,
                     SubnetId=serializers.Identifier(),
-                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
+                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifier()),
                 )
             elif self.object['RouteTableId'] != self.runner.get_plan(self.resource.route_table).resource_id:
                 yield self.generic_action(
                     "Replace route table association",
                     self.client.associate_route_table,
                     AssociationId=self.object["RouteTableAssociationId"],
-                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifer()),
+                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifier()),
                 )
         elif self.object.get("RouteTableAssociationId", None):
             yield self.generic_action(
@@ -119,14 +119,14 @@ class Apply(SimpleApply, Describe):
                 AssociationId=self.object["RouteTableAssociationId"],
             )
 
-        if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
-            if self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
-                yield self.generic_action(
-                    "Replace Network ACL association",
-                    self.client.replace_network_acl_association,
-                    AssociationId=self.object['NetworkAclAssociationId'],
-                    NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifer()),
-                )
+        #if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
+        #    if self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
+        #        yield self.generic_action(
+        #            "Replace Network ACL association",
+        #            self.client.replace_network_acl_association,
+        #            AssociationId=self.object['NetworkAclAssociationId'],
+        #            NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
+        #        )
 
 
 class Destroy(SimpleDestroy, Describe):

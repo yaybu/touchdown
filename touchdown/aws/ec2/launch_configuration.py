@@ -107,6 +107,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_launch_configuration"
+    create_response = "not-that-useful"
 
 
 class Destroy(SimpleDestroy, Describe):

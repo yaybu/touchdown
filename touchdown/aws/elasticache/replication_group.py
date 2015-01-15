@@ -24,7 +24,9 @@ class ReplicationGroup(BaseCacheCluster, Resource):
 
     resource_name = "replication_group"
 
-    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
+    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="ReplicationGroupId")
+    description = argument.String(default=lambda resource: resource.name, field="ReplicationGroupDescription")
+
     primary_cluster = argument.Resource("touchdown.aws.elasticache.cache.CacheCluster", field="PrimaryClusterId")
     automatic_failover = argument.Boolean(field="AutomaticFailoverEnabled")
     num_cache_clusters = argument.Integer(field="NumCacheClusters")

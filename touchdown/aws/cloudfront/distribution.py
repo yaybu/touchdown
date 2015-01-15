@@ -49,7 +49,7 @@ class S3Origin(Resource):
     }
 
     name = argument.String(field='Id')
-    bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identity()))
+    bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()))
     origin_access_identity = argument.String(default='')
 
 
@@ -155,7 +155,7 @@ class ViewerCertificate(Resource):
     certificate = argument.Resource(
         ServerCertificate,
         field="IAMCertificateId",
-        serializer=serializers.Property("IAMCertificateId"),
+        serializer=serializers.Property("ServerCertificateId"),
     )
 
     default_certificate = argument.Boolean(field="CloudFrontDefaultCertificate")
@@ -275,6 +275,8 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Distribution
     service_name = 'cloudfront'
+    plural = 'DistributionList'
+    singular = 'Distribution'
     key = 'Id'
 
     def describe_object(self):

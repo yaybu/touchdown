@@ -50,7 +50,7 @@ class Database(Resource):
     master_username = argument.String(field="MasterUsername")
     """ The username of the main client user """
 
-    master_password = argument.String(field="MasterPassword")
+    master_password = argument.String(field="MasterUserPassword")
     """ The password of the main client user """
 
     security_groups = argument.ResourceList(SecurityGroup, field="VpcSecurityGroupIds")
@@ -105,7 +105,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_db_instance"
-    update_action = "modify_db_instance"
+    #update_action = "modify_db_instance"
 
     signature = (
         Present("name"),

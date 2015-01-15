@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from .vpc import VPC
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -48,6 +48,26 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_internet_gateway"
+
+    def get_create_serializer(self):
+        # As the create call takes *0* parameters, the serializers consider it
+        # a "FieldNotPresent" and break out.
+        return serializers.Const({})
+
+    def update_object(self):
+        for change in super(Apply, self).update_object():
+            yield change
+
+        for attachment in self.object.get("Attachments", []):
+            if attachment['VpcId'] == self.runner.get_plan(self.resource.vpc).resource_id:
+                return
+
+        yield self.generic_action(
+            "Attach to vpc {}".format(self.resource.vpc),
+            self.client.attach_internet_gateway,
+            InternetGatewayId=serializers.Identifier(),
+            VpcId=serializers.Context(serializers.Argument("vpc"), serializers.Identifier()),
+        )
 
 
 class Destroy(SimpleDestroy, Describe):

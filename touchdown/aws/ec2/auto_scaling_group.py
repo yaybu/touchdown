@@ -51,12 +51,12 @@ class AutoScalingGroup(Resource):
     default_cooldown = argument.Integer(default=300, field="DefaultCooldown")
     """ The amount of time (in seconds) between scaling activities. """
 
-    availability_zones = argument.List(field="AvailabilityZones")
+    availability_zones = argument.List(field="AvailabilityZones", serializer=serializers.List(skip_empty=True))
 
     subnets = argument.ResourceList(
         Subnet,
         field="VPCZoneIdentifier",
-        serializer=serializers.CommaSeperatedList(serializers.List()),
+        serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier())),
     )
     """ A list of :py:class:`touchdown.aws.vpc.Subnet` resources """
 
@@ -74,7 +74,10 @@ class AutoScalingGroup(Resource):
     default if you are using ELB with the ASG it will use the same health
     checks as ELB. """
 
-    health_check_grace_period = argument.String(field="HealthCheckGracePeriod")
+    health_check_grace_period = argument.Integer(
+        default=lambda instance: 60 if instance.load_balancers else None,
+        field="HealthCheckGracePeriod",
+    )
 
     placement_group = argument.String(max=255, field="PlacementGroup")
 
@@ -212,6 +215,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_auto_scaling_group"
+    create_response = "not-that-useful"
     update_action = "update_auto_scaling_group"
 
     def update_object(self):
