@@ -28,67 +28,33 @@ class Database(Resource):
     resource_name = "database"
 
     name = argument.String(field="DBInstanceIdentifier")
-
     db_name = argument.String(field="DBName")
-    """ The name of a database to create in the database instance """
-
     allocated_storage = argument.Integer(min=5, max=3072, field="AllocatedStorage")
-    """ The amount of storage to be allocated (in GB). """
-
     iops = argument.Integer(field="Iops")
-
     instance_class = argument.String(field="DBInstanceClass")
-    """ The kind of hardware to use, for example 'db.t1.micro' """
-
     engine = argument.String(default='postgres', field="Engine", aws_update=False)
-    """ The type of database to use, for example 'postgres' """
-
     engine_version = argument.String(field="EngineVersion")
-
     license_model = argument.String()
-
     master_username = argument.String(field="MasterUsername")
-    """ The username of the main client user """
-
     master_password = argument.String(field="MasterUserPassword")
-    """ The password of the main client user """
-
     security_groups = argument.ResourceList(SecurityGroup, field="VpcSecurityGroupIds")
-    """ A list of security groups to apply to this instance """
-
     publically_accessible = argument.Boolean(field="PubliclyAccessible", aws_update=False)
-
     availability_zone = argument.String(field="AvailabilityZone")
-
     subnet_group = argument.Resource(SubnetGroup, field="DBSubnetGroupName", aws_update=False)
-
     preferred_maintenance_window = argument.String(field="PreferredMaintenanceWindow")
-
     multi_az = argument.Boolean(field="MultiAZ")
-
     storage_type = argument.String(field="StorageType")
-
     allow_major_version_upgrade = argument.Boolean(field="AllowMajorVersionUpgrade")
-
     auto_minor_version_upgrade = argument.Boolean(field="AutoMinorVersionUpgrade")
-
     character_set_name = argument.String(field="CharacterSetName")
-
     backup_retention_period = argument.Integer(field="BackupRetentionPeriod")
-
     preferred_backup_window = argument.String(field="PreferredBackupWindow")
-
     license_model = argument.String(field="LicenseModel")
-
     port = argument.Integer(min=1, max=32768, field="Port")
-
     # paramter_group = argument.Resource(ParameterGroup, field="DBParameterGroupName")
     # option_group = argument.Resource(OptionGroup, field="OptionGroupName")
-
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
-
     # tags = argument.Dict()
-
     account = argument.Resource(Account)
 
 
