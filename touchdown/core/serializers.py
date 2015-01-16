@@ -236,9 +236,9 @@ class Dict(Serializer):
                 v = Const(v)
             self.kwargs[k] = v
 
-    def render(self, runner, object):
+    def _render(self, kwargs, runner, object):
         result = hd()
-        for key, value in self.kwargs.items():
+        for key, value in kwargs.items():
             try:
                 result[key] = value.render(runner, object)
             except FieldNotPresent:
@@ -246,6 +246,9 @@ class Dict(Serializer):
         if not len(result):
             raise FieldNotPresent()
         return result
+
+    def render(self, runner, object):
+        return self._render(self.kwargs, runner, object)
 
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))
@@ -256,30 +259,34 @@ class Resource(Dict):
     """ Automatically generate a Dict definition by inspect the 'field'
     paramters of a resource """
 
-    def __init__(self, mode="create"):
+    def __init__(self, mode="create", **kwargs):
         self.mode = mode
-        self.kwargs = {}
+        super(Resource, self).__init__(**kwargs)
 
     def render(self, runner, object):
+        kwargs = dict(self.kwargs)
+
         for name, serializer in getattr(object, "extra_serializers", {}).items():
-            self.kwargs[name] = serializer
+            kwargs[name] = serializer
 
         for argument_name, arg in object.arguments:
             if not (arg.present(object) or arg.default is not None):
                 continue
             if not hasattr(arg, "field"):
                 continue
+            if arg.field in self.kwargs:
+                continue
             if self.mode == "create" and not getattr(arg, "aws_create", True):
                 continue
             if self.mode == "update" and not getattr(arg, "aws_update", True):
                 continue
 
-            self.kwargs[arg.field] = Context(
+            kwargs[arg.field] = Context(
                 Argument(argument_name),
                 arg.serializer
             )
 
-        return super(Resource, self).render(runner, object)
+        return self._render(kwargs, runner, object)
 
     def dependencies(self, object):
         raise NotImplementedError(self.dependencies, object)

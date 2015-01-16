@@ -137,35 +137,38 @@ class Apply(SimpleApply, Describe):
         remote_routes = frozenset(serializers.hd(d) for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
         local_routes = frozenset(serializers.Resource(d).render(self.runner, d) for d in self.resource.routes)
 
-        for remote in remote_routes:
-            for local in local_routes:
-                if remote["GatewayId"] != local["GatewayId"]:
-                    continue
-                if remote["DestinationCidrBlock"] != local["DestinationCidrBlock"]:
-                    continue
-                break
-            else:
-                yield self.generic_action(
-                    "Remove route for {}".format(remote['DestinationCidrBlock']),
-                    self.client.delete_route,
-                    RouteTableId=serializers.Identifier(),
-                    **local
-                )
-
-        for local in local_routes:
+        if remote_routes:
             for remote in remote_routes:
-                if remote["GatewayId"] != local["GatewayId"]:
-                    continue
-                if remote["DestinationCidrBlock"] != local["DestinationCidrBlock"]:
-                    continue
-                break
-            else:
-                yield self.generic_action(
-                    "Adding route for {}".format(local['DestinationCidrBlock']),
-                    self.client.create_route,
-                    RouteTableId=serializers.Identifier(),
-                    **remote
-                )
+                for local in local_routes:
+                    if remote["GatewayId"] != local["GatewayId"]:
+                        continue
+                    if remote["DestinationCidrBlock"] != local["DestinationCidrBlock"]:
+                        continue
+                    break
+                else:
+                    yield self.generic_action(
+                        "Remove route for {}".format(remote['DestinationCidrBlock']),
+                        self.client.delete_route,
+                        RouteTableId=serializers.Identifier(),
+                        **remote
+                    )
+
+        if local_routes:
+            for local in local_routes:
+                for remote in remote_routes:
+                    if remote["GatewayId"] != local["GatewayId"]:
+                        continue
+                    if remote["DestinationCidrBlock"] != local["DestinationCidrBlock"]:
+                        continue
+                    break
+                else:
+                    yield self.generic_action(
+                        "Adding route for {}".format(local['DestinationCidrBlock']),
+                        self.client.create_route,
+                        RouteTableId=serializers.Identifier(),
+                        #FIXME: Need to re-serialize... 
+                        **local
+                    )
 
     def update_object(self):
         for action in super(Apply, self).update_object():

@@ -55,6 +55,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "upload_server_certificate"
+    create_response = "not-that-useful"
 
 
 class Destroy(SimpleDestroy, Describe):

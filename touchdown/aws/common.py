@@ -26,13 +26,16 @@ logger = logging.getLogger(__name__)
 
 class Waiter(Action):
 
-    description = ["Wait for resource to exist"]
-
     def run(self):
         filters = self.plan.get_describe_filters()
-        logger.debug("Waiting with waiter {} and filters {}".format(self.plan.waiter, filters))
-        waiter = self.plan.client.get_waiter(self.plan.waiter)
+        logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
+        waiter = self.plan.client.get_waiter(self.waiter)
         waiter.wait(**filters)
+
+    def __init__(self, plan, description, waiter):
+        super(Waiter, self).__init__(plan)
+        self.description = description
+        self.waiter = waiter
 
 
 class GenericAction(Action):
@@ -193,6 +196,9 @@ class SimpleDescribe(object):
             **kwargs
         )
 
+    def get_waiter(self, description, waiter):
+        return Waiter(self, description, waiter)
+
     def get_actions(self):
         self.object = self.describe_object()
 
@@ -283,7 +289,10 @@ class SimpleApply(SimpleDescribe):
 
         if created:
             if self.waiter:
-                yield Waiter(self)
+                yield self.get_waiter(
+                    ["Waiting for resource to exist"],
+                    self.waiter,
+                )
 
             if self.create_response != "full-description" and not self.waiter:
                 yield PostCreation(self)
@@ -310,6 +319,12 @@ class SimpleDestroy(SimpleDescribe):
             getattr(self.client, self.destroy_action),
             self.get_destroy_serializer(),
         )
+
+        if self.waiter:
+            yield self.get_waiter(
+                ["Waiting for resource to go away"],
+                self.waiter,
+            )
 
     def get_actions(self):
         self.object = self.describe_object()

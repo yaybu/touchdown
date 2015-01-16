@@ -25,14 +25,12 @@ from ..iam import ServerCertificate
 from ..s3 import Bucket
 
 
-class CloudFrontList(serializers.Formatter):
+class CloudFrontList(serializers.Dict):
 
-    def render(self, runner, object):
-        result = self.inner.render(runner, object)
-        return {
-            "Quantity": len(result),
-            "Items": result,
-        }
+    def __init__(self, inner=None, **kwargs):
+        self.kwargs = dict(kwargs)
+        self.kwargs["Items"] = inner or serializers.List()
+        self.kwargs['Quantity'] = serializers.Expression(lambda runner, object: len(self.kwargs["Items"].render(runner, object)))
 
 
 def CloudFrontResourceList():
@@ -100,7 +98,11 @@ class DefaultCacheBehavior(Resource):
         "TrustedSigners": serializers.Const({
             "Enabled": False,
             "Quantity": 0,
-        })
+        }),
+        "AllowedMethods": CloudFrontList(
+            inner=serializers.Context(serializers.Argument("allowed_methods"), serializers.List()),
+            CachedMethods=serializers.Context(serializers.Argument("cached_methods"), CloudFrontList()),
+        ),
     }
 
     target_origin = argument.String(field='TargetOriginId')
@@ -112,11 +114,8 @@ class DefaultCacheBehavior(Resource):
     )
     viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', field="ViewerProtocolPolicy")
     min_ttl = argument.Integer(default=0, field="MinTTL")
-    allowed_methods = argument.List(
-        default=lambda x: ["GET", "HEAD"],
-        field='AllowedMethods',
-        serializer=CloudFrontList(),
-    )
+    allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"])
+    cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
     smooth_streaming = argument.Boolean(default=False, field='SmoothStreaming')
 
 
@@ -311,3 +310,24 @@ class Destroy(SimpleDestroy, Describe):
             Id=self.resource_id,
             IfMatch=self.object['ETag'],
         )
+
+    def destroy_object(self):
+        if not self.object:
+            return
+
+        if self.object['DistributionConfig'].get('Enabled', False):
+            yield self.generic_action(
+                "Disable distribution",
+                self.client.update_distribution,
+                Id=self.object['Id'],
+                IfMatch=self.object['ETag'],
+                DistributionConfig=serializers.Resource(Enabled=False),
+            )
+
+            yield self.get_waiter(
+                ["Waiting for distribution to enter disabled state"],
+                "distribution_deployed",
+            )
+
+        for change in super(Destroy, self).destroy_object():
+            yield change

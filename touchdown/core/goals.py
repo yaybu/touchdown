@@ -67,7 +67,7 @@ class Goal(six.with_metaclass(GoalType)):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
 
     def apply(self, ui):
-        plan = self.get_execution_order().all()
+        plan = list(self.get_execution_order().all())
         with ui.progress(plan, label="Apply changes") as plan:
             for resource in plan:
                 for change in self.get_changes(resource):

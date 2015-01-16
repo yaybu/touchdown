@@ -61,7 +61,9 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_bucket"
+    create_response = "not-that-useful"
     waiter = "bucket_exists"
+
 
 class Destroy(SimpleDestroy, Describe):
 
