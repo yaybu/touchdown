@@ -72,6 +72,7 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_db_instance"
     #update_action = "modify_db_instance"
+    waiter = "db_instance_available"
 
     signature = (
         Present("name"),
@@ -86,6 +87,7 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_db_instance"
+    waiter = "db_instance_deleted"
 
     def get_destroy_serializer(self):
         return serializers.Dict(

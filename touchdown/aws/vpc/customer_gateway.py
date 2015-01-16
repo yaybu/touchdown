@@ -51,6 +51,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_customer_gateway"
+    waiter = "customer_gateway_available"
 
 
 class Destroy(SimpleDestroy, Describe):

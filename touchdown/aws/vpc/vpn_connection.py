@@ -63,6 +63,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_vpn_connection"
+    waiter = "vpn_connection_available"
 
     def update_object(self):
         remote_routes = set(r['DestinationCidrBlock'] for r in self.object.get('Routes', []) if r['State'] != 'deleted')
@@ -88,3 +89,4 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_vpn_connection"
+    waiter = "vpn_connection_deleted"

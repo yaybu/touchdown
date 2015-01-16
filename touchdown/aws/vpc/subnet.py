@@ -89,6 +89,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_subnet"
+    waiter = "subnet_available"
 
     signature = (
         Present('name'),
