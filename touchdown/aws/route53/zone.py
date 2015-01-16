@@ -114,7 +114,8 @@ class Apply(SimpleApply, Describe):
         records = {}
         for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
             record = dict(record)
-            # record['ResourceRecords'] = tuple(record['ResourceRecords'])
+            if 'ResourceRecords' in record:
+                record['ResourceRecords'] = tuple(record['ResourceRecords'])
             records[(record['Name'], record['Type'], record.get('SetIdentifier', ''))] = record
         return records
 

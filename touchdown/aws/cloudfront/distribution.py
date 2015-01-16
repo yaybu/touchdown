@@ -293,6 +293,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_distribution"
+    create_response = "not-that-useful"
 
     def get_create_serializer(self):
         return serializers.Dict(
