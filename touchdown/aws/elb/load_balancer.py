@@ -194,3 +194,4 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_load_balancer"
+    waiter = "load_balancer_deleted"

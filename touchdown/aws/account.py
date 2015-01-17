@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
+import os
+
+from botocore import session, loaders
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
@@ -47,9 +49,13 @@ class Describe(Plan):
     @property
     def session(self):
         if not self._session:
-            self._session = session.get_session()
+            data_path = os.path.join(os.path.dirname(__file__), "data")
+            self._session = session.get_session({
+                "data_path": ('data_path', 'BOTO_DATA_PATH', data_path),
+            })
             self._session.access_key_id = self.resource.access_key_id or None
             self._session.secret_access_key = self.resource.secret_access_key or None
             self._session.session_token = None
             self._session.region = self.resource.region
+
         return self._session

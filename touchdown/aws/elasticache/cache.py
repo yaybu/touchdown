@@ -64,8 +64,10 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_cache_cluster"
     # update_action = "modify_cache_cluster"
+    waiter = "cache_cluster_available"
 
 
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_cache_cluster"
+    waiter = "cache_cluster_deleted"

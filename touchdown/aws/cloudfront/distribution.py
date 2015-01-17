@@ -177,7 +177,9 @@ class Distribution(Resource):
     resource_name = "distribution"
 
     extra_serializers = {
-        "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
+        "CallerReference": serializers.Expression(
+            lambda runner, object: runner.get_plan(object).object.get('DistributionConfig', {}).get('CallerReference', str(uuid.uuid4()))
+        ),
         "Aliases": CloudFrontList(serializers.Chain(
             serializers.Context(serializers.Argument("name"), serializers.ListOfOne()),
             serializers.Context(serializers.Argument("aliases"), serializers.List()),
@@ -278,13 +280,16 @@ class Describe(SimpleDescribe, Plan):
     singular = 'Distribution'
     key = 'Id'
 
+    def get_describe_filters(self):
+        return {"Id": self.object['Id']}
+
     def describe_object(self):
         paginator = self.client.get_paginator("list_distributions")
         for page in paginator.paginate():
             for distribution in page['DistributionList'].get('Items', []):
                 if self.resource.name in distribution['Aliases'].get('Items', []):
                     result = self.client.get_distribution(Id=distribution['Id'])
-                    distribution = {"ETag": result["ETag"]}
+                    distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
                     distribution.update(result['Distribution'])
                     return distribution
 
@@ -321,7 +326,9 @@ class Destroy(SimpleDestroy, Describe):
                 self.client.update_distribution,
                 Id=self.object['Id'],
                 IfMatch=self.object['ETag'],
-                DistributionConfig=serializers.Resource(Enabled=False),
+                DistributionConfig=serializers.Resource(
+                    Enabled=False,
+                ),
             )
 
             yield self.get_waiter(

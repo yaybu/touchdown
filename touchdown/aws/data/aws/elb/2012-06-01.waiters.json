@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "waiters": {
+    "LoadBalancerDeleted": {
+      "delay": 5,
+      "operation": "DescribeLoadBalancers",
+      "maxAttempts": 5,
+      "acceptors": [
+        {
+          "expected": "LoadBalancerNotFound",
+          "matcher": "error",
+          "state": "success"
+        }
+      ]
+    }
+  }
+}
