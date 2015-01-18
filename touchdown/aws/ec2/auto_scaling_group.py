@@ -244,6 +244,7 @@ class TerminateASGInstances(Action):
             yield instance['InstanceId']
 
     def run(self):
+        # Destroy all the instances in the ASG
         self.plan.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
             MinSize=0,
@@ -251,11 +252,20 @@ class TerminateASGInstances(Action):
             DesiredCapacity=0,
         )
 
+        # Wait until all the ASG instances have gone away
         while True:
             asg = self.plan.describe_object()
             if len(asg.get("Instances", [])) == 0:
                 break
-            time.sleep(30)
+            time.sleep(10)
+
+        # Wait until any ASG activies have stopped
+        while True:
+            activities = self.plan.client.describe_scaling_activities(AutoScalingGroupName=self.resource.name)['Activities']
+            if len((a for a in activities if a['StatusCode'] != 'Successful')) == 0:
+                break
+            print activities
+            time.sleep(10)
 
 
 class Destroy(SimpleDestroy, Describe):
