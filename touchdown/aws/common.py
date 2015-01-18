@@ -66,10 +66,12 @@ class GenericAction(Action):
         if self.is_creation_action:
             if self.plan.create_response == "full-description":
                 self.plan.object = object[self.plan.singular]
-            elif self.plan.create_response == "id-only":
-                self.plan.object = {
-                    self.plan.key: object[self.plan.key]
-                }
+            else:
+                if self.plan.create_response == "id-only":
+                    self.plan.object = {
+                        self.plan.key: object[self.plan.key]
+                    }
+                self.plan.object = self.plan.describe_object()
 
 
 class PostCreation(Action):

@@ -40,8 +40,8 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
             name="example.com",
         )
         result = serializers.Resource().render(mock.Mock(), distribution)
+        del result['CallerReference']
         self.assertEqual(result, {
-            'CallerReference': 'e64daba4-dddf-478e-a39b-b15a74325330',
             'Origins': {'Items': (), 'Quantity': 0},
             'Restrictions': {'GeoRestriction': {'RestrictionType': 'none', 'Quantity': 0}},
             'DefaultRootObject': '/',
@@ -61,8 +61,8 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
             aliases=['www.example.com'],
         )
         result = serializers.Resource().render(mock.Mock(), distribution)
+        del result['CallerReference']
         self.assertEqual(result, {
-            'CallerReference': 'e64daba4-dddf-478e-a39b-b15a74325330',
             'Origins': {'Items': (), 'Quantity': 0},
             'Restrictions': {'GeoRestriction': {'RestrictionType': 'none', 'Quantity': 0}},
             'DefaultRootObject': '/',
@@ -103,6 +103,6 @@ class TestCloudFront(aws.TestBasicUsage):
         self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-10-21/distribution", self.fixture_404, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-10-21/distribution", self.fixture_found)
-        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-10-21/distribution/EDFDVBD6EXAMPLE", "aws_distribution_get", expires=1)
+        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-10-21/distribution/EDFDVBD6EXAMPLE", "aws_distribution_get")
         self.runner.apply()
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)

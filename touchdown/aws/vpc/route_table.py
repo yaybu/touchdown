@@ -166,7 +166,6 @@ class Apply(SimpleApply, Describe):
                         "Adding route for {}".format(local['DestinationCidrBlock']),
                         self.client.create_route,
                         RouteTableId=serializers.Identifier(),
-                        #FIXME: Need to re-serialize... 
                         **local
                     )
 

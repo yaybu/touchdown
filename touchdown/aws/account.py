@@ -14,7 +14,7 @@
 
 import os
 
-from botocore import session, loaders
+from botocore import session
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan

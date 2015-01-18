@@ -14,7 +14,9 @@ Contents:
    :maxdepth: 2
 
    config/index
-   contrib
+   cli
+   framework
+
 
 Contributing
 ============
