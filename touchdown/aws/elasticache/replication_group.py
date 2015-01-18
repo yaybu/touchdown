@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .cache import BaseCacheCluster
@@ -51,3 +51,9 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_replication_group"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            ReplicationGroupId=serializers.Identity(),
+            RetainPrimaryCluster=True if self.resource.primary_cluster else False,
+        )
