@@ -34,6 +34,19 @@ class Route(Resource):
     # network_interface = argument.Resource(NetworkInterface, field="NetworkInterfaceId")
     # vpc_peering_connection = argument.Resource(VpcPeeringConnection, field="VpcPeeringConnectionId")
 
+    def matches(self, runner, remote):
+        for name, arg in self.arguments:
+            if not arg.present(self):
+                continue
+            if not arg.field:
+                continue
+            if arg.field not in remote:
+                return False
+            if arg.serializer.render(runner, getattr(self, name)) != remote[arg.field]:
+                return False
+
+        return True
+
 
 class RouteTable(Resource):
 
@@ -134,15 +147,12 @@ class Apply(SimpleApply, Describe):
         Old routes are removed *before* new routes are added. This may cause
         connection glitches when applied, but it avoids route collisions.
         """
-        remote_routes = frozenset(serializers.hd(d) for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
-        local_routes = frozenset(serializers.Resource(d).render(self.runner, d) for d in self.resource.routes)
+        remote_routes = frozenset(d for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
 
         if remote_routes:
             for remote in remote_routes:
-                for local in local_routes:
-                    if remote["GatewayId"] != local["GatewayId"]:
-                        continue
-                    if remote["DestinationCidrBlock"] != local["DestinationCidrBlock"]:
+                for local in self.routes:
+                    if local.matches(self.runner, remote):
                         continue
                     break
                 else:
@@ -153,20 +163,19 @@ class Apply(SimpleApply, Describe):
                         **remote
                     )
 
-        if local_routes:
-            for local in local_routes:
+        if self.routes:
+            for local in self.routes:
                 for remote in remote_routes:
-                    if remote["GatewayId"] != local["GatewayId"]:
-                        continue
-                    if remote["DestinationCidrBlock"] != local["DestinationCidrBlock"]:
+                    if local.matches(self.runner, remote):
                         continue
                     break
                 else:
                     yield self.generic_action(
                         "Adding route for {}".format(local['DestinationCidrBlock']),
                         self.client.create_route,
-                        RouteTableId=serializers.Identifier(),
-                        **local
+                        serializers.Context(serializers.Const(local), serializers.Resource(
+                            RouteTableId=serializers.Identifier(serializers.Const(self.resource)),
+                        ))
                     )
 
     def update_object(self):
