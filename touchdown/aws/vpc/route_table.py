@@ -147,11 +147,11 @@ class Apply(SimpleApply, Describe):
         Old routes are removed *before* new routes are added. This may cause
         connection glitches when applied, but it avoids route collisions.
         """
-        remote_routes = frozenset(d for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
+        remote_routes = (d for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
 
         if remote_routes:
             for remote in remote_routes:
-                for local in self.routes:
+                for local in self.resource.routes:
                     if local.matches(self.runner, remote):
                         continue
                     break
@@ -160,18 +160,18 @@ class Apply(SimpleApply, Describe):
                         "Remove route for {}".format(remote['DestinationCidrBlock']),
                         self.client.delete_route,
                         RouteTableId=serializers.Identifier(),
-                        **remote
+                        DestinationCidrBlock=remote['DestinationCidrBlock'],
                     )
 
-        if self.routes:
-            for local in self.routes:
+        if self.resource.routes:
+            for local in self.resource.routes:
                 for remote in remote_routes:
                     if local.matches(self.runner, remote):
                         continue
                     break
                 else:
                     yield self.generic_action(
-                        "Adding route for {}".format(local['DestinationCidrBlock']),
+                        "Adding route for {}".format(local.destination_cidr),
                         self.client.create_route,
                         serializers.Context(serializers.Const(local), serializers.Resource(
                             RouteTableId=serializers.Identifier(serializers.Const(self.resource)),
