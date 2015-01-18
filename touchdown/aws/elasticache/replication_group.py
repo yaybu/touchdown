@@ -46,11 +46,13 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_replication_group"
     update_action = "modify_replication_group"
+    waiter = "replication_group_available"
 
 
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_replication_group"
+    waiter = "replication_group_deleted"
 
     def get_destroy_serializer(self):
         return serializers.Dict(

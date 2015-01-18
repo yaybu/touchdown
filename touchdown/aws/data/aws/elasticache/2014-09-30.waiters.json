@@ -68,6 +68,74 @@
           "argument": "CacheClusters[].CacheClusterStatus"
         }
       ]
+    },
+    "ReplicationGroupAvailable": {
+      "delay": 30,
+      "operation": "DescribeReplicationGroups",
+      "maxAttempts": 60,
+      "acceptors": [
+        {
+          "expected": "available",
+          "matcher": "pathAll",
+          "state": "success",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "deleted",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "deleting",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "incompatible-network",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "restore-failed",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        }
+      ]
+    },
+    "ReplicationGroupDeleted": {
+      "delay": 30,
+      "operation": "DescribeReplicationGroups",
+      "maxAttempts": 60,
+      "acceptors": [
+        {
+          "expected": "deleted",
+          "matcher": "pathAll",
+          "state": "success",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "creating",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "modifying",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        },
+        {
+          "expected": "rebooting",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "ReplicationGroups[].ReplicationGroupStatus"
+        }
+      ]
     }
   }
 }
