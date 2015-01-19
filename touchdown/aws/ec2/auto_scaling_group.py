@@ -262,9 +262,8 @@ class TerminateASGInstances(Action):
         # Wait until any ASG activies have stopped
         while True:
             activities = self.plan.client.describe_scaling_activities(AutoScalingGroupName=self.resource.name)['Activities']
-            if len((a for a in activities if a['StatusCode'] != 'Successful')) == 0:
+            if len(tuple(a for a in activities if a['StatusCode'] == 'InProgress')) == 0:
                 break
-            print(activities)
             time.sleep(10)
 
 

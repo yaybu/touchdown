@@ -72,6 +72,13 @@ class Describe(SimpleDescribe, Plan):
         if not vpc.resource_id:
             return None
 
+        if self.key in self.object:
+            return {
+                "Filters": [
+                    {'Name': 'vpc-id', 'Values': [self.object[self.key]]}
+                ]
+            }
+
         return {
             "Filters": [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},

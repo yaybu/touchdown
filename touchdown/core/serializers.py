@@ -65,7 +65,7 @@ class Chain(Serializer):
                 pass
         if not len(result) and self.skip_empty:
             raise FieldNotPresent()
-        return tuple(result)
+        return list(result)
 
     def dependencies(self, object):
         return frozenset(itertools.chain(*(c.dependencies(object) for c in self.children)))
@@ -215,7 +215,7 @@ class CommaSeperatedList(Formatter):
 
 class Json(Formatter):
     def render(self, runner, object):
-        return json.dumps(self.inner.render(runner, object))
+        return json.dumps(self.inner.render(runner, object), sort_keys=True)
 
 
 class Format(Formatter):
@@ -237,7 +237,7 @@ class Dict(Serializer):
             self.kwargs[k] = v
 
     def _render(self, kwargs, runner, object):
-        result = hd()
+        result = dict()
         for key, value in kwargs.items():
             try:
                 result[key] = value.render(runner, object)
@@ -304,7 +304,7 @@ class List(Serializer):
             result.append(self.child.render(runner, row))
         if not result and self.skip_empty:
             raise FieldNotPresent()
-        return tuple(result)
+        return list(result)
 
     def dependencies(self, object):
         return frozenset((self.child.dependencies(object), ))

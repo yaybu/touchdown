@@ -42,6 +42,13 @@ class Describe(SimpleDescribe, Plan):
     key = 'VpcId'
 
     def get_describe_filters(self):
+        if self.key in self.object:
+            return {
+                "Filters": [
+                    {'Name': 'vpc-id', 'Values': [self.object[self.key]]}
+                ]
+            }
+
         return {
             "Filters": [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},

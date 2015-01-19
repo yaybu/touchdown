@@ -44,6 +44,17 @@ class Describe(SimpleDescribe, Plan):
     key = 'SubnetId'
 
     def get_describe_filters(self):
+        vpc = self.runner.get_plan(self.resource.vpc)
+        if not vpc.resource_id:
+            return None
+
+        if self.key in self.object:
+            return {
+                "Filters": [
+                    {'Name': 'subnet-id', 'Values': [self.object[self.key]]}
+                ]
+            }
+
         return {
             "Filters": [
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},

@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from ..account import Account
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 
 from .keypair import KeyPair
@@ -29,7 +28,7 @@ class LaunchConfiguration(Resource):
 
     resource_name = "launch_configuration"
 
-    name = argument.String(max=255, field="LaunchConfigurationName")
+    name = argument.String(max=255, field="LaunchConfigurationName", update=False)
     """ A name for this AutoScalingGroup. This field is required. It must be unique within an AWS account """
 
     image = argument.String(max=255, field="ImageId")
@@ -77,17 +76,11 @@ class LaunchConfiguration(Resource):
 
     account = argument.Resource(Account)
 
-    def matches(self, runner, object):
-        if object['ImageId'] != self.image:
-            return False
-        if self.key_pair and self.key_pair.name != object['KeyName']:
-            return False
-        #if object['UserData'] != self.user_data:
-        #    return False
-        #if object['IamInstanceProfile'] != runner.get_plan(self.instance_profile).resource_id:
-        #    return False
-        # FIXME: Match more things
-        return True
+    def matches(self, runner, remote):
+        if "UserData" in remote:
+            import base64
+            remote["UserData"] = base64.b64decode(remote["UserData"])
+        return super(LaunchConfiguration, self).matches(runner, remote)
 
 
 class Describe(SimpleDescribe, Plan):

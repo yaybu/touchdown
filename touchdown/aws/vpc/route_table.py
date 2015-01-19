@@ -53,6 +53,17 @@ class Describe(SimpleDescribe, Plan):
     key = "RouteTableId"
 
     def get_describe_filters(self):
+        vpc = self.runner.get_plan(self.resource.vpc)
+        if not vpc.resource_id:
+            return None
+
+        if self.key in self.object:
+            return {
+                "Filters": [
+                    {'Name': 'route-table-id', 'Values': [self.object[self.key]]}
+                ]
+            }
+
         return {
             "Filters": [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},

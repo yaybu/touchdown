@@ -30,7 +30,9 @@ class Resource(resource.Resource):
         for name, arg in self.arguments:
             if not arg.present(self):
                 continue
-            if not arg.field:
+            if not getattr(arg, "field", ""):
+                continue
+            if not getattr(arg, "update", True):
                 continue
             if arg.field not in remote:
                 return False
@@ -47,6 +49,7 @@ class Waiter(Action):
         logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
         waiter = self.plan.client.get_waiter(self.waiter)
         waiter.wait(**filters)
+        self.plan.object = self.plan.describe_object()
 
     def __init__(self, plan, description, waiter):
         super(Waiter, self).__init__(plan)
@@ -139,6 +142,7 @@ class SimpleDescribe(object):
 
     def __init__(self, runner, resource):
         super(SimpleDescribe, self).__init__(runner, resource)
+        self.object = {}
         if not self.singular:
             if self.get_key:
                 self.singular = self.get_key
@@ -302,9 +306,6 @@ class SimpleApply(SimpleDescribe):
             yield self.create_object()
             created = True
 
-        for change in self.update_tags():
-            yield change
-
         if created:
             if self.waiter:
                 yield self.get_waiter(
@@ -315,7 +316,8 @@ class SimpleApply(SimpleDescribe):
             if self.create_response != "full-description" and not self.waiter:
                 yield PostCreation(self)
 
-        logger.debug("Current state for {} is {}".format(self.resource, self.object))
+        for change in self.update_tags():
+            yield change
 
         logger.debug("Looking for changes to apply")
         for action in self.update_object():
