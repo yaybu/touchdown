@@ -131,14 +131,14 @@ class Apply(SimpleApply, Describe):
                 AssociationId=self.object["RouteTableAssociationId"],
             )
 
-        #if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
-        #    if self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
-        #        yield self.generic_action(
-        #            "Replace Network ACL association",
-        #            self.client.replace_network_acl_association,
-        #            AssociationId=self.object['NetworkAclAssociationId'],
-        #            NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
-        #        )
+        if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
+            if self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
+                yield self.generic_action(
+                    "Replace Network ACL association",
+                    self.client.replace_network_acl_association,
+                    AssociationIdserializers.Property('NetworkAclAssociationId'),
+                    NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
+                )
 
 
 class WaitForNetworkInterfaces(Action):

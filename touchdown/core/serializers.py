@@ -50,6 +50,15 @@ class Identity(Serializer):
         return frozenset()
 
 
+class SubSerializer(Serializer):
+
+    def render(self, runner, object):
+        return object.render(runner, object)
+
+    def dependencies(self, object):
+        return frozenset()
+
+
 class Chain(Serializer):
 
     def __init__(self, *children, **kwargs):

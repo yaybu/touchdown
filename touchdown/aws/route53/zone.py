@@ -138,7 +138,7 @@ class Apply(SimpleApply, Describe):
             else:
                 changes.append(serializers.Dict(
                     Action="UPSERT",
-                    ResourceRecordSet=local,
+                    ResourceRecordSet=serializers.Context(serializers.Const(local), serializers.Resource()),
                 ))
                 description.append("Name => {}, Type={}, Action=UPSERT".format(local.name, local.type))
 
@@ -164,7 +164,7 @@ class Apply(SimpleApply, Describe):
                     HostedZoneId=serializers.Identifier(),
                     ChangeBatch=serializers.Dict(
                         #Comment="",
-                        Changes=serializers.Context(serializers.Const(changes), serializers.List()),
+                        Changes=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
                     )
                 ),
             )

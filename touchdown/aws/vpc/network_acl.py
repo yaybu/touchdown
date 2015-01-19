@@ -107,6 +107,8 @@ class Apply(SimpleApply, Describe):
     def _get_remote_rules(self):
         remote_rules = {}
         for rule in self.object.get("Entries", []):
+            if rule['RuleNumber'] > 32766:
+                continue
             remote_rules[(rule['Egress'], rule['RuleNumber'])] = rule
         return remote_rules
 
@@ -121,7 +123,7 @@ class Apply(SimpleApply, Describe):
             if key not in local_rules:
                 yield self.generic_action(
                     "Remove rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
-                    self.client.delete_network_acl,
+                    self.client.delete_network_acl_entry,
                     NetworkAclId=serializers.Identifier(),
                     RuleNumber=rule['RuleNumber'],
                     Egress=rule['Egress'],
@@ -131,7 +133,7 @@ class Apply(SimpleApply, Describe):
             if key not in self.remote_rules or self.remote_rules[key] != rule:
                 yield self.generic_action(
                     "Add rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
-                    self.client.delete_network_acl,
+                    self.client.create_network_acl_entry,
                     NetworkAclId=serializers.Identifier(),
                     RuleNumber=rule['RuleNumber'],
                     Egress=rule['Egress'],
