@@ -141,6 +141,61 @@ class Apply(SimpleApply, Describe):
         #        )
 
 
+class WaitForNetworkInterfaces(Action):
+
+    description = ["Wait for network interfaces to be released"]
+
+    def check_interface(self, iface):
+        # When an ELB is destroyed its attachment will enter the 'detaching' state
+        # It will eventually leave the subnet, allowing a delete to progress
+        if "Attachment" in iface:
+            if iface['Attachment']['InstanceOwnerId'] == 'amazon-elb' and iface["Attachment"]["Status"] == "detaching":
+                return True
+
+        # An 'available' interface that belongs to an ELB will be cleaned up
+        # within 2 minutes
+        if interface["Description"] == "ELB balancer":
+            if interface['Status'] == 'available':
+                return True
+
+        # Abort! There are interfaces present that aren't pending removal
+        return False
+
+    def run(self):
+        vpc = self.runner.get_target(self.resource.vpc)
+        if not vpc:
+            return
+
+        for i in range(120):
+            interfaces = self.client.describe_network_interfaces(
+                Filters=[
+                    {"Name": "vpc-id", "Values": [vpc.resource_id]},
+                    {"Name": "subnet-id", "Values": [self.resource_id]},
+                ]
+            )
+
+            if not interfaces:
+                return
+
+            for interface in interfaces:
+                if not self.check_interface(interface):
+                    raise errors.Error(
+                        "Subnet {} cannot be deleted until network interface {} ({}) is removed".format(
+                            self.resource_id,
+                            interface["NetworkInterfaceId"],
+                            interface.get("Description", "No description available")
+                        )
+                    )
+
+            time.sleep(1)
+
+
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_subnet"
+
+    def destroy_object(self):
+        yield WaitForNetworkInterfaces(self)
+
+        for change in super(Destroy, self).destroy_object():
+            yield change
