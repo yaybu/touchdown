@@ -44,6 +44,11 @@
       "maxAttempts": 60,
       "acceptors": [
         {
+          "expected": 404,
+          "matcher": "status",
+          "state": "success"
+        },
+        {
           "expected": "deleted",
           "matcher": "pathAll",
           "state": "success",
@@ -111,6 +116,11 @@
       "operation": "DescribeReplicationGroups",
       "maxAttempts": 60,
       "acceptors": [
+        {
+          "expected": 404,
+          "matcher": "status",
+          "state": "success"
+        },
         {
           "expected": "deleted",
           "matcher": "pathAll",

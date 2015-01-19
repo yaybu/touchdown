@@ -56,6 +56,6 @@ class Destroy(SimpleDestroy, Describe):
 
     def get_destroy_serializer(self):
         return serializers.Dict(
-            ReplicationGroupId=serializers.Identity(),
+            ReplicationGroupId=serializers.Identifier(),
             RetainPrimaryCluster=True if self.resource.primary_cluster else False,
         )
