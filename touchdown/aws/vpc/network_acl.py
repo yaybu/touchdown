@@ -110,15 +110,25 @@ class Apply(SimpleApply, Describe):
         local_rules = self._get_local_rules()
         remote_rules = self._get_remote_rules()
 
+        for key, rule in remote_rules.items():
+            if key not in local_rules:
+                yield self.generic_action(
+                    "Remove rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
+                    self.client.delete_network_acl,
+                    NetworkAclId=serializers.Identifier(),
+                    RuleNumber=rule['RuleNumber'],
+                    Egress=rule['Egress'],
+                )
+
         for key, rule in local_rules.items():
             if key not in self.remote_rules or self.remote_rules[key] != rule:
-                #FIXME: Rule stale or out of date
-                print("UPSERT", rule)
-
-        for rule in remote_rules.keys():
-            if rule not in local_rules:
-                #FIXME: Delete remote rule not present @ local
-                print("DELETE", remote_rules[rule])
+                yield self.generic_action(
+                    "Add rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
+                    self.client.delete_network_acl,
+                    NetworkAclId=serializers.Identifier(),
+                    RuleNumber=rule['RuleNumber'],
+                    Egress=rule['Egress'],
+                )
 
 
 class Destroy(SimpleDestroy, Describe):
