@@ -252,7 +252,7 @@ class TerminateASGInstances(Action):
             DesiredCapacity=0,
         )
 
-        # Wait until all the ASG instances have gone away
+        # Wait until all the ASG instances have gone away
         while True:
             asg = self.plan.describe_object()
             if len(asg.get("Instances", [])) == 0:
