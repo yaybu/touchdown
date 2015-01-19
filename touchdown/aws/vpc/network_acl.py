@@ -36,7 +36,7 @@ class Rule(Resource):
     port = argument.Integer(min=-1, max=32768)
     from_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="FromPort")
     to_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="ToPort")
-    action = argument.String(default="ALLOW", choices=["ALLOW", "DENY"])
+    action = argument.String(default="allow", choices=["allow", "deny"])
 
     def __str__(self):
         name = super(Rule, self).__str__()
