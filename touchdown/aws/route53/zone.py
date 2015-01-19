@@ -14,21 +14,29 @@
 
 import uuid
 
-from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import VPC
 from ..elb import LoadBalancer
+
+
+def _normalize(dns_name):
+    """
+    The Amazon Route53 API silently accepts 'foo.com' as a dns record, but
+    internally that becomes 'foo.com.'. In order to match records we need to do
+    the same.
+    """
+    return dns_name.rstrip('.') + "."
 
 
 class Record(Resource):
 
     resource_name = "record"
 
-    name = argument.String(field="Name")
+    name = argument.String(field="Name", serializer=serializers.Expression(lambda r, o: _normalize(o)))
     type = argument.String(field="Type")
     values = argument.List(
         field="ResourceRecords",
@@ -44,7 +52,10 @@ class Record(Resource):
         LoadBalancer,
         field="AliasTarget",
         serializer=serializers.Dict(
-            DNSName=serializers.Property("CanonicalHostedZoneName"),
+            DNSName=serializers.Context(
+                serializers.Property("CanonicalHostedZoneName"),
+                serializers.Expression(lambda r, o: _normalize(o)),
+            ),
             HostedZoneId=serializers.Property("CanonicalHostedZoneNameID"),
             EvaluateTargetHealth=False,
         )
@@ -67,7 +78,7 @@ class HostedZone(Resource):
         "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
     }
 
-    name = argument.String(field="Name")
+    name = argument.String(field="Name", serializer=serializers.Expression(lambda r, o: _normalize(o)))
     vpc = argument.Resource(VPC, field="VPC")
     comment = argument.String(
         field="HostedZoneConfig",
@@ -108,40 +119,46 @@ class Apply(SimpleApply, Describe):
     create_response = "not-that-useful"
     # update_action = "update_hosted_zone_comment"
 
-    def _get_remote_records(self):
-        if not self.object:
-            return {}
-        records = {}
-        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
-            record = dict(record)
-            if 'ResourceRecords' in record:
-                record['ResourceRecords'] = tuple(record['ResourceRecords'])
-            records[(record['Name'], record['Type'], record.get('SetIdentifier', ''))] = record
-        return records
-
-    def _get_local_records(self):
-        records = {}
-        for record in self.resource.records:
-            records[(record.name, record.type, record.set_identifier or '')] = serializers.Resource().render(self.runner, record)
-        return records
-
     def update_object(self):
-        local = self._get_local_records()
-        remote = self._get_remote_records()
         changes = []
+        description = ["Update hosted zone records"]
 
-        for key, record in local.items():
-            if record != remote.get(key, {}):
-                changes.append({"Action": "UPSERT", "ResourceRecordSet": record})
+        # Retrieve all DNS records associated with this hosted zone
+        # Ignore SOA and NS records for the top level domain
+        remote_records = []
+        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
+            if record['Type'] in ('SOA', 'NS') and record['Name'] == _normalize(self.resource.name):
+                continue
+            remote_records.append(record)
+
+        for local in self.resource.records:
+            for remote in remote_records:
+                if local.matches(self.runner, remote):
+                    break
+            else:
+                changes.append(serializers.Dict(
+                    Action="UPSERT",
+                    ResourceRecordSet=local,
+                ))
+                description.append("Name => {}, Type={}, Action=UPSERT".format(local.name, local.type))
 
         if not self.resource.shared:
-            for key, record in remote.items():
-                if record != local.get(key, {}):
+            for remote in remote_records:
+                for local in self.resource.records:
+                    if remote["Name"] != local.name:
+                        continue
+                    if remote["Type"] != local.type:
+                        continue
+                    if remote.get("SetIdentifier", "") != locals.set_identifier:
+                        continue
+                    break
+                else:
                     changes.append({"Action": "DELETE", "ResourceRecordSet": record})
+                    description.append("Name => {}, Type={}, Action=DELETE".format(record["Name"], record["Type"]))
 
         if changes:
             yield self.generic_action(
-                "Update resource record sets",
+                description,
                 self.client.change_resource_record_sets,
                 serializers.Dict(
                     HostedZoneId=serializers.Identifier(),

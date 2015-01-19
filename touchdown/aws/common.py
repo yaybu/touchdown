@@ -16,12 +16,28 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from touchdown.core import errors, serializers
+from touchdown.core import errors, serializers, resource
 from touchdown.core.action import Action
 from touchdown.core.plan import Present
 
 
 logger = logging.getLogger(__name__)
+
+
+class Resource(resource.Resource):
+
+    def matches(self, runner, remote):
+        for name, arg in self.arguments:
+            if not arg.present(self):
+                continue
+            if not arg.field:
+                continue
+            if arg.field not in remote:
+                return False
+            rendered = arg.serializer.render(runner, getattr(self, name))
+            if rendered != remote[arg.field]:
+                return False
+        return True
 
 
 class Waiter(Action):

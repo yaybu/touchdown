@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
-from touchdown.core import serializers
 from .vpc import VPC
 from .internet_gateway import InternetGateway
 from .vpn_gateway import VpnGateway
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Route(Resource):
@@ -33,18 +31,6 @@ class Route(Resource):
     # instance = argument.Resource(Instance, field="InstanceId")
     # network_interface = argument.Resource(NetworkInterface, field="NetworkInterfaceId")
     # vpc_peering_connection = argument.Resource(VpcPeeringConnection, field="VpcPeeringConnectionId")
-
-    def matches(self, runner, remote):
-        for name, arg in self.arguments:
-            if not arg.present(self):
-                continue
-            if not arg.field:
-                continue
-            if arg.field not in remote:
-                return False
-            if arg.serializer.render(runner, getattr(self, name)) != remote[arg.field]:
-                return False
-        return True
 
 
 class RouteTable(Resource):
