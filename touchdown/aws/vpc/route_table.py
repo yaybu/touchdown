@@ -44,7 +44,6 @@ class Route(Resource):
                 return False
             if arg.serializer.render(runner, getattr(self, name)) != remote[arg.field]:
                 return False
-
         return True
 
 
@@ -102,42 +101,6 @@ class Apply(SimpleApply, Describe):
                 GatewayId=serializers.Const(inner=serializers.Const(vgw)),
             )
 
-    def update_associations(self):
-        return
-
-        remote_subnets = {}
-        for association in self.object.get("Associations", []):
-            remote_subnets[association['SubnetId']] = association['RouteTableAssociationId']
-
-        for subnet in self.resource.subnets:
-            subnet_id = self.runner.get_plan(subnet).resource_id
-            if not subnet_id or subnet_id not in remote_subnets:
-                yield self.generic_action(
-                    "Associate with subnet {}".format(subnet.name),
-                    self.client.associate_route_table,
-                    SubnetId=serializers.Identifier(inner=serializers.Const(subnet)),
-                    RouteTableId=serializers.Identifier(self),
-                )
-
-        # If we are the main table then we may be associated with non-managed
-        # tables. Don't try and remove them...
-        if not self.object.get("MainTable", False):
-            return
-
-        local_subnets = []
-        for subnet in self.subnets:
-            subnet_id = self.runner.get_plan(subnet).resource_id
-            if subnet_id:
-                local_subnets.append(subnet_id)
-
-        for subnet, association in remote_subnets.items():
-            if subnet not in remote_subnets:
-                yield self.generic_action(
-                    "Disassociate from subnet {}".format(subnet),
-                    self.client.disassociate_route_table,
-                    AssociationId=association,
-                )
-
     def update_routes(self):
         """
         Compare the individual routes listed in the RouteTable to the ones
@@ -147,14 +110,13 @@ class Apply(SimpleApply, Describe):
         Old routes are removed *before* new routes are added. This may cause
         connection glitches when applied, but it avoids route collisions.
         """
-        remote_routes = (d for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
+        remote_routes = list(d for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
 
         if remote_routes:
             for remote in remote_routes:
                 for local in self.resource.routes:
                     if local.matches(self.runner, remote):
-                        continue
-                    break
+                        break
                 else:
                     yield self.generic_action(
                         "Remove route for {}".format(remote['DestinationCidrBlock']),
@@ -167,8 +129,7 @@ class Apply(SimpleApply, Describe):
             for local in self.resource.routes:
                 for remote in remote_routes:
                     if local.matches(self.runner, remote):
-                        continue
-                    break
+                        break
                 else:
                     yield self.generic_action(
                         "Adding route for {}".format(local.destination_cidr),
@@ -180,8 +141,6 @@ class Apply(SimpleApply, Describe):
 
     def update_object(self):
         for action in super(Apply, self).update_object():
-            yield action
-        for action in self.update_associations():
             yield action
         for action in self.update_routes():
             yield action
