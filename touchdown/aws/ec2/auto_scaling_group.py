@@ -264,7 +264,7 @@ class TerminateASGInstances(Action):
             activities = self.plan.client.describe_scaling_activities(AutoScalingGroupName=self.resource.name)['Activities']
             if len((a for a in activities if a['StatusCode'] != 'Successful')) == 0:
                 break
-            print (activities)
+            print(activities)
             time.sleep(10)
 
 
