@@ -267,8 +267,6 @@ class TerminateASGInstances(Action):
             print (activities)
             time.sleep(10)
 
-        print self.plan.client.describe_scheduled_actions(AutoScalingGroupName=self.resource.name)
-        print self.plan.client.describe_scaling_activities(AutoScalingGroupName=self.resource.name)
 
 class Destroy(SimpleDestroy, Describe):
 

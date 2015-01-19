@@ -281,7 +281,6 @@ class Describe(SimpleDescribe, Plan):
     key = 'Id'
 
     def get_describe_filters(self):
-        print self.object
         return {"Id": self.object['Id']}
 
     def describe_object(self):
