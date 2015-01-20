@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument, serializers
+from touchdown.core import argument, serializers, errors
+from touchdown.core.action import Action
 
 from .vpc import VPC
 from .route_table import RouteTable
@@ -136,7 +139,7 @@ class Apply(SimpleApply, Describe):
                 yield self.generic_action(
                     "Replace Network ACL association",
                     self.client.replace_network_acl_association,
-                    AssociationIdserializers.Property('NetworkAclAssociationId'),
+                    AssociationId=serializers.Property('NetworkAclAssociationId'),
                     NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
                 )
 
@@ -152,27 +155,27 @@ class WaitForNetworkInterfaces(Action):
             if iface['Attachment']['InstanceOwnerId'] == 'amazon-elb' and iface["Attachment"]["Status"] == "detaching":
                 return True
 
-        # An 'available' interface that belongs to an ELB will be cleaned up
+        # An 'available' interface that belongs to an ELB will be cleaned up
         # within 2 minutes
-        if interface["Description"] == "ELB balancer":
-            if interface['Status'] == 'available':
+        if iface["Description"] == "ELB balancer":
+            if iface['Status'] == 'available':
                 return True
 
         # Abort! There are interfaces present that aren't pending removal
         return False
 
     def run(self):
-        vpc = self.runner.get_target(self.resource.vpc)
+        vpc = self.runner.get_plan(self.resource.vpc)
         if not vpc:
             return
 
         for i in range(120):
-            interfaces = self.client.describe_network_interfaces(
+            interfaces = self.plan.client.describe_network_interfaces(
                 Filters=[
                     {"Name": "vpc-id", "Values": [vpc.resource_id]},
-                    {"Name": "subnet-id", "Values": [self.resource_id]},
+                    {"Name": "subnet-id", "Values": [self.plan.resource_id]},
                 ]
-            )
+            ).get('NetworkInterfaces', [])
 
             if not interfaces:
                 return
