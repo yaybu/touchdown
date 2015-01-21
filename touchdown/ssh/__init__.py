@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, errors, resource, plan, workspace
+from touchdown.core import adapters, argument, errors, resource, plan, serializers, workspace
 
 try:
     import paramiko
@@ -20,16 +20,21 @@ except ImportError:
     paramiko = None
 
 
+class Instance(adapters.Adapter):
+    pass
+
+
 class Connection(resource.Resource):
 
     resource_name = "ssh_connection"
 
-    username = argument.String(default="root")
-    password = argument.String()
-    hostname = argument.String()
-    port = argument.Integer(default=22)
+    username = argument.String(default="root", field="username")
+    password = argument.String(field="password")
+    hostname = argument.String(field="hostname")
+    instance = argument.Resource(Instance, field="hostname", serializer=serializers.Resource())
+    port = argument.Integer(field="port", default=22)
 
-    proxy = argument.Resource("touchdown.fuselage.Connection")
+    proxy = argument.Resource("touchdown.ssh.Connection")
 
     root = argument.Resource(workspace.Workspace)
 
@@ -47,24 +52,16 @@ class ConnectionPlan(plan.Plan):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        sock = None
+        kwargs = serializers.Resource().render(self.runner, self.resource)
+
         if self.resource.proxy:
             proxy = self.runner.get_plan(self.resource.proxy)
             transport = proxy.get_client().get_transport()
-            sock = transport.open_channel(
+            kwargs['sock'] = transport.open_channel(
                 'direct-tcpip',
-                (self.resource.hostname, int(self.resource.port)),
+                (kwargs['hostname'], kwargs['port']),
                 ('', 0)
             )
-
-        kwargs = dict(
-            hostname=self.resource.hostname,
-            port=self.resource.port,
-            username=self.resource.username,
-            sock=sock,
-        )
-        if self.resource.password:
-            kwargs['password'] = self.resource.password
 
         client.connect(**kwargs)
 

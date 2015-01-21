@@ -30,7 +30,7 @@ class Bundle(resource.Resource):
 
     resource_name = "fuselage_bundle"
 
-    ssh_connection = argument.Resource(Connection)
+    connection = argument.Resource(Connection)
     resources = argument.List()
 
     root = argument.Resource(workspace.Workspace)
@@ -40,7 +40,7 @@ class Deployment(action.Action):
 
     @property
     def description(self):
-        yield "Apply fuselage configruation to {}".format(self.resource.ssh_connection)
+        yield "Apply fuselage configruation to {}".format(self.resource.connection)
 
     def _run(self, transport, command):
         channel = transport.open_session()
@@ -79,7 +79,7 @@ class Deployment(action.Action):
         b.extend(iter(self.resource.resources))
         bu = builder.build(b)
 
-        client = self.get_plan(self.resource.ssh_connection).get_client()
+        client = self.get_plan(self.resource.connection).get_client()
 
         sftp = client.open_sftp()
 

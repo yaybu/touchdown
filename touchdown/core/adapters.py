@@ -21,15 +21,11 @@ class Adapter(Resource):
     adapts = argument.Resource(Resource)
     input = None
 
-    @property
-    def serializer(self):
-        try:
-            return self.adapt()
-        except NotImplementedError:
-            return super(Adapter, self).serializer
+    def get_serializer(self, runner):
+        raise NotImplementedError(self.get_serializer)
 
     @classmethod
-    def adapt(cls, resource):
+    def wrap(cls, resource):
         for adapter in cls.__subclasses__():
             if adapter.input and isinstance(resource, adapter.input):
                 return adapter(resource, adapts=resource)

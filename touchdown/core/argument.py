@@ -204,8 +204,8 @@ class Resource(Argument):
                     raise errors.InvalidParameter("Parameter must be one of {}".format(str(self.resource_class)))
             else:
                 value = self.resource_class(instance, **value)
-        elif hasattr(self.resource_class, "adapt"):
-            value = self.resource_class.adapt(value)
+        elif hasattr(self.resource_class, "wrap"):
+            value = self.resource_class.wrap(value)
         elif not isinstance(value, self.resource_class):
             raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
         instance.add_dependency(value)
@@ -231,7 +231,7 @@ class Resource(Argument):
 
         argument_name = self.argument_name
 
-        if hasattr(cls, "adapt"):
+        if hasattr(cls, "wrap"):
             return
 
         def _(self, **kwargs):
@@ -276,8 +276,8 @@ class ResourceList(Argument):
                         raise errors.InvalidParameter("Parameter must be one of {}".format(self.resource_class))
                 else:
                     val = self.resource_class(instance, **val)
-            elif hasattr(self.resource_class, "adapt"):
-                value = self.resource_class.adapt(value)
+            elif hasattr(self.resource_class, "wrap"):
+                value = self.resource_class.wrap(value)
             elif not isinstance(val, self.resource_class):
                 raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
             instance.add_dependency(val)

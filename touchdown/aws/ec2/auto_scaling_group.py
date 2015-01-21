@@ -17,10 +17,11 @@ import time
 from touchdown.core.action import Action
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, errors
+from touchdown.core import argument, errors, serializers
 
-from ..account import Account
-from touchdown.core import serializers
+from touchdown import ssh
+
+from ..account import BaseAccount
 from ..elb import LoadBalancer
 from ..vpc import Subnet
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -85,7 +86,7 @@ class AutoScalingGroup(Resource):
 
     replacement_policy = argument.String(choices=['singleton', 'graceful'], default='graceful')
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class ReplaceInstance(Action):
@@ -275,3 +276,47 @@ class Destroy(SimpleDestroy, Describe):
         yield TerminateASGInstances(self)
         for change in super(Destroy, self).destroy_object():
             yield change
+
+
+class Instance(ssh.Instance):
+
+    resource_name = "random_asg_instance"
+    input = AutoScalingGroup
+
+    def get_serializer(self, runner):
+        plan = runner.get_plan(self.adapts)
+
+        # Annoyingly we have to get antother client (different API) to get info
+        # on teh EC2 instances in our asg
+        client = plan.session.create_client(
+            service_name="ec2",
+            region_name=plan.session.region,
+            aws_access_key_id=plan.session.access_key_id,
+            aws_secret_access_key=plan.session.secret_access_key,
+            aws_session_token=plan.session.session_token,
+        )
+
+        reservations = client.describe_instances(
+            InstanceIds=[
+                i["InstanceId"] for i in plan.object.get("Instances", [])
+            ],
+        ).get("Reservations", [])
+
+        instances = []
+        for reservation in reservations:
+            instances.extend(reservation.get("Instances", []))
+
+        if len(instances) == 0:
+            raise errors.Error("No instances available in {}".format(self.adapts))
+
+        for instance in instances:
+            for k in ('PublicDnsName', 'PublicIpAddress'):
+                if k in instance and instance[k]:
+                    return serializers.Const(instance[k])
+
+        for instance in instances:
+            for k in ('PrivateDnsName', 'PrivateIpAddress'):
+                if k in instance and instance[k]:
+                    return serializers.Const(instance[k])
+
+        raise errors.Error("No instances available in {} with ip address".format(self.adapts))

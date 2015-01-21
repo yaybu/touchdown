@@ -204,9 +204,9 @@ class AliasTarget(route53.AliasTarget):
 
     input = LoadBalancer
 
-    def adapt(self):
+    def get_serializer(self, runner):
         return serializers.Context(
-            serializers.Argument("adapts"),
+            serializers.Const(self.adapts),
             serializers.Dict(
                 DNSName=serializers.Context(
                     serializers.Property("CanonicalHostedZoneName"),
