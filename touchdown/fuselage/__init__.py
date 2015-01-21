@@ -17,75 +17,13 @@ import os
 import time
 
 from touchdown.core import action, argument, errors, resource, plan, workspace
+from touchdown.ssh import Connection
 
 try:
     import fuselage
-    from fuselage import bundle, builder, error
+    from fuselage import bundle, builder
 except ImportError:
     fuselage = None
-
-try:
-    import paramiko
-except ImportError:
-    paramiko = None
-
-
-class Connection(resource.Resource):
-
-    resource_name = "ssh_connection"
-
-    username = argument.String(default="root")
-    password = argument.String()
-    hostname = argument.String()
-    port = argument.Integer(default=22)
-
-    proxy = argument.Resource("touchdown.fuselage.Connection")
-
-    root = argument.Resource(workspace.Workspace)
-
-
-class ConnectionPlan(plan.Plan):
-
-    name = "describe"
-    resource = Connection
-    _client = None
-
-    def get_client(self):
-        if self._client:
-            return self._client
-
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        sock = None
-        if self.resource.proxy:
-            proxy = self.runner.get_plan(self.resource.proxy)
-            transport = proxy.get_client().get_transport()
-            sock = transport.open_channel(
-                'direct-tcpip',
-                (self.resource.hostname, int(self.resource.port)),
-                ('', 0)
-            )
-
-        kwargs = dict(
-            hostname=self.resource.hostname,
-            port=self.resource.port,
-            username=self.resource.username,
-            sock=sock,
-        )
-        if self.resource.password:
-            kwargs['password'] = self.resource.password
-
-        client.connect(**kwargs)
-
-        self._client = client
-
-        return client
-
-    def get_actions(self):
-        if not paramiko:
-            raise errors.Error("Paramiko library is required to perform operations involving ssh")
-        return []
 
 
 class Bundle(resource.Resource):

@@ -15,3 +15,4 @@
 import touchdown.core  # noqa
 import touchdown.aws  # noqa
 import touchdown.fuselage  # noqa
+import touchdown.ssh  # noqa
