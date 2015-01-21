@@ -72,9 +72,14 @@ DNS records
         A list of values to return when a client resolves the given ``name``
         and ``type``.
 
-    .. attribute:: load_balancer
+    .. attribute:: alias
 
-        For ``ALIAS`` records you don't need to specify ``values``. Instead you
-        can pass a :class:`LoadBalancer` resource. After the load balancer has
-        been created and assigned a DNS name its ALIAS record will then be
-        created.
+        If creating an ``A`` record you can pass in one of the follwing to
+        create an alias record. This acts like a server side CNAME. Route53
+        resolves the domain name and returns IP addresses directly, reducing
+        latency.
+
+        You can pass in:
+
+          * A :class:`~touchdown.aws.elb.LoadBalancer` instance
+          * A CloudFront :class:`~touchdown.aws.cloudfront.Distribution`
