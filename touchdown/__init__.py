@@ -14,3 +14,4 @@
 
 import touchdown.core  # noqa
 import touchdown.aws  # noqa
+import touchdown.fuselage  # noqa

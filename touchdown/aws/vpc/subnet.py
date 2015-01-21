@@ -134,14 +134,23 @@ class Apply(SimpleApply, Describe):
                 AssociationId=self.object["RouteTableAssociationId"],
             )
 
-        if self.resource.network_acl and (not self.object or self.object.get("NetworkAclAssociationId", None)):
-            if self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
-                yield self.generic_action(
-                    "Replace Network ACL association",
-                    self.client.replace_network_acl_association,
-                    AssociationId=serializers.Property('NetworkAclAssociationId'),
-                    NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
-                )
+        naa_changed = False
+        if not self.resource.network_acl:
+            return
+        if not self.object:
+            naa_changed = True
+        elif not self.object.get("NetworkAclAssociationId", None):
+            naa_changed = True
+        elif self.runner.get_plan(self.resource.network_acl).resource_id != self.object.get('NetworkAclId', None):
+            naa_changed = True
+
+        if naa_changed:
+            yield self.generic_action(
+                "Replace Network ACL association",
+                self.client.replace_network_acl_association,
+                AssociationId=serializers.Property('NetworkAclAssociationId'),
+                NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
+            )
 
 
 class WaitForNetworkInterfaces(Action):
@@ -161,7 +170,7 @@ class WaitForNetworkInterfaces(Action):
             if iface['Status'] == 'available':
                 return True
 
-        # Abort! There are interfaces present that aren't pending removal
+        # Abort! There are interfaces resent that aren't pending removal
         return False
 
     def run(self):
@@ -183,10 +192,11 @@ class WaitForNetworkInterfaces(Action):
             for interface in interfaces:
                 if not self.check_interface(interface):
                     raise errors.Error(
-                        "Subnet {} cannot be deleted until network interface {} ({}) is removed".format(
-                            self.resource_id,
+                        "Subnet {} cannot be deleted until network interface {} ({}) is removed\n{}".format(
+                            self.plan.resource_id,
                             interface["NetworkInterfaceId"],
-                            interface.get("Description", "No description available")
+                            interface.get("Description", "No description available"),
+                            interface
                         )
                     )
 
