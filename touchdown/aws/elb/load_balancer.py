@@ -21,6 +21,7 @@ from ..iam import ServerCertificate
 from ..s3 import Bucket
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import Subnet, SecurityGroup
+from .. import route53
 
 
 class Listener(Resource):
@@ -195,3 +196,23 @@ class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_load_balancer"
     waiter = "load_balancer_deleted"
+
+
+class AliasTarget(route53.AliasTarget):
+
+    """ Adapts a LoadBalancer into a AliasTarget """
+
+    input = LoadBalancer
+
+    def adapt(self):
+        return serializers.Context(
+            serializers.Argument("adapts"),
+            serializers.Dict(
+                DNSName=serializers.Context(
+                    serializers.Property("CanonicalHostedZoneName"),
+                    serializers.Expression(lambda r, o: route53._normalize(o)),
+                ),
+                HostedZoneId=serializers.Property("CanonicalHostedZoneNameID"),
+                EvaluateTargetHealth=False,
+            )
+        )

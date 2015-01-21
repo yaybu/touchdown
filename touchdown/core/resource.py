@@ -56,6 +56,7 @@ class Resource(six.with_metaclass(ResourceType)):
 
     dot_ignore = False
     default_plan = None
+    serializer = None
 
     policies = List()
 

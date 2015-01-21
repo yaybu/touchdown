@@ -273,6 +273,10 @@ class Resource(Dict):
         super(Resource, self).__init__(**kwargs)
 
     def render(self, runner, object):
+        serializer = object.serializer
+        if serializer:
+            return serializer.render(runner, object)
+
         kwargs = dict(self.kwargs)
 
         for name, serializer in getattr(object, "extra_serializers", {}).items():

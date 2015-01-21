@@ -20,7 +20,7 @@ from touchdown.core import argument, serializers
 from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from ..vpc import VPC
-from ..elb import LoadBalancer
+from .alias_target import AliasTarget
 
 
 def _normalize(dns_name):
@@ -48,17 +48,10 @@ class Record(Resource):
 
     set_identifier = argument.Integer(min=1, max=128, field="SetIdentifier")
 
-    load_balancer = argument.Resource(
-        LoadBalancer,
+    alias = argument.Resource(
+        AliasTarget,
         field="AliasTarget",
-        serializer=serializers.Dict(
-            DNSName=serializers.Context(
-                serializers.Property("CanonicalHostedZoneName"),
-                serializers.Expression(lambda r, o: _normalize(o)),
-            ),
-            HostedZoneId=serializers.Property("CanonicalHostedZoneNameID"),
-            EvaluateTargetHealth=False,
-        )
+        serializer=serializers.Resource(),
     )
     #weight = argument.Integer(min=1, max=255, field="Weight")
     #region = argument.String(field="Region")
