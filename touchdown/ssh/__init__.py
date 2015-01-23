@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
+
 from touchdown.core import adapters, argument, errors, resource, plan, serializers, workspace
 
 try:
@@ -24,12 +26,28 @@ class Instance(adapters.Adapter):
     pass
 
 
+def _get_private_key(runner, object):
+    if not object:
+        return None
+    for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
+        try:
+            key = cls.from_private_key(StringIO.StringIO(object))
+        except paramiko.SSHException:
+            continue
+        return key
+    raise errors.Error("Invalid SSH private key")
+
+
 class Connection(resource.Resource):
 
     resource_name = "ssh_connection"
 
     username = argument.String(default="root", field="username")
     password = argument.String(field="password")
+    private_key = argument.String(
+        field="pkey",
+        serializer=serializers.Expression(_get_private_key),
+    )
     hostname = argument.String(field="hostname")
     instance = argument.Resource(Instance, field="hostname", serializer=serializers.Resource())
     port = argument.Integer(field="port", default=22)
@@ -62,6 +80,10 @@ class ConnectionPlan(plan.Plan):
                 (kwargs['hostname'], kwargs['port']),
                 ('', 0)
             )
+
+        if not self.resource.password and not self.resource.private_key:
+            kwargs['look_for_keys'] = True
+            kwargs['allow_agent'] = True
 
         client.connect(**kwargs)
 

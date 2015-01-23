@@ -25,8 +25,8 @@ class Adapter(Resource):
         raise NotImplementedError(self.get_serializer)
 
     @classmethod
-    def wrap(cls, resource):
+    def wrap(cls, parent, resource):
         for adapter in cls.__subclasses__():
             if adapter.input and isinstance(resource, adapter.input):
-                return adapter(resource, adapts=resource)
+                return adapter(parent, adapts=resource)
         raise errors.Error("Cannot turn {} into a {}".format(resource, cls))

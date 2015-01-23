@@ -26,17 +26,19 @@ class Rule(Resource):
     resource_name = "rule"
     dot_ignore = True
 
-    network = argument.IPNetwork(
-        field="IpRanges",
-        serializer=serializers.ListOfOne(serializers.Dict(
-            CidrIp=serializers.String(),
-        )),
-    )
-    protocol = argument.String(default='tcp', choices=['tcp', 'udp', 'icmp'], field="IpProtocol")
-    port = argument.Integer(min=-1, max=32768)
-    from_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="FromPort")
-    to_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="ToPort")
-    action = argument.String(default="allow", choices=["allow", "deny"])
+    network = argument.IPNetwork(field="CidrBlock")
+    protocol = argument.String(default='tcp', choices=['tcp', 'udp', 'icmp'], field="Protocol")
+    port = argument.Integer(min=-1, max=65535)
+    from_port = argument.Integer(default=lambda r: r.port if r.port != -1 else 1, min=-1, max=65535)
+    to_port = argument.Integer(default=lambda r: r.port if r.port != -1 else 65535, min=-1, max=65535)
+    action = argument.String(default="allow", choices=["allow", "deny"], field="RuleAction")
+
+    extra_serializers = {
+        "PortRange": serializers.Dict(
+            From=serializers.Integer(serializers.Argument("from_port")),
+            To=serializers.Integer(serializers.Argument("to_port")),
+        ),
+    }
 
     def __str__(self):
         name = super(Rule, self).__str__()
@@ -91,16 +93,31 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_network_acl"
 
+    def _fix_protocol(self, protocol):
+        # see https://github.com/aws/aws-cli/pull/532/files
+        if protocol == 'tcp':
+            return '6'
+        elif protocol == 'udp':
+            return '17'
+        elif protocol == 'icmp':
+            return '1'
+        elif protocol == 'all':
+            return '-1'
+
     def _get_local_rules(self):
         local_rules = {}
-        for i, rule in enumerate(self.resource.inbound):
+        for i, rule in enumerate(self.resource.inbound, start=1):
             rule = serializers.Resource().render(self.runner, rule)
+            rule['Protocol'] = self._fix_protocol(rule['Protocol'])
             rule['RuleNumber'] = i
+            rule['Egress'] = False
             local_rules[(False, i)] = rule
 
-        for i, rule in enumerate(self.resource.outbound):
+        for i, rule in enumerate(self.resource.outbound, start=1):
             rule = serializers.Resource().render(self.runner, rule)
             rule['RuleNumber'] = i
+            rule['Protocol'] = self._fix_protocol(rule['Protocol'])
+            rule['Egress'] = True
             local_rules[(True, i)] = rule
         return local_rules
 
@@ -120,7 +137,7 @@ class Apply(SimpleApply, Describe):
         remote_rules = self._get_remote_rules()
 
         for key, rule in remote_rules.items():
-            if key not in local_rules:
+            if key not in local_rules or local_rules[key] != rule:
                 yield self.generic_action(
                     "Remove rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
                     self.client.delete_network_acl_entry,
@@ -130,13 +147,17 @@ class Apply(SimpleApply, Describe):
                 )
 
         for key, rule in local_rules.items():
-            if key not in self.remote_rules or self.remote_rules[key] != rule:
+            if key not in remote_rules or remote_rules[key] != rule:
+                if rule['Egress']:
+                    description = "Add rule: {0[RuleAction]} egress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
+                else:
+                    description = "Add rule: {0[RuleAction]} ingress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
+
                 yield self.generic_action(
-                    "Add rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
+                    description,
                     self.client.create_network_acl_entry,
                     NetworkAclId=serializers.Identifier(),
-                    RuleNumber=rule['RuleNumber'],
-                    Egress=rule['Egress'],
+                    **rule
                 )
 
 

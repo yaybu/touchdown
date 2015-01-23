@@ -76,13 +76,13 @@ class AutoScalingGroup(Resource):
     checks as ELB. """
 
     health_check_grace_period = argument.Integer(
-        default=lambda instance: 60 if instance.load_balancers else None,
+        default=lambda instance: 480 if instance.load_balancers else None,
         field="HealthCheckGracePeriod",
     )
 
     placement_group = argument.String(max=255, field="PlacementGroup")
 
-    termination_policies = argument.List(field="TerminationPolicies")
+    termination_policies = argument.List(default=lambda i: ["Default"], field="TerminationPolicies")
 
     replacement_policy = argument.String(choices=['singleton', 'graceful'], default='graceful')
 
@@ -103,7 +103,7 @@ class ReplaceInstance(Action):
         self.instance_id = instance_id
 
     def suspend_processes(self):
-        self.client.suspend_processes(
+        self.plan.client.suspend_processes(
             AutoScalingGroupName=self.resource.name,
             ScalingProcesses=self.scaling_processes,
         )
@@ -123,7 +123,7 @@ class ReplaceInstance(Action):
     """
 
     def terminate_instance(self):
-        self.client.terminate_instance_in_auto_scaling_group(
+        self.plan.client.terminate_instance_in_auto_scaling_group(
             InstanceId=self.instance_id,
             ShouldDecrementDesiredCapacity=False,
         )
@@ -133,14 +133,15 @@ class ReplaceInstance(Action):
         # and use that as a timeout for the release process.
         while True:
             asg = self.plan.describe_object()
-            if asg['DesiredCapacity'] == len(i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy'):
+            if asg['DesiredCapacity'] == len([i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy']):
                 return True
+            time.sleep(5)
 
     def unscale(self):
         raise NotImplementedError(self.unscale)
 
     def resume_processes(self):
-        self.client.resume_processes(
+        self.plan.client.resume_processes(
             AutoScalingGroupName=self.resource.name,
             ScalingProcesses=self.scaling_processes,
         )
@@ -170,21 +171,21 @@ class GracefulReplacement(ReplaceInstance):
         desired_capacity = self.plan.object['DesiredCapacity']
         desired_capacity += 1
 
-        max = self.resource.max
+        max = self.resource.max_size
         if desired_capacity > max:
             max = desired_capacity
 
-        self.client.update_auto_scaling_group(
+        self.plan.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
             MaxSize=max,
             DesiredCapacity=desired_capacity,
         )
 
     def unscale(self):
-        self.client.update_auto_scaling_group(
+        self.plan.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
-            MaxSize=self.resource.max,
-            DesiredCapacity=self.object['DesiredCapacity'],
+            MaxSize=self.resource.max_size,
+            DesiredCapacity=min(self.resource.max_size, self.plan.object['DesiredCapacity']),
         )
 
 
@@ -220,8 +221,10 @@ class Apply(SimpleApply, Describe):
     update_action = "update_auto_scaling_group"
 
     def update_object(self):
-        launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
+        for change in super(Apply, self).update_object():
+            yield change
 
+        launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
         for instance in self.object.get("Instances", []):
             if instance['LifecycleState'] in ('Terminating', ):
                 continue
@@ -309,13 +312,13 @@ class Instance(ssh.Instance):
         if len(instances) == 0:
             raise errors.Error("No instances available in {}".format(self.adapts))
 
-        for instance in instances:
-            for k in ('PublicDnsName', 'PublicIpAddress'):
-                if k in instance and instance[k]:
-                    return serializers.Const(instance[k])
+        if hasattr(self.parent, "proxy") and self.parent.proxy and self.parent.proxy.instance and self.parent.proxy.instance.adapts.subnets[0].vpc == self.adapts.subnets[0].vpc:
+            for instance in instances:
+                if 'PrivateIpAddress' in instance:
+                     return serializers.Const(instance['PrivateIpAddress'])
 
         for instance in instances:
-            for k in ('PrivateDnsName', 'PrivateIpAddress'):
+            for k in ('PublicDnsName', 'PublicIpAddress'):
                 if k in instance and instance[k]:
                     return serializers.Const(instance[k])
 

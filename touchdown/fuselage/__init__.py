@@ -72,9 +72,6 @@ class Deployment(action.Action):
             channel.close()
 
     def run(self):
-        random_string = binascii.hexlify(os.urandom(4)).decode('ascii')
-        path = 'fuselage_%s' % (random_string)
-
         b = bundle.ResourceBundle()
         b.extend(iter(self.resource.resources))
         bu = builder.build(b)
@@ -82,6 +79,10 @@ class Deployment(action.Action):
         client = self.get_plan(self.resource.connection).get_client()
 
         sftp = client.open_sftp()
+        sftp.chdir(".")
+
+        random_string = binascii.hexlify(os.urandom(4)).decode('ascii')
+        path = os.path.join(sftp.getcwd(), 'fuselage_%s' % (random_string))
 
         try:
             sftp.putfo(bu, path)

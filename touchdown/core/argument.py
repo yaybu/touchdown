@@ -205,7 +205,7 @@ class Resource(Argument):
             else:
                 value = self.resource_class(instance, **value)
         elif hasattr(self.resource_class, "wrap"):
-            value = self.resource_class.wrap(value)
+            value = self.resource_class.wrap(instance, value)
         elif not isinstance(value, self.resource_class):
             raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
         instance.add_dependency(value)
@@ -277,7 +277,7 @@ class ResourceList(Argument):
                 else:
                     val = self.resource_class(instance, **val)
             elif hasattr(self.resource_class, "wrap"):
-                value = self.resource_class.wrap(value)
+                value = self.resource_class.wrap(instance, value)
             elif not isinstance(val, self.resource_class):
                 raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
             instance.add_dependency(val)
