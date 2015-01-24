@@ -57,6 +57,19 @@ class Apply(SimpleApply, Describe):
     def update_object(self):
         policy_names = []
 
+        for change in super(Apply, self).update_object():
+            yield change
+
+        remote_policy = self.object.get('AssumeRolePolicy', {}).get('AssumeRolePolicyDocument', '')
+        local_policy = serializers.Json().render(self.runner, self.resource.assume_role_policy)
+        if remote_policy != local_policy:
+            yield self.generic_action(
+                "Update 'Assume Role Policy' document",
+                self.client.update_assume_role_policy,
+                RoleName=serializers.Identifier(),
+                PolicyDocument=serializers.Json(serializers.Argument("assume_role_policy")),
+            )
+
         # If the object exists then we can look at the roles it has
         # Otherwise we assume its a new role and it will have no policies
         if self.object:
