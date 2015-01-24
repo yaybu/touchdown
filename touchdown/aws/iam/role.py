@@ -33,6 +33,20 @@ class Role(Resource):
     policies = argument.Dict()
     account = argument.Resource(Account)
 
+    def clean_assume_role_policy(self, policy):
+        result = {}
+        result['Version'] = policy.get('Version', '2012-10-17')
+        result['Statement'] = []
+        for statement in policy.get("Statement", []):
+            s = {
+                "Action": policy["Action"],
+                "Effect": policy["Effect"],
+                "Principal": policy["Principal"],
+                "Sid": polict.get("Sid", ""),
+            }
+            result['Statement'].append(s)
+        return result
+
 
 class Describe(SimpleDescribe, Plan):
 
@@ -60,9 +74,8 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
-        remote_policy = self.object.get('AssumeRolePolicy', {}).get('AssumeRolePolicyDocument', '')
-        local_policy = serializers.Json().render(self.runner, self.resource.assume_role_policy)
-        if remote_policy != local_policy:
+        remote_policy = self.object.get('AssumeRolePolicyDocument', None)
+        if remote_policy and remote_policy != self.resource.assume_role_policy:
             yield self.generic_action(
                 "Update 'Assume Role Policy' document",
                 self.client.update_assume_role_policy,
