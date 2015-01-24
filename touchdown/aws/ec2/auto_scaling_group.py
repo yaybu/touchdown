@@ -315,7 +315,7 @@ class Instance(ssh.Instance):
         if hasattr(self.parent, "proxy") and self.parent.proxy and self.parent.proxy.instance and self.parent.proxy.instance.adapts.subnets[0].vpc == self.adapts.subnets[0].vpc:
             for instance in instances:
                 if 'PrivateIpAddress' in instance:
-                     return serializers.Const(instance['PrivateIpAddress'])
+                    return serializers.Const(instance['PrivateIpAddress'])
 
         for instance in instances:
             for k in ('PublicDnsName', 'PublicIpAddress'):

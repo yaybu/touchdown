@@ -21,6 +21,34 @@ from .argument import Argument, List
 logger = logging.getLogger(__name__)
 
 
+class Field(object):
+
+    def __init__(self, name, argument):
+        self.name = name
+        self.argument = argument
+        self.__doc__ = self.argument.__doc__
+
+    def present(self, instance):
+        return self.name in instance._values
+
+    def get_value(self, instance):
+        retval = instance._values.get(self.name, None)
+        if not retval:
+            return self.argument.get_default(instance)
+        return retval
+
+    def __set__(self, instance, value):
+        value = self.argument.clean(instance, value)
+        if hasattr(instance, "clean_{}".format(self.name)):
+            value = getattr(instance, "clean_{}".format(self.name))(instance, value)
+        instance._values[self.name] = value
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return self.get_value(instance)
+
+
 class ResourceType(type):
 
     __all_resources__ = {}
@@ -29,15 +57,19 @@ class ResourceType(type):
     def __new__(meta, class_name, bases, new_attrs):
         new_attrs['plans'] = {}
 
+        for name, argument in new_attrs.items():
+            if isinstance(argument, Argument):
+                new_attrs[name] = Field(name, argument)
+                argument.name = name
+
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
         cls.__args__ = {}
         for key in dir(cls):
             value = getattr(cls, key)
-            if isinstance(value, Argument):
+            if isinstance(value, Field):
                 cls.__args__[key] = value
-                value.argument_name = key
-                value.contribute_to_class(cls)
+                value.argument.contribute_to_class(cls)
 
         name = ".".join((cls.__module__, cls.__name__))
         meta.__all_resources__[name] = cls
@@ -60,6 +92,7 @@ class Resource(six.with_metaclass(ResourceType)):
     policies = List()
 
     def __init__(self, parent, **kwargs):
+        self._values = {}
         self.parent = parent
         self.dependencies = set()
         for key, value in kwargs.items():
@@ -68,8 +101,12 @@ class Resource(six.with_metaclass(ResourceType)):
             setattr(self, key, value)
 
     @property
-    def arguments(self):
+    def fields(self):
         return list(self.__args__.items())
+
+    @property
+    def arguments(self):
+        return list((name, field.argument) for (name, field) in self.__args__.items())
 
     @property
     def workspace(self):

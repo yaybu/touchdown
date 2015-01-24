@@ -77,7 +77,7 @@ class LaunchConfiguration(Resource):
     account = argument.Resource(Account)
 
     def matches(self, runner, remote):
-        if "UserData" in remote:
+        if "UserData" in remote and remote["UserData"]:
             import base64
             remote["UserData"] = base64.b64decode(remote["UserData"])
         return super(LaunchConfiguration, self).matches(runner, remote)

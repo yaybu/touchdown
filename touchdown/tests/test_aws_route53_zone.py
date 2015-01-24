@@ -61,6 +61,11 @@ class TestHostedZone(aws.TestCase):
             "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
             "aws_hosted_zone_rrset_1",
         )
+        self.responses.add_fixture(
+            "GET",
+            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
+            "aws_hosted_zone_rrset_1",
+        )
         self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
         self.assertRaises(errors.NothingChanged, self.runner.apply)
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)

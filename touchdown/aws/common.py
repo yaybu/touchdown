@@ -27,8 +27,9 @@ logger = logging.getLogger(__name__)
 class Resource(resource.Resource):
 
     def matches(self, runner, remote):
-        for name, arg in self.arguments:
-            if not arg.present(self):
+        for name, field in self.fields:
+            arg = field.argument
+            if not field.present(self):
                 continue
             if not getattr(arg, "field", ""):
                 continue

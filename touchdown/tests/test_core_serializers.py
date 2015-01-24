@@ -66,4 +66,4 @@ class TestSerializing(unittest.TestCase):
     def test_list(self):
         serializer = serializers.List(serializers.Dict(Name=serializers.Argument("name")))
         result = serializer.render(self.runner, [self.resource])
-        self.assertEqual(result, ({"Name": "test"}, ))
+        self.assertEqual(result, [{"Name": "test"}, ])

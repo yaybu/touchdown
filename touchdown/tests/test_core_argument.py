@@ -12,14 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws
+import unittest
+import netaddr
+
+from touchdown.core import argument, errors
 
 
-class TestKeyPair(aws.TestBasicUsage):
+class TestArguments(unittest.TestCase):
 
-    def setUpResource(self):
-        self.expected_resource_id = 'my-key-pair'
-        self.resource = self.aws.add_keypair(
-            name='my-test-lc',
-            public_key='keypair',
+    def test_list_ips(self):
+        result = argument.List(argument.IPNetwork()).clean(None, ["0.0.0.0/0"])
+        self.assertTrue(isinstance(result, list))
+        self.assertTrue(isinstance(result[0], netaddr.IPNetwork))
+
+    def test_list_invalid_ips(self):
+        self.assertRaises(
+            errors.InvalidParameter,
+            argument.List(argument.IPNetwork()).clean,
+            None,
+            ["0.0.0.0/"],
         )

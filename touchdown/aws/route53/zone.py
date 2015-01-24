@@ -119,10 +119,11 @@ class Apply(SimpleApply, Describe):
         # Retrieve all DNS records associated with this hosted zone
         # Ignore SOA and NS records for the top level domain
         remote_records = []
-        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
-            if record['Type'] in ('SOA', 'NS') and record['Name'] == _normalize(self.resource.name):
-                continue
-            remote_records.append(record)
+        if self.resource_id:
+            for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
+                if record['Type'] in ('SOA', 'NS') and record['Name'] == _normalize(self.resource.name):
+                    continue
+                remote_records.append(record)
 
         for local in self.resource.records:
             for remote in remote_records:
@@ -142,11 +143,11 @@ class Apply(SimpleApply, Describe):
                         continue
                     if remote["Type"] != local.type:
                         continue
-                    if remote.get("SetIdentifier", "") != locals.set_identifier:
+                    if remote.get("SetIdentifier", None) != local.set_identifier:
                         continue
                     break
                 else:
-                    changes.append({"Action": "DELETE", "ResourceRecordSet": record})
+                    changes.append(serializers.Const({"Action": "DELETE", "ResourceRecordSet": record}))
                     description.append("Name => {}, Type={}, Action=DELETE".format(record["Name"], record["Type"]))
 
         if changes:

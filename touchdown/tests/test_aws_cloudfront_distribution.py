@@ -42,14 +42,14 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
         result = serializers.Resource().render(mock.Mock(), distribution)
         del result['CallerReference']
         self.assertEqual(result, {
-            'Origins': {'Items': (), 'Quantity': 0},
+            'Origins': {'Items': [], 'Quantity': 0},
             'Restrictions': {'GeoRestriction': {'RestrictionType': 'none', 'Quantity': 0}},
             'DefaultRootObject': '/',
             'PriceClass': 'PriceClass_100',
             'Enabled': True,
-            'CustomErrorResponses': {'Items': (), 'Quantity': 0},
-            'CacheBehaviors': {'Items': (), 'Quantity': 0},
-            'Aliases': {'Items': ('example.com',), 'Quantity': 1},
+            'CustomErrorResponses': {'Items': [], 'Quantity': 0},
+            'CacheBehaviors': {'Items': [], 'Quantity': 0},
+            'Aliases': {'Items': ['example.com'], 'Quantity': 1},
             'Logging': {'Enabled': False, 'Prefix': '', 'Bucket': '', 'IncludeCookies': False},
             'Comment': 'example.com',
         })
@@ -63,14 +63,14 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
         result = serializers.Resource().render(mock.Mock(), distribution)
         del result['CallerReference']
         self.assertEqual(result, {
-            'Origins': {'Items': (), 'Quantity': 0},
+            'Origins': {'Items': [], 'Quantity': 0},
             'Restrictions': {'GeoRestriction': {'RestrictionType': 'none', 'Quantity': 0}},
             'DefaultRootObject': '/',
             'PriceClass': 'PriceClass_100',
             'Enabled': True,
-            'CustomErrorResponses': {'Items': (), 'Quantity': 0},
-            'CacheBehaviors': {'Items': (), 'Quantity': 0},
-            'Aliases': {'Items': ('example.com', 'www.example.com'), 'Quantity': 2},
+            'CustomErrorResponses': {'Items': [], 'Quantity': 0},
+            'CacheBehaviors': {'Items': [], 'Quantity': 0},
+            'Aliases': {'Items': ['example.com', 'www.example.com'], 'Quantity': 2},
             'Logging': {'Enabled': False, 'Prefix': '', 'Bucket': '', 'IncludeCookies': False},
             'Comment': 'example.com',
         })

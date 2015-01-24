@@ -281,8 +281,9 @@ class Resource(Dict):
         for name, serializer in getattr(object, "extra_serializers", {}).items():
             kwargs[name] = serializer
 
-        for argument_name, arg in object.arguments:
-            if not (arg.present(object) or arg.default is not None):
+        for argument_name, field in object.fields:
+            arg = field.argument
+            if field.get_value(object) is None:
                 continue
             if not hasattr(arg, "field"):
                 continue

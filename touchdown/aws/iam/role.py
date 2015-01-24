@@ -16,7 +16,7 @@ import json
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers
+from touchdown.core import argument, errors, serializers
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -34,6 +34,9 @@ class Role(Resource):
     account = argument.Resource(Account)
 
     def clean_assume_role_policy(self, policy):
+        if frozenset(("Version", "Statement")).difference(frozenset(policy.keys())):
+            raise errors.InvalidParameter("Unexpected policy key")
+
         result = {}
         result['Version'] = policy.get('Version', '2012-10-17')
         result['Statement'] = []
@@ -42,7 +45,7 @@ class Role(Resource):
                 "Action": policy["Action"],
                 "Effect": policy["Effect"],
                 "Principal": policy["Principal"],
-                "Sid": polict.get("Sid", ""),
+                "Sid": policy.get("Sid", ""),
             }
             result['Statement'].append(s)
         return result

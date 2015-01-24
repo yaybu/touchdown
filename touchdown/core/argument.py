@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Isotoma Limited
+# Copyright 2011-2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,11 +22,6 @@ from .utils import force_str
 
 class Argument(object):
 
-    """ Stores the argument value on the instance object. It's a bit fugly,
-    neater ways of doing this that do not involve passing extra arguments to
-    Argument are welcome. """
-
-    argument_id = 0
     default = None
     serializer = serializers.Identity()
 
@@ -36,28 +31,13 @@ class Argument(object):
             self.default = default
         for k, v in kwargs.items():
             setattr(self, k, v)
-        self.arg_id = "argument_%d" % Argument.argument_id
-        Argument.argument_id += 1
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        elif self.present(instance):
-            return getattr(instance, self.arg_id)
-        return self.get_default(instance)
 
     def get_default(self, instance):
         if callable(self.default):
             return self.default(instance)
         return self.default
 
-    def present(self, instance):
-        return hasattr(instance, self.arg_id)
-
     def contribute_to_class(self, cls):
-        pass
-
-    def __set__(self, instance, value):
         pass
 
 
@@ -68,15 +48,13 @@ class Boolean(Argument):
 
     serializer = serializers.Boolean()
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         if isinstance(value, six.string_types):
             if value.lower() in ("1", "yes", "on", "true"):
-                value = True
+                return True
             else:
-                value = False
-        else:
-            value = bool(value)
-        setattr(instance, self.arg_id, value)
+                return False
+        return bool(value)
 
 
 class String(Argument):
@@ -85,10 +63,10 @@ class String(Argument):
 
     serializer = serializers.String()
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         if value is not None:
             value = force_str(value)
-        setattr(instance, self.arg_id, value)
+        return value
 
 
 class Integer(Argument):
@@ -99,53 +77,54 @@ class Integer(Argument):
 
     serializer = serializers.Integer()
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         if not isinstance(value, int):
             try:
                 value = int(value)
             except ValueError:
                 raise errors.InvalidParameter("%s is not an integer" % value)
-        setattr(instance, self.arg_id, value)
+        return value
 
 
 class Octal(Integer):
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         if not isinstance(value, int):
             value = int(value, 8)
-        setattr(instance, self.arg_id, value)
+        return value
 
 
 class IPAddress(String):
 
     serializer = serializers.String()
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         try:
-            value = netaddr.IPAddress(value)
+            return netaddr.IPAddress(value)
         except netaddr.core.AddrFormatError:
             raise errors.InvalidParameter("{} is not a valid IP Address")
-        setattr(instance, self.arg_id, value)
 
 
 class IPNetwork(String):
 
     serializer = serializers.String()
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         try:
             value = netaddr.IPNetwork(value)
         except netaddr.core.AddrFormatError:
             raise errors.InvalidParameter("{} is not a valid IP Address")
         if value != value.cidr:
             raise errors.InvalidParameter("{} looks wrong - did you mean {}?".format(value, value.cdr))
-        setattr(instance, self.arg_id, value)
+        return value
 
 
 class Dict(Argument):
 
-    def __set__(self, instance, value):
-        setattr(instance, self.arg_id, value)
+    def clean(self, instance, value):
+        if not isinstance(value, dict):
+            raise errors.InvalidParameter("{} is not a dictionary")
+        return value
 
     def default(self, instance):
         return {}
@@ -153,8 +132,24 @@ class Dict(Argument):
 
 class List(Argument):
 
-    def __set__(self, instance, value):
-        setattr(instance, self.arg_id, value)
+    def __init__(self, list_of=None, **kwargs):
+        super(List, self).__init__(**kwargs)
+        self.list_of = list_of
+        if not self.serializer:
+            self.serializers = serializers.List(
+                self.list_of.serializer or serializers.String(),
+                skip_empty=True,
+            )
+
+    def clean(self, instance, value):
+        if not isinstance(value, list):
+            raise errors.InvalidParameter("{} is not a list")
+        if not self.list_of:
+            return value
+        result = []
+        for entry in value:
+            result.append(self.list_of.clean(instance, entry))
+        return result
 
     def default(self, instance):
         return []
@@ -187,7 +182,7 @@ class Resource(Argument):
             return self.resource_class(instance, **default)
         return default
 
-    def __set__(self, instance, value):
+    def clean(self, instance, value):
         """
         Every time you assign a value to a Resource argument we validate it is
         the correct type. We also mark self as depending on the resource.
@@ -209,7 +204,7 @@ class Resource(Argument):
         elif not isinstance(value, self.resource_class):
             raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
         instance.add_dependency(value)
-        setattr(instance, self.arg_id, value)
+        return value
 
     def contribute_to_class(self, cls):
         """
@@ -229,7 +224,7 @@ class Resource(Argument):
                 return
             self.resource_class = ResourceType.__all_resources__[self.resource_class]
 
-        argument_name = self.argument_name
+        argument_name = self.name
 
         if hasattr(cls, "wrap"):
             return
@@ -243,54 +238,22 @@ class Resource(Argument):
         setattr(self.resource_class, 'add_%s' % cls.resource_name, _)
 
 
-class ResourceList(Argument):
-
-    """
-    An argument that represents a list of resources that we depend on.
-
-    WARNING: A limitation at present is that you can only *set* a list. Do not
-    mutate a resource list in place as it does not update the dependencies.
-    """
-
-    serializer = serializers.List(serializers.Identifier(), skip_empty=True)
+class ResourceList(List):
 
     def __init__(self, resource_class, **kwargs):
-        super(ResourceList, self).__init__(**kwargs)
-        self.resource_class = resource_class
-
-    def default(self, instance):
-        return []
-
-    def __set__(self, instance, value):
-        value2 = []
-        for val in value:
-            if isinstance(val, dict):
-                if isinstance(self.resource_class, tuple):
-                    for klass in self.resource_class:
-                        try:
-                            val = klass(instance, **val)
-                            break
-                        except errors.InvalidParameter:
-                            continue
-                    else:
-                        raise errors.InvalidParameter("Parameter must be one of {}".format(self.resource_class))
-                else:
-                    val = self.resource_class(instance, **val)
-            elif hasattr(self.resource_class, "wrap"):
-                value = self.resource_class.wrap(instance, value)
-            elif not isinstance(val, self.resource_class):
-                raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
-            instance.add_dependency(val)
-            value2.append(val)
-        setattr(instance, self.arg_id, value2)
+        super(ResourceList, self).__init__(
+            Resource(resource_class),
+            **kwargs
+        )
 
     def contribute_to_class(self, cls):
-        if isinstance(self.resource_class, six.string_types):
+        resource_class = self.list_of.resource_class
+        if isinstance(resource_class, six.string_types):
             from .resource import ResourceType
             if self.resource_class not in ResourceType.__all_resources__:
-                ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)
+                ResourceType.add_callback(resource_class, self.contribute_to_class, cls)
                 return
-            self.resource_class = ResourceType.__all_resources__[self.resource_class]
+            self.list_of.resource_class = ResourceType.__all_resources__[self.resource_class]
         super(ResourceList, self).contribute_to_class(cls)
 
 
@@ -298,8 +261,8 @@ class Serializer(Argument):
 
     serializer = serializers.Expression(lambda runner, object: object.render(runner, object))
 
-    def __set__(self, instance, value):
-        setattr(instance, self.arg_id, value)
+    def clean(self, instance, value):
         for dep in value.dependencies(instance):
             if dep != instance:
                 instance.add_dependency(dep)
+        return value
