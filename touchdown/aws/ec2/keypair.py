@@ -22,28 +22,10 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class KeyPair(Resource):
 
-    """
-    In order to securely use SSH with an EC2 instance (whether created directly
-    or via a :py:class:`AutoScalingGroup`) you must first upload the key to the
-    EC2 key pairs database. The KeyPair resource imports and keeps up to date
-    an ssh public key.
-
-    It can be used with any AWS account resource::
-
-        aws.add_keypair(
-            name="my-keypair",
-            public_key=open(os.expanduser('~/.ssh/id_rsa.pub')),
-        )
-    """
-
     resource_name = "keypair"
 
     name = argument.String(field="KeyName")
-    """ The name of the key. This field is required. """
-
     public_key = argument.String(field="PublicKeyMaterial")
-    """ The public key material, in PEM form. Must be supplied in order to
-    upload a key pair. """
 
     account = argument.Resource(Account)
 
