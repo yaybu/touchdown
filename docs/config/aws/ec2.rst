@@ -94,7 +94,14 @@ Launch Configuration
 
     .. attribute:: image
     .. attribute:: key_pair
+
+        A :class:`~touchdown.aws.ec2.KeyPair`. This is the public key that gets
+        injected to new ec2 instances created by this launch configuration.
+
     .. attribute:: security_groups
+
+        A list of :class:`~touchdown.aws.vpc.SecurityGroup`.
+
     .. attribute:: user_data
     .. attribute:: instance_type
     .. attribute:: kernel
@@ -106,6 +113,11 @@ Launch Configuration
     .. attribute:: instance_monitoring
     .. attribute:: spot_prince
     .. attribute:: instance_profile
+
+        A :class:`~touchdown.aws.iam.InstanceProfile`. Use this to grant
+        started instances a pair of ephemeral credentials for using other AWS
+        services, such as S3.
+
     .. attribute:: ebs_optimized
     .. attribute:: associate_public_ip_address
     .. attribute:: placement_tenancy

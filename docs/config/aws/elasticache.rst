@@ -34,7 +34,8 @@ CacheCluster
 
     .. attribute:: security_groups
 
-        A list of security groups to apply to this instance
+        A list of :class:`~touchdown.aws.vpc.SecurityGroup` to apply to this
+        instance.
 
     .. attribute:: availability_zone
 
@@ -54,7 +55,8 @@ CacheCluster
 
     .. attribute:: subnet_group
 
-        The subnets to start the cache cluster in
+        A :class:`~touchdown.aws.elasticache.SubnetGroup` that describes the
+        subnets to start the cache cluster in.
 
     .. attribute:: parameter_group
 
@@ -96,7 +98,8 @@ ReplicationGroup
 
     .. attribute:: security_groups
 
-        A list of security groups to apply to this instance
+        A list of :class:`~touchdown.aws.vpc.SecurityGroup` to apply to this
+        instance.
 
     .. attribute:: availability_zone
 
@@ -116,7 +119,8 @@ ReplicationGroup
 
     .. attribute:: subnet_group
 
-        The subnets to start the cache cluster in
+        A :class:`~touchdown.aws.elasticache.SubnetGroup` that describes the
+        subnets to start the cache cluster in.
 
     .. attribute:: parameter_group
 

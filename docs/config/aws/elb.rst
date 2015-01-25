@@ -22,6 +22,11 @@ Load Balancer
         directed. You can only set a single backend port. All your application
         servers should be listening on the same port, not on ephemeral ports.
 
+    .. attribute:: subnets
+
+        A list of :class:`~touchdown.aws.vpc.Subnet` resources. These are the
+        subnets that the load balancer can create listeners in.
+
     .. attribute:: availability_zones
 
         A list of availability zones this load balancer can listen in. If you
@@ -33,11 +38,6 @@ Load Balancer
         private ip addresses and cannot be accessed directly from the internet.
         It can be set to internet-facing if you want it to have a public ip
         address.
-
-    .. attribute:: subnets
-
-        A list of :class:`~touchdown.aws.vpc.Subnet` resources. These are the
-        subnets that the load balancer can create listeners in.
 
     .. attribute:: security_groups
 

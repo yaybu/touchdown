@@ -22,7 +22,7 @@ Amazon Web Services
 Authentication
 ==============
 
-The simplest way to start performing actions against AWS is to add a :class:`touchdown.aws.account.Account` object to your workspace::
+The simplest way to start performing actions against AWS is to add a :class:`~touchdown.aws.account.Account` object to your workspace::
 
     aws = workspace.add_aws(
         access_key_id='AKIDFKJDKFJF',
@@ -36,4 +36,3 @@ You can combine this with :class:`touchdown.aws.external_account.ExternalRole` t
         name='my-role',
         arn='',
     )
-
