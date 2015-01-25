@@ -6,6 +6,11 @@ Hardware VPN
    :synopsis: Virtual private network resources.
 
 
+Amazon provide a hardware VPN facility for connecting your VPC to your corporate
+datacenter over industry standard ipsec encryption. This is a dial-in service.
+You connect to it, it does not connect to you.
+
+
 VPN Connections
 ===============
 
@@ -18,6 +23,8 @@ VPN Connections
         vpn = vpn.add_vpn_connection(
             name='my-vpn-connection',
         )
+
+    By default you can only create 10 VPN connections within an Amazon account.
 
     .. attribute:: name
 
