@@ -36,7 +36,7 @@ class Record(Resource):
 
     resource_name = "record"
 
-    name = argument.String(field="Name", serializer=serializers.Expression(lambda r, o: _normalize(o)))
+    name = argument.String(field="Name")
     type = argument.String(field="Type")
     values = argument.List(
         field="ResourceRecords",
@@ -53,6 +53,10 @@ class Record(Resource):
         field="AliasTarget",
         serializer=serializers.Resource(),
     )
+
+    def clean_name(self, name):
+        return _normalize(name)
+
     #weight = argument.Integer(min=1, max=255, field="Weight")
     #region = argument.String(field="Region")
     #geo_location = argument.String(field="GeoLocation")
@@ -71,7 +75,7 @@ class HostedZone(Resource):
         "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
     }
 
-    name = argument.String(field="Name", serializer=serializers.Expression(lambda r, o: _normalize(o)))
+    name = argument.String(field="Name")
     vpc = argument.Resource(VPC, field="VPC")
     comment = argument.String(
         field="HostedZoneConfig",
@@ -86,6 +90,9 @@ class HostedZone(Resource):
     """ If a hosted zone is shared then it won't be destroyed and DNS records will never be deleted """
 
     account = argument.Resource(BaseAccount)
+
+    def clean_name(self, name):
+        return _normalize(name)
 
 
 class Describe(SimpleDescribe, Plan):
@@ -121,7 +128,7 @@ class Apply(SimpleApply, Describe):
         remote_records = []
         if self.resource_id:
             for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
-                if record['Type'] in ('SOA', 'NS') and record['Name'] == _normalize(self.resource.name):
+                if record['Type'] in ('SOA', 'NS') and record['Name'] == self.resource.name:
                     continue
                 remote_records.append(record)
 
