@@ -139,7 +139,7 @@ class List(Argument):
         self.list_of = list_of
         if not self.serializer:
             self.serializer = serializers.List(
-                self.list_of.serializer if self.list_of else  serializers.String(),
+                self.list_of.serializer if self.list_of else serializers.String(),
                 skip_empty=True,
             )
 
