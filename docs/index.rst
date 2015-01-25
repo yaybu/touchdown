@@ -2,23 +2,28 @@
 Touchdown
 =========
 
-Touchdown is a tool for launching and managing infrastrucutre services - be
+Touchdown is a tool for launching and managing infrastructure services - be
 they physical servers, virtual subnets or private dns records.
 
-Define your infrastructure as python and deploy it wih::
+Define your infrastructure as python and deploy it with::
 
     $ touchdown apply
 
 
-Getting help
-============
+Getting started
+===============
 
- * Ask a question in the `#yaybu IRC channel`_.
+ * **From the top:**
+   :doc:`Overview <overview>` |
+   :doc:`Installation <installation>`
 
- * Report a bug in our `issue tracker`_.
+ * **CLI:**
+   :doc:`Applying changes <cli/apply>` |
+   :doc:`Tearing down environments <cli/destroy>` |
+   :doc:`Generating graphs <cli/dot>`
 
-.. _#yaybu IRC channel: irc://irc.oftc.net/yaybu
-.. _issue tracker: https://github.com/yaybu/touchdown/issues
+ * **Tutorial:**
+    :doc:`Hello world with S3, CloudFront and Route53 <tutorial/hello_world`
 
 
 Resources
@@ -40,6 +45,17 @@ Resources
 
  * **Fuselage:**
    :doc:`Deploying over SSH <config/fuselage>`
+
+
+Getting help
+============
+
+ * Ask a question in the `#yaybu IRC channel`_.
+
+ * Report a bug in our `issue tracker`_.
+
+.. _#yaybu IRC channel: irc://irc.oftc.net/yaybu
+.. _issue tracker: https://github.com/yaybu/touchdown/issues
 
 
 Contributing
