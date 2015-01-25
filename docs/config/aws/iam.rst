@@ -1,4 +1,3 @@
-============================
 Identity & Access Management
 ============================
 
@@ -7,7 +6,7 @@ Identity & Access Management
 
 
 InstanceProfile
-===============
+---------------
 
 .. class:: InstanceProfile
 
@@ -28,7 +27,7 @@ InstanceProfile
 
 
 Role
-====
+----
 
 .. class:: Role
 
@@ -69,7 +68,7 @@ Role
 
 
 ServerCertificate
-=================
+-----------------
 
 .. class:: ServerCertificate
 

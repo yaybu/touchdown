@@ -1,4 +1,3 @@
-==================
 Elastic Transcoder
 ==================
 
@@ -7,7 +6,7 @@ Elastic Transcoder
 
 
 Pipeline
-========
+--------
 
 .. class:: Pipeline
 

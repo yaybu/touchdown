@@ -1,4 +1,3 @@
-=====================
 Elastic Compute Cloud
 =====================
 
@@ -7,7 +6,7 @@ Elastic Compute Cloud
 
 
 Auto Scaling Group
-==================
+------------------
 
 .. class:: AutoScalingGroup
 
@@ -56,7 +55,7 @@ Auto Scaling Group
 
 
 Key Pair
-========
+--------
 
 .. class:: KeyPair
 
@@ -83,7 +82,7 @@ Key Pair
 
 
 Launch Configuration
-====================
+--------------------
 
 .. class:: LaunchConfiguration
 

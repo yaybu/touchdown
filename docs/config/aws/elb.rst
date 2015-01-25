@@ -1,4 +1,3 @@
-=====================
 Elastic Load Balancer
 =====================
 
@@ -7,7 +6,7 @@ Elastic Load Balancer
 
 
 Load Balancer
-=============
+-------------
 
 .. class:: LoadBalancer
 
@@ -58,7 +57,7 @@ Load Balancer
 
 
 Listeners
-=========
+---------
 
 .. class:: Listener
 
@@ -86,7 +85,7 @@ Listeners
 
 
 Attributes
-==========
+----------
 
 .. class:: Attributes
 
@@ -102,7 +101,7 @@ Attributes
 
 
 Health checks
-=============
+-------------
 
 .. class:: HealthCheck
 

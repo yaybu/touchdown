@@ -1,4 +1,3 @@
-==========
 Cloudfront
 ==========
 
@@ -7,7 +6,7 @@ Cloudfront
 
 
 Distribution
-============
+------------
 
 .. autoclass:: Distribution
    :members:

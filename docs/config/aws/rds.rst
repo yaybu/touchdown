@@ -1,4 +1,3 @@
-===========================
 Relational Database Service
 ===========================
 
@@ -7,7 +6,7 @@ Relational Database Service
 
 
 Database
-========
+--------
 
 .. class:: Database
 
@@ -92,7 +91,7 @@ Database
 
 
 SubnetGroup
-===========
+-----------
 
 .. class:: Database
 

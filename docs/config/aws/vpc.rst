@@ -1,4 +1,3 @@
-======================
 Virtual private clouds
 ======================
 
@@ -7,7 +6,7 @@ Virtual private clouds
 
 
 Virtual Private Clouds
-======================
+----------------------
 
 .. currentmodule:: touchdown.aws.vpc.vpc
 
@@ -65,7 +64,7 @@ VPC then you must create at least one :class:`Subnet` in it.
 
 
 Subnets
-=======
+-------
 
 .. currentmodule:: touchdown.aws.vpc.subnet
 
@@ -108,7 +107,7 @@ attaching to it with an :class:`InternetGateway`.
 
 
 Security Groups
-===============
+---------------
 
 .. currentmodule:: touchdown.aws.vpc.security_group
 
@@ -197,7 +196,7 @@ Defining rules
 
 
 Network ACL's
-=============
+-------------
 
 .. currentmodule:: touchdown.aws.vpc.network_acl
 
@@ -291,7 +290,7 @@ added a rule for.
 
 
 Route Tables
-============
+------------
 
 .. currentmodule:: touchdown.aws.vpc.route_table
 
@@ -369,7 +368,7 @@ Defining routes
 
 
 Internet Gateway
-================
+----------------
 
 .. currentmodule:: touchdown.aws.vpc.internet_gateway
 

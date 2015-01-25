@@ -1,4 +1,3 @@
-============
 Hardware VPN
 ============
 
@@ -12,7 +11,7 @@ You connect to it, it does not connect to you.
 
 
 VPN Connections
-===============
+---------------
 
 .. currentmodule:: touchdown.aws.vpc
 

@@ -1,4 +1,3 @@
-===========
 ElastiCache
 ===========
 
@@ -10,7 +9,7 @@ read replicas and high availability.
 
 
 CacheCluster
-============
+------------
 
 .. class:: CacheCluster
 
@@ -64,7 +63,7 @@ CacheCluster
 
 
 ReplicationGroup
-================
+----------------
 
 .. class:: ReplicationGroup
 
@@ -128,7 +127,7 @@ ReplicationGroup
 
 
 SubnetGroup
-===========
+-----------
 
 .. class:: SubnetGroup
 

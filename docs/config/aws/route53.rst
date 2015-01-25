@@ -1,4 +1,3 @@
-=======
 Route53
 =======
 
@@ -7,7 +6,7 @@ Route53
 
 
 HostedZone
-==========
+----------
 
 .. class:: HostedZone
 
