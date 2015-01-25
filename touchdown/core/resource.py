@@ -57,19 +57,19 @@ class ResourceType(type):
     def __new__(meta, class_name, bases, new_attrs):
         new_attrs['plans'] = {}
 
-        for name, argument in new_attrs.items():
-            if isinstance(argument, Argument):
-                new_attrs[name] = Field(name, argument)
-                argument.name = name
-
         cls = type.__new__(meta, class_name, bases, new_attrs)
 
         cls.__args__ = {}
         for key in dir(cls):
             value = getattr(cls, key)
-            if isinstance(value, Field):
+            if isinstance(value, Argument):
+                field = Field(key, value)
+                setattr(cls, key, field)
+                cls.__args__[key] = field
+                value.name = key
+                value.contribute_to_class(cls)
+            elif isinstance(value, Field):
                 cls.__args__[key] = value
-                value.argument.contribute_to_class(cls)
 
         name = ".".join((cls.__module__, cls.__name__))
         meta.__all_resources__[name] = cls

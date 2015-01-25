@@ -132,12 +132,14 @@ class Dict(Argument):
 
 class List(Argument):
 
+    serializer = None
+
     def __init__(self, list_of=None, **kwargs):
         super(List, self).__init__(**kwargs)
         self.list_of = list_of
         if not self.serializer:
-            self.serializers = serializers.List(
-                self.list_of.serializer or serializers.String(),
+            self.serializer = serializers.List(
+                self.list_of.serializer if self.list_of else  serializers.String(),
                 skip_empty=True,
             )
 

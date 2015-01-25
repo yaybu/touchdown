@@ -33,7 +33,7 @@ class Role(Resource):
     policies = argument.Dict()
     account = argument.Resource(Account)
 
-    def clean_assume_role_policy(self, policy):
+    def clean_assume_role_policy(self, instance, policy):
         if frozenset(("Version", "Statement")).difference(frozenset(policy.keys())):
             raise errors.InvalidParameter("Unexpected policy key")
 
@@ -42,10 +42,10 @@ class Role(Resource):
         result['Statement'] = []
         for statement in policy.get("Statement", []):
             s = {
-                "Action": policy["Action"],
-                "Effect": policy["Effect"],
-                "Principal": policy["Principal"],
-                "Sid": policy.get("Sid", ""),
+                "Action": statement["Action"],
+                "Effect": statement["Effect"],
+                "Principal": statement["Principal"],
+                "Sid": statement.get("Sid", ""),
             }
             result['Statement'].append(s)
         return result
