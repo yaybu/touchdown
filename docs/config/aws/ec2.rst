@@ -18,7 +18,7 @@ Auto Scaling Group
 
     .. attribute:: subnets
 
-        A list of :class:`~touchdown.aws.vpc.Subnet` resources
+        A list of :class:`~touchdown.aws.vpc.subnet.Subnet` resources
 
     .. attribute:: launch_configuration
 
@@ -50,9 +50,9 @@ Auto Scaling Group
 
     .. attribute:: load_balancers
 
-        A list of touchdown.aws.elb.LoadBalancer resources. As instances are
-        created by the auto scaling group they are added to these load
-        balancers.
+        A list of :class:`~touchdown.aws.elb.LoadBalancer` resources. As
+        instances are created by the auto scaling group they are added to these
+        load balancers.
 
 
 Key Pair
