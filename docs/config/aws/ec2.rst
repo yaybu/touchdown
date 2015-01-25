@@ -67,10 +67,10 @@ Key Pair
 
     It can be used with any AWS account resource::
 
-    aws.add_keypair(
-        name="my-keypair",
-        public_key=open(os.expanduser('~/.ssh/id_rsa.pub')),
-    )
+        aws.add_keypair(
+            name="my-keypair",
+            public_key=open(os.expanduser('~/.ssh/id_rsa.pub')),
+        )
 
     .. attribute:: name
 
