@@ -37,6 +37,11 @@ class Subnet(Resource):
     tags = argument.Dict()
     vpc = argument.Resource(VPC, field='VpcId')
 
+    def clean_cidr_block(self, cidr_block):
+        if not cidr_block in self.vpc.cidr_block:
+            raise errors.InvalidParameter("{} not inside network {}".format(self.cidr_block, self.vpc.cidr_block))
+        return cidr_block
+
 
 class Describe(SimpleDescribe, Plan):
 

@@ -41,7 +41,7 @@ class Connection(resource.Resource):
 
     root = argument.Resource(workspace.Workspace)
 
-    def clean_private_key(self, instance, private_key):
+    def clean_private_key(self, private_key):
         if private_key:
             for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
                 try:

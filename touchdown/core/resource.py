@@ -40,7 +40,7 @@ class Field(object):
     def __set__(self, instance, value):
         value = self.argument.clean(instance, value)
         if hasattr(instance, "clean_{}".format(self.name)):
-            value = getattr(instance, "clean_{}".format(self.name))(instance, value)
+            value = getattr(instance, "clean_{}".format(self.name))(value)
         instance._values[self.name] = value
 
     def __get__(self, instance, owner):
