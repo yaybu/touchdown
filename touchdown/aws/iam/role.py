@@ -34,7 +34,7 @@ class Role(Resource):
     account = argument.Resource(Account)
 
     def clean_assume_role_policy(self, instance, policy):
-        if frozenset(("Version", "Statement")).difference(frozenset(policy.keys())):
+        if frozenset(policy.keys()).difference(frozenset(("Version", "Statement"))):
             raise errors.InvalidParameter("Unexpected policy key")
 
         result = {}

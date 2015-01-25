@@ -27,6 +27,13 @@ class TestRole(aws.TestBasicUsage):
         self.expected_resource_id = 'my-test-role'
         self.resource = self.aws.add_role(
             name='my-test-role',
+            assume_role_policy={
+               "Statement": [{
+                   "Effect": "Allow",
+                   "Principal": {"Service": ["ec2.amazonaws.com"]},
+                   "Action": ["sts:AssumeRole"],
+               }],
+            },
         )
 
     def test_no_change(self):
