@@ -54,16 +54,16 @@ class Deployment(action.Action):
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    print channel.recv(1024)
+                    print(channel.recv(1024))
                 while channel.recv_stderr_ready():
-                    print channel.recv_stderr(1024)
+                    print(channel.recv_stderr(1024))
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
             while channel.recv_ready():
-                print channel.recv(1024)
+                print(channel.recv(1024))
             while channel.recv_stderr_ready():
-                print channel.recv_stderr(1024)
+                print(channel.recv_stderr(1024))
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
