@@ -49,32 +49,70 @@ class Field(object):
         return self.get_value(instance)
 
 
+class Meta(object):
+
+    def __init__(self):
+        self.plans = {}
+        self.fields = {}
+        self.field_order = []
+
+    def iter_fields_in_order(self):
+        for name in self.field_order:
+            yield self.fields[name]
+
+
 class ResourceType(type):
 
     __all_resources__ = {}
     __lazy_lookups__ = {}
 
-    def __new__(meta, class_name, bases, new_attrs):
-        new_attrs['plans'] = {}
+    def __new__(meta_cls, class_name, bases, new_attrs):
+        meta = new_attrs['meta'] = Meta()
 
-        cls = type.__new__(meta, class_name, bases, new_attrs)
+        # FIXME: What order to process the bases in?
+        for base in bases:
+            if hasattr(base, "meta") and isinstance(base.meta, Meta):
+                meta.fields.update(base.meta.fields)
+                meta.field_order.extend(base.meta.field_order)
 
-        cls.__args__ = {}
-        for key in dir(cls):
-            value = getattr(cls, key)
+        # A resource can set its on field_order. An example of when this is
+        # useful is the AWS subnet. We want to validate that its cidr_block
+        # fits inside the cidr_block of its parent vpc. So the vpc must always
+        # be processed first. This guarantee can't be made with kwargs on
+        # cpython.
+        if 'field_order' in new_attrs:
+            meta.field_order.extend(new_attrs['field_order'])
+            del new_attrs['field_order']
+
+        # Replace all Argument instances with Field instances. The Field type
+        # handles the "clean" stage of input processing and the storage of
+        # data passed in.
+        for name, value in new_attrs.items():
             if isinstance(value, Argument):
-                field = Field(key, value)
-                setattr(cls, key, field)
-                cls.__args__[key] = field
-                value.name = key
-                value.contribute_to_class(cls)
-            elif isinstance(value, Field):
-                cls.__args__[key] = value
+                field = new_attrs[name] = Field(name, value)
+                meta.fields[name] = field
+                meta.field_order.append(name)
+                value.name = name
 
+        # De-duplicate the field_order list
+        field_order = []
+        for field in meta.field_order:
+            if field not in field_order:
+                field_order.append(field)
+        meta.field_order = field_order
+
+        # Actuall build a class
+        cls = type.__new__(meta_cls, class_name, bases, new_attrs)
+
+        # Allow fields to contribute to the class...
+        for field in cls.meta.iter_fields_in_order():
+            field.argument.contribute_to_class(cls)
+
+        # Fire any signals.
         name = ".".join((cls.__module__, cls.__name__))
-        meta.__all_resources__[name] = cls
+        meta_cls.__all_resources__[name] = cls
 
-        for callable, args, kwargs in meta.__lazy_lookups__.get(name, []):
+        for callable, args, kwargs in meta_cls.__lazy_lookups__.get(name, []):
             callable(*args, **kwargs)
 
         return cls
@@ -95,18 +133,20 @@ class Resource(six.with_metaclass(ResourceType)):
         self._values = {}
         self.parent = parent
         self.dependencies = set()
-        for key, value in kwargs.items():
-            if key not in self.__args__:
+        for key in kwargs.keys():
+            if key not in self.meta.fields:
                 raise errors.InvalidParameter("'%s' is not a valid option" % (key, ))
-            setattr(self, key, value)
+        for field in self.meta.iter_fields_in_order():
+            if field.name in kwargs:
+                setattr(self, field.name, kwargs[field.name])
 
     @property
     def fields(self):
-        return list(self.__args__.items())
+        return list((field.name, field) for field in self.meta.iter_fields_in_order())
 
     @property
     def arguments(self):
-        return list((name, field.argument) for (name, field) in self.__args__.items())
+        return list((name, field.argument) for (name, field) in self.fields)
 
     @property
     def workspace(self):

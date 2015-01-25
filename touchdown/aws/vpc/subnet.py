@@ -29,6 +29,8 @@ class Subnet(Resource):
 
     resource_name = "subnet"
 
+    field_order = ["vpc"]
+
     name = argument.String()
     cidr_block = argument.IPNetwork(field='CidrBlock')
     availability_zone = argument.String(field='AvailabilityZone')

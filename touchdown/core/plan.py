@@ -23,7 +23,7 @@ class PlanType(type):
     def __new__(meta, class_name, bases, new_attrs):
         cls = type.__new__(meta, class_name, bases, new_attrs)
         if getattr(cls, "resource", None) is not None:
-            cls.resource.plans[cls.name] = cls
+            cls.resource.meta.plans[cls.name] = cls
             if cls.default:
                 cls.resource.default_plan = cls
         return cls
@@ -90,7 +90,7 @@ class Present(ArgumentAssertion):
     def test(self, resource):
         """ Test that the argument this asserts for is present in the
         resource. """
-        return resource.__args__[self.name].present(resource)
+        return resource.meta.fields[self.name].present(resource)
 
     def describe(self, resource):
         yield "'%s' must be present (%s)" % (self.name, self.test(resource))

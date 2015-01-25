@@ -81,7 +81,7 @@ class Describe(Goal):
     name = "describe"
 
     def get_plan_class(self, resource):
-        return resource.plans["describe"]
+        return resource.meta.plans["describe"]
 
 
 class Apply(Goal):
@@ -90,12 +90,12 @@ class Apply(Goal):
 
     def get_plan_class(self, resource):
         if "destroy" in resource.policies:
-            return resource.plans["destroy"]
+            return resource.meta.plans["destroy"]
 
         if "never-create" in resource.policies:
-            return resource.plans["describe"]
+            return resource.meta.plans["describe"]
 
-        return resource.plans.get("apply", resource.plans.get("describe", plan.NullPlan))
+        return resource.meta.plans.get("apply", resource.meta.plans.get("describe", plan.NullPlan))
 
 
 class Destroy(Goal):
@@ -105,5 +105,5 @@ class Destroy(Goal):
 
     def get_plan_class(self, resource):
         if not "never-destroy" in resource.policies:
-            return resource.plans.get("destroy", resource.plans.get("describe", plan.NullPlan))
-        return resource.plans.get("describe", plan.NullPlan)
+            return resource.meta.plans.get("destroy", resource.meta.plans.get("describe", plan.NullPlan))
+        return resource.meta.plans.get("describe", plan.NullPlan)

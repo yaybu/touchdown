@@ -135,7 +135,7 @@ class Argument(Serializer):
             result = getattr(object, self.attribute)
         except AttributeError:
             raise FieldNotPresent(self.attribute)
-        if not object.__args__[self.attribute].present(object):
+        if not object.meta.fields[self.attribute].present(object):
             if result is None:
                 raise FieldNotPresent(self.attribute)
             pass
