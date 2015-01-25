@@ -10,7 +10,7 @@ interpreter.
 .. _Fuselage: https://github.com/yaybu/fuselage
 
 
-..class:: Bundle
+.. class:: Bundle
 
     You can create a bundle from the workspace::
 
@@ -61,8 +61,8 @@ interpreter.
             resources=[<snip>],
         )
 
-    ..attribute:: connection
+    .. attribute:: connection
 
-    ..attribute:: resources
+    .. attribute:: resources
 
         This is a list of fuselage resources to apply.
