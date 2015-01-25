@@ -26,28 +26,13 @@ class Instance(adapters.Adapter):
     pass
 
 
-def _get_private_key(runner, object):
-    if not object:
-        return None
-    for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
-        try:
-            key = cls.from_private_key(six.BytesIO(object))
-        except paramiko.SSHException:
-            continue
-        return key
-    raise errors.Error("Invalid SSH private key")
-
-
 class Connection(resource.Resource):
 
     resource_name = "ssh_connection"
 
     username = argument.String(default="root", field="username")
     password = argument.String(field="password")
-    private_key = argument.String(
-        field="pkey",
-        serializer=serializers.Expression(_get_private_key),
-    )
+    private_key = argument.String(field="pkey", serializer=serializers.Identity())
     hostname = argument.String(field="hostname")
     instance = argument.Resource(Instance, field="hostname", serializer=serializers.Resource())
     port = argument.Integer(field="port", default=22)
@@ -55,6 +40,16 @@ class Connection(resource.Resource):
     proxy = argument.Resource("touchdown.ssh.Connection")
 
     root = argument.Resource(workspace.Workspace)
+
+    def clean_private_key(self, instance, private_key):
+        if private_key:
+            for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
+                try:
+                    key = cls.from_private_key(six.BytesIO(private_key))
+                except paramiko.SSHException:
+                    continue
+                return key
+        raise errors.InvalidParameter("Invalid SSH private key")
 
 
 class ConnectionPlan(plan.Plan):
