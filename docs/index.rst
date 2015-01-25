@@ -21,10 +21,6 @@ Getting help
 .. _issue tracker: https://github.com/yaybu/touchdown/issues
 
 
-First steps
-===========
-
-
 Resources
 =========
 
@@ -39,7 +35,8 @@ Resources
    :doc:`Relational Database Service <config/aws/rds>` |
    :doc:`Route53 DNS <config/aws/route53>` |
    :doc:`Simple Storage Service <config/aws/s3>` |
-   :doc:`Virtual Private Cloud <config/aws/vpc>`
+   :doc:`Virtual Private Cloud <config/aws/vpc>` |
+   :doc:`VPNs <config/aws/vpn>`
 
  * **Fuselage:**
    :doc:`Deploying over SSH <config/fuselage>`
