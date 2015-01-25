@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import StringIO
+import six
 
 from touchdown.core import adapters, argument, errors, resource, plan, serializers, workspace
 
@@ -31,7 +31,7 @@ def _get_private_key(runner, object):
         return None
     for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
         try:
-            key = cls.from_private_key(StringIO.StringIO(object))
+            key = cls.from_private_key(six.BytesIO(object))
         except paramiko.SSHException:
             continue
         return key
