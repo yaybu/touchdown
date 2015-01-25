@@ -15,8 +15,7 @@
 import logging
 import six
 
-from . import errors
-from .argument import Argument, List
+from . import argument, errors
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +87,7 @@ class ResourceType(type):
         # handles the "clean" stage of input processing and the storage of
         # data passed in.
         for name, value in new_attrs.items():
-            if isinstance(value, Argument):
+            if isinstance(value, argument.Argument):
                 field = new_attrs[name] = Field(name, value)
                 meta.fields[name] = field
                 meta.field_order.append(name)
@@ -127,7 +126,7 @@ class Resource(six.with_metaclass(ResourceType)):
     dot_ignore = False
     default_plan = None
 
-    policies = List()
+    policies = argument.List(argument.String())
 
     def __init__(self, parent, **kwargs):
         self._values = {}
