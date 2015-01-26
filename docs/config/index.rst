@@ -23,7 +23,6 @@ VPC at Amazon with a subnet your ``Touchdownfile`` would contain::
 
 
 .. toctree::
-   :glob:
 
-   aws/*
+   aws/index
    fuselage
