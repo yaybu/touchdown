@@ -5,6 +5,15 @@ Touchdown
 Touchdown is a tool for launching and managing infrastructure services - be
 they physical servers, virtual subnets or private dns records.
 
+.. toctree::
+   :hidden:
+
+   overview
+   installation
+   tutorial/index
+   config/index
+   framework
+
 
 Getting started
 ===============
@@ -19,14 +28,14 @@ Getting started
    :doc:`Generating graphs <cli/dot>`
 
  * **Tutorial:**
-   :doc:`Hello world with S3, CloudFront and Route53 <tutorial/hello_world>`
+   :doc:`Hello world <tutorial/hello_world>`
 
 
 Resources
 =========
 
  * **Amazon:**
-   :doc:`Authentication <config/aws/index>` |
+   :doc:`Authentication <config/aws/authentication>` |
    :doc:`CloudFront<config/aws/cloudfront>` |
    :doc:`EC2 <config/aws/ec2>` |
    :doc:`ElastiCache <config/aws/elasticache>` |
