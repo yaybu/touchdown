@@ -5,10 +5,6 @@ Touchdown
 Touchdown is a tool for launching and managing infrastructure services - be
 they physical servers, virtual subnets or private dns records.
 
-Define your infrastructure as python and deploy it with::
-
-    $ touchdown apply
-
 
 Getting started
 ===============
