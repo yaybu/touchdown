@@ -9,8 +9,8 @@ Glossary
        the environment.
 
    plan
-       Given a goal and a resource a plan decides what changes need to be made
-       to achieve the goal.
+       Given a :term:`goal` and a :term:`resource` a plan decides what changes
+       need to be made to achieve the goal.
 
    resource
        An entity that is subject to configuration management by Touchdown. It
