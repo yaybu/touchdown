@@ -23,7 +23,7 @@ Getting started
    :doc:`Generating graphs <cli/dot>`
 
  * **Tutorial:**
-    :doc:`Hello world with S3, CloudFront and Route53 <tutorial/hello_world>`
+   :doc:`Hello world with S3, CloudFront and Route53 <tutorial/hello_world>`
 
 
 Resources
