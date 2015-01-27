@@ -35,11 +35,22 @@ class TestArguments(unittest.TestCase):
     def test_string(self):
         self.assertEqual(argument.String().clean(None, 0), "0")
 
+    def test_string_none(self):
+        self.assertEqual(argument.String().clean(None, None), None)
+
     def test_integer_from_string(self):
         self.assertEqual(argument.Integer().clean(None, "0"), 0)
 
     def test_integer(self):
         self.assertEqual(argument.Integer().clean(None, 0), 0)
+
+    def test_not_an_integer(self):
+        self.assertRaises(
+            errors.InvalidParameter,
+            argument.Integer().clean,
+            None,
+            "five"
+        )
 
     def test_ip_address(self):
         self.assertEqual(
