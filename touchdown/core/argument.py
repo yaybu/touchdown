@@ -64,9 +64,14 @@ class String(Argument):
     serializer = serializers.String()
 
     def clean(self, instance, value):
-        if value is not None:
-            value = force_str(value)
-        return value
+        if value is None:
+            return value
+
+        # Automatically cast integers, etc to string
+        if not isinstance(value, (six.binary_type, six.text_type)):
+            value = str(value)
+
+        return force_str(value)
 
 
 class Integer(Argument):
@@ -86,14 +91,6 @@ class Integer(Argument):
         return value
 
 
-class Octal(Integer):
-
-    def clean(self, instance, value):
-        if not isinstance(value, int):
-            value = int(value, 8)
-        return value
-
-
 class IPAddress(String):
 
     serializer = serializers.String()
@@ -101,7 +98,7 @@ class IPAddress(String):
     def clean(self, instance, value):
         try:
             return netaddr.IPAddress(value)
-        except netaddr.core.AddrFormatError:
+        except (netaddr.core.AddrFormatError, ValueError):
             raise errors.InvalidParameter("{} is not a valid IP Address")
 
 
@@ -112,7 +109,7 @@ class IPNetwork(String):
     def clean(self, instance, value):
         try:
             value = netaddr.IPNetwork(value)
-        except netaddr.core.AddrFormatError:
+        except (netaddr.core.AddrFormatError, ValueError):
             raise errors.InvalidParameter("{} is not a valid IP Address")
         if value != value.cidr:
             raise errors.InvalidParameter("{} looks wrong - did you mean {}?".format(value, value.cdr))

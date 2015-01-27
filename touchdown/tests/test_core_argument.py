@@ -41,9 +41,6 @@ class TestArguments(unittest.TestCase):
     def test_integer(self):
         self.assertEqual(argument.Integer().clean(None, 0), 0)
 
-    def test_octal(self):
-        self.assertEqual(argument.Integer().clean(None, "0644"), 0o644)
-
     def test_ip_address(self):
         self.assertEqual(
             str(argument.IPAddress().clean(None, "192.168.0.1")),
@@ -69,7 +66,7 @@ class TestArguments(unittest.TestCase):
             errors.InvalidParameter,
             argument.IPNetwork().clean,
             None,
-            "192.168.0.1",
+            "192.168.0.270",
         )
 
     def test_dict(self):
@@ -77,7 +74,7 @@ class TestArguments(unittest.TestCase):
 
     def test_not_a_dict(self):
         self.assertRaises(
-            errors.InvalidParamter,
+            errors.InvalidParameter,
             argument.Dict().clean,
             None,
             []
@@ -98,7 +95,7 @@ class TestArguments(unittest.TestCase):
 
     def test_not_a_list(self):
         self.assertRaises(
-            errors.InvalidParamter,
+            errors.InvalidParameter,
             argument.List().clean,
             None,
             {}
