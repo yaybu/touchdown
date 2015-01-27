@@ -20,6 +20,69 @@ from touchdown.core import argument, errors
 
 class TestArguments(unittest.TestCase):
 
+    def test_bool_true(self):
+        self.assertEqual(argument.Boolean().clean(None, "on"), True)
+        self.assertEqual(argument.Boolean().clean(None, "yes"), True)
+        self.assertEqual(argument.Boolean().clean(None, "1"), True)
+        self.assertEqual(argument.Boolean().clean(None, "true"), True)
+
+    def test_bool_false(self):
+        self.assertEqual(argument.Boolean().clean(None, "off"), False)
+        self.assertEqual(argument.Boolean().clean(None, "no"), False)
+        self.assertEqual(argument.Boolean().clean(None, "0"), False)
+        self.assertEqual(argument.Boolean().clean(None, "false"), False)
+
+    def test_string(self):
+        self.assertEqual(argument.String().clean(None, 0), "0")
+
+    def test_integer_from_string(self):
+        self.assertEqual(argument.Integer().clean(None, "0"), 0)
+
+    def test_integer(self):
+        self.assertEqual(argument.Integer().clean(None, 0), 0)
+
+    def test_octal(self):
+        self.assertEqual(argument.Integer().clean(None, "0644"), 0o644)
+
+    def test_ip_address(self):
+        self.assertEqual(
+            str(argument.IPAddress().clean(None, "192.168.0.1")),
+            "192.168.0.1",
+        )
+
+    def test_ip_address_exception(self):
+        self.assertRaises(
+            errors.InvalidParameter,
+            argument.IPAddress().clean,
+            None,
+            "192.168.0.1/24",
+        )
+
+    def test_ip_network(self):
+        self.assertEqual(
+            str(argument.IPNetwork().clean(None, "192.168.0.1/25")),
+            "192.168.0.1/25",
+        )
+
+    def test_ip_network_exception(self):
+        self.assertRaises(
+            errors.InvalidParameter,
+            argument.IPNetwork().clean,
+            None,
+            "192.168.0.1",
+        )
+
+    def test_dict(self):
+        self.assertEqual(argument.Dict().clean(None, {}), {})
+
+    def test_not_a_dict(self):
+        self.assertRaises(
+            errors.InvalidParamter,
+            argument.Dict().clean,
+            None,
+            []
+        )
+
     def test_list_ips(self):
         result = argument.List(argument.IPNetwork()).clean(None, ["0.0.0.0/0"])
         self.assertTrue(isinstance(result, list))
@@ -31,4 +94,12 @@ class TestArguments(unittest.TestCase):
             argument.List(argument.IPNetwork()).clean,
             None,
             ["0.0.0.0/"],
+        )
+
+    def test_not_a_list(self):
+        self.assertRaises(
+            errors.InvalidParamter,
+            argument.List().clean,
+            None,
+            {}
         )
