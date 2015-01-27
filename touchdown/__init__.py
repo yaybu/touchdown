@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import touchdown.core  # noqa
 import touchdown.aws  # noqa
 import touchdown.fuselage  # noqa
 import touchdown.ssh  # noqa
+
+from touchdown.core import Runner, Workspace
+
+__all__ = [
+    "Runner",
+    "Workspace",
+]
