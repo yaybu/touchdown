@@ -36,16 +36,16 @@ Resources
 
  * **Amazon:**
    :doc:`Authentication <config/aws/authentication>` |
-   :doc:`CloudFront<config/aws/cloudfront>` |
-   :doc:`EC2 <config/aws/ec2>` |
-   :doc:`ElastiCache <config/aws/elasticache>` |
-   :doc:`ElasticTranscoder <config/aws/elastictranscoder>` |
-   :doc:`Elastic Load Balancing <config/aws/elb>` |
+   :doc:`CDN <config/aws/cloudfront>` |
+   :doc:`Compute <config/aws/ec2>` |
+   :doc:`DNS <config/aws/route53>` |
+   :doc:`Key Value Stores <config/aws/elasticache>` |
    :doc:`Identity & Access Management <config/aws/iam>` |
-   :doc:`Relational Database Service <config/aws/rds>` |
-   :doc:`Route53 DNS <config/aws/route53>` |
+   :doc:`Load Balancing <config/aws/elb>` |
+   :doc:`Networking <config/aws/vpc>` |
+   :doc:`Relational Databases <config/aws/rds>` |
    :doc:`Simple Storage Service <config/aws/s3>` |
-   :doc:`Virtual Private Cloud <config/aws/vpc>` |
+   :doc:`Transcoding <config/aws/elastictranscoder>` |
    :doc:`VPNs <config/aws/vpn>`
 
  * **Fuselage:**
