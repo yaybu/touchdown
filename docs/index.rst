@@ -28,7 +28,8 @@ Getting started
    :doc:`Generating graphs <cli/dot>`
 
  * **Tutorial:**
-   :doc:`Hello world <tutorial/hello_world>`
+   :doc:`Hello world <tutorial/hello_world>` |
+   :doc:`Django <tutorial/django>`
 
 
 Resources
