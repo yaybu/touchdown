@@ -72,6 +72,7 @@ an :class:`~touchdown.aws.iam.InstanceProfile` to grant a
 :class:`~touchdown.aws.iam.Role` to the instance.
 
 ::
+
     instance_profile = aws.add_instance_profile(
         name="radpress-app",
         roles=[aws.add_role(
