@@ -128,8 +128,52 @@ Building your base image
 Deploying an instance
 ---------------------
 
-Adding a load balancer
-----------------------
+We'll deploy the image we just made with an auto scaling group. We are going to
+put a load balancer in front, which we'll set up first::
+
+    aws.add_load_balancer(
+        name='balancer',
+        listeners=[
+            {"port": 80, "protocol": "http", "instance_port": 8080, "instance_protocol": "http"}
+        ],
+        subnets=subnets['delivery'],
+        security_groups=[security_groups['delivery']],
+        health_check={
+            "interval": 30,
+            "healthy_threshold": 3,
+            "unhealthy_threshold": 5,
+            "check": "HTTP:8080/__ping__",
+            "timeout": 20,
+        },
+        attributes={
+            "cross_zone_load_balancing": True,
+            "connection_draining": 30,
+        },
+    )
+
+
+Then we need a :class:`~touchdown.aws.ec2.LaunchConfiguration` that says what
+any started instances should look like and the
+:class:`~touchdown.aws.ec2.AutoScalingGroup` itself::
+
+    app = aws.add_auto_scaling_group(
+        name="radpress-app",
+        launch_configuration=aws.add_launch_configuration(
+            name="radpress-app-{}".format(int(time.time())),
+            image=ami,
+            instance_type="t1.micro",
+            user_data="",
+            key_pair=keypair,
+            security_groups=security_groups["app"],
+            associate_public_ip_address=True,
+            instance_profile=instance_profile,
+        ),
+        min_size=1,
+        max_size=1,
+        load_balancers=[lb],
+        subnets=subnets["app"],
+    )
+
 
 Content delivery networks
 -------------------------
