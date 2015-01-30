@@ -30,6 +30,7 @@ setup(
     install_requires=[
         'six',
         'click',
+        'contextlib2',
     ],
     entry_points='''
         [console_scripts]

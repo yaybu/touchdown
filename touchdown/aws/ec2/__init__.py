@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .ami import Image
 from .keypair import KeyPair
 from .auto_scaling_group import AutoScalingGroup
 from .launch_configuration import LaunchConfiguration
 
 
 __all__ = [
+    'Image',
     'KeyPair',
     'AutoScalingGroup',
     'LaunchConfiguration',
