@@ -94,8 +94,6 @@ class Apply(SimpleApply, Describe):
             )['PolicyNames']
 
         for name, document in self.resource.policies.items():
-            document = json.loads(document)
-
             changed = False
             if name not in policy_names:
                 changed = True
