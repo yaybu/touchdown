@@ -31,10 +31,10 @@ class Image(Resource):
 
     resource_name = "image"
 
-    name = argument.String(field="Name")
+    name = argument.String(min=3, max=128, field="Name")
     description = argument.String(field="Description")
 
-    ami = argument.String()
+    source_ami = argument.String()
 
     resources = argument.List()
 
@@ -47,6 +47,8 @@ class Image(Resource):
     #location = argument.String()
     #snapshot_id = argument.String()
 
+    tags = argument.Dict()
+
     account = argument.Resource(BaseAccount)
 
 
@@ -54,7 +56,7 @@ class BuildInstance(Action):
 
     @property
     def description(self):
-        yield "Build new AMI '{}' from '{}'".format(self.resource.name, self.resource.ami)
+        yield "Build new AMI '{}' from '{}'".format(self.resource.name, self.resource.source_ami)
 
     def create_security_group(self):
         print("Creating temporary security group")
@@ -86,9 +88,9 @@ class BuildInstance(Action):
         )
 
     def create_instance(self, keypair, security_group):
-        print("Creating a source instance from {}".format(self.resource.ami))
+        print("Creating a source instance from {}".format(self.resource.source_ami))
         reservations = self.plan.client.run_instances(
-            ImageId=self.resource.ami,
+            ImageId=self.resource.source_ami,
             InstanceType="m1.small",
             MaxCount=1,
             MinCount=1,
