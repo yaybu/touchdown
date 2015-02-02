@@ -23,7 +23,7 @@ from ..vpc import SecurityGroup
 from .subnet_group import SubnetGroup
 
 
-class BaseCacheCluster(object):
+class BaseCacheCluster(Resource):
 
     instance_class = argument.String(field="CacheNodeType")
     engine = argument.String(field='Engine', aws_update=False)
@@ -42,7 +42,7 @@ class BaseCacheCluster(object):
     account = argument.Resource(Account)
 
 
-class CacheCluster(BaseCacheCluster, Resource):
+class CacheCluster(BaseCacheCluster):
 
     resource_name = "cache_cluster"
 

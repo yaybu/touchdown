@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
@@ -20,7 +19,7 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .cache import BaseCacheCluster
 
 
-class ReplicationGroup(BaseCacheCluster, Resource):
+class ReplicationGroup(BaseCacheCluster):
 
     resource_name = "replication_group"
 

@@ -228,6 +228,9 @@ class Resource(Argument):
         if hasattr(cls, "wrap"):
             return
 
+        if not hasattr(cls, "resource_name"):
+            return
+
         def _(self, **kwargs):
             arguments = {argument_name: self}
             arguments.update(kwargs)
