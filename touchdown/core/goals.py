@@ -81,7 +81,7 @@ class Describe(Goal):
     name = "describe"
 
     def get_plan_class(self, resource):
-        return resource.meta.plans["describe"]
+        return resource.meta.plans.get("describe", plan.NullPlan)
 
 
 class Apply(Goal):

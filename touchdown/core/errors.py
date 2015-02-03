@@ -17,11 +17,15 @@ class Error(Exception):
     pass
 
 
-class NothingChanged(Exception):
+class NothingChanged(Error):
     pass
 
 
-class InvalidParameter(Exception):
+class InvalidParameter(Error):
+    pass
+
+
+class NotFound(Error):
     pass
 
 

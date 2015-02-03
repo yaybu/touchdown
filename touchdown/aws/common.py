@@ -228,6 +228,8 @@ class SimpleDescribe(object):
         if not self.object:
             raise errors.NotFound("Object '{}' could not be found, and is not scheduled to be created")
 
+        return []
+
     @property
     def resource_id(self):
         if self.key in self.object:

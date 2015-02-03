@@ -77,7 +77,7 @@ class Describe(SimpleDescribe, Plan):
         if self.key in self.object:
             return {
                 "Filters": [
-                    {'Name': 'vpc-id', 'Values': [self.object[self.key]]}
+                    {'Name': 'network-acl-id', 'Values': [self.object[self.key]]}
                 ]
             }
 
