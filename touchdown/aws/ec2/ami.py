@@ -21,7 +21,7 @@ except ImportError:
 from touchdown.core.action import Action
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, errors
+from touchdown.core import argument, errors, serializers
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -46,6 +46,8 @@ class Image(Resource):
     #sriov_net_support = argument.String(choices=["simple"], field="SriovNetSupport")
     #location = argument.String()
     #snapshot_id = argument.String()
+
+    launch_permissions = argument.List()
 
     tags = argument.Dict()
 
@@ -168,6 +170,39 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
+        description = ["Update who can launch this image"]
+
+        remote_userids = []
+        if self.object:
+            results = self.client.describe_image_attribute(
+                ImageId=self.object['ImageId'],
+                Attribute="launchPermission",
+            ).get("LaunchPermissions", [])
+            remote_userids = [r['UserId'] for r in results]
+
+        add = []
+        for userid in self.resource.launch_permissions:
+            if not userid in remote_userids:
+                description.append("Add launch permission for '{}'".format(userid))
+                add.append({"UserId": userid})
+
+        remove = []
+        for userid in remote_userids:
+            if not userid in self.resource.launch_permissions:
+                description.append("Remove launch permission for '{}'".format(userid))
+                remove.append({"UserId": userid})
+
+        if add or remove:
+            yield self.generic_action(
+                description,
+                self.client.modify_image_attribute,
+                ImageId=serializers.Identifier(),
+                Attribute="launchPermission",
+                LaunchPermission=dict(
+                    Add=add,
+                    Remove=remove,
+                ),
+            )
 
 class Destroy(SimpleDestroy, Describe):
 
