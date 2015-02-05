@@ -295,7 +295,7 @@ class Resource(Dict):
                 continue
 
             if hasattr(object, "serialize_" + argument_name):
-                serializer = Expression(getattr("serialize_" + argument_name))
+                serializer = Expression(getattr(object, "serialize_" + argument_name))
             else:
                 serializer = arg.serializer
 
