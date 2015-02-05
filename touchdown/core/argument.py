@@ -223,13 +223,10 @@ class Resource(Argument):
         implicitly).
         """
         if isinstance(self.resource_class, six.string_types):
-            print "contribute_to_class", cls, self.resource_class
             from .resource import ResourceType
             if self.resource_class not in ResourceType.__all_resources__:
                 ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)
-                print "POSTPONING"
                 return
-            print "SETTING TO", ResourceType.__all_resources__[self.resource_class], type(ResourceType.__all_resources__[self.resource_class])
             self.resource_class = ResourceType.__all_resources__[self.resource_class]
 
         argument_name = self.name

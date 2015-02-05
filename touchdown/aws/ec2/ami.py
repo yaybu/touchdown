@@ -149,7 +149,6 @@ class BuildInstance(Action):
             #use_agent=False,
         )
         for step in self.resource.steps:
-            print step
             cli.run_script(**serializers.Resource().render(self.runner, step))
 
     def terminate_instance(self, instance):
@@ -168,7 +167,7 @@ class BuildInstance(Action):
             security_group = self.create_security_group()
             instance = self.create_instance(keypair, security_group)
 
-            print "Deploying instance"
+            print("Deploying instance")
             self.deploy_instance(keypair, instance)
 
             print("Creating image")

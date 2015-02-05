@@ -40,7 +40,6 @@ class Connection(resource.Resource):
     root = argument.Resource(workspace.Workspace)
 
     def clean_private_key(self, private_key):
-        print private_key, client
         if private_key and client:
             return client.private_key_from_string(private_key)
         raise errors.InvalidParameter("Invalid SSH private key")
