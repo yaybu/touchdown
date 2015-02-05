@@ -33,6 +33,7 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 class Image(Resource):
 
     resource_name = "image"
+    immutable_tags = True
 
     name = argument.String(min=3, max=128, field="Name")
     description = argument.String(field="Description")

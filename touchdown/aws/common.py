@@ -260,6 +260,9 @@ class SimpleApply(SimpleDescribe):
         return g
 
     def update_tags(self):
+        if getattr(self.resource, "immutable_tags", False) and self.object:
+            return
+
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)
             local_tags['Name'] = self.resource.name

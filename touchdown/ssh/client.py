@@ -70,17 +70,17 @@ class Client(paramiko.SSHClient):
             channel.close()
 
     def run_script(self, script):
-        sftp = self.client.open_sftp()
+        sftp = self.open_sftp()
         sftp.chdir(".")
 
         random_string = binascii.hexlify(os.urandom(4)).decode('ascii')
-        path = os.path.join(sftp.getcwd(), 'fuselage_%s' % (random_string))
+        path = os.path.join(sftp.getcwd(), 'touchdown_%s' % (random_string))
 
         try:
-            sftp.putfo(six.StringIO(self.resource.contents), path)
+            sftp.putfo(script, path)
             sftp.chmod(path, 0o755)
             try:
-                transport = self.client.get_transport()
+                transport = self.get_transport()
                 self._run(transport, "sudo " + path)
             finally:
                 sftp.remove(path)
