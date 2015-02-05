@@ -23,6 +23,9 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, serializers
 
+from touchdown.provisioner import Step
+from touchdown import ssh
+
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
@@ -36,7 +39,8 @@ class Image(Resource):
 
     source_ami = argument.String()
 
-    resources = argument.List()
+    username = argument.String()
+    steps = argument.List(argument.Resource(tuple(Step.__subclasses__())))
 
     #architecture = argument.String(field="Architecture", default="x86_64", choices=["x86_64", "i386"])
     #kernel = argument.String(field="KernelId")
@@ -67,6 +71,16 @@ class BuildInstance(Action):
             Description="Temporary security group",
         )
         self.stack.callback(self.destroy_security_group, security_group)
+
+        print("Granting SSH access")
+        self.plan.client.authorize_security_group_ingress(
+            GroupId=security_group['GroupId'],
+            IpProtocol="tcp",
+            FromPort=22,
+            ToPort=22,
+            CidrIp="0.0.0.0/0",
+        )
+
         return security_group
 
     def destroy_security_group(self, security_group):
@@ -97,7 +111,11 @@ class BuildInstance(Action):
             MaxCount=1,
             MinCount=1,
             KeyName=keypair['KeyName'],
-            SecurityGroupIds=[security_group['GroupId']],
+            NetworkInterfaces=[{
+                "DeviceIndex": 0,
+                "AssociatePublicIpAddress": True,
+                "Groups": [security_group['GroupId']],
+            }],
         )
 
         if len(reservations.get("Instances", [])) == 0:
@@ -112,7 +130,29 @@ class BuildInstance(Action):
         print("Waiting for instance {} to boot...".format(instance["InstanceId"]))
         self.plan.client.get_waiter("instance_running").wait(InstanceIds=[instance["InstanceId"]])
 
-        return instance
+        # We have to now get the info about the isntance again so we know
+        # it's public ip address
+        reservation = self.plan.client.describe_instances(
+            InstanceIds=[instance["InstanceId"]]
+        )['Reservations'][0]
+        return reservation["Instances"][0]
+
+    def deploy_instance(self, keypair, instance):
+        cli = ssh.Client()
+
+        print self.resource.username
+        print keypair
+
+        cli.connect(
+            hostname=instance['PublicIpAddress'],
+            username=self.resource.username,
+            pkey=ssh.private_key_from_string(keypair['KeyMaterial']),
+            look_for_keys=False,
+            #use_agent=False,
+        )
+        for step in self.steps:
+            print step
+            cli.run_script(**serializers.Resource().render(self.runner, step))
 
     def terminate_instance(self, instance):
         print("Terminating instance")
@@ -129,6 +169,9 @@ class BuildInstance(Action):
             keypair = self.create_keypair()
             security_group = self.create_security_group()
             instance = self.create_instance(keypair, security_group)
+
+            print "Deploying instance"
+            self.deploy_instance(keypair, instance)
 
             print("Creating image")
             self.plan.client.create_image(
@@ -203,6 +246,7 @@ class Apply(SimpleApply, Describe):
                     Remove=remove,
                 ),
             )
+
 
 class Destroy(SimpleDestroy, Describe):
 

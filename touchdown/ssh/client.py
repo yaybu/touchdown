@@ -14,33 +14,31 @@
 
 import binascii
 import os
+import socket
 import time
 
-from touchdown.core import action, argument, errors, resource, plan, workspace
-from touchdown.ssh import Connection
+import six
+import paramiko
 
-try:
-    import fuselage
-    from fuselage import bundle, builder
-except ImportError:
-    fuselage = None
+from touchdown.core import errors
 
 
-class Bundle(resource.Resource):
+def private_key_from_string(private_key):
+    for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
+        try:
+            key = cls.from_private_key(six.BytesIO(private_key))
+        except paramiko.SSHException:
+            continue
+        return key
 
-    resource_name = "fuselage_bundle"
 
-    connection = argument.Resource(Connection)
-    resources = argument.List()
+class Client(paramiko.SSHClient):
 
-    root = argument.Resource(workspace.Workspace)
+    connection_attempts = 20
 
-
-class Deployment(action.Action):
-
-    @property
-    def description(self):
-        yield "Apply fuselage configruation to {}".format(self.resource.connection)
+    def __init__(self, *args, **kwargs):
+        super(Client, self).__init__(*args, **kwargs)
+        self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     def _run(self, transport, command):
         channel = transport.open_session()
@@ -71,24 +69,18 @@ class Deployment(action.Action):
         finally:
             channel.close()
 
-    def run(self):
-        b = bundle.ResourceBundle()
-        b.extend(iter(self.resource.resources))
-        bu = builder.build(b)
-
-        client = self.get_plan(self.resource.connection).get_client()
-
-        sftp = client.open_sftp()
+    def run_script(self, script):
+        sftp = self.client.open_sftp()
         sftp.chdir(".")
 
         random_string = binascii.hexlify(os.urandom(4)).decode('ascii')
         path = os.path.join(sftp.getcwd(), 'fuselage_%s' % (random_string))
 
         try:
-            sftp.putfo(bu, path)
+            sftp.putfo(six.StringIO(self.resource.contents), path)
             sftp.chmod(path, 0o755)
             try:
-                transport = client.get_transport()
+                transport = self.client.get_transport()
                 self._run(transport, "sudo " + path)
             finally:
                 sftp.remove(path)
@@ -96,14 +88,24 @@ class Deployment(action.Action):
         finally:
             sftp.close()
 
+    def verify_transport(self):
+        # FIXME: Run a shell command like 'false' and make sure it returns false
+        # Then run a shell command like 'whoami' and make sure it has exit code 0 and returns the right user
+        # Some weird AMI's hijack SSH a bit and allow authentication to succeed, but then return an error
+        # when the user tries to run any command. Great if SSHing in from terminal
+        # but rubbish for developers D:
+        return
 
-class Apply(plan.Plan):
+    def connect(self, **kwargs):
+        for i in range(self.connection_attempts):
+            try:
+                super(Client, self).connect(**kwargs)
+                break
+            except paramiko.PasswordRequiredException:
+                raise errors.Error("Unable to authenticate with remote server")
+            except (socket.error, EOFError):
+                time.sleep(i + 1)
+        else:
+            raise errors.Error("Unable to connect to remove server after {} tries".format(self.connection_attempts))
 
-    name = "apply"
-    resource = Bundle
-
-    def get_actions(self):
-        if not fuselage:
-            raise errors.Error("You need the fuselage package to use the fuselage_bundle resource")
-
-        yield Deployment(self)
+        self.verify_transport()

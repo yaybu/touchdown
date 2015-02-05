@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import touchdown.aws  # noqa
-import touchdown.fuselage  # noqa
+import touchdown.provisioner  # noqa
 import touchdown.ssh  # noqa
 
 from touchdown.core import Runner, Workspace

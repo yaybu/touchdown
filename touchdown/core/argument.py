@@ -192,7 +192,8 @@ class Resource(Argument):
                     try:
                         value = klass(instance, **value)
                         break
-                    except errors.InvalidParameter:
+                    except errors.InvalidParameter as e:
+                        print e
                         continue
                 else:
                     raise errors.InvalidParameter("Parameter must be one of {}".format(str(self.resource_class)))

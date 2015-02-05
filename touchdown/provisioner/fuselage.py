@@ -12,12 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .client import Client, private_key_from_string
-from .connection import Connection, Instance
+try:
+    import fuselage
+    from fuselage import bundle, builder
+except ImportError:
+    fuselage = None
 
-__all__ = [
-    "Client",
-    "Connection",
-    "Instance",
-    "private_key_from_string",
-]
+from touchdown.core import argument, errors
+from . import provisioner
+
+
+class Bundle(provisioner.Step):
+
+    resource_name = "fuselage_bundle"
+
+    resources = argument.List(field="script")
+
+    def serialize_resources(self, runner, value):
+        if not fuselage:
+            raise errors.Error("You need the fuselage package to use the fuselage_bundle resource")
+        b = bundle.ResourceBundle()
+        b.extend(iter(value))
+        return builder.build(b)

@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .client import Client, private_key_from_string
-from .connection import Connection, Instance
+import six
 
-__all__ = [
-    "Client",
-    "Connection",
-    "Instance",
-    "private_key_from_string",
-]
+from touchdown.core import argument, serializers
+from . import provisioner
+
+
+class Script(provisioner.Step):
+
+    resource_name = "script"
+
+    script = argument.String(
+        field="script",
+        serializer=serializers.Expression(lambda r, o: six.StringIO(o)),
+    )

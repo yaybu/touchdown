@@ -294,9 +294,14 @@ class Resource(Dict):
             if self.mode == "update" and not getattr(arg, "aws_update", True):
                 continue
 
+            if hasattr(object, "serialize_" + argument_name):
+                serializer = Expression(getattr("serialize_" + argument_name))
+            else:
+                serializer = arg.serializer
+
             kwargs[arg.field] = Context(
                 Argument(argument_name),
-                arg.serializer
+                serializer,
             )
 
         return self._render(kwargs, runner, object)
@@ -326,6 +331,8 @@ class List(Serializer):
 class Context(Serializer):
 
     def __init__(self, serializer, inner):
+        if not isinstance(serializer, Serializer):
+            serializer = Const(serializer)
         self.serializer = serializer
         self.inner = inner
 

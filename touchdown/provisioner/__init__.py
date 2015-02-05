@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .client import Client, private_key_from_string
-from .connection import Connection, Instance
+from .provisioner import Provisioner, Step
+from .bash import Script
+from .fuselage import Bundle
 
 __all__ = [
-    "Client",
-    "Connection",
-    "Instance",
-    "private_key_from_string",
+    "Provisioner",
+    "Step",
+    "Script",
+    "Bundle",
 ]
