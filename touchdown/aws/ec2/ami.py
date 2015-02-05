@@ -140,9 +140,6 @@ class BuildInstance(Action):
     def deploy_instance(self, keypair, instance):
         cli = ssh.Client()
 
-        print self.resource.username
-        print keypair
-
         cli.connect(
             hostname=instance['PublicIpAddress'],
             username=self.resource.username,
@@ -150,7 +147,7 @@ class BuildInstance(Action):
             look_for_keys=False,
             #use_agent=False,
         )
-        for step in self.steps:
+        for step in self.resource.steps:
             print step
             cli.run_script(**serializers.Resource().render(self.runner, step))
 
