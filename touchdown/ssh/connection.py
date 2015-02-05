@@ -15,7 +15,7 @@
 from touchdown.core import adapters, argument, errors, resource, plan, serializers, workspace
 
 try:
-    from .client import client
+    from . import client
 except ImportError:
     client = None
 
@@ -35,11 +35,12 @@ class Connection(resource.Resource):
     instance = argument.Resource(Instance, field="hostname", serializer=serializers.Resource())
     port = argument.Integer(field="port", default=22)
 
-    proxy = argument.Resource("touchdown.ssh.Connection")
+    proxy = argument.Resource("touchdown.ssh.connection.Connection")
 
     root = argument.Resource(workspace.Workspace)
 
     def clean_private_key(self, private_key):
+        print private_key, client
         if private_key and client:
             return client.private_key_from_string(private_key)
         raise errors.InvalidParameter("Invalid SSH private key")

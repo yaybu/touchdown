@@ -41,7 +41,7 @@ class Image(Resource):
     source_ami = argument.String()
 
     username = argument.String()
-    steps = argument.List(argument.Resource(tuple(Step.__subclasses__())))
+    steps = argument.List(argument.Resource(Step))
 
     #architecture = argument.String(field="Architecture", default="x86_64", choices=["x86_64", "i386"])
     #kernel = argument.String(field="KernelId")

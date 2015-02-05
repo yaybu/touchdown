@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
+import itertools
 
 import netaddr
+import six
 
 from . import errors, serializers
 from .utils import force_str
@@ -175,6 +176,14 @@ class Resource(Argument):
         super(Resource, self).__init__(**kwargs)
         self.resource_class = resource_class
 
+    def get_resource_class(self):
+        if not isinstance(self.resource_class, (list, tuple)):
+            return tuple([self.resource_class] + self.resource_class.__subclasses__())
+        return tuple(itertools.chain(
+            self.resource_class,
+            *[r.__subclasses__() for r in self.resource_class]
+        ))
+
     def get_default(self, instance):
         default = super(Resource, self).get_default(instance)
         if isinstance(default, dict):
@@ -187,21 +196,17 @@ class Resource(Argument):
         the correct type. We also mark self as depending on the resource.
         """
         if isinstance(value, dict):
-            if isinstance(self.resource_class, tuple):
-                for klass in self.resource_class:
-                    try:
-                        value = klass(instance, **value)
-                        break
-                    except errors.InvalidParameter as e:
-                        print e
-                        continue
-                else:
-                    raise errors.InvalidParameter("Parameter must be one of {}".format(str(self.resource_class)))
+            for resource_class in self.get_resource_class():
+                try:
+                    value = resource_class(instance, **value)
+                    break
+                except errors.InvalidParameter:
+                    continue
             else:
-                value = self.resource_class(instance, **value)
+                raise errors.InvalidParameter("Parameter must be one of {}".format(str(self.get_resource_class())))
         elif hasattr(self.resource_class, "wrap"):
             value = self.resource_class.wrap(instance, value)
-        elif not isinstance(value, self.resource_class):
+        elif not isinstance(value, self.get_resource_class()):
             raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
         instance.add_dependency(value)
         return value
@@ -218,10 +223,13 @@ class Resource(Argument):
         implicitly).
         """
         if isinstance(self.resource_class, six.string_types):
+            print "contribute_to_class", cls, self.resource_class
             from .resource import ResourceType
             if self.resource_class not in ResourceType.__all_resources__:
                 ResourceType.add_callback(self.resource_class, self.contribute_to_class, cls)
+                print "POSTPONING"
                 return
+            print "SETTING TO", ResourceType.__all_resources__[self.resource_class], type(ResourceType.__all_resources__[self.resource_class])
             self.resource_class = ResourceType.__all_resources__[self.resource_class]
 
         argument_name = self.name

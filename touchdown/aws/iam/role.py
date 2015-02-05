@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, serializers
@@ -118,7 +116,7 @@ class Apply(SimpleApply, Describe):
                     self.client.put_role_policy,
                     RoleName=self.resource.name,
                     PolicyName=name,
-                    PolicyDocument=json.dumps(document),
+                    PolicyDocument=document,
                 )
 
         for name in policy_names:

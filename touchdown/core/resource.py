@@ -111,6 +111,9 @@ class ResourceType(type):
         name = ".".join((cls.__module__, cls.__name__))
         meta_cls.__all_resources__[name] = cls
 
+        print "FIRING", name, type(name)
+        print meta_cls.__lazy_lookups__.get(name, [])
+
         for callable, args, kwargs in meta_cls.__lazy_lookups__.get(name, []):
             callable(*args, **kwargs)
 
