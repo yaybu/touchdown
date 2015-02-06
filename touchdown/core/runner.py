@@ -24,7 +24,7 @@ class Runner(object):
 
     def __init__(self, goal, workspace, ui):
         try:
-            self.goal = goals.Goal.goals[goal](workspace)
+            self.goal = goals.Goal.goals[goal](workspace, ui)
         except KeyError:
             raise errors.Error("No such goal '{}'".format(goal))
 

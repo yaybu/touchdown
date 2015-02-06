@@ -24,6 +24,9 @@ class ConsoleInterface(object):
     def __init__(self, interactive=True):
         self.interactive = interactive
 
+    def echo(self, text):
+        click.echo(text)
+
     def progress(self, iterable, label=None, length=None):
         return click.progressbar(iterable, label=label, length=length)
 

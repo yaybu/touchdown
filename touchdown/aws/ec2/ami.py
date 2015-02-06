@@ -66,14 +66,14 @@ class BuildInstance(Action):
         yield "Build new AMI '{}' from '{}'".format(self.resource.name, self.resource.source_ami)
 
     def create_security_group(self):
-        print("Creating temporary security group")
+        self.plan.echo("Creating temporary security group")
         security_group = self.plan.client.create_security_group(
             GroupName="temporary-security-group",
             Description="Temporary security group",
         )
         self.stack.callback(self.destroy_security_group, security_group)
 
-        print("Granting SSH access")
+        self.plan.echo("Granting SSH access")
         self.plan.client.authorize_security_group_ingress(
             GroupId=security_group['GroupId'],
             IpProtocol="tcp",
@@ -85,13 +85,13 @@ class BuildInstance(Action):
         return security_group
 
     def destroy_security_group(self, security_group):
-        print("Deleting temproary security group")
+        self.plan.echo("Deleting temproary security group")
         self.plan.client.delete_security_group(
             GroupId=security_group["GroupId"],
         )
 
     def create_keypair(self):
-        print("Creating temporary keypair")
+        self.plan.echo("Creating temporary keypair")
         keypair = self.plan.client.create_key_pair(
             KeyName="temporary-key-pair",
         )
@@ -99,13 +99,13 @@ class BuildInstance(Action):
         return keypair
 
     def destroy_keypair(self, keypair):
-        print("Deleting temproary keypair")
+        self.plan.echo("Deleting temproary keypair")
         self.plan.client.delete_key_pair(
             KeyName=keypair["KeyName"],
         )
 
     def create_instance(self, keypair, security_group):
-        print("Creating a source instance from {}".format(self.resource.source_ami))
+        self.plan.echo("Creating a source instance from {}".format(self.resource.source_ami))
         reservations = self.plan.client.run_instances(
             ImageId=self.resource.source_ami,
             InstanceType="m1.small",
@@ -128,7 +128,7 @@ class BuildInstance(Action):
 
         self.stack.callback(self.terminate_instance, instance)
 
-        print("Waiting for instance {} to boot...".format(instance["InstanceId"]))
+        self.plan.echo("Waiting for instance {} to boot...".format(instance["InstanceId"]))
         self.plan.client.get_waiter("instance_running").wait(InstanceIds=[instance["InstanceId"]])
 
         # We have to now get the info about the isntance again so we know
@@ -152,12 +152,12 @@ class BuildInstance(Action):
             cli.run_script(**serializers.Resource().render(self.runner, step))
 
     def terminate_instance(self, instance):
-        print("Terminating instance")
+        self.plan.echo("Terminating instance")
         self.plan.client.terminate_instances(
             InstanceIds=[instance["InstanceId"]],
         )
 
-        print("Waiting for instance to go away")
+        self.plan.echo("Waiting for instance to go away")
         self.plan.client.get_waiter("instance_terminated").wait(InstanceIds=[instance["InstanceId"]])
 
     def run(self):
@@ -167,20 +167,21 @@ class BuildInstance(Action):
             security_group = self.create_security_group()
             instance = self.create_instance(keypair, security_group)
 
-            print("Deploying instance")
+            self.plan.echo("Deploying instance")
             self.deploy_instance(keypair, instance)
 
-            print("Creating image")
+            self.plan.echo("Creating image")
             self.plan.client.create_image(
                 Name=self.resource.name,
                 InstanceId=instance['InstanceId'],
             )
 
-            print("Waiting for image to become available")
+            self.plan.echo("Waiting for image to become available")
             # self.plan.client.get_waiter("ami_available").wait(ImageId=[image["ImageId"]])
             for i in range(20):
                 self.plan.object = self.plan.describe_object()
                 if self.plan.object.get("State", "pending") == "available":
+                    self.plan.echo("Image '{}' built.".format(image["ImageId"]))
                     return
                 time.sleep(15)
             raise errors.Error("Image didn't become available")

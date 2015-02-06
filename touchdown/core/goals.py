@@ -31,7 +31,8 @@ class Goal(six.with_metaclass(GoalType)):
     goals = {}
     execute_in_reverse = False
 
-    def __init__(self, workspace):
+    def __init__(self, workspace, ui):
+        self.ui = ui
         self.workspace = workspace
         self.resources = {}
         self.changes = {}

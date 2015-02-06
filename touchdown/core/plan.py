@@ -58,6 +58,9 @@ class Plan(six.with_metaclass(PlanType)):
         else:
             self.parent = None
 
+    def echo(self, text):
+        self.runner.ui.echo("[{}] {}".format(self.resource, text))
+
     def validate(self):
         a = AND(*self.signature)
         if a.test(self.resource):
