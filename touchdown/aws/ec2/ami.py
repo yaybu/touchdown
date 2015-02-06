@@ -181,7 +181,7 @@ class BuildInstance(Action):
             for i in range(20):
                 self.plan.object = self.plan.describe_object()
                 if self.plan.object.get("State", "pending") == "available":
-                    self.plan.echo("Image '{}' built.".format(image["ImageId"]))
+                    self.plan.echo("Image '{}' built.".format(self.plan.object["ImageId"]))
                     return
                 time.sleep(15)
             raise errors.Error("Image didn't become available")
