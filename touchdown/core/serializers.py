@@ -18,12 +18,6 @@ import json
 from touchdown.core.utils import force_str
 
 
-class hd(dict):
-
-    def __hash__(self):
-        return hash(frozenset(self.items()))
-
-
 class FieldNotPresent(Exception):
     pass
 
@@ -233,6 +227,10 @@ class Format(Formatter):
         self.format_string = format_string
 
     def render(self, runner, object):
+        if not object:
+            return ""
+        if hasattr(object, "resource_name") and not runner.get_plan(object).object:
+            return ""
         return self.format_string.format(self.inner.render(runner, object))
 
 

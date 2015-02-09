@@ -45,17 +45,41 @@ class Resource(resource.Resource):
 
 class Waiter(Action):
 
+    def __init__(self, plan, description, waiter):
+        super(Waiter, self).__init__(plan)
+        self.description = description
+        self.waiter = waiter
+
+    def ready(self):
+        waiter = self.plan.get_waiter(self.waiter)
+        filters = self.plan.get_describe_filters()
+        acceptors = list(waiter.config.acceptors)
+        response = waiter._operation_method(**filters)
+
+        current_state = 'waiting'
+
+        for acceptor in acceptors:
+            if acceptor.matcher_func(response):
+                current_state = acceptor.state
+                break
+        else:
+            if 'Error' in response:
+                raise errors.Error('Unexpected error encountered.')
+
+        if current_state == 'success':
+            return True
+
+        if current_state == 'failure':
+            raise errors.Error('Waiter encountered a terminal failure state')
+
+        return False
+
     def run(self):
         filters = self.plan.get_describe_filters()
         logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
         waiter = self.plan.client.get_waiter(self.waiter)
         waiter.wait(**filters)
         self.plan.object = self.plan.describe_object()
-
-    def __init__(self, plan, description, waiter):
-        super(Waiter, self).__init__(plan)
-        self.description = description
-        self.waiter = waiter
 
 
 class GenericAction(Action):
@@ -314,10 +338,12 @@ class SimpleApply(SimpleDescribe):
 
         if created:
             if self.waiter:
-                yield self.get_waiter(
+                waiter = self.get_waiter(
                     ["Waiting for resource to exist"],
                     self.waiter,
                 )
+                if created or not waiter.ready():
+                    yield waiter
 
             if self.create_response != "full-description" and not self.waiter:
                 yield PostCreation(self)
