@@ -261,6 +261,8 @@ class Instance(ssh.Instance):
     def get_serializer(self, runner):
         plan = runner.get_plan(self.adapts)
 
+        plan.echo("Scanning for healthy instances to SSH to")
+
         # Annoyingly we have to get antother client (different API) to get info
         # on teh EC2 instances in our asg
         client = plan.session.create_client(

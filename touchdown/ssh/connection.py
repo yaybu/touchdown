@@ -60,19 +60,29 @@ class ConnectionPlan(plan.Plan):
         kwargs = serializers.Resource().render(self.runner, self.resource)
 
         if self.resource.proxy:
+            self.echo("Setting up connection proxy via {}".format(self.resource.proxy))
             proxy = self.runner.get_plan(self.resource.proxy)
             transport = proxy.get_client().get_transport()
+            self.echo("Setting up proxy channel to {}".format(kwargs['hostname']))
             kwargs['sock'] = transport.open_channel(
                 'direct-tcpip',
                 (kwargs['hostname'], kwargs['port']),
                 ('', 0)
             )
+            self.echo("Proxy setup")
 
         if not self.resource.password and not self.resource.private_key:
             kwargs['look_for_keys'] = True
             kwargs['allow_agent'] = True
 
+        args = ["hostname={}".format(kwargs['hostname']), "username={}".format(kwargs['username'])]
+        if self.resource.port != 22:
+            args.append("port={}".format(kwargs['port']))
+
+        self.echo("Establishing ssh connection ({})".format(", ".join(args)))
         cli.connect(**kwargs)
+
+        self.echo("Got connection")
 
         self._client = cli
 
