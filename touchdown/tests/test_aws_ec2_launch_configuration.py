@@ -18,7 +18,7 @@ from . import aws
 class TestLaunchConfiguration(aws.TestBasicUsage):
 
     def setUpResource(self):
-        self.expected_resource_id = 'my-test-lc'
+        self.expected_resource_id = 'my-test-lc.1'
         self.resource = self.aws.add_launch_configuration(
             name='my-test-lc',
             image='ami-514ac838'

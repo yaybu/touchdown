@@ -12,7 +12,7 @@ Connection: close
         <PlacementTenancy>dedicated</PlacementTenancy>
         <CreatedTime>2013-01-21T23:04:42.200Z</CreatedTime>
         <KernelId/>
-        <LaunchConfigurationName>my-test-lc</LaunchConfigurationName>
+        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>
         <UserData/>
         <InstanceType>m1.small</InstanceType>
         <LaunchConfigurationARN>arn:aws:autoscaling:us-east-1:803981987763:launchConfiguration:
