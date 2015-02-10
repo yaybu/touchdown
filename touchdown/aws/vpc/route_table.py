@@ -27,11 +27,16 @@ class Route(Resource):
 
     destination_cidr = argument.IPNetwork(field="DestinationCidrBlock")
     internet_gateway = argument.Resource(InternetGateway, field="GatewayId")
+    ignore = argument.Boolean(default=False)
 
     # instance = argument.Resource(Instance, field="InstanceId")
     # network_interface = argument.Resource(NetworkInterface, field="NetworkInterfaceId")
     # vpc_peering_connection = argument.Resource(VpcPeeringConnection, field="VpcPeeringConnectionId")
 
+    def matches(self, runner, route):
+        if self.ignore and route['DestinationCidrBlock'] == self.destination_cidr:
+            return True
+        return super(Route, self).matches(runner, route)
 
 class RouteTable(Resource):
 
@@ -124,6 +129,9 @@ class Apply(SimpleApply, Describe):
 
         if self.resource.routes:
             for local in self.resource.routes:
+                if local.ignore:
+                    continue
+
                 for remote in remote_routes:
                     if local.matches(self.runner, remote):
                         break

@@ -35,11 +35,14 @@ class Resource(resource.Resource):
                 continue
             if not getattr(arg, "update", True):
                 continue
+            if not getattr(self, name) and arg.field not in remote:
+                return True
             if arg.field not in remote:
                 return False
             rendered = arg.serializer.render(runner, getattr(self, name))
             if rendered != remote[arg.field]:
                 return False
+
         return True
 
 
