@@ -323,7 +323,7 @@ class List(Serializer):
         return list(result)
 
     def dependencies(self, object):
-        return frozenset((self.child.dependencies(object), ))
+        return frozenset(self.child.dependencies(object))
 
 
 class Context(Serializer):

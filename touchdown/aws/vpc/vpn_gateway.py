@@ -68,7 +68,7 @@ class Apply(SimpleApply, Describe):
                 "Attach gateway to vpc",
                 self.client.attach_vpn_gateway,
                 VpnGatewayId=serializers.Identifier(),
-                VpcId=serializers.Context(serializers.Argument("vpc"), serializers.Identifer()),
+                VpcId=serializers.Context(serializers.Argument("vpc"), serializers.Identifier()),
             )
 
 

@@ -46,7 +46,7 @@ class VpnConnection(Resource):
 
 class Describe(SimpleDescribe, Plan):
 
-    resource = CustomerGateway
+    resource = VpnConnection
     service_name = 'ec2'
     describe_action = "describe_vpn_connections"
     describe_list_key = "VpnConnections"

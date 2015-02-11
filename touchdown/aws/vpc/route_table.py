@@ -82,7 +82,7 @@ class Apply(SimpleApply, Describe):
     create_action = "create_route_table"
 
     def update_vpgw_associations(self):
-        remote = set(r['GatewayId'] for r in self.object.get("PropagatingsVgws", []))
+        remote = set(r['GatewayId'] for r in self.object.get("PropagatingVgws", []))
         local = set()
         for vgw in self.resource.propagating_vpn_gateways:
             id = self.runner.get_plan(vgw).resource_id
@@ -113,7 +113,8 @@ class Apply(SimpleApply, Describe):
         Old routes are removed *before* new routes are added. This may cause
         connection glitches when applied, but it avoids route collisions.
         """
-        remote_routes = list(d for d in self.object.get("Routes", []) if d["GatewayId"] != "local")
+        remote_routes = list(d for d in self.object.get("Routes", []) if d.get("GatewayId", "") != "local")
+        remote_routes = list(d for d in remote_routes if d["Origin"] != "EnableVgwRoutePropagation")
 
         if remote_routes:
             for remote in remote_routes:
