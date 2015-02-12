@@ -1,7 +1,8 @@
-botocore==0.86.0
+botocore==0.87.0
 click==3.3
 netaddr==0.7.13
 contextlib2
+paramiko
 
 six
 pytest
