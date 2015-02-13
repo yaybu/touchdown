@@ -73,6 +73,7 @@ class ReplaceInstances(Action):
     def __init__(self, plan, instance_ids):
         super(ReplaceInstances, self).__init__(plan)
         self.instance_ids = instance_ids
+        self.desired_capacity = plan.object.get('DesiredCapacity', self.resource.min_size)
 
     @property
     def description(self):
@@ -97,7 +98,7 @@ class ReplaceInstances(Action):
         self.plan.echo("Waiting for scaling group to become healthy")
         while True:
             asg = self.plan.describe_object()
-            if asg['DesiredCapacity'] == len([i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy']):
+            if self.desired_capacity == len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']):
                 return True
             time.sleep(5)
 
@@ -131,26 +132,26 @@ class GracefulReplacement(ReplaceInstances):
 
     def scale(self):
         self.plan.echo("Increasing scaling group capacity for node replacement")
-        desired_capacity = self.plan.object['DesiredCapacity']
-        desired_capacity += 1
+        self.desired_capacity += 1
 
         max = self.resource.max_size
-        if desired_capacity > max:
-            max = desired_capacity
+        if self.desired_capacity > max:
+            max = self.desired_capacity
 
         self.plan.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
             MaxSize=max,
-            DesiredCapacity=desired_capacity,
+            DesiredCapacity=self.desired_capacity,
         )
         self.wait_for_healthy_asg()
 
     def unscale(self):
         self.plan.echo("Restoring scaling group to original capacity")
+        self.desired_capacity -= 1
         self.plan.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
             MaxSize=self.resource.max_size,
-            DesiredCapacity=min(self.resource.max_size, self.plan.object['DesiredCapacity']),
+            DesiredCapacity=min(self.resource.max_size, self.desired_capacity),
         )
         self.wait_for_healthy_asg()
 
