@@ -61,7 +61,7 @@ class AutoScalingGroup(Resource):
     account = argument.Resource(BaseAccount)
 
 
-class ReplaceInstance(Action):
+class ReplaceInstances(Action):
 
     scaling_processes = [
         "AlarmNotification",
@@ -70,9 +70,15 @@ class ReplaceInstance(Action):
         "ScheduledActions",
     ]
 
-    def __init__(self, plan, instance_id):
-        super(ReplaceInstance, self).__init__(plan)
-        self.instance_id = instance_id
+    def __init__(self, plan, instance_ids):
+        super(ReplaceInstances, self).__init__(plan)
+        self.instance_ids = instance_ids
+
+    @property
+    def description(self):
+        yield "Replace stale inances"
+        for instance_id in self.instance_ids:
+            yield instance_id
 
     def suspend_processes(self):
         self.plan.client.suspend_processes(
@@ -81,65 +87,7 @@ class ReplaceInstance(Action):
         )
 
     def scale(self):
-        raise NotImplementedError(self.scale)
-
-    # FIXME: If TerminateInstanceInAutoScalingGroup is graceful then we don't
-    # need to detach from the ASG.
-    """
-    def remove_from_balancer(self):
-        self.client.detach_instances(
-            AutoScalingGroupName=self.resource.name,
-            InstanceIds=[self.instance_id],
-            ShouldDecrementDesiredCapacity=False,
-        )
-    """
-
-    def terminate_instance(self):
-        self.plan.client.terminate_instance_in_auto_scaling_group(
-            InstanceId=self.instance_id,
-            ShouldDecrementDesiredCapacity=False,
-        )
-
-    def wait_for_healthy_asg(self):
-        # FIXME: Consider the grace period of the ASG + few minutes for booting
-        # and use that as a timeout for the release process.
-        while True:
-            asg = self.plan.describe_object()
-            if asg['DesiredCapacity'] == len([i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy']):
-                return True
-            time.sleep(5)
-
-    def unscale(self):
-        raise NotImplementedError(self.unscale)
-
-    def resume_processes(self):
-        self.plan.client.resume_processes(
-            AutoScalingGroupName=self.resource.name,
-            ScalingProcesses=self.scaling_processes,
-        )
-
-    def run(self):
-        self.suspend_processes()
-        try:
-            self.scale()
-            try:
-                # self.remove_from_balancer()
-                self.terminate_instance()
-                if not self.wait_for_healthy_asg():
-                    raise errors.Error("Auto scaling group {} is not returning to a healthy state".format(self.resource.name))
-            finally:
-                self.unscale()
-        finally:
-            self.resume_processes()
-
-
-class GracefulReplacement(ReplaceInstance):
-
-    @property
-    def description(self):
-        yield "Gracefully replace instance {} (by increasing ASG pool and then terminating)".format(self.instance_id)
-
-    def scale(self):
+        self.plan.echo("Increasing scaling group capacity for node replacement")
         desired_capacity = self.plan.object['DesiredCapacity']
         desired_capacity += 1
 
@@ -153,25 +101,59 @@ class GracefulReplacement(ReplaceInstance):
             DesiredCapacity=desired_capacity,
         )
 
+    def terminate_instance(self, instance_id):
+        self.plan.echo("Terminating instance {}".format(instance_id))
+        self.plan.client.terminate_instance_in_auto_scaling_group(
+            InstanceId=instance_id,
+            ShouldDecrementDesiredCapacity=False,
+        )
+
+    def wait_for_healthy_asg(self):
+        self.plan.echo("Waiting for scaling group to become healthy")
+        while True:
+            asg = self.plan.describe_object()
+            if asg['DesiredCapacity'] == len([i for i in asg['Instances'] if i['HealthStatus'] == 'Healthy']):
+                return True
+            time.sleep(5)
+
     def unscale(self):
+        self.plan.echo("Restoring scaling group to original capacity")
         self.plan.client.update_auto_scaling_group(
             AutoScalingGroupName=self.resource.name,
             MaxSize=self.resource.max_size,
             DesiredCapacity=min(self.resource.max_size, self.plan.object['DesiredCapacity']),
         )
 
+    def resume_processes(self):
+        self.plan.client.resume_processes(
+            AutoScalingGroupName=self.resource.name,
+            ScalingProcesses=self.scaling_processes,
+        )
 
-class SingletonReplacement(Action):
+    def run(self):
+        self.plan.echo("Suspend autoscaling activities")
+        self.suspend_processes()
+        try:
+            self.scale()
+            self.wait_for_healthy_asg()
+            try:
+                for instance_id in self.instance_ids:
+                    self.terminate_instance(instance_id)
+                    self.wait_for_healthy_asg()
+            finally:
+                self.unscale()
+                self.wait_for_healthy_asg()
+        finally:
+            self.plan.echo("Resuming autoscaling activities")
+            self.resume_processes()
 
-    @property
-    def description(self):
-        yield "Replace singleton instance {}".format(self.instance_id)
 
-    def scale(self):
-        pass
+class GracefulReplacement(ReplaceInstances):
+    pass
 
-    def unscale(self):
-        pass
+
+class SingletonReplacement(ReplaceInstances):
+    pass
 
 
 class Describe(SimpleDescribe, Plan):
@@ -197,16 +179,21 @@ class Apply(SimpleApply, Describe):
             yield change
 
         launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
+        instances = []
+
         for instance in self.object.get("Instances", []):
             if instance['LifecycleState'] in ('Terminating', ):
                 continue
             if instance.get('LaunchConfigurationName', '') != launch_config_name:
-                klass = {
-                    'graceful': GracefulReplacement,
-                    'singleton': SingletonReplacement,
-                }[self.resource.replacement_policy]
+                instances.append(instance['InstanceId'])
 
-                yield klass(self, instance['InstanceId'])
+        if instances:
+            klass = {
+                'graceful': GracefulReplacement,
+                'singleton': SingletonReplacement,
+            }[self.resource.replacement_policy]
+
+            yield klass(self, instances)
 
 
 class TerminateASGInstances(Action):
