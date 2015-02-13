@@ -101,7 +101,7 @@ class Apply(SimpleApply, Describe):
                 "Disable route propagation from vpn gateway {}".format(vgw),
                 self.client.disable_vgw_route_propagation,
                 RouteTableId=serializers.Identifier(),
-                GatewayId=serializers.Const(inner=serializers.Const(vgw)),
+                GatewayId=serializers.Const(vgw),
             )
 
     def update_routes(self):
