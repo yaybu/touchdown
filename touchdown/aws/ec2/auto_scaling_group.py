@@ -86,21 +86,6 @@ class ReplaceInstances(Action):
             ScalingProcesses=self.scaling_processes,
         )
 
-    def scale(self):
-        self.plan.echo("Increasing scaling group capacity for node replacement")
-        desired_capacity = self.plan.object['DesiredCapacity']
-        desired_capacity += 1
-
-        max = self.resource.max_size
-        if desired_capacity > max:
-            max = desired_capacity
-
-        self.plan.client.update_auto_scaling_group(
-            AutoScalingGroupName=self.resource.name,
-            MaxSize=max,
-            DesiredCapacity=desired_capacity,
-        )
-
     def terminate_instance(self, instance_id):
         self.plan.echo("Terminating instance {}".format(instance_id))
         self.plan.client.terminate_instance_in_auto_scaling_group(
@@ -116,14 +101,6 @@ class ReplaceInstances(Action):
                 return True
             time.sleep(5)
 
-    def unscale(self):
-        self.plan.echo("Restoring scaling group to original capacity")
-        self.plan.client.update_auto_scaling_group(
-            AutoScalingGroupName=self.resource.name,
-            MaxSize=self.resource.max_size,
-            DesiredCapacity=min(self.resource.max_size, self.plan.object['DesiredCapacity']),
-        )
-
     def resume_processes(self):
         self.plan.client.resume_processes(
             AutoScalingGroupName=self.resource.name,
@@ -135,25 +112,56 @@ class ReplaceInstances(Action):
         self.suspend_processes()
         try:
             self.scale()
-            self.wait_for_healthy_asg()
             try:
                 for instance_id in self.instance_ids:
                     self.terminate_instance(instance_id)
                     self.wait_for_healthy_asg()
             finally:
                 self.unscale()
-                self.wait_for_healthy_asg()
         finally:
             self.plan.echo("Resuming autoscaling activities")
             self.resume_processes()
 
+        # Make sure that our dependents have up to date intel on instances we
+        # have just brought into service
+        self.plan.object = self.plan.describe_object()
+
 
 class GracefulReplacement(ReplaceInstances):
-    pass
+
+    def scale(self):
+        self.plan.echo("Increasing scaling group capacity for node replacement")
+        desired_capacity = self.plan.object['DesiredCapacity']
+        desired_capacity += 1
+
+        max = self.resource.max_size
+        if desired_capacity > max:
+            max = desired_capacity
+
+        self.plan.client.update_auto_scaling_group(
+            AutoScalingGroupName=self.resource.name,
+            MaxSize=max,
+            DesiredCapacity=desired_capacity,
+        )
+        self.wait_for_healthy_asg()
+
+    def unscale(self):
+        self.plan.echo("Restoring scaling group to original capacity")
+        self.plan.client.update_auto_scaling_group(
+            AutoScalingGroupName=self.resource.name,
+            MaxSize=self.resource.max_size,
+            DesiredCapacity=min(self.resource.max_size, self.plan.object['DesiredCapacity']),
+        )
+        self.wait_for_healthy_asg()
 
 
 class SingletonReplacement(ReplaceInstances):
-    pass
+
+    def scale(self):
+        pass
+
+    def unscale(self):
+        pass
 
 
 class Describe(SimpleDescribe, Plan):
