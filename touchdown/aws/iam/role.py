@@ -57,14 +57,9 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'iam'
     describe_action = "list_roles"
     describe_list_key = "Roles"
+    describe_filters = {}
+    describe_object_matches = lambda self, role: role['RoleName'] == self.resource.name
     key = 'RoleName'
-
-    def describe_object(self):
-        paginator = self.client.get_paginator("list_roles")
-        for page in paginator.paginate():
-            for role in page['Roles']:
-                if role['RoleName'] == self.resource.name:
-                    return role
 
 
 class Apply(SimpleApply, Describe):

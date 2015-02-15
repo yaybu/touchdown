@@ -16,6 +16,8 @@ import logging
 
 from botocore.exceptions import ClientError
 
+import jmespath
+
 from touchdown.core import errors, serializers, resource
 from touchdown.core.action import Action
 from touchdown.core.plan import Present
@@ -141,6 +143,8 @@ class SimpleDescribe(object):
 
     get_action = None
     get_key = None
+    describe_filters = None
+    describe_object_matches = lambda self, x: True
     describe_notfound_exception = None
     get_notfound_exception = None
 
@@ -197,21 +201,34 @@ class SimpleDescribe(object):
 
         logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
 
-        filters = self.get_describe_filters()
-        if not filters:
+        if self.describe_filters is not None:
+            filters = self.describe_filters
+        else:
+            filters = self.get_describe_filters()
+
+        if filters is None:
             logger.debug("Could not generate valid filters - this generally means we've determined the object cant exist!")
             return {}
 
         logger.debug("Filters are: {}".format(filters))
 
-        try:
-            results = getattr(self.client, self.describe_action)(**filters)
-        except ClientError as e:
-            if e.response['Error']['Code'] == self.describe_notfound_exception:
-                return {}
-            raise
+        if self.client.can_paginate(self.describe_action):
+            paginator = self.client.get_paginator(self.describe_action)
+            def _():
+                for page in paginator.paginate(**filters):
+                    for result in jmespath.search(self.describe_list_key, page):
+                        yield result
+            results = _()
+        else:
+            try:
+                results = getattr(self.client, self.describe_action)(**filters)
+            except ClientError as e:
+                if e.response['Error']['Code'] == self.describe_notfound_exception:
+                    return {}
+                raise
+            results = jmespath.search(self.describe_list_key, results)
 
-        objects = results[self.describe_list_key]
+        objects = filter(self.describe_object_matches, results)
 
         if len(objects) > 1:
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))

@@ -245,20 +245,24 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'cloudfront'
     plural = 'DistributionList'
     singular = 'Distribution'
+    describe_filters = {}
+    describe_action = "list_distributions"
+    describe_list_key = 'DistributionList.Items'
     key = 'Id'
 
     def get_describe_filters(self):
         return {"Id": self.object['Id']}
 
+    def describe_object_matches(self, d):
+        return self.resource.name in d['Aliases'].get('Items', [])
+
     def describe_object(self):
-        paginator = self.client.get_paginator("list_distributions")
-        for page in paginator.paginate():
-            for distribution in page['DistributionList'].get('Items', []):
-                if self.resource.name in distribution['Aliases'].get('Items', []):
-                    result = self.client.get_distribution(Id=distribution['Id'])
-                    distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
-                    distribution.update(result['Distribution'])
-                    return distribution
+        distribution = super(Describe, self).describe_object()
+        if distribution:
+            result = self.client.get_distribution(Id=distribution['Id'])
+            distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
+            distribution.update(result['Distribution'])
+            return distribution
 
 
 class Apply(SimpleApply, Describe):

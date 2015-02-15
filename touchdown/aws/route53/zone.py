@@ -100,17 +100,11 @@ class Describe(SimpleDescribe, Plan):
     resource = HostedZone
     service_name = 'route53'
     describe_action = "list_hosted_zones"
-    describe_list_key = "HostedZone"
+    describe_list_key = "HostedZones"
+    describe_filters = {}
+    describe_object_matches = lambda self, zone: zone['Name'] == self.resource.name
     singular = "HostedZone"
     key = 'Id'
-
-    def describe_object(self):
-        zone_name = self.resource.name.rstrip(".") + "."
-        paginator = self.client.get_paginator("list_hosted_zones")
-        for page in paginator.paginate():
-            for zone in page['HostedZones']:
-                if zone['Name'] == zone_name:
-                    return zone
 
 
 class Apply(SimpleApply, Describe):

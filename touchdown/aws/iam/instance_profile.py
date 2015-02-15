@@ -37,14 +37,9 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'iam'
     describe_action = "list_instance_profiles"
     describe_list_key = "InstanceProfiles"
+    describe_filters = {}
+    describe_object_matches = lambda self, ip: ip['InstanceProfileName'] == self.resource.name
     key = 'InstanceProfileName'
-
-    def describe_object(self):
-        paginator = self.client.get_paginator("list_instance_profiles")
-        for page in paginator.paginate():
-            for ip in page['InstanceProfiles']:
-                if ip['InstanceProfileName'] == self.resource.name:
-                    return ip
 
 
 class Apply(SimpleApply, Describe):

@@ -43,12 +43,8 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'sns'
     describe_action = "list_topics"
     describe_list_key = "Topics"
+    describe_object_matches = lambda self, topic: topic['TopicArn'].endswith(self.resource.name)
     key = 'TopicArn'
-
-    def describe_object(self):
-        for topic in self.client.list_topics()['Topics']:
-            if topic['TopicArn'].endswith(self.resource.name):
-                return topic
 
 
 class Apply(SimpleApply, Describe):
