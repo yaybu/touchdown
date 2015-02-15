@@ -42,6 +42,34 @@ When you assign a value to the "vpc" parameter of the subnet, you are providing
 an implicit dependency hint. These dependency hints allow us to ensure a VPC is
 created before a Subnet.
 
+One common task is converting between the API that touchdown presents (which
+aims to be high level with strong checking capabilities) and the API of the
+underlying service. For example, in the case of botocore everything maps down
+to JSON-like primitives that map closely to the AWS API. The
+``touchdown.core.serializers`` library helps here.
+
+An example: In S3 the location field is weirdly in a sub-dictionary. We need to
+generate JSON that looks like::
+
+    {
+        "Bucket": "bucket-name",
+        "CreateBucketConfiguration": {
+            "LocationConstraint": "eu-west-1",
+        }
+    }
+
+We can write a resource that handles this with the ``serializer`` annotation::
+
+    class Bucket(Resource):
+        resource_name = "bucket"
+
+        name = argument.String(field="Bucket")
+        region = argument.String(
+            field="CreateBucketConfiguration",
+            serializer=serializers.Dict(
+                LocationConstraint=serializers.Identity(),
+            )
+        )
 
 AWS and botocore
 ----------------
@@ -181,45 +209,58 @@ apply any required changes).
 
         If not specified, ``full-description`` is assumed.
 
+    .. method:: get_create_serializer()
 
-Because the botocore library is quite low level one of the main tasks in
-binding the API is mapping touchdown resources to JSON. The
-``touchdown.core.serializers`` library helps here.
+        Returns a serializer instance that can turn the resource into kwargs
+        that are passed to botocore.
 
-In S3 the location field is weirdly in a sub-dictionary. We need to generate
-JSON that looks like::
+        The default implementation is::
 
-    {
-        "Bucket": "bucket-name",
-        "CreateBucketConfiguration": {
-            "LocationConstraint": "eu-west-1",
-        }
-    }
+            def get_create_serializer(self):
+                return serializers.Resource()
 
-We can write a resource that handles this with the ``serializer`` annotations::
+        This uses the ``field`` and ``serializer`` annotations automatically
+        so in most cases does not need customizing when adding a new resource
+        type.
 
-    class Bucket(Resource):
-        resource_name = "bucket"
+    .. method:: update_object()
 
-        name = argument.String(field="Bucket")
-        region = argument.String(
-            field="CreateBucketConfiguration",
-            serializer=serializers.Dict(
-                LocationConstraint=serializers.Identity(),
-            )
-        )
+        This method is called to update an existing or newly created object.
+        It should cope with the fact that self.object might not be set yet (which
+        would indicate a newly created object).
+
+        It should yield actions that can be executed later. As there are very
+        few recurring patterns for updating instances at AWS, the implementation
+        is quite specific to the service.
+
 
 Destroying instances
 --------------------
 
 .. class:: SimpleDestroy
 
+    This is a mixin to create a ``destroy`` plan for a resource. It should be
+    mixed with a concrete subclass of :class:`SimpleDescribe`.
+
     For example::
 
         class Destroy(SimpleDestroy, Describe):
-
             destroy_action = "delete_security_group"
 
     .. attribute:: destroy_action
 
         The botocore API to call to delete an instance.
+
+    .. method:: get_destroy_serializer()
+
+        Returns a serializer instance that can turn the resource into kwargs
+        that are passed to botocore.
+
+        The default implementation is::
+
+            def get_destroy_serializer(self):
+                return serializers.Dict(**{self.key: self.resource_id})
+
+        In most cases this will correctly pass the ID of the resource to be
+        deleted to botocore, so it often doesn't need implementing for new
+        subclasses.
