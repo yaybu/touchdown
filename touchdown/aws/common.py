@@ -232,7 +232,7 @@ class SimpleDescribe(object):
                 raise
             results = jmespath.search(self.describe_envelope, results)
 
-        objects = filter(self.describe_object_matches, results)
+        objects = list(filter(self.describe_object_matches, results))
 
         if len(objects) > 1:
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))
