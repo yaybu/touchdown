@@ -214,10 +214,12 @@ class SimpleDescribe(object):
 
         if self.client.can_paginate(self.describe_action):
             paginator = self.client.get_paginator(self.describe_action)
+
             def _():
                 for page in paginator.paginate(**filters):
                     for result in jmespath.search(self.describe_list_key, page):
                         yield result
+
             results = _()
         else:
             try:

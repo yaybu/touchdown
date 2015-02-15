@@ -44,12 +44,11 @@ class Describe(SimpleDescribe, Plan):
 
     def describe_object(self):
         object = super(Describe, self).describe_object()
-        if not object:
-            return object
-        result = dict(object['ServerCertificateMetadata'])
-        result['CertificateBody'] = object['CertificateBody']
-        result['CertificateChain'] = object['CertificateChain']
-        return result
+        if object:
+            result = dict(object['ServerCertificateMetadata'])
+            result['CertificateBody'] = object['CertificateBody']
+            result['CertificateChain'] = object['CertificateChain']
+            return result
 
 
 class Apply(SimpleApply, Describe):

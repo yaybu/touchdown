@@ -88,20 +88,20 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'autoscaling'
     describe_action = "describe_launch_configurations"
     describe_list_key = "LaunchConfigurations"
+    describe_filters = {}
     key = 'LaunchConfigurationName'
 
     biggest_serial = 0
 
-    def describe_object(self):
-        for launch_config in self.client.describe_launch_configurations()['LaunchConfigurations']:
-            if not launch_config["LaunchConfigurationName"].startswith(self.resource.name + "."):
-                continue
+    def describe_object_matches(self, lc):
+        if not lc["LaunchConfigurationName"].startswith(self.resource.name + "."):
+            return False
 
-            serial = launch_config["LaunchConfigurationName"].rsplit(".", 1)[1]
-            self.biggest_serial = max(int(serial), self.biggest_serial)
+        serial = lc["LaunchConfigurationName"].rsplit(".", 1)[1]
+        self.biggest_serial = max(int(serial), self.biggest_serial)
 
-            if self.resource.matches(self.runner, launch_config):
-                return launch_config
+        if self.resource.matches(self.runner, lc):
+            return True
 
 
 class Apply(SimpleApply, Describe):
