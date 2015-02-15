@@ -74,7 +74,7 @@ class ResourceType(type):
                 meta.fields.update(base.meta.fields)
                 meta.field_order.extend(base.meta.field_order)
 
-        # A resource can set its on field_order. An example of when this is
+        # A resource can set its own field_order. An example of when this is
         # useful is the AWS subnet. We want to validate that its cidr_block
         # fits inside the cidr_block of its parent vpc. So the vpc must always
         # be processed first. This guarantee can't be made with kwargs on
@@ -100,7 +100,7 @@ class ResourceType(type):
                 field_order.append(field)
         meta.field_order = field_order
 
-        # Actuall build a class
+        # Actually build a class
         cls = type.__new__(meta_cls, class_name, bases, new_attrs)
 
         # Allow fields to contribute to the class...
