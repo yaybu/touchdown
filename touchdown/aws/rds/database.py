@@ -64,7 +64,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'rds'
     describe_action = "describe_db_instances"
     describe_notfound_exception = "DBInstanceNotFound"
-    describe_list_key = "DBInstances"
+    describe_envelope = "DBInstances"
     key = 'DBInstanceIdentifier'
 
 

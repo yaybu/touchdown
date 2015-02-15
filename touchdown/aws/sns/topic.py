@@ -42,7 +42,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Topic
     service_name = 'sns'
     describe_action = "list_topics"
-    describe_list_key = "Topics"
+    describe_envelope = "Topics"
     describe_object_matches = lambda self, topic: topic['TopicArn'].endswith(self.resource.name)
     key = 'TopicArn'
 

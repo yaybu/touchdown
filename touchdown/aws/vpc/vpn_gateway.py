@@ -36,7 +36,7 @@ class Describe(SimpleDescribe, Plan):
     resource = VpnGateway
     service_name = 'ec2'
     describe_action = "describe_vpn_gateways"
-    describe_list_key = "VpnGateways"
+    describe_envelope = "VpnGateways"
     key = "VpnGatewayId"
 
     def get_describe_filters(self):

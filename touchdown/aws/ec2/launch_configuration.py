@@ -87,7 +87,7 @@ class Describe(SimpleDescribe, Plan):
     resource = LaunchConfiguration
     service_name = 'autoscaling'
     describe_action = "describe_launch_configurations"
-    describe_list_key = "LaunchConfigurations"
+    describe_envelope = "LaunchConfigurations"
     describe_filters = {}
     key = 'LaunchConfigurationName'
 

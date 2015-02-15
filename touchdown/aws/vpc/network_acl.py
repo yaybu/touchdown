@@ -66,7 +66,7 @@ class Describe(SimpleDescribe, Plan):
     resource = NetworkACL
     service_name = 'ec2'
     describe_action = "describe_network_acls"
-    describe_list_key = "NetworkAcls"
+    describe_envelope = "NetworkAcls"
     key = 'NetworkAclId'
 
     def get_describe_filters(self):

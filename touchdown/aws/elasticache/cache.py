@@ -56,7 +56,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'elasticache'
     describe_action = "describe_cache_clusters"
     describe_notfound_exception = "CacheClusterNotFound"
-    describe_list_key = "CacheClusters"
+    describe_envelope = "CacheClusters"
     key = 'CacheClusterId'
 
 

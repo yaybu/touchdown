@@ -37,7 +37,7 @@ class Describe(SimpleDescribe, Plan):
     resource = CustomerGateway
     service_name = 'ec2'
     describe_action = "describe_customer_gateways"
-    describe_list_key = "CustomerGateways"
+    describe_envelope = "CustomerGateways"
     key = "CustomerGatewayId"
 
     def get_describe_filters(self):

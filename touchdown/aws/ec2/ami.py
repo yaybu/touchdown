@@ -192,7 +192,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Image
     service_name = 'ec2'
     describe_action = "describe_images"
-    describe_list_key = "Images"
+    describe_envelope = "Images"
     key = 'ImageId'
 
     def get_describe_filters(self):

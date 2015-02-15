@@ -50,7 +50,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Subnet
     service_name = 'ec2'
     describe_action = "describe_subnets"
-    describe_list_key = "Subnets"
+    describe_envelope = "Subnets"
     key = 'SubnetId'
 
     def get_describe_filters(self):

@@ -40,7 +40,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'rds'
     describe_action = "describe_db_subnet_groups"
     describe_notfound_exception = "DBSubnetGroupNotFoundFault"
-    describe_list_key = "DBSubnetGroups"
+    describe_envelope = "DBSubnetGroups"
     key = 'DBSubnetGroupName'
 
 

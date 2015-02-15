@@ -109,7 +109,7 @@ class Describe(SimpleDescribe, Plan):
     resource = SecurityGroup
     service_name = 'ec2'
     describe_action = "describe_security_groups"
-    describe_list_key = "SecurityGroups"
+    describe_envelope = "SecurityGroups"
     key = 'GroupId'
 
     def get_describe_filters(self):

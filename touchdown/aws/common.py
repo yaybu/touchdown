@@ -164,7 +164,7 @@ class SimpleDescribe(object):
             if self.get_key:
                 self.singular = self.get_key
             else:
-                self.singular = self.describe_list_key[:-1]
+                self.singular = self.describe_envelope[:-1]
 
     @property
     def session(self):
@@ -217,7 +217,7 @@ class SimpleDescribe(object):
 
             def _():
                 for page in paginator.paginate(**filters):
-                    for result in jmespath.search(self.describe_list_key, page):
+                    for result in jmespath.search(self.describe_envelope, page):
                         yield result
 
             results = _()
@@ -228,7 +228,7 @@ class SimpleDescribe(object):
                 if e.response['Error']['Code'] == self.describe_notfound_exception:
                     return {}
                 raise
-            results = jmespath.search(self.describe_list_key, results)
+            results = jmespath.search(self.describe_envelope, results)
 
         objects = filter(self.describe_object_matches, results)
 

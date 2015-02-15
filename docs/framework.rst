@@ -68,7 +68,7 @@ use the ``SimpleApply`` mixin::
         service_name = 'ec2'
         create_action = "import_key_pair"
         describe_action = "describe_key_pairs"
-        describe_list_key = "KeyPairs"
+        describe_envelope = "KeyPairs"
         key = 'KeyName'
 
         def get_describe_filters(self):

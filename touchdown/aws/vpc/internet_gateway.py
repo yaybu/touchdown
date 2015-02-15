@@ -34,7 +34,7 @@ class Describe(SimpleDescribe, Plan):
     resource = InternetGateway
     service_name = 'ec2'
     describe_action = "describe_internet_gateways"
-    describe_list_key = "InternetGateways"
+    describe_envelope = "InternetGateways"
     key = "InternetGatewayId"
 
     def get_describe_filters(self):

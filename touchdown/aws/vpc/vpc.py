@@ -38,7 +38,7 @@ class Describe(SimpleDescribe, Plan):
     resource = VPC
     service_name = 'ec2'
     describe_action = "describe_vpcs"
-    describe_list_key = "Vpcs"
+    describe_envelope = "Vpcs"
     key = 'VpcId'
 
     def get_describe_filters(self):

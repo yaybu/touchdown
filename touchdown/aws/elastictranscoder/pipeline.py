@@ -43,7 +43,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Pipeline
     service_name = 'elastictranscoder'
     describe_action = "list_pipelines"
-    describe_list_key = "Pipelines"
+    describe_envelope = "Pipelines"
     describe_fitlers = {}
     describe_object_matches = lambda self, p: p['Name'] == self.resource.name
     key = 'Id'

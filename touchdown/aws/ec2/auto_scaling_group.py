@@ -170,7 +170,7 @@ class Describe(SimpleDescribe, Plan):
     resource = AutoScalingGroup
     service_name = 'autoscaling'
     describe_action = "describe_auto_scaling_groups"
-    describe_list_key = "AutoScalingGroups"
+    describe_envelope = "AutoScalingGroups"
     key = 'AutoScalingGroupName'
 
     def get_describe_filters(self):

@@ -243,11 +243,10 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Distribution
     service_name = 'cloudfront'
-    plural = 'DistributionList'
     singular = 'Distribution'
     describe_filters = {}
     describe_action = "list_distributions"
-    describe_list_key = 'DistributionList.Items'
+    describe_envelope = 'DistributionList.Items'
     key = 'Id'
 
     def get_describe_filters(self):

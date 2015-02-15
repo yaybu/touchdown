@@ -55,7 +55,7 @@ class Describe(SimpleDescribe, Plan):
     resource = RouteTable
     service_name = 'ec2'
     describe_action = "describe_route_tables"
-    describe_list_key = "RouteTables"
+    describe_envelope = "RouteTables"
     key = "RouteTableId"
 
     def get_describe_filters(self):

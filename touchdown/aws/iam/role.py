@@ -56,7 +56,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Role
     service_name = 'iam'
     describe_action = "list_roles"
-    describe_list_key = "Roles"
+    describe_envelope = "Roles"
     describe_filters = {}
     describe_object_matches = lambda self, role: role['RoleName'] == self.resource.name
     key = 'RoleName'

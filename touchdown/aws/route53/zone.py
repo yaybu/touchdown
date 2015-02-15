@@ -100,7 +100,7 @@ class Describe(SimpleDescribe, Plan):
     resource = HostedZone
     service_name = 'route53'
     describe_action = "list_hosted_zones"
-    describe_list_key = "HostedZones"
+    describe_envelope = "HostedZones"
     describe_filters = {}
     describe_object_matches = lambda self, zone: zone['Name'] == self.resource.name
     singular = "HostedZone"

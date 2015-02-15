@@ -35,7 +35,7 @@ class Describe(SimpleDescribe, Plan):
     resource = KeyPair
     service_name = 'ec2'
     describe_action = "describe_key_pairs"
-    describe_list_key = "KeyPairs"
+    describe_envelope = "KeyPairs"
     describe_notfound_exception = "InvalidKeyPair.NotFound"
     key = 'KeyName'
 

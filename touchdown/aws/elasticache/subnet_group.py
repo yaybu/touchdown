@@ -39,7 +39,7 @@ class Describe(SimpleDescribe, Plan):
     resource = SubnetGroup
     service_name = 'elasticache'
     describe_action = "describe_cache_subnet_groups"
-    describe_list_key = "CacheSubnetGroups"
+    describe_envelope = "CacheSubnetGroups"
     describe_notfound_exception = "CacheSubnetGroupNotFoundFault"
     key = 'CacheSubnetGroupName'
 

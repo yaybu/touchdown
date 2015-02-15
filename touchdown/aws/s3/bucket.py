@@ -42,7 +42,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Bucket
     service_name = 's3'
     describe_action = "list_buckets"
-    describe_list_key = "Buckets"
+    describe_envelope = "Buckets"
     describe_filters = {}
     describe_object_matches = lambda self, bucket: bucket['Name'] == self.resource.name
     key = 'Bucket'

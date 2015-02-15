@@ -49,7 +49,7 @@ class Describe(SimpleDescribe, Plan):
     resource = VpnConnection
     service_name = 'ec2'
     describe_action = "describe_vpn_connections"
-    describe_list_key = "VpnConnections"
+    describe_envelope = "VpnConnections"
     key = "VpnConnectionId"
 
     def get_describe_filters(self):

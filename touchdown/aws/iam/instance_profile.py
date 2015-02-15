@@ -36,7 +36,7 @@ class Describe(SimpleDescribe, Plan):
     resource = InstanceProfile
     service_name = 'iam'
     describe_action = "list_instance_profiles"
-    describe_list_key = "InstanceProfiles"
+    describe_envelope = "InstanceProfiles"
     describe_filters = {}
     describe_object_matches = lambda self, ip: ip['InstanceProfileName'] == self.resource.name
     key = 'InstanceProfileName'
