@@ -74,23 +74,120 @@ use the ``SimpleApply`` mixin::
         def get_describe_filters(self):
             return {"KeyNames": [self.resource.name]}
 
-This is enough for a "ensure it exists" implementation of KeyPairs at Amazon.
-For some components you don't even need to overrride
-``get_describe_filters``.
 
-If you can't describe an object well enough with filters to return a single
-object then you need to override ``describe_object``. For example, for s3::
+Finding existing resources at Amazon
+------------------------------------
 
-    def describe_object(self):
-        for bucket in self.client.list_buckets()['Buckets']:
-            if bucket['Name'] == self.resource.name:
-                return bucket
+.. class:: SimpleDescribe
+
+    This is a mixin that you use with the ``Plan`` base class. It knows about
+    common patterns used at AWS for retrieving metadata about resources already
+    created.
+
+    For example::
+
+        class Describe(SimpleDescribe, Plan):
+
+            resource = Bucket
+            service_name = 's3'
+            describe_action = "list_buckets"
+            describe_envelope = "Buckets"
+            describe_filters = {}
+            describe_object_matches = lambda self, bucket: bucket['Name'] == self.resource.name
+            key = 'Bucket'
+
+    .. attribute:: service_name
+
+        This is the name of an API service, for example ``ec2`` or ``sns``. It
+        matches the parameter you would pass to botocore's ``create_client()``.
+
+    .. attribute:: describe_action
+
+        The name of a botocore API. For example ``list_topics`` or ``describe_roles``.
+
+    .. attribute:: describe_filters
+
+        A set of filters to pass to the API. As it is not very useful to pass
+        a static set of filters this is generally a property::
+
+            @property
+            def describe_filters(self):
+                return {"Name": self.resource.name}
+
+    .. attribute:: descrive_envelope
+
+        The envelope that the response is wrapped in. This is a jmespath
+        expression. For example, a CloudFront Distribution will return data like
+        this::
+
+            {"DistributionList": "Items": [...]}
+
+        So the expression is ``DistributionList.Items``.
+
+    .. attribute:: describe_object_matches
+
+        A callable that does client side filtering of a list of Amazon resources.
+        It is called for each item retrieved and passed the parsed JSON. It
+        should return ``True`` if it matches the current resource.
+
+        For example::
+
+            def describe_object_matches(self, data):
+                return data['Name'] == self.resource.name
+
+        This is much less efficient than passing a filter to the API, but not
+        all AWS API's have advanced enough filtering.
+
+    .. attribute:: key
+    .. attribute:: singular
+
+
+Creating new instances
+----------------------
+
+Before creating a new instance we have to check if an instance exists already.
+We leverage the ``SimpleDescribe`` subclass we have already made to do this,
+and mixin the ``SipleApply`` mixin to create an instance if its missing (and
+apply any required changes).
+
+
+.. class:: SimpleApply
+
+    For example::
+
+        class Apply(SimpleApply, Describe):
+
+            create_action = "import_key_pair"
+            create_response = "id-only"
+
+    .. attribute:: create_action
+
+        A botocore API that can be used to create an instance.
+
+    .. attribute:: create_response
+
+        The results from the various Amazon API's vary, but fit into a handful
+        of common patterns:
+
+        ``full-description``
+            The result of this API is a description complete enough that we
+            don't need to call the describe API again.
+        ``id-only``
+            The response contains the ID of the newly created resource, but
+            it does not contain the full data you would get if you called the
+            describe API.
+        ``not-that-useful``
+            Beyond reporting success via a HTTP ``200``, the API has no outputs.
+
+        If not specified, ``full-description`` is assumed.
+
 
 Because the botocore library is quite low level one of the main tasks in
 binding the API is mapping touchdown resources to JSON. The
-``touchdown.aws.serializers`` library helps here.
+``touchdown.core.serializers`` library helps here.
 
-In S3 the location field is weirdly in a sub-dictionary. We need to generate JSON that looks like::
+In S3 the location field is weirdly in a sub-dictionary. We need to generate
+JSON that looks like::
 
     {
         "Bucket": "bucket-name",
@@ -111,3 +208,18 @@ We can write a resource that handles this with the ``serializer`` annotations::
                 LocationConstraint=serializers.Identity(),
             )
         )
+
+Destroying instances
+--------------------
+
+.. class:: SimpleDestroy
+
+    For example::
+
+        class Destroy(SimpleDestroy, Describe):
+
+            destroy_action = "delete_security_group"
+
+    .. attribute:: destroy_action
+
+        The botocore API to call to delete an instance.
