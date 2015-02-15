@@ -19,6 +19,7 @@ from botocore.exceptions import ClientError
 from touchdown.core import errors, serializers, resource
 from touchdown.core.action import Action
 from touchdown.core.plan import Present
+from touchdown.core.diff import DiffSet
 
 
 logger = logging.getLogger(__name__)
@@ -27,23 +28,7 @@ logger = logging.getLogger(__name__)
 class Resource(resource.Resource):
 
     def matches(self, runner, remote):
-        for name, field in self.fields:
-            arg = field.argument
-            if not field.present(self):
-                continue
-            if not getattr(arg, "field", ""):
-                continue
-            if not getattr(arg, "update", True):
-                continue
-            if not getattr(self, name) and arg.field not in remote:
-                return True
-            if arg.field not in remote:
-                return False
-            rendered = arg.serializer.render(runner, getattr(self, name))
-            if rendered != remote[arg.field]:
-                return False
-
-        return True
+        return DiffSet(runner, self, remote).matches()
 
 
 class Waiter(Action):
@@ -203,7 +188,7 @@ class SimpleDescribe(object):
         if self.get_action:
             logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.get_action))
             try:
-                result = getattr(self.client, self.get_action)(**{self.key: self.resource.name})
+                result = getattr(self.client, self.get_action)(**self.get_describe_filters())
             except ClientError as e:
                 if e.response['Error']['Code'] == self.get_notfound_exception:
                     return {}

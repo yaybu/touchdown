@@ -32,7 +32,7 @@ class Field(object):
 
     def get_value(self, instance):
         retval = instance._values.get(self.name, None)
-        if not retval:
+        if retval is None:
             return self.argument.get_default(instance)
         return retval
 

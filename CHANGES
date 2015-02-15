@@ -1,0 +1,9 @@
+Changelog for Touchdown
+=======================
+
+0.0.2 (unreleased)
+------------------
+
+- Basic support for Amazon SQS.
+
+- Basic support for Amazon SNS.
