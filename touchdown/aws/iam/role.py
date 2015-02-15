@@ -58,8 +58,10 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "list_roles"
     describe_envelope = "Roles"
     describe_filters = {}
-    describe_object_matches = lambda self, role: role['RoleName'] == self.resource.name
     key = 'RoleName'
+
+    def describe_object_matches(self, role):
+        return role['RoleName'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):

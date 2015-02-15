@@ -144,7 +144,6 @@ class SimpleDescribe(object):
     get_action = None
     get_key = None
     describe_filters = None
-    describe_object_matches = lambda self, x: True
     describe_notfound_exception = None
     get_notfound_exception = None
 
@@ -187,6 +186,9 @@ class SimpleDescribe(object):
         return {
             self.key: self.resource.name
         }
+
+    def describe_object_matches(self, object):
+        return True
 
     def describe_object(self):
         if self.get_action:

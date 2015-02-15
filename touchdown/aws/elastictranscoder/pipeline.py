@@ -45,8 +45,10 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "list_pipelines"
     describe_envelope = "Pipelines"
     describe_fitlers = {}
-    describe_object_matches = lambda self, p: p['Name'] == self.resource.name
     key = 'Id'
+
+    def describe_object_matches(self, pipeline):
+        return pipeline['Name'] == self.resource.name
 
 
 class Apply(SimpleApply, Plan):

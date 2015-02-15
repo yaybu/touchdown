@@ -38,8 +38,10 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "list_instance_profiles"
     describe_envelope = "InstanceProfiles"
     describe_filters = {}
-    describe_object_matches = lambda self, ip: ip['InstanceProfileName'] == self.resource.name
     key = 'InstanceProfileName'
+
+    def describe_object_matches(self, instance_profile):
+        return instance_profile['InstanceProfileName'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):

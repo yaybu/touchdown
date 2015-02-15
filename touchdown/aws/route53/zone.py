@@ -102,9 +102,11 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "list_hosted_zones"
     describe_envelope = "HostedZones"
     describe_filters = {}
-    describe_object_matches = lambda self, zone: zone['Name'] == self.resource.name
     singular = "HostedZone"
     key = 'Id'
+
+    def describe_object_matches(self, zone):
+        return zone['Name'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
