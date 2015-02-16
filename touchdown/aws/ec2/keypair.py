@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
 from ..account import Account
@@ -47,6 +47,11 @@ class Apply(SimpleApply, Describe):
 
     create_action = "import_key_pair"
     create_response = "id-only"
+
+    signature = (
+        Present("name"),
+        Present("public_key"),
+    )
 
 
 class Destroy(SimpleDestroy, Describe):
