@@ -54,10 +54,15 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_bucket"
     create_response = "not-that-useful"
-    waiter = "bucket_exists"
+    #waiter = "bucket_exists"
 
 
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_bucket"
-    waiter = "bucket_not_exists"
+    #waiter = "bucket_not_exists"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            Bucket=self.resource.name,
+        )
