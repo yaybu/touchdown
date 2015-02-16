@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -30,7 +30,7 @@ class Pipeline(Resource):
     name = argument.String(field="Name")
     input_bucket = argument.Resource(Bucket, field="InputBucket")
     output_bucket = argument.Resource(Bucket, field="OutputBucket")
-    role = argument.Resource(Role, field="Role")
+    role = argument.Resource(Role, field="Role", serializer=serializers.Property("Arn"))
     # key = argument.Resource(KmsKey, field="AwsKmsKeyArn")
     # notifications = argument.Resource(Topic, field="Notifications")
     content_config = argument.Dict(field="ContentConfig")
