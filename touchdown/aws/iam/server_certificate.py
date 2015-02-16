@@ -37,9 +37,9 @@ class Describe(SimpleDescribe, Plan):
 
     resource = ServerCertificate
     service_name = 'iam'
-    get_action = "get_server_certificate"
-    get_key = "ServerCertificate"
-    get_notfound_exception = "NoSuchEntity"
+    describe_action = "get_server_certificate"
+    describe_envelope = "ServerCertificate"
+    describe_notfound_exception = "NoSuchEntity"
     key = 'ServerCertificateName'
 
     def describe_object(self):

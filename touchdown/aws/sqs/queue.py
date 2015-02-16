@@ -44,18 +44,13 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Queue
     service_name = 'sqs'
-    get_action = 'get_queue_url'
-    get_key = "QueueUrl"
-    get_notfound_exception = "AWS.SimpleQueueService.NonExistentQueue"
+    describe_action = 'get_queue_url'
+    describe_envelope = "{QueueUrl: QueueUrl}"
+    describe_notfound_exception = "AWS.SimpleQueueService.NonExistentQueue"
     key = "QueueUrl"
 
     def get_describe_filters(self):
         return {"QueueName": self.resource.name}
-
-    @property
-    def resource_id(self):
-        if self.object:
-            return self.object
 
 
 class Apply(SimpleApply, Describe):

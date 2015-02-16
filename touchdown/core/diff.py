@@ -46,6 +46,9 @@ class DiffSet(object):
 
         self.diffs = []
 
+        if not self.local:
+            return
+
         for name, field in local.fields:
             arg = field.argument
             if not field.present(local):

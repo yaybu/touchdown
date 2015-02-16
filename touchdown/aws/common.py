@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from inspect import isgeneratorfunction
 import logging
 
 from botocore.exceptions import ClientError
@@ -141,11 +142,8 @@ class SimpleDescribe(object):
 
     name = "describe"
 
-    get_action = None
-    get_key = None
     describe_filters = None
     describe_notfound_exception = None
-    get_notfound_exception = None
 
     # If singular is not then we will automatically trim the 's' off
     singular = None
@@ -160,10 +158,7 @@ class SimpleDescribe(object):
         super(SimpleDescribe, self).__init__(runner, resource)
         self.object = {}
         if not self.singular:
-            if self.get_key:
-                self.singular = self.get_key
-            else:
-                self.singular = self.describe_envelope[:-1]
+            self.singular = self.describe_envelope[:-1]
 
     @property
     def session(self):
@@ -191,16 +186,6 @@ class SimpleDescribe(object):
         return True
 
     def describe_object(self):
-        if self.get_action:
-            logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.get_action))
-            try:
-                result = getattr(self.client, self.get_action)(**self.get_describe_filters())
-            except ClientError as e:
-                if e.response['Error']['Code'] == self.get_notfound_exception:
-                    return {}
-                raise
-            return result[self.get_key]
-
         logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
 
         if self.describe_filters is not None:
@@ -232,7 +217,10 @@ class SimpleDescribe(object):
                 raise
             results = jmespath.search(self.describe_envelope, results)
 
-        objects = list(filter(self.describe_object_matches, results))
+        if isgeneratorfunction(results) or isinstance(results, list):
+            objects = list(filter(self.describe_object_matches, results))
+        else:
+            objects = [results]
 
         if len(objects) > 1:
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))

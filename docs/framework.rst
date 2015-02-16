@@ -142,7 +142,7 @@ Finding existing resources at Amazon
             def describe_filters(self):
                 return {"Name": self.resource.name}
 
-    .. attribute:: descrive_envelope
+    .. attribute:: describe_envelope
 
         The envelope that the response is wrapped in. This is a jmespath
         expression. For example, a CloudFront Distribution will return data like
@@ -165,6 +165,11 @@ Finding existing resources at Amazon
 
         This is much less efficient than passing a filter to the API, but not
         all AWS API's have advanced enough filtering.
+
+    .. attribute:: describe_notfound_exception
+
+        The kind of botocore ``ClientError`` that is raised when a matching
+        item cannot be found.
 
     .. attribute:: key
     .. attribute:: singular
