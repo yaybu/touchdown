@@ -20,7 +20,7 @@ except ImportError:
 
 from touchdown.core.action import Action
 from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, errors, serializers
 
 from touchdown.provisioner import Step
@@ -203,6 +203,10 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_image"
     create_response = "not-that-useful"
+
+    signature = (
+        Present("name"),
+    )
 
     def create_object(self):
         return BuildInstance(self)

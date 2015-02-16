@@ -15,7 +15,7 @@
 import uuid
 
 from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 
 from ..account import Account
@@ -103,6 +103,11 @@ class Apply(SimpleApply, Describe):
     create_action = "create_streaming_distribution"
     create_response = "not-that-useful"
     waiter = "streaming_distribution_deployed"
+
+    signature = (
+        Present("name"),
+        Present("s3_origin"),
+    )
 
     def get_create_serializer(self):
         return serializers.Dict(

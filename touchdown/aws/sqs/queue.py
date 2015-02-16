@@ -60,6 +60,9 @@ class Apply(SimpleApply, Describe):
     #waiter = "bucket_exists"
 
     def update_object(self):
+        if not self.resource.attributes:
+            return
+
         attributes = {}
         if self.resource_id:
             attributes = self.client.get_queue_attributes(

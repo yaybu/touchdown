@@ -245,6 +245,12 @@ class Apply(SimpleApply, Describe):
     create_response = "not-that-useful"
     waiter = "distribution_deployed"
 
+    signature = (
+        Present("name"),
+        Present("origins"),
+        Present("default_cache_behavior"),
+    )
+
     def get_create_serializer(self):
         return serializers.Dict(
             DistributionConfig=serializers.Resource(),

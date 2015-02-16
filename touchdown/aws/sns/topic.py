@@ -56,6 +56,9 @@ class Apply(SimpleApply, Describe):
     create_response = "id-only"
 
     def update_object(self):
+        if not self.resource.attributes:
+            return
+
         attributes = {}
         if self.resource_id:
             attributes = self.client.get_topic_attributes(
