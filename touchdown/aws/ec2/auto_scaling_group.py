@@ -34,7 +34,7 @@ class AutoScalingGroup(Resource):
 
     name = argument.String(field="AutoScalingGroupName")
     launch_configuration = argument.Resource(LaunchConfiguration, field="LaunchConfigurationName")
-    min_size = argument.Integer(field="MinSize")
+    min_size = argument.Integer(min=1, field="MinSize")
     max_size = argument.Integer(field="MaxSize")
     desired_capacity = argument.Integer(field="DesiredCapacity")
     default_cooldown = argument.Integer(default=300, field="DefaultCooldown")
@@ -182,6 +182,10 @@ class Apply(SimpleApply, Describe):
     create_action = "create_auto_scaling_group"
     create_response = "not-that-useful"
     update_action = "update_auto_scaling_group"
+
+    signature = (
+        Present("name"),
+    )
 
     def update_object(self):
         for change in super(Apply, self).update_object():

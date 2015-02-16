@@ -106,7 +106,7 @@ class Apply(SimpleApply, Describe):
 
     signature = (
         Present("name"),
-        Present("s3_origin"),
+        Present("origin"),
     )
 
     def get_create_serializer(self):
