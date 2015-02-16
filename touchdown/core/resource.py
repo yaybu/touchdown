@@ -37,9 +37,12 @@ class Field(object):
         return retval
 
     def __set__(self, instance, value):
-        value = self.argument.clean(instance, value)
-        if hasattr(instance, "clean_{}".format(self.name)):
-            value = getattr(instance, "clean_{}".format(self.name))(value)
+        try:
+            value = self.argument.clean(instance, value)
+            if hasattr(instance, "clean_{}".format(self.name)):
+                value = getattr(instance, "clean_{}".format(self.name))(value)
+        except errors.InvalidParameter as e:
+            raise errors.InvalidParameter("{}: {}".format(self.name, e.args[0]))
         instance._values[self.name] = value
 
     def __get__(self, instance, owner):

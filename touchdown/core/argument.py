@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import itertools
+import re
 
 import netaddr
 import six
@@ -64,6 +65,11 @@ class String(Argument):
 
     serializer = serializers.String()
 
+    min = None
+    max = None
+    choices = None
+    regex = None
+
     def clean(self, instance, value):
         if value is None:
             return value
@@ -72,7 +78,30 @@ class String(Argument):
         if not isinstance(value, (six.binary_type, six.text_type)):
             value = str(value)
 
-        return force_str(value)
+        # Cast to native string type for this python version
+        value = force_str(value)
+
+        if self.min is not None and len(value) < self.min:
+            raise errors.InvalidParameter(
+                "Value should be at least {} characters".format(self.min),
+            )
+
+        if self.max is not None and len(value) > self.max:
+            raise errors.InvalidParameter(
+                "Value should be at most {} characters".format(self.max),
+            )
+
+        if self.choices is not None and value not in self.choices:
+            raise errors.InvalidParameter(
+                "Not a valid value for this field",
+            )
+
+        if self.regex is not None and not re.match(self.regex, value):
+            raise errors.InvalidParameter(
+                "Regex validation failed ({})".format(self.regex),
+            )
+
+        return value
 
 
 class Integer(Argument):

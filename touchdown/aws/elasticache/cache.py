@@ -46,7 +46,7 @@ class CacheCluster(BaseCacheCluster):
 
     resource_name = "cache_cluster"
 
-    name = argument.String(regex=r"[a-z1-9\-]{1,20}", field="CacheClusterId")
+    name = argument.String(min=1, max=20, regex=r"^[a-z1-9\-]*$", field="CacheClusterId")
     # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", field='ReplicationGroupId')
 
 
