@@ -33,8 +33,8 @@ class Pipeline(Resource):
     role = argument.Resource(Role, field="Role", serializer=serializers.Property("Arn"))
     # key = argument.Resource(KmsKey, field="AwsKmsKeyArn")
     # notifications = argument.Resource(Topic, field="Notifications")
-    content_config = argument.Dict(field="ContentConfig")
-    thumbnail_config = argument.Dict(field="ThumbnailConfig")
+    content_config = argument.Dict(field="ContentConfig", default=None)
+    thumbnail_config = argument.Dict(field="ThumbnailConfig", default=None)
     account = argument.Resource(Account)
 
 
