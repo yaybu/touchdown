@@ -51,12 +51,12 @@ class Describe(SimpleDescribe, Plan):
         return pipeline['Name'] == self.resource.name
 
 
-class Apply(SimpleApply, Plan):
+class Apply(SimpleApply, Describe):
 
     create_action = "create_pipeline"
     update_action = "update_pipeline"
 
 
-class Destroy(SimpleDestroy, Plan):
+class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_pipeline"
