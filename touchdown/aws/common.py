@@ -201,9 +201,14 @@ class SimpleDescribe(object):
             paginator = self.client.get_paginator(self.describe_action)
 
             def _():
-                for page in paginator.paginate(**filters):
-                    for result in jmespath.search(self.describe_envelope, page):
-                        yield result
+                try:
+                    for page in paginator.paginate(**filters):
+                        for result in jmespath.search(self.describe_envelope, page):
+                            yield result
+                except ClientError as e:
+                    if e.response['Error']['Code'] == self.describe_notfound_exception:
+                        raise StopIteration
+                    raise
 
             results = _()
         else:
