@@ -43,6 +43,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'sns'
     describe_action = "list_topics"
     describe_envelope = "Topics"
+    describe_filters = {}
     key = 'TopicArn'
 
     def describe_object_matches(self, topic):
