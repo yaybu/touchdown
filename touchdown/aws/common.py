@@ -254,7 +254,7 @@ class SimpleDescribe(object):
         self.object = self.describe_object()
 
         if not self.object:
-            raise errors.NotFound("Object '{}' could not be found, and is not scheduled to be created")
+            raise errors.NotFound("Object '{}' could not be found, and is not scheduled to be created".format(self.resource))
 
         return []
 
