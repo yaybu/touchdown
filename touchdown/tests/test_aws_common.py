@@ -34,5 +34,6 @@ class TestGenericAction(unittest.TestCase):
         g.run()
 
         api.assert_called_with(
+            NumCacheNodes=1,
             CacheClusterId='freddy',
         )
