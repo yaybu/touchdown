@@ -7,3 +7,5 @@ Changelog for Touchdown
 - Basic support for Amazon SQS.
 
 - Basic support for Amazon SNS.
+
+- Basic support for Amazon CloudFront Streaming Distributions.

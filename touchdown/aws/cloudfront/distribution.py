@@ -24,31 +24,7 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..iam import ServerCertificate
 from ..s3 import Bucket
 
-
-class CloudFrontList(serializers.Dict):
-
-    def __init__(self, inner=None, **kwargs):
-        self.kwargs = dict(kwargs)
-        self.kwargs["Items"] = inner or serializers.List()
-        self.kwargs['Quantity'] = serializers.Expression(lambda runner, object: len(self.kwargs["Items"].render(runner, object)))
-
-
-def CloudFrontResourceList():
-    return CloudFrontList(serializers.List(serializers.Resource()))
-
-
-class S3Origin(Resource):
-
-    resource_name = "s3_origin"
-    extra_serializers = {
-        "S3OriginConfig": serializers.Dict(
-            OriginAccessIdentity=serializers.Argument("origin_access_identity"),
-        ),
-    }
-
-    name = argument.String(field='Id')
-    bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()))
-    origin_access_identity = argument.String(default='')
+from .common import S3Origin, CloudFrontList, CloudFrontResourceList
 
 
 class CustomOrigin(Resource):

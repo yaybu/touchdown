@@ -282,3 +282,55 @@ argument to a distribution.
 
         The default value is ``TLSv1``. To decrease the security of your system
         you can instead set this to ``SSLv3``. This is strongly discouraged.
+
+
+Streaming media
+---------------
+
+.. class:: StreamingDistribution
+
+    .. attribute:: name
+
+        The name of the streaming distribution. This should be the primary
+        domain that it responds to.
+
+    .. attribute:: comment
+
+        Any comments you want to include about the distribution.
+
+    .. attribute:: aliases
+
+        Alternative names that the distribution should respond to.
+
+    .. attribute:: enabled
+
+        Whether or not this distribution is active.
+
+    .. attribute:: origin
+
+        A :class:`S3Origin` that describes where to stream media from.
+
+    .. attribute:: logging
+
+        A :class:`StreamingLoggingConfig` resource that describes how CloudFront
+        should log.
+
+    .. attribute:: price_class
+
+        The price class. By default ``PriceClass_100`` is used, which is the
+        cheapest.
+
+
+.. class:: StreamingLoggingConfig
+
+    .. attribute:: enabled
+
+        By default this is ``False``. Set it to ``True`` to get CDN logs.
+
+    .. attribute:: bucket
+
+        A :class:`~touchdown.aws.s3.Bucket`.
+
+    .. attribute:: path
+
+        A path within the S3 bucket to store the incoming logs.

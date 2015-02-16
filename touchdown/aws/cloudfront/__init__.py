@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from .distribution import Distribution
+from .streaming_distribution import StreamingDistribution
 
 __all__ = [
     'Distribution',
+    'StreamingDistribution',
 ]
