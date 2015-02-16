@@ -42,7 +42,7 @@ class AutoScalingGroup(Resource):
     subnets = argument.ResourceList(
         Subnet,
         field="VPCZoneIdentifier",
-        serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier())),
+        serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier(), skip_empty=True)),
     )
     load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", aws_update=False)
     health_check_type = argument.String(
