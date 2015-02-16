@@ -111,7 +111,7 @@ class Apply(SimpleApply, Describe):
 
     def get_create_serializer(self):
         return serializers.Dict(
-            DistributionConfig=serializers.Resource(),
+            StreamingDistributionConfig=serializers.Resource(),
         )
 
 
