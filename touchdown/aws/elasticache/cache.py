@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
 from ..account import Account
@@ -33,7 +33,7 @@ class BaseCacheCluster(Resource):
     availability_zone = argument.String(field='PreferredAvailabilityZone')
     multi_az = argument.Boolean(field='AZMode')
     auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade')
-    num_cache_nodes = argument.Integer(field='NumCacheNodes')
+    num_cache_nodes = argument.Integer(default=1, min=1, field='NumCacheNodes')
     subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName')
     # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
@@ -65,6 +65,11 @@ class Apply(SimpleApply, Describe):
     create_action = "create_cache_cluster"
     # update_action = "modify_cache_cluster"
     waiter = "cache_cluster_available"
+
+    signature = (
+        Present("name"),
+        Present("instance_class"),
+    )
 
 
 class Destroy(SimpleDestroy, Describe):
