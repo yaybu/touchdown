@@ -14,11 +14,12 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers
+from touchdown.core import argument, serializers, diff
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
+from ..sns import Topic
 from ..s3 import Bucket
 from ..iam import Role
 
@@ -27,14 +28,52 @@ class Pipeline(Resource):
 
     resource_name = "pipeline"
 
+    extra_serializers = {
+        "Notificiations": serializers.Resource(group="notifications"),
+    }
+
     name = argument.String(field="Name")
     input_bucket = argument.Resource(Bucket, field="InputBucket")
     output_bucket = argument.Resource(Bucket, field="OutputBucket")
-    role = argument.Resource(Role, field="Role", serializer=serializers.Property("Arn"))
     # key = argument.Resource(KmsKey, field="AwsKmsKeyArn")
-    # notifications = argument.Resource(Topic, field="Notifications")
+
+    role = argument.Resource(
+        Role,
+        field="Role",
+        serializer=serializers.Property("Arn")
+    )
+
+    progressing = argument.Resource(
+        Topic,
+        field="Progressing",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications"
+    )
+
+    completed = argument.Resource(
+        Topic,
+        field="Completed",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications"
+    )
+
+    warning = argument.Resource(
+        Topic,
+        field="Warning",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications"
+    )
+
+    error = argument.Resource(
+        Topic,
+        field="Error",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications"
+    )
+
     #content_config = argument.Dict(field="ContentConfig", default=None)
     #thumbnail_config = argument.Dict(field="ThumbnailConfig", default=None)
+
     account = argument.Resource(Account)
 
 
@@ -54,7 +93,19 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_pipeline"
-    update_action = "update_pipeline"
+
+    def update_object(self):
+        if not self.object:
+            return
+
+        d = diff.DiffSet(self.runner, self.resource, self.object.get('Notifications', {}), group="notifications")
+        if not d.matches():
+            yield self.generic_action(
+                "Update pipline notification topics" + d.get_descriptions(),
+                self.client.update_pipeline_notifications,
+                Id=serializers.Identifier(),
+                Notifications=serializers.Resource(group="notifications"),
+            )
 
 
 class Destroy(SimpleDestroy, Describe):

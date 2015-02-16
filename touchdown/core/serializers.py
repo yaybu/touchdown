@@ -266,8 +266,9 @@ class Resource(Dict):
     """ Automatically generate a Dict definition by inspect the 'field'
     paramters of a resource """
 
-    def __init__(self, mode="create", **kwargs):
+    def __init__(self, mode="create", group="", **kwargs):
         self.mode = mode
+        self.group = group
         super(Resource, self).__init__(**kwargs)
 
     def render(self, runner, object):
@@ -290,6 +291,8 @@ class Resource(Dict):
             if self.mode == "create" and not getattr(arg, "aws_create", True):
                 continue
             if self.mode == "update" and not getattr(arg, "aws_update", True):
+                continue
+            if self.group != getattr(arg, "group", ""):
                 continue
 
             if hasattr(object, "serialize_" + argument_name):

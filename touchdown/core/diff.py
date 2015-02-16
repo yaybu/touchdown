@@ -39,10 +39,11 @@ class Diff(object):
 
 class DiffSet(object):
 
-    def __init__(self, runner, local, remote):
+    def __init__(self, runner, local, remote, group=""):
         self.runner = runner
         self.local = local
         self.remote = remote
+        self.group = group
 
         self.diffs = []
 
@@ -56,6 +57,8 @@ class DiffSet(object):
             if not getattr(arg, "field", ""):
                 continue
             if not getattr(arg, "update", True):
+                continue
+            if getattr(arg, "group", "") != self.group:
                 continue
             if not getattr(local, name) and arg.field not in remote:
                 continue
