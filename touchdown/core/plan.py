@@ -40,7 +40,6 @@ class Plan(six.with_metaclass(PlanType)):
     default = False
 
     # the name of the plan
-
     name = None
 
     # specify the resource to which this plan applies
@@ -66,7 +65,7 @@ class Plan(six.with_metaclass(PlanType)):
         if a.test(self.resource):
             return
 
-        msg = ["Resource doesn't confirm to the plan %s" % self.name]
+        msg = ["{} doesn't confirm to the plan {}".format(self.resource, self.name)]
         msg.extend(a.describe(self.resource))
         raise errors.NonConformingPolicy("\n".join(msg))
 

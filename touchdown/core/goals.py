@@ -46,7 +46,9 @@ class Goal(six.with_metaclass(GoalType)):
     def get_plan(self, resource):
         if resource not in self.resources:
             klass = self.get_plan_class(resource)
-            self.resources[resource] = klass(self, resource)
+            plan = klass(self, resource)
+            plan.validate()
+            self.resources[resource] = plan
         return self.resources[resource]
 
     def get_changes(self, resource):
