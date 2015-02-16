@@ -100,7 +100,10 @@ class GenericAction(Action):
 
         if self.is_creation_action:
             if self.plan.create_response == "full-description":
-                self.plan.object = object[self.plan.singular]
+                self.plan.object = jmespath.search(
+                    getattr(self.plan, "create_envelope", self.plan.describe_envelope[:-1]),
+                    object,
+                )
             else:
                 if self.plan.create_response == "id-only":
                     self.plan.object = {
@@ -145,9 +148,6 @@ class SimpleDescribe(object):
     describe_filters = None
     describe_notfound_exception = None
 
-    # If singular is not then we will automatically trim the 's' off
-    singular = None
-
     signature = (
         Present('name'),
     )
@@ -157,8 +157,6 @@ class SimpleDescribe(object):
     def __init__(self, runner, resource):
         super(SimpleDescribe, self).__init__(runner, resource)
         self.object = {}
-        if not self.singular:
-            self.singular = self.describe_envelope[:-1]
 
     @property
     def session(self):
@@ -216,11 +214,10 @@ class SimpleDescribe(object):
                     return {}
                 raise
             results = jmespath.search(self.describe_envelope, results)
+            if not isgeneratorfunction(results) and not isinstance(results, list):
+                results = [results]
 
-        if isgeneratorfunction(results) or isinstance(results, list):
-            objects = list(filter(self.describe_object_matches, results))
-        else:
-            objects = [results]
+        objects = list(filter(self.describe_object_matches, results))
 
         if len(objects) > 1:
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))

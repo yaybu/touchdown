@@ -243,7 +243,6 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Distribution
     service_name = 'cloudfront'
-    singular = 'Distribution'
     describe_filters = {}
     describe_action = "list_distributions"
     describe_envelope = 'DistributionList.Items'

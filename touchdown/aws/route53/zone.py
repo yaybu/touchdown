@@ -102,7 +102,6 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "list_hosted_zones"
     describe_envelope = "HostedZones"
     describe_filters = {}
-    singular = "HostedZone"
     key = 'Id'
 
     def describe_object_matches(self, zone):
