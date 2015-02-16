@@ -185,6 +185,9 @@ class Apply(SimpleApply, Describe):
 
     signature = (
         Present("name"),
+        Present("min_size"),
+        Present("max_size"),
+        Present("launch_configuration"),
     )
 
     def update_object(self):

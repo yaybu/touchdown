@@ -33,7 +33,6 @@ class BaseCacheCluster(Resource):
     availability_zone = argument.String(field='PreferredAvailabilityZone')
     multi_az = argument.Boolean(field='AZMode')
     auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade')
-    num_cache_nodes = argument.Integer(default=1, min=1, field='NumCacheNodes')
     subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName')
     # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
@@ -47,6 +46,8 @@ class CacheCluster(BaseCacheCluster):
     resource_name = "cache_cluster"
 
     name = argument.String(min=1, max=20, regex=r"^[a-z1-9\-]*$", field="CacheClusterId")
+    num_cache_nodes = argument.Integer(default=1, min=1, field='NumCacheNodes')
+
     # replication_group = argument.Resource("touchdown.aws.elasticache.replication_group.ReplicationGroup", field='ReplicationGroupId')
 
 
