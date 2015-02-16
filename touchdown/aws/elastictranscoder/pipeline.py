@@ -44,7 +44,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'elastictranscoder'
     describe_action = "list_pipelines"
     describe_envelope = "Pipelines"
-    describe_fitlers = {}
+    describe_filters = {}
     key = 'Id'
 
     def describe_object_matches(self, pipeline):
