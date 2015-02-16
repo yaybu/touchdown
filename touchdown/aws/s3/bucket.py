@@ -44,16 +44,10 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "list_buckets"
     describe_envelope = "Buckets"
     describe_filters = {}
-    key = 'Bucket'
+    key = 'Name'
 
     def describe_object_matches(self, bucket):
         return bucket['Name'] == self.resource.name
-
-    @property
-    def resource_id(self):
-        if self.object:
-            return self.object['Name']
-        return None
 
 
 class Apply(SimpleApply, Describe):
