@@ -208,7 +208,7 @@ class SimpleDescribe(object):
                 except ClientError as e:
                     if e.response['Error']['Code'] == self.describe_notfound_exception:
                         raise StopIteration
-                    raise
+                    raise errors.Error("{}: {}".format(self.resource, e))
 
             results = _()
         else:
@@ -217,7 +217,7 @@ class SimpleDescribe(object):
             except ClientError as e:
                 if e.response['Error']['Code'] == self.describe_notfound_exception:
                     return {}
-                raise
+                raise errors.Error("{}: {}".format(self.resource, e))
             results = jmespath.search(self.describe_envelope, results)
             if not isgeneratorfunction(results) and not isinstance(results, list):
                 results = [results]
