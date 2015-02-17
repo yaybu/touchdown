@@ -9,3 +9,14 @@ Changelog for Touchdown
 - Basic support for Amazon SNS.
 
 - Basic support for Amazon CloudFront Streaming Distributions.
+
+- Strings fields are now validated against their annotations:
+
+    * `min` enforces a minimum length for a value
+    * `max` enforces a maximum length for a value
+    * `choices` enforces that the value is one of a pre-determined list
+    * `regex` enforces that the value matches a guard expression
+
+- More types now have proper ``signature`` annotations for their ``Apply``
+  policy. For example, you will now be warned at plan time if a
+  SecurityGroup doesn't have the required ``description`` field (#10).
