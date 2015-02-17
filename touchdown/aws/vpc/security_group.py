@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -137,6 +137,11 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_security_group"
     create_response = "id-only"
+
+    signature = (
+        Present("name"),
+        Present("description"),
+    )
 
     def update_object(self):
         for local_rule in self.resource.ingress:
