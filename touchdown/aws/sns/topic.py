@@ -26,20 +26,17 @@ class Subscription(Adapter):
     resource_name = "subscription"
 
 
-class TopicAttributes(Resource):
-
-    display_name = argument.String(field="DisplayName")
-    policy = argument.String(field="Policy")
-    delivery_policy = argument.String(field="DeliveryPolicy")
-
-
 class Topic(Resource):
 
     resource_name = "topic"
 
     name = argument.String(field="Name", min=1, max=256, regex='[A-Za-z0-9-_]*')
-    attributes = argument.Resource(TopicAttributes)
     notify = argument.ResourceList(Subscription)
+
+    display_name = argument.String(field="DisplayName", group="attributes")
+    policy = argument.String(field="Policy", group="attributes")
+    delivery_policy = argument.String(field="DeliveryPolicy", group="attributes")
+
     account = argument.Resource(Account)
 
 
@@ -98,16 +95,13 @@ class Apply(SimpleApply, Describe):
                     SubscriptionArn=serializers.Const(remote['SubscriptionArn']),
                 )
 
-        if not self.resource.attributes:
-            return
-
         attributes = {}
         if self.resource_id:
             attributes = self.client.get_topic_attributes(
                 TopicArn=self.resource_id,
             )['Attributes']
 
-        d = DiffSet(self.runner, self.resource.attributes, attributes)
+        d = DiffSet(self.runner, self.resource, attributes, group="attributes")
         for diff in d.get_changes():
             yield self.generic_action(
                 "Update {}".format(diff),

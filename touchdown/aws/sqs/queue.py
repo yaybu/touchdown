@@ -22,22 +22,20 @@ from touchdown.core.diff import DiffSet
 
 from .. import sns
 
-class QueueAttributes(Resource):
-
-    delay_seconds = argument.Integer(min=0, max=900, field="DelaySeconds", serializer=serializers.String())
-    maximum_message_size = argument.Integer(min=1024, max=262144, field="MaximumMessageSize", serializer=serializers.String())
-    message_retention_period = argument.Integer(min=60, max=1209600, field="MessageRetentionPeriod", serializer=serializers.String())
-    policy = argument.String(field="Policy")
-    receive_message_wait_time_seconds = argument.Integer(min=0, max=20, field="ReceiveMessageWaitTimeSeconds", serializer=serializers.String())
-    visibility_timeout = argument.Integer(default=30, min=0, max=43200, field="VisibilityTimeout", serializer=serializers.String())
-
 
 class Queue(Resource):
 
     resource_name = "queue"
 
     name = argument.String(field="QueueName")
-    attributes = argument.Resource(QueueAttributes, serializer=serializers.Resource())
+
+    delay_seconds = argument.Integer(min=0, max=900, field="DelaySeconds", serializer=serializers.String(), group="attributes")
+    maximum_message_size = argument.Integer(min=1024, max=262144, field="MaximumMessageSize", serializer=serializers.String(), group="attributes")
+    message_retention_period = argument.Integer(min=60, max=1209600, field="MessageRetentionPeriod", serializer=serializers.String(), group="attributes")
+    policy = argument.String(field="Policy", group="attributes")
+    receive_message_wait_time_seconds = argument.Integer(min=0, max=20, field="ReceiveMessageWaitTimeSeconds", serializer=serializers.String(), group="attributes")
+    visibility_timeout = argument.Integer(default=30, min=0, max=43200, field="VisibilityTimeout", serializer=serializers.String(), group="attributes")
+
     account = argument.Resource(Account)
 
 
@@ -70,19 +68,13 @@ class Apply(SimpleApply, Describe):
     #waiter = "bucket_exists"
 
     def update_object(self):
-        if not self.resource.attributes:
-            return
-
-        d = DiffSet(self.runner, self.resource.attributes, self.object)
+        d = DiffSet(self.runner, self.resource, self.object, group="attributes")
         if d.matches():
             yield self.generic_action(
                 ["Updating queue attributes"] + list(d.get_descriptions()),
                 self.client.set_queue_attributes,
                 QueueUrl=serializers.Identifier(),
-                Attributes=serializers.Context(
-                    serializers.Const(self.resource.attributes),
-                    serializers.Resource(),
-                )
+                Attributes=serializers.Resource(group="attributes")
             )
 
 
