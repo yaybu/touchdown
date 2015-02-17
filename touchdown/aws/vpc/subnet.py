@@ -130,7 +130,7 @@ class Apply(SimpleApply, Describe):
             elif self.object['RouteTableId'] != self.runner.get_plan(self.resource.route_table).resource_id:
                 yield self.generic_action(
                     "Replace route table association",
-                    self.client.associate_route_table,
+                    self.client.replace_route_table_association,
                     AssociationId=self.object["RouteTableAssociationId"],
                     RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifier()),
                 )
