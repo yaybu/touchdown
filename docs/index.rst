@@ -45,6 +45,8 @@ Resources
    :doc:`Load Balancing <config/aws/elb>` |
    :doc:`Networking <config/aws/vpc>` |
    :doc:`Relational Databases <config/aws/rds>` |
+   :doc:`Simple Notification Service <config/aws/sns>` |
+   :doc:`Simple Queue Service <config/aws/sqs>` |
    :doc:`Simple Storage Service <config/aws/s3>` |
    :doc:`Transcoding <config/aws/elastictranscoder>` |
    :doc:`VPNs <config/aws/vpn>`
