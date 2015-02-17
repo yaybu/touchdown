@@ -261,7 +261,7 @@ class Instance(ssh.Instance):
     resource_name = "random_asg_instance"
     input = AutoScalingGroup
 
-    def get_serializer(self, runner):
+    def get_serializer(self, runner, **kwargs):
         plan = runner.get_plan(self.adapts)
 
         plan.echo("Scanning for healthy instances to SSH to")

@@ -20,6 +20,7 @@ from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 from touchdown.core.diff import DiffSet
 
+from .. import sns
 
 class QueueAttributes(Resource):
 
@@ -52,6 +53,15 @@ class Describe(SimpleDescribe, Plan):
     def get_describe_filters(self):
         return {"QueueName": self.resource.name}
 
+    def describe_object(self):
+        object = super(Describe, self).describe_object()
+        if object:
+            object.update(self.client.get_queue_attributes(
+                QueueUrl=object['QueueUrl'],
+                AttributeNames=['All'],
+            )['Attributes'])
+        return object
+
 
 class Apply(SimpleApply, Describe):
 
@@ -63,14 +73,7 @@ class Apply(SimpleApply, Describe):
         if not self.resource.attributes:
             return
 
-        attributes = {}
-        if self.resource_id:
-            attributes = self.client.get_queue_attributes(
-                QueueUrl=self.resource_id,
-                AttributeNames=['All'],
-            )['Attributes']
-
-        d = DiffSet(self.runner, self.resource.attributes, attributes)
+        d = DiffSet(self.runner, self.resource.attributes, self.object)
         if d.matches():
             yield self.generic_action(
                 ["Updating queue attributes"] + list(d.get_descriptions()),
@@ -91,4 +94,21 @@ class Destroy(SimpleDestroy, Describe):
     def get_destroy_serializer(self):
         return serializers.Dict(
             QueueUrl=serializers.Identifier(),
+        )
+
+
+class Subscription(sns.Subscription):
+
+    """ Adapts a Queue into a Subscription """
+
+    input = Queue
+
+    def get_serializer(self, runner, **kwargs):
+        return serializers.Dict(
+            Protocol=serializers.Const("sqs"),
+            Endpoint=serializers.Context(
+                serializers.Const(self.adapts),
+                serializers.Property("QueueArn"),
+            ),
+            TopicArn=kwargs['TopicArn'],
         )

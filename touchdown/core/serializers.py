@@ -273,7 +273,7 @@ class Resource(Dict):
 
     def render(self, runner, object):
         if hasattr(object, "get_serializer"):
-            return object.get_serializer(runner).render(runner, object)
+            return object.get_serializer(runner, **self.kwargs).render(runner, object)
 
         kwargs = dict(self.kwargs)
 

@@ -18,7 +18,12 @@ from touchdown.core import argument
 from ..account import Account
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
+from touchdown.core.adapters import Adapter
 from touchdown.core.diff import DiffSet
+
+
+class Subscription(Adapter):
+    resource_name = "subscription"
 
 
 class TopicAttributes(Resource):
@@ -34,6 +39,7 @@ class Topic(Resource):
 
     name = argument.String(field="Name", min=1, max=256, regex='[A-Za-z0-9-_]*')
     attributes = argument.Resource(TopicAttributes)
+    notify = argument.ResourceList(Subscription)
     account = argument.Resource(Account)
 
 
@@ -56,6 +62,42 @@ class Apply(SimpleApply, Describe):
     create_response = "id-only"
 
     def update_object(self):
+        remote_subscriptions = []
+        if self.object:
+            remote_subscriptions = self.client.list_subscriptions_by_topic(
+                TopicArn=self.resource_id,
+            )['Subscriptions']
+
+        for local in self.resource.notify:
+            for remote in remote_subscriptions:
+                if DiffSet(self.runner, local, remote).matches():
+                    break
+            else:
+                yield self.generic_action(
+                    "Subscribe to {}".format(local),
+                    self.client.subscribe,
+                    serializers.Context(
+                        local,
+                        serializers.Resource(
+                            TopicArn=serializers.Context(
+                                self.resource,
+                                serializers.Property("TopicArn"),
+                            ),
+                        )
+                    )
+                )
+
+        for remote in remote_subscriptions:
+            for local in self.resource.notify:
+                if DiffSet(self.runner, local, remote).matches():
+                    break
+            else:
+                yield self.generic_action(
+                    "Unsubscribe from protocol {}, endpoint {}".format(remote["Protocol"], remote["Endpoint"]),
+                    self.client.unsubscribe,
+                    SubscriptionArn=serializers.Const(remote['SubscriptionArn']),
+                )
+
         if not self.resource.attributes:
             return
 

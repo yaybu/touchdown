@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .topic import Topic
+from .topic import Topic, Subscription
 
 __all__ = [
+    "Subscription",
     "Topic",
 ]

@@ -101,7 +101,7 @@ class Apply(SimpleApply, Describe):
         d = diff.DiffSet(self.runner, self.resource, self.object.get('Notifications', {}), group="notifications")
         if not d.matches():
             yield self.generic_action(
-                "Update pipline notification topics" + d.get_descriptions(),
+                ["Update pipline notification topics"] + list(d.get_descriptions()),
                 self.client.update_pipeline_notifications,
                 Id=serializers.Identifier(),
                 Notifications=serializers.Resource(group="notifications"),

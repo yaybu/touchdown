@@ -204,7 +204,7 @@ class AliasTarget(route53.AliasTarget):
 
     input = LoadBalancer
 
-    def get_serializer(self, runner):
+    def get_serializer(self, runner, **kwargs):
         return serializers.Context(
             serializers.Const(self.adapts),
             serializers.Dict(
