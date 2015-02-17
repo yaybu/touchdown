@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -31,7 +31,7 @@ class BaseCacheCluster(Resource):
     port = argument.Integer(min=1, max=32768, field='Port', aws_update=False)
     security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds')
     availability_zone = argument.String(field='PreferredAvailabilityZone')
-    multi_az = argument.Boolean(field='AZMode')
+    multi_az = argument.Boolean(field='AZMode', serializer=serializers.Expression(lambda r, o: "cross-az" if o else "single-az"))
     auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade')
     subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName')
     # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
