@@ -69,7 +69,7 @@ class Apply(SimpleApply, Describe):
 
     def update_object(self):
         d = DiffSet(self.runner, self.resource, self.object, group="attributes")
-        if d.matches():
+        if not d.matches():
             yield self.generic_action(
                 ["Updating queue attributes"] + list(d.get_descriptions()),
                 self.client.set_queue_attributes,

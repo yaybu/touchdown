@@ -28,10 +28,6 @@ class Pipeline(Resource):
 
     resource_name = "pipeline"
 
-    extra_serializers = {
-        "Notificiations": serializers.Resource(group="notifications"),
-    }
-
     name = argument.String(field="Name")
     input_bucket = argument.Resource(Bucket, field="InputBucket")
     output_bucket = argument.Resource(Bucket, field="OutputBucket")
@@ -95,9 +91,6 @@ class Apply(SimpleApply, Describe):
     create_action = "create_pipeline"
 
     def update_object(self):
-        if not self.object:
-            return
-
         d = diff.DiffSet(self.runner, self.resource, self.object.get('Notifications', {}), group="notifications")
         if not d.matches():
             yield self.generic_action(
