@@ -21,7 +21,7 @@ CacheCluster
 
     .. attribute:: engine
 
-        The type of database to use, for example ``redis``
+        The type of database to use, for example ``redis`` or ``memcache``.
 
     .. attribute:: engine_version
 
@@ -42,7 +42,7 @@ CacheCluster
 
     .. attribute:: multi_az
 
-        Whether or not to enable mutli-availability-zone features
+        Whether or not to enable mutli-availability-zone features. This setting only applies when ``engine`` is ``memcache``.
 
     .. attribute:: auto_minor_version_upgrade
 
