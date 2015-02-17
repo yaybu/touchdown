@@ -233,7 +233,7 @@ class SimpleDescribe(object):
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))
 
         if len(objects) == 1:
-            logger.debug("Found object {}".format(objects[0][self.key]))
+            logger.debug("Found object {}".format(objects[0]))
             return objects[0]
 
         return {}
