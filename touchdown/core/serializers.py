@@ -277,8 +277,9 @@ class Resource(Dict):
 
         kwargs = dict(self.kwargs)
 
-        for name, serializer in getattr(object, "extra_serializers", {}).items():
-            kwargs[name] = serializer
+        if not self.group:
+            for name, serializer in getattr(object, "extra_serializers", {}).items():
+                kwargs[name] = serializer
 
         for argument_name, field in object.fields:
             arg = field.argument

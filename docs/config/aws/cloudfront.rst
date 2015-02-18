@@ -1,19 +1,31 @@
-Cloudfront
+CloudFront
 ==========
 
 .. module:: touchdown.aws.cloudfront
    :synopsis: CloudFront resources.
 
+There are 2 kinds of CloudFront distribution:
 
-CloudFront is an "origin pull" based content delivery network. This means it
-works a bit like a caching proxy like varnish.
+ * A 'Web' distribution that acts as a CDN for HTTP and HTTPS traffic
+ * A 'Streaming' distribution that acts as a CDN for RTMP traffic
 
 
-Delivering content over HTTP and HTTPS
---------------------------------------
+Serving content over HTTP and HTTPS
+-----------------------------------
 
-To cache standard (non-streaming) assets you need a create a CloudFront
-Distribution.
+Web distributions act an "origin pull" based content delivery network. This
+means they work a bit like a caching proxy like varnish.
+
+There are several pieces that need configuring. Together these pieces are
+called a Distribution Config. They are:
+
+  * How should the distribution listen for traffic. What ports, what certs,
+    what domains.
+  * What backend servers can traffic be sent to. These are origins.
+  * How should traffic be mapped from a request to an origin. For example, you
+    might have a application cluster at ``/`` and a search cluster at
+    ``/search``. These are called cache behaviours, and can also change how
+    aggressively you cache based on the URL.
 
 
 .. class:: Distribution
@@ -46,6 +58,10 @@ Distribution.
         A list of :class:`Origin` resources that the Distribution acts as a
         front-end for.
 
+You must provide a default cache behaviour. You may optionally provide a list
+of cache behaviours. CloudFront will do path matching on these first, and then
+fall back to the default behaviour.
+
     .. attribute:: default_cache_behavior
 
         How the proxy should behave when none of the rules in ``behaviors``
@@ -71,14 +87,29 @@ Distribution.
         The price class. By default ``PriceClass_100`` is used, which is the
         cheapest.
 
-    .. attribute:: viewer_certificate
+If you are using HTTPS with CloudFront you can set some additional options for
+how to set up the SSL stack:
 
-        A :class:`ViewerCertificate` resource that describes the SSL
-        configuration for the front end.
+    .. attribute:: ssl_certificate
+
+        A :class:`~touchdown.aws.iam.ServerCertificate`.
+
+    .. attribute:: ssl_support_method
+
+        If this is set to ``sni-only`` then CloudFront uses the SNI mechanism.
+        This only works on browsers newer than IE6. If you need maximum
+        compatibility set it to ``vip``. Your distribution will be assigned its
+        own dedicated IP addresses, negating the need to use SNI. However, this
+        is much more expensive.
+
+    .. attribute:: ssl_minimum_protocol_version
+
+        The default value is ``TLSv1``. To decrease the security of your system
+        you can instead set this to ``SSLv3``. **This is strongly discouraged**.
 
 
 Serving content from an S3 bucket
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can pass a :class:`S3Origin` to a CloudFront distribution to have it serve
 content from an S3 bucket.
@@ -99,7 +130,7 @@ content from an S3 bucket.
 
 
 Serving content from a backend HTTP or HTTPS service
-----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 CloudFront can act as a proxy for any HTTP or HTTP service. Just pass a
 :class:`CustomOrigin` to a CloudFront distribution.
@@ -124,7 +155,7 @@ CloudFront can act as a proxy for any HTTP or HTTP service. Just pass a
 
         The port that is serving HTTPS content. The default value is ``443``.
 
-    .. attribute:: origin_protocol
+    .. attribute:: protocol
 
         Specifies what protocol is used to contact this origin server. The
         default is ``match-viewer``. This means that the backend is contacted
@@ -133,33 +164,13 @@ CloudFront can act as a proxy for any HTTP or HTTP service. Just pass a
         traffic in the clear to your backend.
 
 
-Cache behaviors
----------------
+Cache behaviours
+~~~~~~~~~~~~~~~
 
 Particularly if you are using CloudFront in front of your entire site you might
 want different caching policies from different URL's. For example, there is no
 need to pass the query string or any cookies to the part of your site that
 serves CSS. This helps to improve cacheability.
-
-
-.. class:: ForwardedValues
-
-    .. attribute:: query_string
-
-        Whether or not to forward the query string to the origin server.
-
-    .. attribute:: headers
-
-        A whitelist of HTTP headers to forward to the origin server.
-
-    .. attribute:: cookie_whitelist
-
-        A list of cookies.
-
-    .. attribute:: forward_cookies
-
-        What to do with the cookies in ``cookie_whitelist``. The default value
-        is ``whitelist``.
 
 
 .. class:: CacheBehavior
@@ -169,10 +180,23 @@ serves CSS. This helps to improve cacheability.
         The name of a :class:`S3Origin` or :class:`CustomOrigin` that this
         behaviour applies to.
 
-    .. attribute:: forwarded_values
+    .. attribute:: forward_query_string
 
-        A :class:`ForwardedValues` structure. Should cookies and headers be
-        forwarded?
+        Whether or not to forward the query string to the origin server.
+
+    .. attribute:: forward_headers
+
+        A whitelist of HTTP headers to forward to the origin server.
+
+        If you want to forward all headers you can set this to ``['*']``. If
+        you set it to an empty list no headers will be sent.
+
+    .. attribute:: forward_cookies
+
+        A list of cookies to forward to the origin server.
+
+        If you want to forward all cookies you can set this to ``['*']``. If you
+        set it to an empty list no cookies will be sent.
 
     .. attribute:: viewer_protocol_policy
 
@@ -200,7 +224,7 @@ serves CSS. This helps to improve cacheability.
 
 
 Error handling
---------------
+~~~~~~~~~~~~~~
 
 .. class:: ErrorResponse
 
@@ -228,7 +252,7 @@ Error handling
 
 
 Access logging
---------------
+~~~~~~~~~~~~~~
 
 .. class:: LoggingConfig
 
@@ -252,40 +276,23 @@ Access logging
         A path within the S3 bucket to store the incoming logs.
 
 
-SSL configuration
------------------
+Serving media over RTMP
+-----------------------
 
-In order to turn on https support you need to provide the ``viewer_certificate``
-argument to a distribution.
+A streaming distribution allows you to serve static media to your visitors over
+RTMP. You will need to serve the media player over HTTP(S) so you will probably
+use a streaming distribution in conjunction with a standard CloudFront
+distribution.
 
+RTMP requests are accepted on ports 1935 and port 80. This is not configurable.
 
-.. class:: ViewerCertificate
+CloudFront supports:
 
-    .. attribute:: certificate
+ * RTMP
+ * RTMPT (RTMP over HTTP)
+ * RTMPE (Encrypted RTMP)
+ * RTMPTE (Encrypted RTMP over HTTP)
 
-        A :class:`~touchdown.aws.iam.ServerCertificate`.
-
-    .. attribute:: default_certificate
-
-        If you don't provide a ``certificate`` and set this to ``True`` then
-        you can use the certificate for ``*.cloudfront.net``.
-
-    .. attribute:: ssl_support_method
-
-        If this is set to ``sni-only`` then CloudFront uses the SNI mechanism.
-        This only works on browsers newer than IE6. If you need maximum
-        compatibility set it to ``vip``. Your distribution will be assigned its
-        own dedicated IP addresses, negating the need to use SNI. However, this
-        is much more expensive.
-
-    .. attribute:: minimum_protocol_version
-
-        The default value is ``TLSv1``. To decrease the security of your system
-        you can instead set this to ``SSLv3``. This is strongly discouraged.
-
-
-Streaming media
----------------
 
 .. class:: StreamingDistribution
 

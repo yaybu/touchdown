@@ -24,6 +24,8 @@ from . import aws
 
 class TestCloudFrontDistributionSerializing(unittest.TestCase):
 
+    maxDiff=8192
+
     def setUp(self):
         uuid = mock.Mock()
         uuid.return_value = "e64daba4-dddf-478e-a39b-b15a74325330"
@@ -52,6 +54,11 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
             'Aliases': {'Items': ['example.com'], 'Quantity': 1},
             'Logging': {'Enabled': False, 'Prefix': '', 'Bucket': '', 'IncludeCookies': False},
             'Comment': 'example.com',
+            'ViewerCertificate': {
+                'CloudFrontDefaultCertificate': True,
+                'MinimumProtocolVersion': 'TLSv1',
+                'SSLSupportMethod': 'sni-only'
+            },
         })
 
     def test_simple_distribution_with_aliases(self):
@@ -73,6 +80,11 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
             'Aliases': {'Items': ['example.com', 'www.example.com'], 'Quantity': 2},
             'Logging': {'Enabled': False, 'Prefix': '', 'Bucket': '', 'IncludeCookies': False},
             'Comment': 'example.com',
+            'ViewerCertificate': {
+                'CloudFrontDefaultCertificate': True,
+                'MinimumProtocolVersion': 'TLSv1',
+                'SSLSupportMethod': 'sni-only'
+            },
         })
 
 

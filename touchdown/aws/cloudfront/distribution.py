@@ -35,7 +35,7 @@ class CustomOrigin(Resource):
         "CustomOriginConfig": serializers.Dict(
             HTTPPort=serializers.Argument("http_port"),
             HTTPSPort=serializers.Argument("https_port"),
-            OriginProtocolPolicy=serializers.Argument("origin_protocol"),
+            OriginProtocolPolicy=serializers.Argument("protocol"),
         )
     }
 
@@ -43,25 +43,7 @@ class CustomOrigin(Resource):
     domain_name = argument.String(field='DomainName')
     http_port = argument.Integer(default=80)
     https_port = argument.Integer(default=443)
-    origin_protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
-
-
-class ForwardedValues(Resource):
-
-    resource_name = "forwarded_values"
-    dot_ignore = True
-
-    extra_serializers = {
-        "Cookies": serializers.Dict(
-            Forward=serializers.Argument("forward_cookies"),
-            WhitelistedNames=CloudFrontList(serializers.Argument("cookie_whitelist")),
-        )
-    }
-    query_string = argument.Boolean(field="QueryString", default=False)
-    headers = argument.List(field="Headers", serializer=CloudFrontList(serializers.List()))
-
-    forward_cookies = argument.String(default="whitelist")
-    cookie_whitelist = argument.List()
+    protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
 
 
 class DefaultCacheBehavior(Resource):
@@ -79,19 +61,26 @@ class DefaultCacheBehavior(Resource):
             inner=serializers.Context(serializers.Argument("allowed_methods"), serializers.List()),
             CachedMethods=serializers.Context(serializers.Argument("cached_methods"), CloudFrontList()),
         ),
+        "ForwardedValues": serializers.Resource(
+            group="forwarded-values",
+            Cookies=serializers.Resource(
+                group="cookies",
+                Forward=serializers.Expression(lambda r, o: "all" if o.forward_cookies == ["*"] else "none" if len(o.forward_cookies) == 0 else "whitelist"),
+            )
+        )
     }
 
     target_origin = argument.String(field='TargetOriginId')
-    forwarded_values = argument.Resource(
-        ForwardedValues,
-        default=lambda instance: dict(),
-        field="ForwardedValues",
-        serializer=serializers.Resource(),
-    )
-    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', field="ViewerProtocolPolicy")
-    min_ttl = argument.Integer(default=0, field="MinTTL")
-    allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"])
+
+    forward_query_string = argument.Boolean(default=True, field="QueryString", group="forwarded-values")
+    forward_headers = argument.List(field="Headers", serializer=CloudFrontList(serializers.List()), group="forwarded-values")
+    forward_cookies = argument.List(field="WhitelistedNames", serializer=CloudFrontList(serializers.List(skip_empty=False)), group="cookies")
+
+    allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
     cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
+
+    min_ttl = argument.Integer(default=0, field="MinTTL")
+    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', field="ViewerProtocolPolicy")
     smooth_streaming = argument.Boolean(default=False, field='SmoothStreaming')
 
 
@@ -123,31 +112,6 @@ class LoggingConfig(Resource):
     prefix = argument.String(field="Prefix", default="")
 
 
-class ViewerCertificate(Resource):
-
-    resource_name = "viewer_certificate"
-
-    certificate = argument.Resource(
-        ServerCertificate,
-        field="IAMCertificateId",
-        serializer=serializers.Property("ServerCertificateId"),
-    )
-
-    default_certificate = argument.Boolean(field="CloudFrontDefaultCertificate")
-
-    ssl_support_method = argument.String(
-        default="sni-only",
-        choices=["sni-only", "vip"],
-        field="SSLSupportMethod",
-    )
-
-    minimum_protocol_version = argument.String(
-        default="TLSv1",
-        choices=["TLSv1", "SSLv3"],
-        field="MinimumProtocolVersion",
-    )
-
-
 class Distribution(Resource):
 
     resource_name = "distribution"
@@ -168,6 +132,10 @@ class Distribution(Resource):
                 "Quantity": 0,
             },
         }),
+        "ViewerCertificate": serializers.Resource(
+            group="viewer-certificate",
+            CloudFrontDefaultCertificate=serializers.Expression(lambda r, o: False if o.ssl_certificate else True),
+        )
     }
 
     name = argument.String()
@@ -206,10 +174,26 @@ class Distribution(Resource):
         choices=['PriceClass_100', 'PriceClass_200', 'PriceClass_All'],
         field="PriceClass",
     )
-    viewer_certificate = argument.Resource(
-        ViewerCertificate,
-        field="ViewerCertificate",
-        serializer=serializers.Resource(),
+
+    ssl_certificate = argument.Resource(
+        ServerCertificate,
+        field="IAMCertificateId",
+        serializer=serializers.Property("ServerCertificateId"),
+        group="viewer-certificate",
+    )
+
+    ssl_support_method = argument.String(
+        default="sni-only",
+        choices=["sni-only", "vip"],
+        field="SSLSupportMethod",
+        group="viewer-certificate",
+    )
+
+    ssl_minimum_protocol_version = argument.String(
+        default="TLSv1",
+        choices=["TLSv1", "SSLv3"],
+        field="MinimumProtocolVersion",
+        group="viewer-certificate",
     )
 
     account = argument.Resource(Account)
