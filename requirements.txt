@@ -1,4 +1,4 @@
-botocore==0.89.0
+botocore==0.91.0
 jmespath==0.6.1
 click==3.3
 netaddr==0.7.13
@@ -13,7 +13,7 @@ coveralls==0.5
 flake8==2.3.0
 mccabe==0.3
 mock==1.0.1
-pep8==1.6.1
+pep8==1.6.2
 py==1.4.26
 pyflakes==0.8.1
 pytest==2.6.4
