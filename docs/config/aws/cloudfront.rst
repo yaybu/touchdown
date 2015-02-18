@@ -27,8 +27,26 @@ called a Distribution Config. They are:
     ``/search``. These are called cache behaviours, and can also change how
     aggressively you cache based on the URL.
 
+.. note:: CloudFront configuration changes are slow
+
+    Any configuration changes to a distribution are slow - taking around 15
+    minutes. If using blue/green type techniques during deployment it is best
+    to not do that switch at the CloudFront tier of your stack.
 
 .. class:: Distribution
+
+    The minimum distribution is::
+
+        distribution = self.aws.add_distribution(
+            name='www.example.com',
+            origins=[{
+                "name": "www",
+                "domain_name": "backend.example.com",
+            }],
+            default_cache_behavior={
+                "target_origin": "www",
+            },
+        )
 
     .. attribute:: name
 
@@ -41,7 +59,7 @@ called a Distribution Config. They are:
 
     .. attribute:: aliases
 
-        Alternative names that the distribution should respond to.
+        Alternative domain names that the distribution should respond to.
 
     .. attribute:: root_object
 
@@ -51,16 +69,14 @@ called a Distribution Config. They are:
 
     .. attribute:: enabled
 
-        Whether or not this distribution is active.
+        Whether or not this distribution is active. A distribution must be
+        enabled before it can be accessed by a client. It must be disabled
+        before it can be deleted.
 
     .. attribute:: origins
 
         A list of :class:`Origin` resources that the Distribution acts as a
         front-end for.
-
-You must provide a default cache behaviour. You may optionally provide a list
-of cache behaviours. CloudFront will do path matching on these first, and then
-fall back to the default behaviour.
 
     .. attribute:: default_cache_behavior
 
@@ -87,9 +103,6 @@ fall back to the default behaviour.
         The price class. By default ``PriceClass_100`` is used, which is the
         cheapest.
 
-If you are using HTTPS with CloudFront you can set some additional options for
-how to set up the SSL stack:
-
     .. attribute:: ssl_certificate
 
         A :class:`~touchdown.aws.iam.ServerCertificate`.
@@ -112,8 +125,25 @@ Serving content from an S3 bucket
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can pass a :class:`S3Origin` to a CloudFront distribution to have it serve
-content from an S3 bucket.
+content from an S3 bucket. If you have a bucket called ``my-test-bucket`` then
+this looks like::
 
+    bucket = aws.add_bucket(name="my-test-bucket")
+
+    distribution = self.aws.add_distribution(
+        name='www.example.com',
+        origins=[{
+            "name": "www",
+            "bucket": bucket,
+        }],
+        default_cache_behavior={
+            "target_origin": "www",
+        },
+    )
+
+You cannot use SSL for an S3 bucket backend - even if using HTTPS between the
+client and CloudFront, the connection between CloudFront and S3 will always be
+over unencrypted HTTP.
 
 .. class:: S3Origin
 
@@ -133,7 +163,21 @@ Serving content from a backend HTTP or HTTPS service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 CloudFront can act as a proxy for any HTTP or HTTP service. Just pass a
-:class:`CustomOrigin` to a CloudFront distribution.
+:class:`CustomOrigin` to a CloudFront distribution. For example, to serve
+content from ``backend.example.com`` on port 8080 abd 8443::
+
+    distribution = self.aws.add_distribution(
+        name='www.example.com',
+        origins=[{
+            "name": "www",
+            "domain_name": "backend.example.com",
+            "http_port": 8080,
+            "https_port": 8043,
+        }],
+        default_cache_behavior={
+            "target_origin": "www",
+        },
+    )
 
 
 .. class:: CustomOrigin
