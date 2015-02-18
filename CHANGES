@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- The CloudFront abstraction has been revisited to flatten and simplify the
+  structure (as the actual payload for CloudFront is quite complicated). The
+  docs have been updated accordingly.
 
 
 0.0.2 (2015-02-18)
