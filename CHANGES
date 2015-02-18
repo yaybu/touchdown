@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.2 (unreleased)
+0.0.2 (2015-02-18)
 ------------------
 
 - Basic support for Amazon SQS.
