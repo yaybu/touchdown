@@ -10,6 +10,8 @@ Changelog for Touchdown
 
 - Basic support for Amazon CloudFront Streaming Distributions.
 
+- Pipeline sbould now be able to create one.
+
 - Strings fields are now validated against their annotations:
 
     * `min` enforces a minimum length for a value
