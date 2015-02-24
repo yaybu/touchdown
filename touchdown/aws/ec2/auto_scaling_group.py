@@ -44,7 +44,7 @@ class AutoScalingGroup(Resource):
         field="VPCZoneIdentifier",
         serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier(), skip_empty=True)),
     )
-    load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", aws_update=False)
+    load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", update=False)
     health_check_type = argument.String(
         max=32,
         default=lambda instance: "ELB" if instance.load_balancers else None,

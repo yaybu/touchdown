@@ -28,7 +28,7 @@ class ReplicationGroup(BaseCacheCluster):
 
     primary_cluster = argument.Resource("touchdown.aws.elasticache.cache.CacheCluster", field="PrimaryClusterId")
     automatic_failover = argument.Boolean(field="AutomaticFailoverEnabled")
-    num_cache_clusters = argument.Integer(field="NumCacheClusters")
+    num_cache_clusters = argument.Integer(field="NumCacheClusters", update=False)
 
 
 class Describe(SimpleDescribe, Plan):

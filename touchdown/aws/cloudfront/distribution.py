@@ -74,7 +74,7 @@ class DefaultCacheBehavior(Resource):
 
     forward_query_string = argument.Boolean(default=True, field="QueryString", group="forwarded-values")
     forward_headers = argument.List(field="Headers", serializer=CloudFrontList(serializers.List()), group="forwarded-values")
-    forward_cookies = argument.List(field="WhitelistedNames", serializer=CloudFrontList(serializers.List(skip_empty=False)), group="cookies")
+    forward_cookies = argument.List(field="WhitelistedNames", serializer=CloudFrontList(serializers.Expression(lambda r, o: [] if o == ['*'] else o)), group="cookies")
 
     allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
     cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
@@ -118,7 +118,7 @@ class Distribution(Resource):
 
     extra_serializers = {
         "CallerReference": serializers.Expression(
-            lambda runner, object: runner.get_plan(object).object.get('DistributionConfig', {}).get('CallerReference', str(uuid.uuid4()))
+            lambda runner, object: runner.get_plan(object).object.get('CallerReference', str(uuid.uuid4()))
         ),
         "Aliases": CloudFrontList(serializers.Chain(
             serializers.Context(serializers.Argument("name"), serializers.ListOfOne()),
@@ -219,13 +219,14 @@ class Describe(SimpleDescribe, Plan):
         if distribution:
             result = self.client.get_distribution(Id=distribution['Id'])
             distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
-            distribution.update(result['Distribution'])
+            distribution.update(result['Distribution']['DistributionConfig'])
             return distribution
 
 
 class Apply(SimpleApply, Describe):
 
     create_action = "create_distribution"
+    #update_action = "update_distribution"
     create_response = "not-that-useful"
     waiter = "distribution_deployed"
 
@@ -238,6 +239,13 @@ class Apply(SimpleApply, Describe):
     def get_create_serializer(self):
         return serializers.Dict(
             DistributionConfig=serializers.Resource(),
+        )
+
+    def get_update_serializer(self):
+        return serializers.Dict(
+            Id=serializers.Identifier(),
+            DistributionConfig=serializers.Resource(),
+            IfMatch=serializers.Property("ETag"),
         )
 
 

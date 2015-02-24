@@ -289,9 +289,9 @@ class Resource(Dict):
                 continue
             if arg.field in self.kwargs:
                 continue
-            if self.mode == "create" and not getattr(arg, "aws_create", True):
+            if self.mode == "create" and not getattr(arg, "create", True):
                 continue
-            if self.mode == "update" and not getattr(arg, "aws_update", True):
+            if self.mode == "update" and not getattr(arg, "update", True):
                 continue
             if self.group != getattr(arg, "group", ""):
                 continue
@@ -321,7 +321,10 @@ class List(Serializer):
     def render(self, runner, object):
         result = []
         for row in object:
-            result.append(self.child.render(runner, row))
+            try:
+                result.append(self.child.render(runner, row))
+            except FieldNotPresent:
+                pass
         if not result and self.skip_empty:
             raise FieldNotPresent()
         return list(result)

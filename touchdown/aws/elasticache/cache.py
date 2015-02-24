@@ -25,15 +25,15 @@ from .subnet_group import SubnetGroup
 
 class BaseCacheCluster(Resource):
 
-    instance_class = argument.String(field="CacheNodeType")
-    engine = argument.String(field='Engine', aws_update=False)
+    instance_class = argument.String(field="CacheNodeType", update=False)
+    engine = argument.String(field='Engine', update=False)
     engine_version = argument.String(field='EngineVersion')
-    port = argument.Integer(min=1, max=32768, field='Port', aws_update=False)
-    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds')
+    port = argument.Integer(min=1, max=32768, field='Port', update=False)
+    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds', update=False)
     availability_zone = argument.String(field='PreferredAvailabilityZone')
     multi_az = argument.Boolean(field='AZMode', serializer=serializers.Expression(lambda r, o: "cross-az" if o else "single-az"))
-    auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade')
-    subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName')
+    auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade', update=False)
+    subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName', update=False)
     # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
 

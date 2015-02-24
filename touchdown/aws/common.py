@@ -88,7 +88,9 @@ class GenericAction(Action):
 
     @property
     def description(self):
-        yield self._description
+        if isinstance(self._description, list):
+            return self._description
+        return [self._description]
 
     def run(self):
         logger.debug("Calling {}".format(self.func))
@@ -278,6 +280,9 @@ class SimpleApply(SimpleDescribe):
     def get_create_serializer(self):
         return serializers.Resource()
 
+    def get_update_serializer(self):
+        return serializers.Resource(mode="update")
+
     def create_object(self):
         g = self.generic_action(
             "Creating {}".format(self.resource),
@@ -311,22 +316,13 @@ class SimpleApply(SimpleDescribe):
         if self.update_action and self.object:
             logger.debug("Checking resource {} for changes".format(self.resource))
 
-            description = ["Updating {}".format(self.resource)]
-            local = serializers.Resource(mode="update")
-            for k, v in local.render(self.runner, self.resource).items():
-                if k not in self.object:
-                    continue
-                if v != self.object[k]:
-                    logger.debug("Resource field {} has changed ({} != {})".format(k, v, self.object[k]))
-                    description.append("{} => {}".format(k, v))
-
-            logger.debug("Resource has {} differences".format(len(description) - 1))
-
-            if len(description) > 1:
+            ds = DiffSet(self.runner, self.resource, self.object)
+            if not ds.matches():
+                logger.debug("Resource has {} differences".format(len(ds)))
                 yield self.generic_action(
-                    description,
+                    ["Updating {}".format(self.resource)] + list(ds.get_descriptions()),
                     getattr(self.client, self.update_action),
-                    serializer=local
+                    self.get_update_serializer(),
                 )
 
     def get_actions(self):

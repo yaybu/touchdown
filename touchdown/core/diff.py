@@ -6,13 +6,14 @@
 #
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# Unless required by applicable law or agreed to in writing, softwserializersdistributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
 import logging
+
+from touchdown.core import serializers
 
 
 logger = logging.getLogger(__name__)
@@ -63,7 +64,11 @@ class DiffSet(object):
             if not getattr(local, name) and arg.field not in remote:
                 continue
 
-            rendered = arg.serializer.render(runner, getattr(local, name))
+            try:
+                rendered = arg.serializer.render(runner, getattr(local, name))
+            except serializers.FieldNotPresent:
+                continue
+
             if arg.field not in remote:
                 self.diffs.append(Diff(arg, "", rendered))
             elif rendered != remote[arg.field]:
@@ -78,4 +83,7 @@ class DiffSet(object):
             yield diff
 
     def matches(self):
-        return len(self.diffs) == 0
+        return len(self) == 0
+
+    def __len__(self):
+        return len(self.diffs)

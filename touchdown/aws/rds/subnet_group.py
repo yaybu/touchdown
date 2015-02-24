@@ -28,7 +28,7 @@ class SubnetGroup(Resource):
 
     name = argument.String(field="DBSubnetGroupName")
     description = argument.String(field="DBSubnetGroupDescription")
-    subnets = argument.ResourceList(Subnet, field="SubnetIds")
+    subnets = argument.ResourceList(Subnet, field="SubnetIds", update=False)
     # tags = argument.Dict()
 
     account = argument.Resource(Account)
