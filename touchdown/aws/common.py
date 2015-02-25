@@ -205,7 +205,7 @@ class SimpleDescribe(object):
             def _():
                 try:
                     for page in paginator.paginate(**filters):
-                        for result in jmespath.search(self.describe_envelope, page):
+                        for result in jmespath.search(self.describe_envelope, page) or []:
                             yield result
                 except ClientError as e:
                     if e.response['Error']['Code'] == self.describe_notfound_exception:
@@ -226,10 +226,12 @@ class SimpleDescribe(object):
                 raise errors.Error("{}: {}".format(self.resource, e))
 
             results = jmespath.search(self.describe_envelope, results)
-            if not isgeneratorfunction(results) and not isinstance(results, list):
+            if results is None:
+                results = []
+            elif not isgeneratorfunction(results) and not isinstance(results, list):
                 results = [results]
 
-        objects = list(filter(self.describe_object_matches, results))
+        objects = list(filter(self.describe_object_matches, results or []))
 
         if len(objects) > 1:
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))

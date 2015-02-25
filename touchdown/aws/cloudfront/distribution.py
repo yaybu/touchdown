@@ -263,7 +263,7 @@ class Destroy(SimpleDestroy, Describe):
         if not self.object:
             return
 
-        if self.object['DistributionConfig'].get('Enabled', False):
+        if self.object.get('Enabled', False):
             yield self.generic_action(
                 "Disable distribution",
                 self.client.update_distribution,
