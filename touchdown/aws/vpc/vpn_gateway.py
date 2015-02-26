@@ -36,7 +36,6 @@ class AttachmentStateWaiter(Action):
 
     def check(self):
         status = self.plan.describe_object()
-        print status
         for attachment in status.get('VpcAttachments', []):
             if attachment['State'] in self.error_states:
                 raise errors.Error("Gateway in unexpected state {}".format(attachment['State']))
