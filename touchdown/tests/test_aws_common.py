@@ -15,9 +15,12 @@
 import unittest
 import mock
 
+from botocore import xform_name
+import botocore.session
+
 from touchdown.core import serializers
 
-from touchdown.aws.common import GenericAction
+from touchdown.aws import common
 from touchdown.aws.elasticache import CacheCluster
 
 
@@ -29,7 +32,7 @@ class TestGenericAction(unittest.TestCase):
 
         plan.resource = CacheCluster(None, name='freddy')
 
-        g = GenericAction(plan, "I am an action", api, serializer=serializers.Resource())
+        g = common.GenericAction(plan, "I am an action", api, serializer=serializers.Resource())
         self.assertEqual(tuple(g.description), ("I am an action", ))
         g.run()
 
@@ -37,3 +40,27 @@ class TestGenericAction(unittest.TestCase):
             NumCacheNodes=1,
             CacheClusterId='freddy',
         )
+
+
+class TestSimpleDescribeImplementations(unittest.TestCase):
+
+    ignore = (
+        common.SimpleApply,
+        common.SimpleDestroy,
+    )
+
+    def test_valid(self):
+        session = botocore.session.get_session()
+        for impl in common.SimpleDescribe.__subclasses__():
+            if issubclass(impl, self.ignore):
+                continue
+
+            service = session.get_service_model(impl.service_name)
+            methods = {xform_name(s): s for s in service.operation_names}
+            operation = service.operation_model(methods[impl.describe_action])
+
+            if not "." in impl.describe_envelope and not ":" in impl.describe_envelope:
+                self.assertEqual(
+                    impl.describe_envelope in operation.output_shape.members,
+                    True
+                )
