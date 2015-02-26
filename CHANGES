@@ -8,6 +8,12 @@ Changelog for Touchdown
   structure (as the actual payload for CloudFront is quite complicated). The
   docs have been updated accordingly.
 
+- Tearing down a CloudFront distribution now correctly refreshes the ETag after
+  disabling a distribution, allowing it to suceed.
+
+- The VPN Gateway handling has been improved. They are now correctly attached
+  and detached from a VPC when creating and destroying them.
+
 
 0.0.2 (2015-02-18)
 ------------------
