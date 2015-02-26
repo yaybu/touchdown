@@ -174,8 +174,7 @@ class WaitForNetworkInterfaces(Action):
         # An 'available' interface that belongs to an ELB will be cleaned up
         # within 2 minutes
         if iface["Description"] == "ELB balancer":
-            if iface['Status'] == 'available':
-                return True
+            return True
 
         # Abort! There are interfaces resent that aren't pending removal
         return False
