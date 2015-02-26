@@ -231,7 +231,10 @@ class Format(Formatter):
             return ""
         if hasattr(object, "resource_name") and not runner.get_plan(object).object:
             return ""
-        return self.format_string.format(self.inner.render(runner, object))
+        try:
+            return self.format_string.format(self.inner.render(runner, object))
+        except:
+            return ""
 
 
 class Dict(Serializer):

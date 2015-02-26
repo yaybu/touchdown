@@ -124,6 +124,14 @@ class PostCreation(Action):
             raise errors.Error("Object creation failed")
 
 
+class RefreshMetadata(Action):
+
+    description = ["Refresh resource metadata"]
+
+    def run(self):
+        self.plan.object = self.plan.describe_object()
+
+
 class SetTags(Action):
 
     def __init__(self, plan, tags):

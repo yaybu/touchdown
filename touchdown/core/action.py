@@ -24,4 +24,4 @@ class Action(object):
         return self.runner.get_plan(resource)
 
     def __str__(self):
-        return self.description
+        return "\n".join(self.description)

@@ -71,12 +71,15 @@ class Goal(six.with_metaclass(GoalType)):
 
     def apply(self, ui):
         plan = list(self.get_execution_order().all())
-        with ui.progress(plan, label="Apply changes") as plan:
-            for resource in plan:
-                for change in self.get_changes(resource):
-                    # if not ui.confirm_action(change):
-                    #     continue
-                    change.run()
+        #with ui.progress(plan, label="Apply changes") as plan:
+        for resource in plan:
+            for change in self.get_changes(resource):
+                ui.echo("[{}] {}".format(resource, change.description[0])
+                for line in change.description[1:]:
+                    ui.echo("[{}]     {}".format(resource, line))
+                # if not ui.confirm_action(change):
+                #     continue
+                change.run()
 
 
 class Describe(Goal):
