@@ -16,7 +16,7 @@ import time
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers
+from touchdown.core import argument, serializers, errors
 from touchdown.core.action import Action
 
 from .vpc import VPC
@@ -120,7 +120,6 @@ class Apply(SimpleApply, Describe):
 
         if wait:
             yield AttachmentStateWaiter(self, "attached", ["detached", "detaching"])
-
 
 
 class Destroy(SimpleDestroy, Describe):
