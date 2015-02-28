@@ -1,0 +1,211 @@
+interactions:
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172022Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>218d377e-7ed9-4146-a40b-ba9a4e3fd87f</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:22 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateVpc&InstanceTenancy=default&Version=2014-10-01&CidrBlock=192.168.0.1%2F25
+    headers:
+      Content-Length: ['86']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n \
+        \   <requestId>eb3f7f47-f925-4795-a862-c37ae8721bf6</requestId>\n    <vpc>\n\
+        \        <vpcId>vpc-812ff5e4</vpcId>\n        <state>pending</state>\n   \
+        \     <cidrBlock>192.168.0.0/25</cidrBlock>\n        <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \        <instanceTenancy>default</instanceTenancy>\n    </vpc>\n</CreateVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:22 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-812ff5e4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>e72205a9-5f92-4924-b4f3-a895e38f7624</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-812ff5e4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <instanceTenancy>default</instanceTenancy>\n            <isDefault>false</isDefault>\n\
+        \        </item>\n    </vpcSet>\n</DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:22 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-812ff5e4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>b65edba3-abc8-4521-82a0-63a11e1a795f</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-812ff5e4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <instanceTenancy>default</instanceTenancy>\n            <isDefault>false</isDefault>\n\
+        \        </item>\n    </vpcSet>\n</DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:22 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=vpc-812ff5e4&Version=2014-10-01&Tag.1.Value=test-vpc&Tag.1.Key=Name
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>646fe843-ff27-4611-a11a-f00cec5ad3ed</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:22 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-812ff5e4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>2ee4b2af-0599-43e2-b3f4-06ee77cb1d73</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-812ff5e4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:23 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>d5da7af5-51b8-4d01-8b4a-7699384c2e8c</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-812ff5e4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:22 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteVpc&VpcId=vpc-812ff5e4&Version=2014-10-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172023Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n \
+        \   <requestId>1215f49e-06a1-46e6-bc06-5b8e985bcdcc</requestId>\n    <return>true</return>\n\
+        </DeleteVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:23 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-812ff5e4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T172024Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>afc673a5-3dd9-4bec-8181-fcf609d713b5</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 17:20:23 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+version: 1

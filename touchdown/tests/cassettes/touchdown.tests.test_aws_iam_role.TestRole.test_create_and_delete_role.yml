@@ -1,0 +1,173 @@
+interactions:
+- request:
+    body: Action=ListRoles&Version=2010-05-08
+    headers:
+      Content-Length: ['35']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155600Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<ListRolesResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ListRolesResult>\n    <IsTruncated>false</IsTruncated>\n    <Roles>\n\
+        \      </Roles>\n  </ListRolesResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>4ae8ac54-bf62-11e4-a9b0-9555e062ac93</RequestId>\n  </ResponseMetadata>\n\
+        </ListRolesResponse>\n"}
+    headers:
+      content-length: ['891']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:01 GMT']
+      x-amzn-requestid: [4ae8ac54-bf62-11e4-a9b0-9555e062ac93]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateRole&RoleName=my-test-role&Version=2010-05-08&AssumeRolePolicyDocument=%7B%22Statement%22%3A+%5B%7B%22Action%22%3A+%22sts%3AAssumeRole%22%2C+%22Effect%22%3A+%22Allow%22%2C+%22Principal%22%3A+%7B%22Service%22%3A+%22ec2.amazonaws.com%22%7D%2C+%22Sid%22%3A+%22%22%7D%5D%2C+%22Version%22%3A+%222012-10-17%22%7D
+    headers:
+      Content-Length: ['319']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155601Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<CreateRoleResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <CreateRoleResult>\n    <Role>\n      <Path>/</Path>\n      <Arn>arn:aws:iam::000000000000:role/my-test-role</Arn>\n\
+        \      <RoleName>my-test-role</RoleName>\n      <AssumeRolePolicyDocument>%7B%22Statement%22%3A%20%5B%7B%22Action%22%3A%20%22sts%3AAssumeRole%22%2C%20%22Effect%22%3A%20%22Allow%22%2C%20%22Principal%22%3A%20%7B%22Service%22%3A%20%22ec2.amazonaws.com%22%7D%2C%20%22Sid%22%3A%20%22%22%7D%5D%2C%20%22Version%22%3A%20%222012-10-17%22%7D</AssumeRolePolicyDocument>\n\
+        \      <CreateDate>2015-02-28T15:56:01.402Z</CreateDate>\n      <RoleId>AROAIFQOEF5FIPM2XHY7S</RoleId>\n\
+        \    </Role>\n  </CreateRoleResult>\n  <ResponseMetadata>\n    <RequestId>4afb97d8-bf62-11e4-bd85-8f7993f0ca95</RequestId>\n\
+        \  </ResponseMetadata>\n</CreateRoleResponse>\n"}
+    headers:
+      content-length: ['806']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:01 GMT']
+      x-amzn-requestid: [4afb97d8-bf62-11e4-bd85-8f7993f0ca95]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=ListRoles&Version=2010-05-08
+    headers:
+      Content-Length: ['35']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155601Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<ListRolesResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ListRolesResult>\n    <IsTruncated>false</IsTruncated>\n    <Roles>\n\
+        \      <member>\n        <Path>/</Path>\n        <Arn>arn:aws:iam::000000000000:role/my-test-role</Arn>\n\
+        \        <RoleName>my-test-role</RoleName>\n        <AssumeRolePolicyDocument>%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D</AssumeRolePolicyDocument>\n\
+        \        <CreateDate>2015-02-28T15:56:01Z</CreateDate>\n        <RoleId>AROAIFQOEF5FIPM2XHY7S</RoleId>\n\
+        \      </member>\n    </Roles>\n  </ListRolesResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>4b1b06d5-bf62-11e4-a4a1-350fa7ba709e</RequestId>\n  </ResponseMetadata>\n\
+        </ListRolesResponse>\n"}
+    headers:
+      content-length: ['1437']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:00 GMT']
+      x-amzn-requestid: [4b1b06d5-bf62-11e4-a4a1-350fa7ba709e]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=ListRolePolicies&RoleName=my-test-role&Version=2010-05-08
+    headers:
+      Content-Length: ['64']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155601Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<ListRolePoliciesResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ListRolePoliciesResult>\n    <PolicyNames/>\n    <IsTruncated>false</IsTruncated>\n\
+        \  </ListRolePoliciesResult>\n  <ResponseMetadata>\n    <RequestId>4b2e198d-bf62-11e4-bd85-8f7993f0ca95</RequestId>\n\
+        \  </ResponseMetadata>\n</ListRolePoliciesResponse>\n"}
+    headers:
+      content-length: ['323']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:01 GMT']
+      x-amzn-requestid: [4b2e198d-bf62-11e4-bd85-8f7993f0ca95]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=ListRoles&Version=2010-05-08
+    headers:
+      Content-Length: ['35']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155601Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<ListRolesResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ListRolesResult>\n    <IsTruncated>false</IsTruncated>\n    <Roles>\n\
+        \      <member>\n        <Path>/</Path>\n        <Arn>arn:aws:iam::000000000000:role/my-test-role</Arn>\n\
+        \        <RoleName>my-test-role</RoleName>\n        <AssumeRolePolicyDocument>%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D</AssumeRolePolicyDocument>\n\
+        \        <CreateDate>2015-02-28T15:56:01Z</CreateDate>\n        <RoleId>AROAIFQOEF5FIPM2XHY7S</RoleId>\n\
+        \      </member>\n    </Roles>\n  </ListRolesResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>4b7ada54-bf62-11e4-a9b0-9555e062ac93</RequestId>\n  </ResponseMetadata>\n\
+        </ListRolesResponse>\n"}
+    headers:
+      content-length: ['1437']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:02 GMT']
+      x-amzn-requestid: [4b7ada54-bf62-11e4-a9b0-9555e062ac93]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=ListRolePolicies&RoleName=my-test-role&Version=2010-05-08
+    headers:
+      Content-Length: ['64']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155602Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<ListRolePoliciesResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ListRolePoliciesResult>\n    <PolicyNames/>\n    <IsTruncated>false</IsTruncated>\n\
+        \  </ListRolePoliciesResult>\n  <ResponseMetadata>\n    <RequestId>4b90ac48-bf62-11e4-a9b0-9555e062ac93</RequestId>\n\
+        \  </ResponseMetadata>\n</ListRolePoliciesResponse>\n"}
+    headers:
+      content-length: ['323']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:02 GMT']
+      x-amzn-requestid: [4b90ac48-bf62-11e4-a9b0-9555e062ac93]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteRole&RoleName=my-test-role&Version=2010-05-08
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155602Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<DeleteRoleResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ResponseMetadata>\n    <RequestId>4ba51e6c-bf62-11e4-bd85-8f7993f0ca95</RequestId>\n\
+        \  </ResponseMetadata>\n</DeleteRoleResponse>\n"}
+    headers:
+      content-length: ['200']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:02 GMT']
+      x-amzn-requestid: [4ba51e6c-bf62-11e4-bd85-8f7993f0ca95]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=ListRoles&Version=2010-05-08
+    headers:
+      Content-Length: ['35']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155602Z]
+    method: !!python/unicode 'POST'
+    uri: https://iam.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<ListRolesResponse xmlns=\"https://iam.amazonaws.com/doc/2010-05-08/\"\
+        >\n  <ListRolesResult>\n    <IsTruncated>false</IsTruncated>\n    <Roles>\n\
+        \      </Roles>\n  </ListRolesResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>4ae8ac54-bf62-11e4-a9b0-9555e062ac93</RequestId>\n  </ResponseMetadata>\n\
+        </ListRolesResponse>\n"}
+    headers:
+      content-length: ['891']
+      content-type: [text/xml]
+      date: ['Sat, 28 Feb 2015 15:56:02 GMT']
+      x-amzn-requestid: [4bbec0f2-bf62-11e4-bd85-8f7993f0ca95]
+    status: {code: 200, message: OK}
+version: 1

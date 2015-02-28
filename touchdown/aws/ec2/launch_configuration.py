@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
 from ..account import Account
@@ -108,6 +108,11 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_launch_configuration"
     create_response = "not-that-useful"
+
+    signature = (
+        Present("image"),
+        Present("instance_type"),
+    )
 
     def get_create_serializer(self):
         return serializers.Resource(

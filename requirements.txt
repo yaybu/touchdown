@@ -17,5 +17,7 @@ pep8==1.6.2
 py==1.4.26
 pyflakes==0.8.1
 pytest==2.6.4
+vcrpy==1.2.0
+wrapt==1.10.2
 
 -e .

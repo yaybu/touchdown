@@ -17,6 +17,13 @@ import unittest
 import mock
 import six
 
+try:
+    from contextlib import ExitStack
+except ImportError:
+    from contextlib2 import ExitStack
+
+import vcr
+
 from touchdown.core import workspace, errors
 from touchdown.core.runner import Runner
 from touchdown.core.main import ConsoleInterface
@@ -177,3 +184,48 @@ class TestBasicUsage(TestCase):
         self.runner.dot()
         self.runner.apply()
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
+
+
+class RecordedBotoCoreTest(unittest.TestCase):
+
+    def patches(self):
+        try:
+            import botocore.vendored.requests.packages.urllib3.connectionpool as cpool
+        except ImportError:  # pragma: no cover
+            return ()
+        from vcr.stubs.requests_stubs import VCRRequestsHTTPConnection, VCRRequestsHTTPSConnection
+
+        return (
+            (cpool, 'VerifiedHTTPSConnection', VCRRequestsHTTPSConnection),
+            (cpool, 'VerifiedHTTPSConnection', VCRRequestsHTTPSConnection),
+            (cpool, 'HTTPConnection', VCRRequestsHTTPConnection),
+            (cpool, 'HTTPSConnection', VCRRequestsHTTPSConnection),
+            (cpool.HTTPConnectionPool, 'ConnectionCls', VCRRequestsHTTPConnection),
+            (cpool.HTTPSConnectionPool, 'ConnectionCls', VCRRequestsHTTPSConnection),
+        )
+
+    def setUp(self):
+        self.stack = ExitStack()
+
+        self.stack.enter_context(vcr.use_cassette(
+            os.path.join(os.path.dirname(__file__), 'cassettes/{}.yml'.format(self.id())),
+            serializers='json',
+            custom_patches=self.patches(),
+            filter_headers=['authorization'],
+        ))
+
+        self.workspace = workspace.Workspace()
+        self.aws = self.workspace.add_aws(region='eu-west-1')
+
+    def tearDown(self):
+        self.stack.close()
+
+    def apply(self):
+        self.apply_runner = Runner("apply", self.workspace, ConsoleInterface(interactive=False))
+        self.apply_runner.apply()
+        self.assertRaises(errors.NothingChanged, self.apply_runner.apply)
+
+    def destroy(self):
+        self.destroy_runner = Runner("destroy", self.workspace, ConsoleInterface(interactive=False))
+        self.destroy_runner.apply()
+        self.assertRaises(errors.NothingChanged, self.destroy_runner.apply)

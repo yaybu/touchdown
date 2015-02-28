@@ -1,0 +1,177 @@
+interactions:
+- request:
+    body: Action=DescribeKeyPairs&Version=2014-10-01&KeyName.1=test-keypair
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155557Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0" encoding="UTF-8"?>
+
+        <Response><Errors><Error><Code>InvalidKeyPair.NotFound</Code><Message>The
+        key pair ''test-keypair'' does not exist</Message></Error></Errors><RequestID>830066b6-f8c2-4f2c-9846-89f69e926ae4</RequestID></Response>'}
+    headers:
+      cneonction: [close]
+      date: ['Sat, 28 Feb 2015 15:55:57 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+    status: {code: 400, message: Bad Request}
+- request:
+    body: Action=ImportKeyPair&KeyName=test-keypair&PublicKeyMaterial=c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBNk5GOGlhbGx2UVZwMjJXRGtUa3lydHZwOWVXVzZBOFlWcitrejRUakdZZTdnSHpJdytuaU5sdEdFRkh6RDgrdjFJMllKNm9YZXZjdDFZZVMwbzlIWnlOMVE5cWdDZ3pVRnRkT0tMdjZJZWRwbHFvUGtjbUYwYVlldDJQa0VEbzNNbFRCY2tGWFBJVEFNekY4ZEpTSUZvOUQ4SGZkT1YwSUFkeDRPN1B0aXhXS241eTJoTU5HMHpRUHlVZWNwNHB6QzZraXZBSWh5ZkhpbEZSNjFSR0wrR1BYUTJNV1pXRlliQUdqeWlZSm5BbUNQM05PVGQwak1aRW5Ea2JVdnhoTW1CWVNkRVRrMXJSZ20rUjRMT3pGVUdhSHFIRExLTFgrRklQS2NGOTZocnVjWHpjV3lMYkliRWdFOThPSGxuVllDelJkSzhqbHFtOHRlaFVjOWM5V2hRPT0gaW5zZWN1cmUgcHVibGljIGtleQ%3D%3D&Version=2014-10-01
+    headers:
+      Content-Length: ['619']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155558Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <ImportKeyPairResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>bcdb3466-c964-44df-9e4b-b3c779e0fcf9</requestId>\n    <keyName>test-keypair</keyName>\n\
+        \    <keyFingerprint>c7:15:68:10:e9:39:6c:ab:99:fe:d0:8b:e8:ec:f5:ae</keyFingerprint>\n\
+        </ImportKeyPairResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 15:55:59 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeKeyPairs&Version=2014-10-01&KeyName.1=test-keypair
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155559Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeKeyPairsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>f6229fec-a6ab-4120-89fc-b0fc743c5e68</requestId>\n    <keySet>\n\
+        \        <item>\n            <keyName>test-keypair</keyName>\n           \
+        \ <keyFingerprint>c7:15:68:10:e9:39:6c:ab:99:fe:d0:8b:e8:ec:f5:ae</keyFingerprint>\n\
+        \        </item>\n    </keySet>\n</DescribeKeyPairsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 15:55:58 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeKeyPairs&Version=2014-10-01&KeyName.1=test-keypair
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155559Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeKeyPairsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>cceec200-529f-4461-b92c-c6d57e004174</requestId>\n    <keySet>\n\
+        \        <item>\n            <keyName>test-keypair</keyName>\n           \
+        \ <keyFingerprint>c7:15:68:10:e9:39:6c:ab:99:fe:d0:8b:e8:ec:f5:ae</keyFingerprint>\n\
+        \        </item>\n    </keySet>\n</DescribeKeyPairsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 15:55:58 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeKeyPairs&Version=2014-10-01&KeyName.1=test-keypair
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155559Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeKeyPairsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>984ec85e-bfdf-4e94-b277-9ccefe41bcbb</requestId>\n    <keySet>\n\
+        \        <item>\n            <keyName>test-keypair</keyName>\n           \
+        \ <keyFingerprint>c7:15:68:10:e9:39:6c:ab:99:fe:d0:8b:e8:ec:f5:ae</keyFingerprint>\n\
+        \        </item>\n    </keySet>\n</DescribeKeyPairsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 15:55:58 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeKeyPairs&Version=2014-10-01&KeyName.1=test-keypair
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155559Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeKeyPairsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>3741fe32-4783-49ff-97ed-9058305e7a76</requestId>\n    <keySet>\n\
+        \        <item>\n            <keyName>test-keypair</keyName>\n           \
+        \ <keyFingerprint>c7:15:68:10:e9:39:6c:ab:99:fe:d0:8b:e8:ec:f5:ae</keyFingerprint>\n\
+        \        </item>\n    </keySet>\n</DescribeKeyPairsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 15:55:59 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteKeyPair&KeyName=test-keypair&Version=2014-10-01
+    headers:
+      Content-Length: ['60']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155559Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteKeyPairResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>d3c78ebf-7a98-4e4d-9487-19f5be5e5477</requestId>\n    <return>true</return>\n\
+        </DeleteKeyPairResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sat, 28 Feb 2015 15:55:59 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeKeyPairs&Version=2014-10-01&KeyName.1=test-keypair
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150228T155559Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0" encoding="UTF-8"?>
+
+        <Response><Errors><Error><Code>InvalidKeyPair.NotFound</Code><Message>The
+        key pair ''test-keypair'' does not exist</Message></Error></Errors><RequestID>3be472e3-e01b-45bf-a901-3d1c074dade3</RequestID></Response>'}
+    headers:
+      cneonction: [close]
+      date: ['Sat, 28 Feb 2015 15:55:59 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+    status: {code: 400, message: Bad Request}
+version: 1

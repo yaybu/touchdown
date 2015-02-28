@@ -15,11 +15,13 @@
 from . import aws
 
 
-class TestLaunchConfiguration(aws.TestBasicUsage):
+class TestRole(aws.RecordedBotoCoreTest):
 
-    def setUpResource(self):
-        self.expected_resource_id = 'my-test-lc.1'
-        self.resource = self.aws.add_launch_configuration(
+    def test_create_and_delete_role(self):
+        self.aws.add_launch_configuration(
             name='my-test-lc',
-            image='ami-514ac838'
+            image='ami-cba130bc',
+            instance_type='t2.micro',
         )
+        self.apply()
+        self.destroy()

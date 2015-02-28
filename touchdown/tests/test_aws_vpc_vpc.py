@@ -15,11 +15,12 @@
 from . import aws
 
 
-class TestVpc(aws.TestBasicUsage):
+class TestVpc(aws.RecordedBotoCoreTest):
 
-    def setUpResource(self):
-        self.expected_resource_id = 'vpc-1a2b3c4d'
-        self.resource = self.aws.add_vpc(
+    def test_create_and_delete_role(self):
+        self.aws.add_vpc(
             name='test-vpc',
             cidr_block='192.168.0.1/25',
         )
+        self.apply()
+        self.destroy()
