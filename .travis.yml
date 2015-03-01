@@ -11,14 +11,12 @@ cache:
   directories:
     - $HOME/wheelhouse
 
-env: AWS_ACCESS_KEY_ID=AKIASDSDSDSDSDSD AWS_SECRET_ACCESS_KEY=dummykey
-
 install:
   - pip wheel --find-links=$HOME/wheelhouse -r requirements.txt --wheel-dir=$HOME/wheelhouse
   - pip install --no-index --find-links=$HOME/wheelhouse -r requirements.txt
 
 script:
-  - coverage run $(which py.test) touchdown
+  - AWS_ACCESS_KEY_ID=AKIASDSDSDSDSDSD AWS_SECRET_ACCESS_KEY=dummykey coverage run $(which py.test) touchdown
   - flake8 touchdown
 
 after_success:
