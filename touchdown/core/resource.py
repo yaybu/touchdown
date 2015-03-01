@@ -37,6 +37,11 @@ class Field(object):
         return retval
 
     def __set__(self, instance, value):
+        if value is None:
+            if self.name in instance._values:
+                del instance._values[self.name]
+            return
+
         try:
             value = self.argument.clean(instance, value)
             if hasattr(instance, "clean_{}".format(self.name)):

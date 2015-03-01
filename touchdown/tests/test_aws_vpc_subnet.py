@@ -28,3 +28,20 @@ class TestVpc(aws.RecordedBotoCoreTest):
         )
         self.apply()
         self.destroy()
+
+    def test_adding_and_removing_route_table_to_subnet(self):
+        vpc = self.aws.add_vpc(
+            name='test-vpc',
+            cidr_block='192.168.0.0/25',
+        )
+        subnet = vpc.add_subnet(
+            name='test-subnet',
+            cidr_block='192.168.0.0/25',
+            route_table=vpc.add_route_table(
+                name='test-subnet',
+            ),
+        )
+        self.apply()
+        subnet.route_table = None
+        self.apply()
+        self.destroy()

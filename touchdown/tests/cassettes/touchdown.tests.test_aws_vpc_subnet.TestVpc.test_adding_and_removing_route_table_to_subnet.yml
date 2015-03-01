@@ -1,0 +1,1079 @@
+interactions:
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090225Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>aca8e4fd-c1bc-4a98-b237-777a314c73c1</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:24 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateVpc&InstanceTenancy=default&Version=2014-10-01&CidrBlock=192.168.0.0%2F25
+    headers:
+      Content-Length: ['86']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090225Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n \
+        \   <requestId>3520dca1-fe33-4672-9f05-ee9957dc676d</requestId>\n    <vpc>\n\
+        \        <vpcId>vpc-914298f4</vpcId>\n        <state>pending</state>\n   \
+        \     <cidrBlock>192.168.0.0/25</cidrBlock>\n        <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \        <instanceTenancy>default</instanceTenancy>\n    </vpc>\n</CreateVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:24 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-914298f4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090225Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>049c5512-8244-4341-b6fc-2418c308566d</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-914298f4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <instanceTenancy>default</instanceTenancy>\n            <isDefault>false</isDefault>\n\
+        \        </item>\n    </vpcSet>\n</DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-914298f4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090225Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>17cb004e-73d0-46c2-b12d-0020d324ba3e</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-914298f4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <instanceTenancy>default</instanceTenancy>\n            <isDefault>false</isDefault>\n\
+        \        </item>\n    </vpcSet>\n</DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=vpc-914298f4&Version=2014-10-01&Tag.1.Value=test-vpc&Tag.1.Key=Name
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090225Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>ac5dbdbd-91d8-4e69-b7e8-122eb42177e6</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateRouteTable&VpcId=vpc-914298f4&Version=2014-10-01
+    headers:
+      Content-Length: ['61']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090225Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateRouteTableResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>e94dadff-a842-4a5b-bc86-f530653b11a9</requestId>\n    <routeTable>\n\
+        \        <routeTableId>rtb-3d8f2458</routeTableId>\n        <vpcId>vpc-914298f4</vpcId>\n\
+        \        <routeSet>\n            <item>\n                <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                <gatewayId>local</gatewayId>\n                <state>active</state>\n\
+        \                <origin>CreateRouteTable</origin>\n            </item>\n\
+        \        </routeSet>\n        <associationSet/>\n        <propagatingVgwSet/>\n\
+        \        <tagSet/>\n    </routeTable>\n</CreateRouteTableResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=rtb-3d8f2458&Version=2014-10-01&Tag.1.Value=test-subnet&Tag.1.Key=Name
+    headers:
+      Content-Length: ['101']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>b23f2ffa-b840-42c8-9608-1c706e683d65</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateSubnet&VpcId=vpc-914298f4&Version=2014-10-01&CidrBlock=192.168.0.0%2F25
+    headers:
+      Content-Length: ['84']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateSubnetResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>0bbebed4-4997-4270-8b89-80c68338b386</requestId>\n    <subnet>\n\
+        \        <subnetId>subnet-01bb6958</subnetId>\n        <state>pending</state>\n\
+        \        <vpcId>vpc-914298f4</vpcId>\n        <cidrBlock>192.168.0.0/25</cidrBlock>\n\
+        \        <availableIpAddressCount>123</availableIpAddressCount>\n        <availabilityZone>eu-west-1b</availabilityZone>\n\
+        \    </subnet>\n</CreateSubnetResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSubnets&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=subnet-id
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSubnetsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>299b9a36-0d8e-48d2-a47a-596337b18043</requestId>\n    <subnetSet>\n\
+        \        <item>\n            <subnetId>subnet-01bb6958</subnetId>\n      \
+        \      <state>available</state>\n            <vpcId>vpc-914298f4</vpcId>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <availableIpAddressCount>123</availableIpAddressCount>\n\
+        \            <availabilityZone>eu-west-1b</availabilityZone>\n           \
+        \ <defaultForAz>false</defaultForAz>\n            <mapPublicIpOnLaunch>false</mapPublicIpOnLaunch>\n\
+        \        </item>\n    </subnetSet>\n</DescribeSubnetsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSubnets&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=subnet-id
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSubnetsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>52bb7ef2-ff79-478b-b824-0af7df765797</requestId>\n    <subnetSet>\n\
+        \        <item>\n            <subnetId>subnet-01bb6958</subnetId>\n      \
+        \      <state>available</state>\n            <vpcId>vpc-914298f4</vpcId>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <availableIpAddressCount>123</availableIpAddressCount>\n\
+        \            <availabilityZone>eu-west-1b</availabilityZone>\n           \
+        \ <defaultForAz>false</defaultForAz>\n            <mapPublicIpOnLaunch>false</mapPublicIpOnLaunch>\n\
+        \        </item>\n    </subnetSet>\n</DescribeSubnetsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:25 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>b5f8a89b-d168-421a-af0d-ae7379b0303c</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-7905ab1c</networkAclId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet>\n\
+        \                <item>\n                    <networkAclAssociationId>aclassoc-0a02286f</networkAclAssociationId>\n\
+        \                    <networkAclId>acl-7905ab1c</networkAclId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                </item>\n\
+        \            </associationSet>\n            <tagSet/>\n        </item>\n \
+        \   </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>56cb3101-a97f-4baf-8e5a-7e4c57acaad8</requestId>\n    <routeTableSet/>\n\
+        </DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=subnet-01bb6958&Version=2014-10-01&Tag.1.Value=test-subnet&Tag.1.Key=Name
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090226Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>d85dc522-6680-4a7a-b2a3-81ee41a8bc98</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=AssociateRouteTable&SubnetId=subnet-01bb6958&RouteTableId=rtb-3d8f2458&Version=2014-10-01
+    headers:
+      Content-Length: ['96']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <AssociateRouteTableResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>e4506e99-284a-4ac0-bd5d-edff68b2f56e</requestId>\n    <associationId>rtbassoc-53e95636</associationId>\n\
+        </AssociateRouteTableResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-914298f4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>0128036e-e408-4f5d-a0e4-8b53b7c068e1</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-914298f4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=rtb-3d8f2458&Version=2014-10-01&Filter.1.Name=route-table-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>21c6fb54-7b05-4b12-be75-65b9c073379e</requestId>\n    <routeTableSet>\n\
+        \        <item>\n            <routeTableId>rtb-3d8f2458</routeTableId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <routeSet>\n        \
+        \        <item>\n                    <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                    <gatewayId>local</gatewayId>\n                    <state>active</state>\n\
+        \                    <origin>CreateRouteTable</origin>\n                </item>\n\
+        \            </routeSet>\n            <associationSet>\n                <item>\n\
+        \                    <routeTableAssociationId>rtbassoc-53e95636</routeTableAssociationId>\n\
+        \                    <routeTableId>rtb-3d8f2458</routeTableId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                    <main>false</main>\n\
+        \                </item>\n            </associationSet>\n            <propagatingVgwSet/>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </routeTableSet>\n</DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSubnets&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=subnet-id
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSubnetsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>0d8265f1-017f-4556-a0a5-7b62eaadb560</requestId>\n    <subnetSet>\n\
+        \        <item>\n            <subnetId>subnet-01bb6958</subnetId>\n      \
+        \      <state>available</state>\n            <vpcId>vpc-914298f4</vpcId>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <availableIpAddressCount>123</availableIpAddressCount>\n\
+        \            <availabilityZone>eu-west-1b</availabilityZone>\n           \
+        \ <defaultForAz>false</defaultForAz>\n            <mapPublicIpOnLaunch>false</mapPublicIpOnLaunch>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </subnetSet>\n</DescribeSubnetsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:26 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>fd641d4d-374c-40c0-9374-32431940a149</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-7905ab1c</networkAclId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet>\n\
+        \                <item>\n                    <networkAclAssociationId>aclassoc-0a02286f</networkAclAssociationId>\n\
+        \                    <networkAclId>acl-7905ab1c</networkAclId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                </item>\n\
+        \            </associationSet>\n            <tagSet/>\n        </item>\n \
+        \   </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>e2088fc0-eeb0-486c-b42a-7f4cc3f683c5</requestId>\n    <routeTableSet>\n\
+        \        <item>\n            <routeTableId>rtb-3d8f2458</routeTableId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <routeSet>\n        \
+        \        <item>\n                    <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                    <gatewayId>local</gatewayId>\n                    <state>active</state>\n\
+        \                    <origin>CreateRouteTable</origin>\n                </item>\n\
+        \            </routeSet>\n            <associationSet>\n                <item>\n\
+        \                    <routeTableAssociationId>rtbassoc-53e95636</routeTableAssociationId>\n\
+        \                    <routeTableId>rtb-3d8f2458</routeTableId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                    <main>false</main>\n\
+        \                </item>\n            </associationSet>\n            <propagatingVgwSet/>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </routeTableSet>\n</DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>b3d4b13b-3d08-4263-aa65-e579b5749a2e</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-914298f4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=test-subnet&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['99']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090227Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>65ff5166-91f5-4f0d-824f-d90983b843c9</requestId>\n    <routeTableSet>\n\
+        \        <item>\n            <routeTableId>rtb-3d8f2458</routeTableId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <routeSet>\n        \
+        \        <item>\n                    <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                    <gatewayId>local</gatewayId>\n                    <state>active</state>\n\
+        \                    <origin>CreateRouteTable</origin>\n                </item>\n\
+        \            </routeSet>\n            <associationSet>\n                <item>\n\
+        \                    <routeTableAssociationId>rtbassoc-53e95636</routeTableAssociationId>\n\
+        \                    <routeTableId>rtb-3d8f2458</routeTableId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                    <main>false</main>\n\
+        \                </item>\n            </associationSet>\n            <propagatingVgwSet/>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </routeTableSet>\n</DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSubnets&Filter.1.Value.1=192.168.0.0%2F25&Version=2014-10-01&Filter.1.Name=cidrBlock
+    headers:
+      Content-Length: ['99']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSubnetsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>cffce1ab-042a-4448-99d6-5991aea27635</requestId>\n    <subnetSet>\n\
+        \        <item>\n            <subnetId>subnet-01bb6958</subnetId>\n      \
+        \      <state>available</state>\n            <vpcId>vpc-914298f4</vpcId>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <availableIpAddressCount>123</availableIpAddressCount>\n\
+        \            <availabilityZone>eu-west-1b</availabilityZone>\n           \
+        \ <defaultForAz>false</defaultForAz>\n            <mapPublicIpOnLaunch>false</mapPublicIpOnLaunch>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </subnetSet>\n</DescribeSubnetsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>3eb1f514-25fe-403f-acf6-5be4f3a6bd41</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-7905ab1c</networkAclId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet>\n\
+        \                <item>\n                    <networkAclAssociationId>aclassoc-0a02286f</networkAclAssociationId>\n\
+        \                    <networkAclId>acl-7905ab1c</networkAclId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                </item>\n\
+        \            </associationSet>\n            <tagSet/>\n        </item>\n \
+        \   </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>7cf13b96-09d7-49bf-a348-7ffa3ec74c98</requestId>\n    <routeTableSet>\n\
+        \        <item>\n            <routeTableId>rtb-3d8f2458</routeTableId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <routeSet>\n        \
+        \        <item>\n                    <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                    <gatewayId>local</gatewayId>\n                    <state>active</state>\n\
+        \                    <origin>CreateRouteTable</origin>\n                </item>\n\
+        \            </routeSet>\n            <associationSet>\n                <item>\n\
+        \                    <routeTableAssociationId>rtbassoc-53e95636</routeTableAssociationId>\n\
+        \                    <routeTableId>rtb-3d8f2458</routeTableId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                    <main>false</main>\n\
+        \                </item>\n            </associationSet>\n            <propagatingVgwSet/>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </routeTableSet>\n</DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DisassociateRouteTable&AssociationId=rtbassoc-53e95636&Version=2014-10-01
+    headers:
+      Content-Length: ['80']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DisassociateRouteTableResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>e27fe076-d9fd-4cb7-8211-7dd31e2cc3e4</requestId>\n    <return>true</return>\n\
+        </DisassociateRouteTableResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:27 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-914298f4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>f828c1b6-36cf-4fc3-a498-3e8f51cd1805</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-914298f4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=rtb-3d8f2458&Version=2014-10-01&Filter.1.Name=route-table-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>5c593c51-ce88-400c-8183-a0a3e624dfd3</requestId>\n    <routeTableSet>\n\
+        \        <item>\n            <routeTableId>rtb-3d8f2458</routeTableId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <routeSet>\n        \
+        \        <item>\n                    <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                    <gatewayId>local</gatewayId>\n                    <state>active</state>\n\
+        \                    <origin>CreateRouteTable</origin>\n                </item>\n\
+        \            </routeSet>\n            <associationSet/>\n            <propagatingVgwSet/>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </routeTableSet>\n</DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSubnets&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=subnet-id
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSubnetsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>4db594e4-8829-4bde-883c-6ff300670ac8</requestId>\n    <subnetSet>\n\
+        \        <item>\n            <subnetId>subnet-01bb6958</subnetId>\n      \
+        \      <state>available</state>\n            <vpcId>vpc-914298f4</vpcId>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <availableIpAddressCount>123</availableIpAddressCount>\n\
+        \            <availabilityZone>eu-west-1b</availabilityZone>\n           \
+        \ <defaultForAz>false</defaultForAz>\n            <mapPublicIpOnLaunch>false</mapPublicIpOnLaunch>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </subnetSet>\n</DescribeSubnetsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>8115e83d-4d88-46c3-b33d-ffd48289d42a</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-7905ab1c</networkAclId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet>\n\
+        \                <item>\n                    <networkAclAssociationId>aclassoc-0a02286f</networkAclAssociationId>\n\
+        \                    <networkAclId>acl-7905ab1c</networkAclId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                </item>\n\
+        \            </associationSet>\n            <tagSet/>\n        </item>\n \
+        \   </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090228Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>ab4ecd2c-b81e-4a08-a198-32eb7d77dd3a</requestId>\n    <routeTableSet/>\n\
+        </DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>0d95ab41-0450-4436-a5da-e39393550a58</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-914298f4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=test-subnet&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['99']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>6b3a4e75-a443-492a-9e1f-4953cb817d53</requestId>\n    <routeTableSet>\n\
+        \        <item>\n            <routeTableId>rtb-3d8f2458</routeTableId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <routeSet>\n        \
+        \        <item>\n                    <destinationCidrBlock>192.168.0.0/25</destinationCidrBlock>\n\
+        \                    <gatewayId>local</gatewayId>\n                    <state>active</state>\n\
+        \                    <origin>CreateRouteTable</origin>\n                </item>\n\
+        \            </routeSet>\n            <associationSet/>\n            <propagatingVgwSet/>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </routeTableSet>\n</DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:28 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSubnets&Filter.1.Value.1=192.168.0.0%2F25&Version=2014-10-01&Filter.1.Name=cidrBlock
+    headers:
+      Content-Length: ['99']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSubnetsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>c28a9eae-bb1d-4851-80f0-beabd7f4eb7e</requestId>\n    <subnetSet>\n\
+        \        <item>\n            <subnetId>subnet-01bb6958</subnetId>\n      \
+        \      <state>available</state>\n            <vpcId>vpc-914298f4</vpcId>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <availableIpAddressCount>123</availableIpAddressCount>\n\
+        \            <availabilityZone>eu-west-1b</availabilityZone>\n           \
+        \ <defaultForAz>false</defaultForAz>\n            <mapPublicIpOnLaunch>false</mapPublicIpOnLaunch>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-subnet</value>\n                </item>\n\
+        \            </tagSet>\n        </item>\n    </subnetSet>\n</DescribeSubnetsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>8cb75011-c897-43c0-b341-6324b53446e9</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-7905ab1c</networkAclId>\n \
+        \           <vpcId>vpc-914298f4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet>\n\
+        \                <item>\n                    <networkAclAssociationId>aclassoc-0a02286f</networkAclAssociationId>\n\
+        \                    <networkAclId>acl-7905ab1c</networkAclId>\n         \
+        \           <subnetId>subnet-01bb6958</subnetId>\n                </item>\n\
+        \            </associationSet>\n            <tagSet/>\n        </item>\n \
+        \   </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeRouteTables&Filter.1.Value.1=subnet-01bb6958&Version=2014-10-01&Filter.1.Name=association.subnet-id
+    headers:
+      Content-Length: ['114']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeRouteTablesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>958e0868-ca48-47b3-99b1-574783336164</requestId>\n    <routeTableSet/>\n\
+        </DescribeRouteTablesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Filter.1.Name=vpc-id&Filter.2.Value.1=subnet-01bb6958&Filter.2.Name=subnet-id&Version=2014-10-01&Action=DescribeNetworkInterfaces&Filter.1.Value.1=vpc-914298f4
+    headers:
+      Content-Length: ['159']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkInterfacesResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>4742f5e0-2ffc-4c76-944c-3f5f72957c15</requestId>\n    <networkInterfaceSet/>\n\
+        </DescribeNetworkInterfacesResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteSubnet&SubnetId=subnet-01bb6958&Version=2014-10-01
+    headers:
+      Content-Length: ['63']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090229Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteSubnetResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>03b09713-1245-4e22-98ab-f08b38f944ed</requestId>\n    <return>true</return>\n\
+        </DeleteSubnetResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteRouteTable&RouteTableId=rtb-3d8f2458&Version=2014-10-01
+    headers:
+      Content-Length: ['68']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090230Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteRouteTableResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>6327b93c-133b-462d-aadd-c697d91ad744</requestId>\n    <return>true</return>\n\
+        </DeleteRouteTableResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteVpc&VpcId=vpc-914298f4&Version=2014-10-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090230Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n \
+        \   <requestId>f2b99af0-d237-450f-9616-3f1a9461c020</requestId>\n    <return>true</return>\n\
+        </DeleteVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:29 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-914298f4&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150301T090230Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>e2df42df-3e47-4d2c-a767-77209b1e1282</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Sun, 01 Mar 2015 09:02:30 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+version: 1
