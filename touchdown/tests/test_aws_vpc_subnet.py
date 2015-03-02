@@ -45,3 +45,19 @@ class TestVpc(aws.RecordedBotoCoreTest):
         subnet.route_table = None
         self.apply()
         self.destroy()
+
+    def test_adding_and_removing_acls_to_subnet(self):
+        vpc = self.aws.add_vpc(
+            name='test-vpc',
+            cidr_block='192.168.0.0/25',
+        )
+        subnet = vpc.add_subnet(
+            name='test-subnet',
+            cidr_block='192.168.0.0/25',
+        )
+        self.apply()
+        subnet.network_acl = network_acl=vpc.add_network_acl(
+            name='test-subnet',
+        )
+        self.apply()
+        self.destroy()
