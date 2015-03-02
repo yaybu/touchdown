@@ -56,7 +56,7 @@ class TestVpc(aws.RecordedBotoCoreTest):
             cidr_block='192.168.0.0/25',
         )
         self.apply()
-        subnet.network_acl = network_acl=vpc.add_network_acl(
+        subnet.network_acl = vpc.add_network_acl(
             name='test-subnet',
         )
         self.apply()
