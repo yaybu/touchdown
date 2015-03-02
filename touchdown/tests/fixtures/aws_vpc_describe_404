@@ -1,9 +1,0 @@
-HTTP/1.1 200 OK
-Date: Tue, 6 Jan 2015 23:58:40 GMT
-Content-Type: text/xml; charset="utf-8"
-Connection: close
-
-<DescribeVpcsResponse xmlns="http://ec2.amazonaws.com/doc/2014-10-01/">
-<requestId>7a62c49f-347e-4fc4-9331-6e8eEXAMPLE</requestId>
-<vpcSet/>
-</DescribeVpcsResponse>
