@@ -92,6 +92,21 @@ Subnets
         be a subset of the network range covered by the VPC. For example, it
         cannot be 192.168.0.0/24 if the parent VPC covers 10.0.0.0/24.
 
+    .. attribute:: network_acl
+
+        A :class:`~touchdown.aws.vpc.network_acl.NetworkACL` resource.
+
+        This controls which IP address a subnet can connect out to an can
+        receive connections from.
+
+    .. attribute:: route_table
+
+        A :class:`~touchdown.aws.vpc.route_table.RouteTable` resource.
+
+        Where to route traffic external to the VPC. This controls whether to
+        send traffic via an internet gateway, vpn gateway or via another
+        instance that is applying NAT to traffic.
+
     .. attribute:: availability_zone
 
         The AWS availability zone this subnet is created in.
