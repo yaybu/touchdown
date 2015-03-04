@@ -1,0 +1,236 @@
+interactions:
+- request:
+    body: Action=GetQueueUrl&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110756Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><ErrorResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><Error><Type>Sender</Type><Code>AWS.SimpleQueueService.NonExistentQueue</Code><Message>The
+        specified queue does not exist for this wsdl version.</Message><Detail/></Error><RequestId>28c462a8-cb81-56b2-b5b0-2fd8224c8646</RequestId></ErrorResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['333']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:57 GMT']
+      server: [Server]
+      x-amzn-requestid: [28c462a8-cb81-56b2-b5b0-2fd8224c8646]
+    status: {code: 400, message: Bad Request}
+- request:
+    body: Action=CreateQueue&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110757Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><CreateQueueResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><CreateQueueResult><QueueUrl>https://eu-west-1.queue.amazonaws.com/000000000000/test-queue</QueueUrl></CreateQueueResult><ResponseMetadata><RequestId>1c3c77c5-40be-55cf-be58-3ab5a973953b</RequestId></ResponseMetadata></CreateQueueResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['332']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:57 GMT']
+      server: [Server]
+      x-amzn-requestid: [1c3c77c5-40be-55cf-be58-3ab5a973953b]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueUrl&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110757Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueUrlResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueUrlResult><QueueUrl>https://eu-west-1.queue.amazonaws.com/000000000000/test-queue</QueueUrl></GetQueueUrlResult><ResponseMetadata><RequestId>46ed305d-d5a2-5144-9aac-7d2d3c6f91b0</RequestId></ResponseMetadata></GetQueueUrlResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['332']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:57 GMT']
+      server: [Server]
+      x-amzn-requestid: [46ed305d-d5a2-5144-9aac-7d2d3c6f91b0]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueAttributes&QueueUrl=https%3A%2F%2Feu-west-1.queue.amazonaws.com%2F000000000000%2Ftest-queue&Version=2012-11-05&AttributeName.1=All
+    headers:
+      Content-Length: ['145']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110757Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueAttributesResponse
+        xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueAttributesResult><Attribute><Name>QueueArn</Name><Value>arn:aws:sqs:eu-west-1:000000000000:test-queue</Value></Attribute><Attribute><Name>ApproximateNumberOfMessages</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesNotVisible</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesDelayed</Name><Value>0</Value></Attribute><Attribute><Name>CreatedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>LastModifiedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>VisibilityTimeout</Name><Value>30</Value></Attribute><Attribute><Name>MaximumMessageSize</Name><Value>262144</Value></Attribute><Attribute><Name>MessageRetentionPeriod</Name><Value>345600</Value></Attribute><Attribute><Name>DelaySeconds</Name><Value>0</Value></Attribute><Attribute><Name>ReceiveMessageWaitTimeSeconds</Name><Value>0</Value></Attribute></GetQueueAttributesResult><ResponseMetadata><RequestId>ad07866e-17f6-5f6b-ba33-cb1efe3b9f9f</RequestId></ResponseMetadata></GetQueueAttributesResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['1164']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:57 GMT']
+      server: [Server]
+      x-amzn-requestid: [ad07866e-17f6-5f6b-ba33-cb1efe3b9f9f]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueUrl&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110757Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueUrlResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueUrlResult><QueueUrl>https://eu-west-1.queue.amazonaws.com/000000000000/test-queue</QueueUrl></GetQueueUrlResult><ResponseMetadata><RequestId>e2a5bc86-8a5d-5d17-909d-f1f663902de3</RequestId></ResponseMetadata></GetQueueUrlResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['332']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:57 GMT']
+      server: [Server]
+      x-amzn-requestid: [e2a5bc86-8a5d-5d17-909d-f1f663902de3]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueAttributes&QueueUrl=https%3A%2F%2Feu-west-1.queue.amazonaws.com%2F000000000000%2Ftest-queue&Version=2012-11-05&AttributeName.1=All
+    headers:
+      Content-Length: ['145']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueAttributesResponse
+        xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueAttributesResult><Attribute><Name>QueueArn</Name><Value>arn:aws:sqs:eu-west-1:000000000000:test-queue</Value></Attribute><Attribute><Name>ApproximateNumberOfMessages</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesNotVisible</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesDelayed</Name><Value>0</Value></Attribute><Attribute><Name>CreatedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>LastModifiedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>VisibilityTimeout</Name><Value>30</Value></Attribute><Attribute><Name>MaximumMessageSize</Name><Value>262144</Value></Attribute><Attribute><Name>MessageRetentionPeriod</Name><Value>345600</Value></Attribute><Attribute><Name>DelaySeconds</Name><Value>0</Value></Attribute><Attribute><Name>ReceiveMessageWaitTimeSeconds</Name><Value>0</Value></Attribute></GetQueueAttributesResult><ResponseMetadata><RequestId>a21b048b-efb9-5118-81eb-49fb0674d1ec</RequestId></ResponseMetadata></GetQueueAttributesResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['1164']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:57 GMT']
+      server: [Server]
+      x-amzn-requestid: [a21b048b-efb9-5118-81eb-49fb0674d1ec]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueUrl&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueUrlResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueUrlResult><QueueUrl>https://eu-west-1.queue.amazonaws.com/000000000000/test-queue</QueueUrl></GetQueueUrlResult><ResponseMetadata><RequestId>8370ac58-87ea-5c10-9425-e1286e24ace4</RequestId></ResponseMetadata></GetQueueUrlResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['332']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:58 GMT']
+      server: [Server]
+      x-amzn-requestid: [8370ac58-87ea-5c10-9425-e1286e24ace4]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueAttributes&QueueUrl=https%3A%2F%2Feu-west-1.queue.amazonaws.com%2F000000000000%2Ftest-queue&Version=2012-11-05&AttributeName.1=All
+    headers:
+      Content-Length: ['145']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueAttributesResponse
+        xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueAttributesResult><Attribute><Name>QueueArn</Name><Value>arn:aws:sqs:eu-west-1:000000000000:test-queue</Value></Attribute><Attribute><Name>ApproximateNumberOfMessages</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesNotVisible</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesDelayed</Name><Value>0</Value></Attribute><Attribute><Name>CreatedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>LastModifiedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>VisibilityTimeout</Name><Value>30</Value></Attribute><Attribute><Name>MaximumMessageSize</Name><Value>262144</Value></Attribute><Attribute><Name>MessageRetentionPeriod</Name><Value>345600</Value></Attribute><Attribute><Name>DelaySeconds</Name><Value>0</Value></Attribute><Attribute><Name>ReceiveMessageWaitTimeSeconds</Name><Value>0</Value></Attribute></GetQueueAttributesResult><ResponseMetadata><RequestId>b0db3f8c-c8a3-5238-b721-72fc216d22cc</RequestId></ResponseMetadata></GetQueueAttributesResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['1164']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:58 GMT']
+      server: [Server]
+      x-amzn-requestid: [b0db3f8c-c8a3-5238-b721-72fc216d22cc]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueUrl&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueUrlResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueUrlResult><QueueUrl>https://eu-west-1.queue.amazonaws.com/000000000000/test-queue</QueueUrl></GetQueueUrlResult><ResponseMetadata><RequestId>e2d59e4b-8b16-52d0-b0bf-d33b62d8d7a2</RequestId></ResponseMetadata></GetQueueUrlResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['332']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:58 GMT']
+      server: [Server]
+      x-amzn-requestid: [e2d59e4b-8b16-52d0-b0bf-d33b62d8d7a2]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueAttributes&QueueUrl=https%3A%2F%2Feu-west-1.queue.amazonaws.com%2F000000000000%2Ftest-queue&Version=2012-11-05&AttributeName.1=All
+    headers:
+      Content-Length: ['145']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><GetQueueAttributesResponse
+        xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><GetQueueAttributesResult><Attribute><Name>QueueArn</Name><Value>arn:aws:sqs:eu-west-1:000000000000:test-queue</Value></Attribute><Attribute><Name>ApproximateNumberOfMessages</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesNotVisible</Name><Value>0</Value></Attribute><Attribute><Name>ApproximateNumberOfMessagesDelayed</Name><Value>0</Value></Attribute><Attribute><Name>CreatedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>LastModifiedTimestamp</Name><Value>1425467277</Value></Attribute><Attribute><Name>VisibilityTimeout</Name><Value>30</Value></Attribute><Attribute><Name>MaximumMessageSize</Name><Value>262144</Value></Attribute><Attribute><Name>MessageRetentionPeriod</Name><Value>345600</Value></Attribute><Attribute><Name>DelaySeconds</Name><Value>0</Value></Attribute><Attribute><Name>ReceiveMessageWaitTimeSeconds</Name><Value>0</Value></Attribute></GetQueueAttributesResult><ResponseMetadata><RequestId>8378fe95-1c22-5ffe-91ba-b3e5f5ec6a8c</RequestId></ResponseMetadata></GetQueueAttributesResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['1164']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:58 GMT']
+      server: [Server]
+      x-amzn-requestid: [8378fe95-1c22-5ffe-91ba-b3e5f5ec6a8c]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteQueue&QueueUrl=https%3A%2F%2Feu-west-1.queue.amazonaws.com%2F000000000000%2Ftest-queue&Version=2012-11-05
+    headers:
+      Content-Length: ['118']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><DeleteQueueResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><ResponseMetadata><RequestId>8c604dae-2f89-5847-b00a-00dec647fd35</RequestId></ResponseMetadata></DeleteQueueResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['211']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:58 GMT']
+      server: [Server]
+      x-amzn-requestid: [8c604dae-2f89-5847-b00a-00dec647fd35]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=GetQueueUrl&Version=2012-11-05&QueueName=test-queue
+    headers:
+      Content-Length: ['58']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T110758Z]
+    method: !!python/unicode 'POST'
+    uri: https://eu-west-1.queue.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode '<?xml version="1.0"?><ErrorResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><Error><Type>Sender</Type><Code>AWS.SimpleQueueService.NonExistentQueue</Code><Message>The
+        specified queue does not exist for this wsdl version.</Message><Detail/></Error><RequestId>4b77392e-98c6-503f-9a60-745e7108254d</RequestId></ErrorResponse>'}
+    headers:
+      connection: [keep-alive]
+      content-length: ['333']
+      content-type: [text/xml]
+      date: ['Wed, 04 Mar 2015 11:07:58 GMT']
+      server: [Server]
+      x-amzn-requestid: [4b77392e-98c6-503f-9a60-745e7108254d]
+    status: {code: 400, message: Bad Request}
+version: 1
