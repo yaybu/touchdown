@@ -79,7 +79,7 @@ class DependencyMap(object):
     def all(self):
         """ Visits all remaining nodes in order immediately """
         while self.map:
-            ready = list(self.get_ready())
+            ready = sorted(list(self.get_ready()))
             if not ready:
                 return
 

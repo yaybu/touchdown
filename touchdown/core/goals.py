@@ -14,8 +14,6 @@
 
 from __future__ import division
 
-import math
-
 import six
 
 from . import dependencies, plan

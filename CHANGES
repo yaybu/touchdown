@@ -9,6 +9,8 @@ Changelog for Touchdown
 - Timeouts when operations take longer than expected are handled more
   gracefully. Fixes #6.
 
+- The dependency solver now sorts within batches, fixing #4.
+
 
 0.0.4 (2015-02-26)
 ------------------
