@@ -28,3 +28,18 @@ class TestSecurityGroup(aws.RecordedBotoCoreTest):
         )
         self.apply()
         self.destroy()
+
+    def test_adding_ingress(self):
+        vpc = self.aws.add_vpc(
+            name='test-vpc',
+            cidr_block='192.168.0.0/25',
+        )
+        vpc.add_security_group(
+            name='test-security-group',
+            description='test-security-group',
+            ingress=[
+                {"port": 80, "network": "0.0.0.0/0"},
+            ]
+        )
+        self.apply()
+        self.destroy()
