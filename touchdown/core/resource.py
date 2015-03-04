@@ -168,3 +168,6 @@ class Resource(six.with_metaclass(ResourceType)):
         if hasattr(self, "name"):
             return "{} '{}'".format(self.resource_name, self.name)
         return self.resource_name
+
+    def __lt__(self, other):
+        return str(self) < str(other)
