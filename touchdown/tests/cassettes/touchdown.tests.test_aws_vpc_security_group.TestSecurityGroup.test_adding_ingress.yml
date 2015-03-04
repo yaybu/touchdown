@@ -1,0 +1,431 @@
+interactions:
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113536Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>ddc706a0-67cb-4a01-b8d9-571f3d1f2688</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:37 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateVpc&InstanceTenancy=default&Version=2014-10-01&CidrBlock=192.168.0.0%2F25
+    headers:
+      Content-Length: ['86']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113537Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n \
+        \   <requestId>0df00c09-d19c-4d84-ae14-42a4091247af</requestId>\n    <vpc>\n\
+        \        <vpcId>vpc-1853f67d</vpcId>\n        <state>pending</state>\n   \
+        \     <cidrBlock>192.168.0.0/25</cidrBlock>\n        <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \        <instanceTenancy>default</instanceTenancy>\n    </vpc>\n</CreateVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:37 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-1853f67d&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113537Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>89b04967-31b0-4829-b5c8-9c3ae5f5c2ec</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-1853f67d</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <instanceTenancy>default</instanceTenancy>\n            <isDefault>false</isDefault>\n\
+        \        </item>\n    </vpcSet>\n</DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:37 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-1853f67d&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113538Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>c2e3039a-5938-4d18-8d6b-8f9cf7e6d0ed</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-1853f67d</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <instanceTenancy>default</instanceTenancy>\n            <isDefault>false</isDefault>\n\
+        \        </item>\n    </vpcSet>\n</DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:37 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=vpc-1853f67d&Version=2014-10-01&Tag.1.Value=test-vpc&Tag.1.Key=Name
+    headers:
+      Content-Length: ['98']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113538Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>a8de0e01-adda-4184-b202-c7d5646528d1</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:37 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateSecurityGroup&GroupName=test-security-group&Version=2014-10-01&VpcId=vpc-1853f67d&GroupDescription=test-security-group
+    headers:
+      Content-Length: ['131']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113538Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateSecurityGroupResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>f9720d70-896d-4f7a-a392-8f1c624773b5</requestId>\n    <return>true</return>\n\
+        \    <groupId>sg-e290e287</groupId>\n</CreateSecurityGroupResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:38 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSecurityGroups&Filter.1.Value.1=sg-e290e287&Version=2014-10-01&Filter.1.Name=group-id
+    headers:
+      Content-Length: ['100']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113538Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSecurityGroupsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>5189b341-0508-4493-934f-a87ce28368bc</requestId>\n    <securityGroupInfo>\n\
+        \        <item>\n            <ownerId>000000000000</ownerId>\n           \
+        \ <groupId>sg-e290e287</groupId>\n            <groupName>test-security-group</groupName>\n\
+        \            <groupDescription>test-security-group</groupDescription>\n  \
+        \          <vpcId>vpc-1853f67d</vpcId>\n            <ipPermissions/>\n   \
+        \         <ipPermissionsEgress>\n                <item>\n                \
+        \    <ipProtocol>-1</ipProtocol>\n                    <groups/>\n        \
+        \            <ipRanges>\n                        <item>\n                \
+        \            <cidrIp>0.0.0.0/0</cidrIp>\n                        </item>\n\
+        \                    </ipRanges>\n                </item>\n            </ipPermissionsEgress>\n\
+        \        </item>\n    </securityGroupInfo>\n</DescribeSecurityGroupsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:38 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSecurityGroups&Filter.1.Value.1=sg-e290e287&Version=2014-10-01&Filter.1.Name=group-id
+    headers:
+      Content-Length: ['100']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113539Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSecurityGroupsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>98422b83-065d-4d30-9f1c-fecab22ee456</requestId>\n    <securityGroupInfo>\n\
+        \        <item>\n            <ownerId>000000000000</ownerId>\n           \
+        \ <groupId>sg-e290e287</groupId>\n            <groupName>test-security-group</groupName>\n\
+        \            <groupDescription>test-security-group</groupDescription>\n  \
+        \          <vpcId>vpc-1853f67d</vpcId>\n            <ipPermissions/>\n   \
+        \         <ipPermissionsEgress>\n                <item>\n                \
+        \    <ipProtocol>-1</ipProtocol>\n                    <groups/>\n        \
+        \            <ipRanges>\n                        <item>\n                \
+        \            <cidrIp>0.0.0.0/0</cidrIp>\n                        </item>\n\
+        \                    </ipRanges>\n                </item>\n            </ipPermissionsEgress>\n\
+        \        </item>\n    </securityGroupInfo>\n</DescribeSecurityGroupsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:38 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=sg-e290e287&Version=2014-10-01&Tag.1.Value=test-security-group&Tag.1.Key=Name
+    headers:
+      Content-Length: ['108']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113539Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>169b1e87-393f-4b8a-b9e7-935d21345d08</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:39 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: IpPermissions.1.FromPort=80&IpPermissions.1.ToPort=80&IpPermissions.1.IpProtocol=tcp&IpPermissions.1.IpRanges.1.CidrIp=0.0.0.0%2F0&Version=2014-10-01&Action=AuthorizeSecurityGroupIngress&GroupId=sg-e290e287
+    headers:
+      Content-Length: ['206']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113539Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <AuthorizeSecurityGroupIngressResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>1f1ed8c9-b751-4ee4-b4c3-81d0508d914d</requestId>\n    <return>true</return>\n\
+        </AuthorizeSecurityGroupIngressResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:39 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-1853f67d&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113539Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>9d4079be-a777-49d3-9981-f445f48b8607</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-1853f67d</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:38 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeSecurityGroups&Filter.1.Value.1=sg-e290e287&Version=2014-10-01&Filter.1.Name=group-id
+    headers:
+      Content-Length: ['100']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113539Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSecurityGroupsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>c807c65e-3419-41f8-99b3-54eb4bb9d695</requestId>\n    <securityGroupInfo>\n\
+        \        <item>\n            <ownerId>000000000000</ownerId>\n           \
+        \ <groupId>sg-e290e287</groupId>\n            <groupName>test-security-group</groupName>\n\
+        \            <groupDescription>test-security-group</groupDescription>\n  \
+        \          <vpcId>vpc-1853f67d</vpcId>\n            <ipPermissions>\n    \
+        \            <item>\n                    <ipProtocol>tcp</ipProtocol>\n  \
+        \                  <fromPort>80</fromPort>\n                    <toPort>80</toPort>\n\
+        \                    <groups/>\n                    <ipRanges>\n         \
+        \               <item>\n                            <cidrIp>0.0.0.0/0</cidrIp>\n\
+        \                        </item>\n                    </ipRanges>\n      \
+        \          </item>\n            </ipPermissions>\n            <ipPermissionsEgress>\n\
+        \                <item>\n                    <ipProtocol>-1</ipProtocol>\n\
+        \                    <groups/>\n                    <ipRanges>\n         \
+        \               <item>\n                            <cidrIp>0.0.0.0/0</cidrIp>\n\
+        \                        </item>\n                    </ipRanges>\n      \
+        \          </item>\n            </ipPermissionsEgress>\n            <tagSet>\n\
+        \                <item>\n                    <key>Name</key>\n           \
+        \         <value>test-security-group</value>\n                </item>\n  \
+        \          </tagSet>\n        </item>\n    </securityGroupInfo>\n</DescribeSecurityGroupsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:39 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2014-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113540Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>422928e0-4679-494c-816f-0a8567e61719</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-1853f67d</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:39 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Filter.1.Name=group-name&Filter.2.Value.1=vpc-1853f67d&Filter.2.Name=vpc-id&Version=2014-10-01&Action=DescribeSecurityGroups&Filter.1.Value.1=test-security-group
+    headers:
+      Content-Length: ['161']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113540Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeSecurityGroupsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>8b3c5559-ea9d-4c58-8341-8aa771117e29</requestId>\n    <securityGroupInfo>\n\
+        \        <item>\n            <ownerId>000000000000</ownerId>\n           \
+        \ <groupId>sg-e290e287</groupId>\n            <groupName>test-security-group</groupName>\n\
+        \            <groupDescription>test-security-group</groupDescription>\n  \
+        \          <vpcId>vpc-1853f67d</vpcId>\n            <ipPermissions>\n    \
+        \            <item>\n                    <ipProtocol>tcp</ipProtocol>\n  \
+        \                  <fromPort>80</fromPort>\n                    <toPort>80</toPort>\n\
+        \                    <groups/>\n                    <ipRanges>\n         \
+        \               <item>\n                            <cidrIp>0.0.0.0/0</cidrIp>\n\
+        \                        </item>\n                    </ipRanges>\n      \
+        \          </item>\n            </ipPermissions>\n            <ipPermissionsEgress>\n\
+        \                <item>\n                    <ipProtocol>-1</ipProtocol>\n\
+        \                    <groups/>\n                    <ipRanges>\n         \
+        \               <item>\n                            <cidrIp>0.0.0.0/0</cidrIp>\n\
+        \                        </item>\n                    </ipRanges>\n      \
+        \          </item>\n            </ipPermissionsEgress>\n            <tagSet>\n\
+        \                <item>\n                    <key>Name</key>\n           \
+        \         <value>test-security-group</value>\n                </item>\n  \
+        \          </tagSet>\n        </item>\n    </securityGroupInfo>\n</DescribeSecurityGroupsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:40 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteSecurityGroup&Version=2014-10-01&GroupId=sg-e290e287
+    headers:
+      Content-Length: ['65']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113540Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteSecurityGroupResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\"\
+        >\n    <requestId>cf079f90-6046-4d96-bfbf-0a1aec23433b</requestId>\n    <return>true</return>\n\
+        </DeleteSecurityGroupResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:40 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteVpc&VpcId=vpc-1853f67d&Version=2014-10-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113540Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n \
+        \   <requestId>14edd889-085c-4d6b-a894-52001874cd1f</requestId>\n    <return>true</return>\n\
+        </DeleteVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:40 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-1853f67d&Version=2014-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [Botocore/0.93.0 Python/2.7.6 Darwin/14.1.0]
+      X-Amz-Date: [20150304T113541Z]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com:443/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2014-10-01/\">\n\
+        \    <requestId>8bde2e23-b4e6-4d26-aa40-08b69a52ff95</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Wed, 04 Mar 2015 11:35:40 GMT']
+      server: [AmazonEC2]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+version: 1
