@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+
+import math
+
 import six
 
 from . import dependencies, plan
@@ -71,13 +75,13 @@ class Goal(six.with_metaclass(GoalType)):
 
     def apply(self, ui):
         plan = list(self.get_execution_order().all())
-        #with ui.progress(plan, label="Apply changes") as plan:
-        for resource in plan:
+        for i, resource in enumerate(plan):
+            progress = i / len(plan)
             for change in self.get_changes(resource):
                 description = list(change.description)
-                ui.echo("[{}] {}".format(resource, description[0]))
+                ui.echo("[{: >6.2%}] [{}] {}".format(progress, resource, description[0]))
                 for line in description[1:]:
-                    ui.echo("[{}]     {}".format(resource, line))
+                    ui.echo("[{: >6.2%}] [{}]     {}".format(progress, resource, line))
                 change.run()
 
 

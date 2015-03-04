@@ -15,7 +15,7 @@
 from inspect import isgeneratorfunction
 import logging
 
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, WaiterError
 
 import jmespath
 
@@ -69,7 +69,12 @@ class Waiter(Action):
         filters = self.plan.get_describe_filters()
         logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
         waiter = self.plan.client.get_waiter(self.waiter)
-        waiter.wait(**filters)
+
+        try:
+            waiter.wait(**filters)
+        except WaiterError:
+            raise errors.Error("Operation took too long to complete")
+
         self.plan.object = self.plan.describe_object()
 
 
