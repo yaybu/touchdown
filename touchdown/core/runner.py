@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import logging
+from threading import Thread
+from six.moves.queue import Queue
 
 from . import errors, goals
 
@@ -53,6 +55,20 @@ class Runner(object):
             if changes:
                 yield resource, changes
 
+    def apply_resource(self, progress, resource):
+        for change in self.goal.get_changes(resource):
+            description = list(change.description)
+            self.ui.echo("[{: >6.2%}] [{}] {}".format(progress, resource, description[0]))
+            for line in description[1:]:
+                self.ui.echo("[{: >6.2%}] [{}]     {}".format(progress, resource, line))
+            change.run()
+
+    def apply_resources(self):
+        plan = list(self.goal.get_execution_order().all())
+        for i, resource in enumerate(plan):
+            progress = i / len(plan)
+            self.apply_resource(progress, resource)
+
     def apply(self):
         plan = list(self.plan())
 
@@ -62,4 +78,49 @@ class Runner(object):
         if not self.ui.confirm_plan(plan):
             return
 
-        self.goal.apply(self.ui)
+        self.apply_resources()
+
+
+class ThreadedRunner(Runner):
+
+    workers = 8
+
+    def apply_resources(self):
+        ready = Queue()
+        done = Queue()
+
+        map = self.goal.get_execution_order()
+
+        # A worker thread just pops stuff off the queue and passes it
+        # to self.apply_resource()
+        def worker():
+            while True:
+                resource = ready.get()
+                self.apply_resource(0, resource)
+                done.put(resource)
+                ready.task_done()
+
+        # Start up as many workers as requested.
+        for i in range(self.workers):
+            t = Thread(target=worker)
+            t.daemon = True
+            t.start()
+
+        # Seed the workers with the initial batch of work
+        # These are all the tasks that have no dependencies
+        for resource in map.get_ready():
+            ready.put(resource)
+
+        # Now we block on the "done" queue. Resources put in the queue are
+        # complete - so we can inform the dep solver and ask for any new work
+        # that this might unblock.
+        while not map.empty():
+            resource = done.get()
+            map.complete(resource)
+            for resource in map.get_ready():
+                ready.put(resource)
+            done.task_done()
+
+        # No more dependencies to process - we just need to wait for any
+        # remaining tasks to complete
+        ready.join()

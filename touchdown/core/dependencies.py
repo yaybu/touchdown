@@ -86,3 +86,9 @@ class DependencyMap(object):
             for node in ready:
                 yield node
                 self.complete(node)
+
+    def empty(self):
+        return len(self) == 0
+
+    def __len__(self):
+        return len(self.map)

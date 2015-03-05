@@ -71,17 +71,6 @@ class Goal(six.with_metaclass(GoalType)):
     def get_execution_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
 
-    def apply(self, ui):
-        plan = list(self.get_execution_order().all())
-        for i, resource in enumerate(plan):
-            progress = i / len(plan)
-            for change in self.get_changes(resource):
-                description = list(change.description)
-                ui.echo("[{: >6.2%}] [{}] {}".format(progress, resource, description[0]))
-                for line in description[1:]:
-                    ui.echo("[{: >6.2%}] [{}]     {}".format(progress, resource, line))
-                change.run()
-
 
 class Describe(Goal):
 
