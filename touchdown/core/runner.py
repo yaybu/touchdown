@@ -114,7 +114,7 @@ class ThreadedRunner(Runner):
 
         # Start up as many workers as requested.
         for i in range(self.workers):
-            t = Thread(target=worker)
+            t = Thread(target=worker, name="worker{}".format(i))
             t.daemon = True
             t.start()
 
