@@ -81,12 +81,24 @@ class Runner(object):
         self.apply_resources()
 
 
+class QueueOnce(Queue):
+
+    def _init(self, maxsize):
+        Queue._init(self, maxsize)
+        self._items = set()
+
+    def _put(self, item):
+        if item not in self._items:
+            Queue._put(self, item)
+            self._items.add(item)
+
+
 class ThreadedRunner(Runner):
 
     workers = 8
 
     def apply_resources(self):
-        ready = Queue()
+        ready = QueueOnce()
         done = Queue()
 
         map = self.goal.get_execution_order()
