@@ -122,6 +122,8 @@ class ThreadedRunner(Runner):
         ABORT = object()
 
         map = self.goal.get_execution_order()
+        total = len(map)
+        current = 0
 
         # A worker thread just pops stuff off the queue and passes it
         # to self.apply_resource()
@@ -130,16 +132,17 @@ class ThreadedRunner(Runner):
                 try:
                     active.add(resource)
                     try:
-                        self.apply_resource(0, resource)
+                        self.apply_resource(current / total, resource)
                     finally:
                         active.remove(resource)
                     done.put(resource)
                 except errors.Error as e:
-                    self.ui.echo("[{: >6.2%}] [{}] ERROR: {}".format(0, resource, e))
+                    self.ui.echo("[{: >6.2%}] [{}] ERROR: {}. Stopping.".format(current / total, resource, e))
                     done.put(ABORT)
                     ready.stop()
                     continue
                 except Exception:
+                    self.ui.echo("ERROR: Unhandled error - stopping.")
                     done.put(ABORT)
                     ready.stop()
                     raise
@@ -164,6 +167,8 @@ class ThreadedRunner(Runner):
                 if resource == ABORT:
                     break
 
+                current += 1
+
                 map.complete(resource)
                 for resource in map.get_ready():
                     ready.put(resource)
@@ -173,5 +178,12 @@ class ThreadedRunner(Runner):
 
         # No more dependencies to process - we just need to wait for any
         # remaining tasks to complete
+        remaining = None
         while len(active) > 0:
+            if len(active) != remaining:
+                remaining = len(active)
+                if remaining == 1:
+                    self.ui.echo("{} remaining".format(list(active)[0]))
+                else:
+                    self.ui.echo("{} tasks remaining".format(remaining))
             time.sleep(1)
