@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import logging
+import time
 from threading import Thread
-from six.moves.queue import Queue
+from six.moves import queue
 
 from . import errors, goals
 
@@ -81,15 +82,32 @@ class Runner(object):
         self.apply_resources()
 
 
-class QueueOnce(Queue):
+class InteruptibleQueue(queue.Queue):
+    def _init(self, maxsize):
+        queue.Queue._init(self, maxsize)
+        self.stopped = False
+
+    def stop(self):
+        self.stopped = True
+
+    def __iter__(self):
+        while not self.stopped:
+            try:
+                yield self.get(timeout=1)
+                self.task_done()
+            except queue.Empty:
+                pass
+
+
+class QueueOnce(InteruptibleQueue):
 
     def _init(self, maxsize):
-        Queue._init(self, maxsize)
+        InteruptibleQueue._init(self, maxsize)
         self._items = set()
 
     def _put(self, item):
         if item not in self._items:
-            Queue._put(self, item)
+            InteruptibleQueue._put(self, item)
             self._items.add(item)
 
 
@@ -99,8 +117,8 @@ class ThreadedRunner(Runner):
 
     def apply_resources(self):
         ready = QueueOnce()
-        done = Queue()
-
+        done = InteruptibleQueue()
+        active = set()
         ABORT = object()
 
         map = self.goal.get_execution_order()
@@ -108,20 +126,22 @@ class ThreadedRunner(Runner):
         # A worker thread just pops stuff off the queue and passes it
         # to self.apply_resource()
         def worker():
-            while True:
-                resource = ready.get()
+            for resource in ready:
                 try:
-                    self.apply_resource(0, resource)
+                    active.add(resource)
+                    try:
+                        self.apply_resource(0, resource)
+                    finally:
+                        active.remove(resource)
                     done.put(resource)
-                    ready.task_done()
                 except errors.Error as e:
                     self.ui.echo("[{: >6.2%}] [{}] ERROR: {}".format(0, resource, e))
                     done.put(ABORT)
-                    ready.task_done()
+                    ready.stop()
                     continue
                 except Exception:
                     done.put(ABORT)
-                    ready.task_done()
+                    ready.stop()
                     raise
 
         # Start up as many workers as requested.
@@ -139,12 +159,19 @@ class ThreadedRunner(Runner):
         # complete - so we can inform the dep solver and ask for any new work
         # that this might unblock.
         while not map.empty():
-            resource = done.get()
-            map.complete(resource)
-            for resource in map.get_ready():
-                ready.put(resource)
-            done.task_done()
+            try:
+                resource = done.get(timeout=1)
+                if resource == ABORT:
+                    break
+
+                map.complete(resource)
+                for resource in map.get_ready():
+                    ready.put(resource)
+                done.task_done()
+            except queue.Empty:
+                pass
 
         # No more dependencies to process - we just need to wait for any
         # remaining tasks to complete
-        ready.join()
+        while len(active) > 0:
+            time.sleep(1)
