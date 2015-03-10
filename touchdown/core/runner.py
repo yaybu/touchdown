@@ -101,6 +101,8 @@ class ThreadedRunner(Runner):
         ready = QueueOnce()
         done = Queue()
 
+        ABORT = object()
+
         map = self.goal.get_execution_order()
 
         # A worker thread just pops stuff off the queue and passes it
@@ -108,9 +110,19 @@ class ThreadedRunner(Runner):
         def worker():
             while True:
                 resource = ready.get()
-                self.apply_resource(0, resource)
-                done.put(resource)
-                ready.task_done()
+                try:
+                    self.apply_resource(0, resource)
+                    done.put(resource)
+                    ready.task_done()
+                except errors.Error as e:
+                    self.ui.echo("[{: >6.2%}] [{}] ERROR: {}".format(0, resource, e))
+                    done.put(ABORT)
+                    ready.task_done()
+                    continue
+                except Exception:
+                    done.put(ABORT)
+                    ready.task_done()
+                    raise
 
         # Start up as many workers as requested.
         for i in range(self.workers):
