@@ -47,7 +47,14 @@ class Describe(SimpleDescribe, Plan):
     key = 'Name'
 
     def describe_object_matches(self, bucket):
-        return bucket['Name'] == self.resource.name
+        if bucket['Name'] == self.resource.name:
+            # Sometimes the API returns a bucket that doesn't exist!
+            try:
+                self.client.head_bucket(Bucket=self.resource.name)
+                return True
+            except:
+                return False
+        return False
 
 
 class Apply(SimpleApply, Describe):
