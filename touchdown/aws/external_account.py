@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore import session
-
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
 from .account import BaseAccount, Account
+
+from .session import Session
 
 
 class ExternalRole(BaseAccount):
@@ -52,15 +52,14 @@ class Describe(Plan):
                 **serializers.Resource().render(self.runner, self.resource)
             )
 
-            self._session = session.get_session()
-
             c = self.object['Credentials']
-            self._session.access_key_id = c['AccessKeyId']
-            self._session.secret_access_key = c['SecretAccessKey']
-            self._session.session_token = c['SessionToken']
-            self._session.expiration = c['Expiration']
-
-            self._session.region = self.resource.account.region
+            self._session = Session(
+                access_key_id=c['AccessKeyId'],
+                secret_access_key=c['SecretAccessKey'],
+                session_token=c['SessionToken'],
+                expiration=c['Expiration'],
+                region=self.resource.account.region,
+            )
 
         return self._session
 
@@ -68,11 +67,5 @@ class Describe(Plan):
     def client(self):
         session = self.runner.get_plan(self.resource.account).session
         if not self._client:
-            self._client = session.create_client(
-                service_name="sts",
-                region_name=self.resource.account.region,
-                aws_access_key_id=session.access_key_id,
-                aws_secret_access_key=session.secret_access_key,
-                aws_session_token=session.session_token,
-            )
+            self._client = session.create_client(service_name="sts")
         return self._client

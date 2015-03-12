@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-from botocore import session
-
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from touchdown.core.workspace import Workspace
+
+from .session import Session
 
 
 class BaseAccount(Resource):
@@ -49,13 +47,10 @@ class Describe(Plan):
     @property
     def session(self):
         if not self._session:
-            data_path = os.path.join(os.path.dirname(__file__), "data")
-            self._session = session.get_session({
-                "data_path": ('data_path', 'BOTO_DATA_PATH', data_path),
-            })
-            self._session.access_key_id = self.resource.access_key_id or None
-            self._session.secret_access_key = self.resource.secret_access_key or None
-            self._session.session_token = None
-            self._session.region = self.resource.region
-
+            self._session = Session(
+                access_key_id=self.resource.access_key_id or None,
+                secret_access_key=self.resource.secret_access_key or None,
+                session_token=None,
+                region=self.resource.region,
+            )
         return self._session

@@ -181,13 +181,7 @@ class SimpleDescribe(object):
     def client(self):
         session = self.session
         if not self._client:
-            self._client = session.create_client(
-                service_name=self.service_name,
-                region_name=session.region,
-                aws_access_key_id=session.access_key_id,
-                aws_secret_access_key=session.secret_access_key,
-                aws_session_token=session.session_token,
-            )
+            self._client = session.create_client(self.service_name)
         return self._client
 
     def get_describe_filters(self):
