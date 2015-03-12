@@ -51,7 +51,11 @@ class Runner(object):
         return "\n".join(graph)
 
     def plan(self):
-        self.goal.plan(self.ui)
+        self.goal.reset_changes()
+        resolved = list(self.goal.get_plan_order().all())
+        with self.ui.progress(resolved, label="Creating change plan") as resolved:
+            for resource in resolved:
+                self.goal.get_changes(resource)
 
         for resource in self.goal.get_execution_order().all():
             changes = self.goal.get_changes(resource)

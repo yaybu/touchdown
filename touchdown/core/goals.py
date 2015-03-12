@@ -37,6 +37,9 @@ class Goal(six.with_metaclass(GoalType)):
         self.ui = ui
         self.workspace = workspace
         self.resources = {}
+        self.reset_changes()
+
+    def reset_changes(self):
         self.changes = {}
 
     def get_plan_order(self):
@@ -57,13 +60,6 @@ class Goal(six.with_metaclass(GoalType)):
         if not resource in self.changes:
             self.changes[resource] = list(self.get_plan(resource).get_actions())
         return self.changes[resource]
-
-    def plan(self, ui):
-        self.changes = {}
-        resolved = list(self.get_plan_order().all())
-        with ui.progress(resolved, label="Creating change plan") as resolved:
-            for resource in resolved:
-                self.get_changes(resource)
 
     def is_stale(self):
         return len(self.changes) != 0
