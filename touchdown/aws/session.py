@@ -30,7 +30,7 @@ session = session.get_session({
 
 # Force botocore to initialise - this avoids race conditions around
 # get_component
-session.create_client("ec2")
+session.create_client("ec2", "eu-west-1")
 
 
 class Session(object):
