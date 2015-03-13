@@ -16,7 +16,7 @@ import logging
 
 import click
 
-from touchdown.core.runner import Runner
+from touchdown.core.runner import ThreadedRunner, Runner
 from touchdown.core.workspace import Workspace
 from touchdown.core import errors
 
@@ -51,10 +51,17 @@ class ConsoleInterface(object):
         return click.confirm("Do you want to continue?")
 
 
+def get_runner(ctx, target):
+    if ctx.parent.params['parallel']:
+        return ThreadedRunner(target, ctx.parent.obj, ConsoleInterface())
+    return Runner(target, ctx.parent.obj, ConsoleInterface())
+
+
 @click.group()
 @click.option('--debug/--no-debug', default=False, envvar='DEBUG')
+@click.option('--parallel/--serial', default=False, envvar='PARALLEL')
 @click.pass_context
-def main(ctx, debug):
+def main(ctx, debug, parallel):
     if debug:
         logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
     g = {"workspace": Workspace()}
@@ -67,7 +74,7 @@ def main(ctx, debug):
 @main.command()
 @click.pass_context
 def apply(ctx):
-    r = Runner("apply", ctx.obj, ConsoleInterface())
+    r = get_runner(ctx, "apply")
     try:
         r.apply()
     except errors.Error as e:
@@ -77,7 +84,7 @@ def apply(ctx):
 @main.command()
 @click.pass_context
 def destroy(ctx):
-    r = Runner("destroy", ctx.obj, ConsoleInterface())
+    r = get_runner(ctx, "destroy")
     try:
         r.apply()
     except errors.Error as e:
@@ -87,14 +94,14 @@ def destroy(ctx):
 @main.command()
 @click.pass_context
 def plan(ctx):
-    r = Runner("apply", ctx.obj, ConsoleInterface())
+    r = get_runner(ctx, "apply")
     r.ui.render_plan(r.plan())
 
 
 @main.command()
 @click.pass_context
 def dot(ctx):
-    r = Runner("apply", ctx.obj, ConsoleInterface())
+    r = get_runner(ctx, "apply")
     click.echo(r.dot())
 
 

@@ -5,7 +5,13 @@ Changelog for Touchdown
 ------------------
 
 - Add an experimental threaded resolver for deploying infrastructure in
-  parallel.
+  parallel. If you are using the command line tool you can pass
+  ``--parallel``::
+
+    touchdown --parallel apply
+
+  Users consuming the python API can switch from the ``Runner`` class to
+  ``ThreadedRunner``.
 
 
 0.0.6 (2015-03-04)
