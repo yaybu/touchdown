@@ -20,6 +20,31 @@ other features beyond just deploying configuration changes. Today we can
 visualize your infrastructure to help you see how your components are
 connected, but that is just the beginning.
 
+Goals
+-----
+
+Strict
+    It is frustrating and potentially even dangerous to have an operation fail
+    part way through. It can be costly if it fails part way through a slow
+    operation. So we do as much validation as possible before evening making the
+    first API call.
+
+Declarative
+    The aim is to describe your environment in a declarative way. What should
+    your infrastructure look like, not what changes to make to it. The metadata
+    this gives about your environment is then useful for more than just creating
+    an instance.
+
+Idempotent
+    Being able to run the tool twice and be confident that you won't end up
+    with 2 semi-broken instances. Idempotence means it is safe to apply a
+    configuration multiple times.
+
+Repeatable
+    Once your Touchdown configuration is working you should be able to tear it
+    down and rebuild it, and get something configured exactly the same.
+
+
 Direction
 ---------
 
