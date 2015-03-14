@@ -10,6 +10,7 @@ they physical servers, virtual subnets or private dns records.
 
    overview
    installation
+   cli/touchdown
    tutorial/index
    config/index
    framework
@@ -23,6 +24,7 @@ Getting started
    :doc:`Installation <installation>`
 
  * **CLI:**
+   :doc:`The touchdown command <cli/touchdown>` |
    :doc:`Applying changes <cli/apply>` |
    :doc:`Tearing down environments <cli/destroy>` |
    :doc:`Generating graphs <cli/dot>`
