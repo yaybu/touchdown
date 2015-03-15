@@ -5,6 +5,34 @@ Elastic Compute Cloud
    :synopsis: Elastic Compute Cloud resources.
 
 
+Machine Images
+--------------
+
+.. class:: Image
+
+    This represents a base image that can be used for booting other machines.
+
+    .. attribute:: name
+
+    .. attribute:: description
+
+    .. attribute:: source_ami
+
+        An AMI to base the new AMI on.
+
+    .. attribute:: username
+
+        The username to use when sshing to a new images.
+
+    .. attribute:: steps
+
+        A list of steps to perform on the booted machine.
+
+    .. attribute:: launch_permissions
+
+    .. attribute:: tags
+
+
 Auto Scaling Group
 ------------------
 
