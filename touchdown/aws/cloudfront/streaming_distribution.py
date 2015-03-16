@@ -23,7 +23,7 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy, RefreshMetadata
 
 from ..s3 import Bucket
 
-from .common import S3Origin, CloudFrontList
+from .common import CloudFrontList
 
 
 class StreamingLoggingConfig(Resource):
