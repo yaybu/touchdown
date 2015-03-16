@@ -42,7 +42,7 @@ class CustomOrigin(Resource):
 
     name = argument.String(field='Id')
     domain_name = argument.String(field='DomainName')
-    origin_path = argument.String(default='/', field='OriginPath')
+    origin_path = argument.String(default='', field='OriginPath')
     http_port = argument.Integer(default=80)
     https_port = argument.Integer(default=443)
     protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
