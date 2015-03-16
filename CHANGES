@@ -13,6 +13,20 @@ Changelog for Touchdown
   Users consuming the python API can switch from the ``Runner`` class to
   ``ThreadedRunner``.
 
+- StreamingDistribution should now work.
+
+- You can now create ``ALIAS`` records for Distribution and
+  StreamingDistribution resources::
+
+      aws.add_hosted_zone(
+          name="example.com",
+          records=[
+              {"name": "backend",   "type": "A", "alias": my_load_balancer},
+              {"name": "www",       "type": "A", "alias": my_distribution},
+              {"name": "streaming", "type": "A", "alias": my_streaming_distribution},
+          ],
+      )
+
 
 0.0.6 (2015-03-04)
 ------------------

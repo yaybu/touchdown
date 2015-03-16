@@ -15,7 +15,7 @@ HostedZone
         aws.add_hosted_zone(
             name="example.com",
             records=[
-                {"type": "ALIAS", "load_balancer": my_load_balancer},
+                {"name": "www", "type": "A", "alias": my_load_balancer},
             ],
         )
 
@@ -82,3 +82,4 @@ DNS records
 
           * A :class:`~touchdown.aws.elb.LoadBalancer` instance
           * A CloudFront :class:`~touchdown.aws.cloudfront.Distribution`
+          * A CloudFront :class:`~touchdown.aws.cloudfront.StreamingDistribution`
