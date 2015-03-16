@@ -26,7 +26,8 @@ from touchdown.core import errors
 def private_key_from_string(private_key):
     for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
         try:
-            key = cls.from_private_key(six.BytesIO(private_key))
+            f = six.StringIO(private_key)
+            key = cls.from_private_key(f)
         except paramiko.SSHException:
             continue
         return key
