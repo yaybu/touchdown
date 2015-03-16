@@ -19,7 +19,7 @@ from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 
 from ..account import Account
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy, RefreshMetadata
 
 from ..s3 import Bucket
 
@@ -125,7 +125,7 @@ class Destroy(SimpleDestroy, Describe):
     def get_destroy_serializer(self):
         return serializers.Dict(
             Id=self.resource_id,
-            IfMatch=self.object['ETag'],
+            IfMatch=serializers.Property('ETag'),
         )
 
     def destroy_object(self):
@@ -138,7 +138,7 @@ class Destroy(SimpleDestroy, Describe):
                 self.client.update_streaming_distribution,
                 Id=self.object['Id'],
                 IfMatch=self.object['ETag'],
-                DistributionConfig=serializers.Resource(
+                StreamingDistributionConfig=serializers.Resource(
                     Enabled=False,
                 ),
             )
@@ -147,6 +147,8 @@ class Destroy(SimpleDestroy, Describe):
                 ["Waiting for streaming distribution to enter disabled state"],
                 "streaming_distribution_deployed",
             )
+
+            yield RefreshMetadata(self)
 
         for change in super(Destroy, self).destroy_object():
             yield change

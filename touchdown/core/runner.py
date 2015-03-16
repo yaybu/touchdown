@@ -78,7 +78,7 @@ class Runner(object):
         plan = list(self.plan())
 
         if not len(plan):
-            raise errors.NothingChanged()
+            raise errors.NothingChanged("Planning stage found no changes were required.")
 
         if not self.ui.confirm_plan(plan):
             return
