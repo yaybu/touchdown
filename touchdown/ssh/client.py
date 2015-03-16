@@ -30,6 +30,7 @@ def private_key_from_string(private_key):
         except paramiko.SSHException:
             continue
         return key
+    raise paramiko.SSHException('not a valid private key file')
 
 
 class Client(paramiko.SSHClient):
