@@ -23,6 +23,7 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy, RefreshMetadata
 
 from ..iam import ServerCertificate
 from ..s3 import Bucket
+from .. import route53
 
 from .common import S3Origin, CloudFrontList, CloudFrontResourceList
 
@@ -283,3 +284,23 @@ class Destroy(SimpleDestroy, Describe):
 
         for change in super(Destroy, self).destroy_object():
             yield change
+
+
+class AliasTarget(route53.AliasTarget):
+
+    """ Adapts a Distribution into a AliasTarget """
+
+    input = Distribution
+
+    def get_serializer(self, runner, **kwargs):
+        return serializers.Context(
+            serializers.Const(self.adapts),
+            serializers.Dict(
+                DNSName=serializers.Context(
+                    serializers.Property("DomainName"),
+                    serializers.Expression(lambda r, o: route53._normalize(o)),
+                ),
+                HostedZoneId="Z2FDTNDATAQYW2",
+                EvaluateTargetHealth=False,
+            )
+        )
