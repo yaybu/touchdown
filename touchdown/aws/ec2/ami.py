@@ -85,7 +85,7 @@ class BuildInstance(Action):
         return security_group
 
     def destroy_security_group(self, security_group):
-        self.plan.echo("Deleting temproary security group")
+        self.plan.echo("Deleting temporary security group")
         self.plan.client.delete_security_group(
             GroupId=security_group["GroupId"],
         )
@@ -99,7 +99,7 @@ class BuildInstance(Action):
         return keypair
 
     def destroy_keypair(self, keypair):
-        self.plan.echo("Deleting temproary keypair")
+        self.plan.echo("Deleting temporary keypair")
         self.plan.client.delete_key_pair(
             KeyName=keypair["KeyName"],
         )
