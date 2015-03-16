@@ -15,6 +15,7 @@
 import binascii
 import os
 import socket
+import sys
 import time
 
 import six
@@ -37,12 +38,29 @@ def private_key_from_string(private_key):
 class Client(paramiko.SSHClient):
 
     connection_attempts = 20
+    input_encoding = None
 
     def __init__(self, *args, **kwargs):
         super(Client, self).__init__(*args, **kwargs)
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    def _run(self, transport, command):
+    def _maybe_decode(self, recv, n, encoding=None):
+        result = recv(n)
+        if encoding is not None:
+            result = result.decode(encoding)
+        else:
+            result = result.decode('utf8', 'replace')
+        return result
+
+    def _run(self, transport, command, input_encoding=None,
+             output_encoding=None, stdout=None):
+        if stdout is None:
+            stdout = sys.stdout
+        if input_encoding is None:
+            input_encoding = self.input_encoding
+        if output_encoding is None and hasattr(stdout, 'encoding'):
+            # as in sys.stdout
+            output_encoding = stdout.encoding
         channel = transport.open_session()
         try:
             channel.exec_command(command)
@@ -54,16 +72,20 @@ class Client(paramiko.SSHClient):
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    print(channel.recv(1024))
+                    buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+                    print(buf, file=stdout)
                 while channel.recv_stderr_ready():
-                    print(channel.recv_stderr(1024))
+                    buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
+                    print(buf, file=stdout)
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
             while channel.recv_ready():
-                print(channel.recv(1024))
+                buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+                print(buf, file=stdout)
             while channel.recv_stderr_ready():
-                print(channel.recv_stderr(1024))
+                buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
+                print(buf, file=stdout)
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
@@ -98,6 +120,15 @@ class Client(paramiko.SSHClient):
         # but rubbish for developers D:
         return
 
+    def get_input_encoding(self):
+        result_buf = six.StringIO()
+        transport = self.get_transport()
+        self._run(transport, 'printenv LANG', stdout=result_buf)
+        result_buf.seek(0)
+        lang = result_buf.read()
+        if '.' in lang:
+            self.input_encoding = lang.rsplit('.', 1)[-1]
+
     def connect(self, **kwargs):
         for i in range(self.connection_attempts):
             try:
@@ -111,3 +142,4 @@ class Client(paramiko.SSHClient):
             raise errors.Error("Unable to connect to remove server after {} tries".format(self.connection_attempts))
 
         self.verify_transport()
+        self.get_input_encoding()
