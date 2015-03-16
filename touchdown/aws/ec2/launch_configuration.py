@@ -20,6 +20,7 @@ from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
+from touchdown.core.utils import force_str
 
 from .keypair import KeyPair
 
@@ -78,7 +79,7 @@ class LaunchConfiguration(Resource):
     def matches(self, runner, remote):
         if "UserData" in remote and remote["UserData"]:
             import base64
-            remote["UserData"] = base64.b64decode(remote["UserData"])
+            remote["UserData"] = force_str(base64.b64decode(remote["UserData"]))
         return super(LaunchConfiguration, self).matches(runner, remote)
 
 
