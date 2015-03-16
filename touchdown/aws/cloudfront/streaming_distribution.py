@@ -48,17 +48,20 @@ class StreamingDistribution(Resource):
             serializers.Context(serializers.Argument("name"), serializers.ListOfOne()),
             serializers.Context(serializers.Argument("aliases"), serializers.List()),
         )),
+        "TrustedSigners": serializers.Const({
+            "Enabled": False,
+            "Quantity": 0,
+        }),
+        "S3Origin": serializers.Resource(group="s3origin"),
     }
 
     name = argument.String()
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
     aliases = argument.List()
     enabled = argument.Boolean(default=True, field="Enabled")
-    origin = argument.Resource(
-        S3Origin,
-        field="S3Origin",
-        serializer=serializers.Resource(),
-    )
+
+    bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()), group="s3origin")
+    origin_access_identity = argument.String(default='', field="OriginAccessIdentity", group="s3origin")
     logging = argument.Resource(
         StreamingLoggingConfig,
         default=lambda instance: dict(enabled=False),
@@ -106,7 +109,7 @@ class Apply(SimpleApply, Describe):
 
     signature = (
         Present("name"),
-        Present("origin"),
+        Present("bucket"),
     )
 
     def get_create_serializer(self):
