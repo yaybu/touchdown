@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-
-from botocore.exceptions import ClientError
-
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
