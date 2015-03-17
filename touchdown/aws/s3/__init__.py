@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from .bucket import Bucket
+from .file import File
 
 __all__ = [
     'Bucket',
+    'File',
 ]

@@ -42,6 +42,7 @@ class CustomOrigin(Resource):
 
     name = argument.String(field='Id')
     domain_name = argument.String(field='DomainName')
+    origin_path = argument.String(default='', field='OriginPath')
     http_port = argument.Integer(default=80)
     https_port = argument.Integer(default=443)
     protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
@@ -219,7 +220,11 @@ class Describe(SimpleDescribe, Plan):
         distribution = super(Describe, self).describe_object()
         if distribution:
             result = self.client.get_distribution(Id=distribution['Id'])
-            distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
+            distribution = {
+                "ETag": result["ETag"],
+                "Id": distribution["Id"],
+                "DomainName": result["Distribution"]["DomainName"],
+            }
             distribution.update(result['Distribution']['DistributionConfig'])
             return distribution
 

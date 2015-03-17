@@ -43,4 +43,5 @@ class S3Origin(Resource):
 
     name = argument.String(field='Id')
     bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()))
+    origin_path = argument.String(default='', field="OriginPath")
     origin_access_identity = argument.String(default='')
