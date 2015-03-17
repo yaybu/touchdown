@@ -27,6 +27,15 @@ Changelog for Touchdown
           ],
       )
 
+- You can now set CORS and policy for S3 buckets. You can also do simple file
+  uploads with the new file resource::
+
+      bucket = aws.add_bucket(name="my-test-bucket")
+      bucket.add_file(
+          name="crossdomain.xml",
+          contents=open("crossdomain.xml").read(),
+      )
+
 
 0.0.6 (2015-03-04)
 ------------------
