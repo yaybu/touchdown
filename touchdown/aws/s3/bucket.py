@@ -86,7 +86,7 @@ class Apply(SimpleApply, Describe):
         update_cors = False
         if not self.object:
             update_cors = True
-        else:
+        elif self.resource.rules:
             try:
                 remote = self.client.get_bucket_cors(Bucket=self.resource.name)["CORSRules"]
             except ClientError as e:
@@ -110,7 +110,7 @@ class Apply(SimpleApply, Describe):
         update_policy = False
         if not self.object:
             update_policy = True
-        else:
+        elif self.resource.policy:
             try:
                 remote = self.client.get_bucket_policy(Bucket=self.resource.name)["Policy"]
             except ClientError as e:
