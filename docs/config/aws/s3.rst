@@ -61,11 +61,42 @@ Simple storage service
 Adding files to buckets
 -----------------------
 
-Touchdown has basic support for pushing files to S3. This is lightweight and
-basic. It's using for setting up things like crossdomain.xml::
+.. class:: File
 
-    bucket = aws.add_bucket(name="my-test-bucket")
-    bucket.add_file(
-        name="crossdomain.xml",
-        contents=open("crossdomain.xml").read(),
-    )
+    Touchdown has basic support for pushing files to S3. This is lightweight and
+    basic. It's using for setting up things like crossdomain.xml::
+
+        bucket = aws.add_bucket(name="my-test-bucket")
+        bucket.add_file(
+            name="crossdomain.xml",
+            contents=open("crossdomain.xml").read(),
+            acl="public-read",
+        )
+
+    .. attribute:: name
+
+    .. attribute:: contents
+
+    .. attribute: acl
+
+        Set one of the canned ACL's.
+
+        ``private``
+            Owner gets ``FULL_CONTROL``. No one else has access rights. This
+            is the default.
+        ``public-read``
+            Owner gets ``FULL_CONTROL``. The ``AllUsers group`` gets ``READ``
+            access.
+        ``public-read-write``
+            Owner gets ``FULL_CONTROL``. The ``AllUsers`` group gets ``READ``
+            and ``WRITE`` access. Granting this on a bucket is generally not
+            recommended.
+        ``authenticated-read``
+            Owner gets ``FULL_CONTROL``. The ``AuthenticatedUsers`` group gets
+            ``READ`` access.
+        ``bucket-owner-read``
+            Object owner gets ``FULL_CONTROL``. Bucket owner gets ``READ``
+            access.
+        ``bucket-owner-full-control``
+            Both the object owner and the bucket owner get ``FULL_CONTROL``
+            over the object.
