@@ -103,7 +103,7 @@ class Apply(SimpleApply, Describe):
                 self.client.put_bucket_cors,
                 Bucket=self.resource.name,
                 CORSConfiguration=dict(
-                    CORSRules=local,
+                    CORSRules=[serializers.Resource().render(self.runner, rule) for rule in self.resource.rules],
                 ),
             )
 

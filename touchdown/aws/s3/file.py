@@ -27,6 +27,13 @@ class File(Resource):
 
     name = argument.String(field="Key")
     contents = argument.String(field="Body")
+
+    acl = argument.String(
+        default="private",
+        choices=["private", "public-read", "public-read-write", "authenticated-read", "bucket-owner-read", "bucket-owner-full-control"],
+        field="ACL",
+    )
+
     bucket = argument.Resource(Bucket, field="Bucket")
 
 
@@ -39,6 +46,10 @@ class Describe(SimpleDescribe, Plan):
     key = 'Name'
 
     def get_describe_filters(self):
+        if not self.runner.get_plan(self.resource.bucket).resource_id:
+            # If the bucket doesn't exist yet, the file can't. So bail out.
+            return
+
         return {
             "Bucket": self.resource.bucket.name,
         }
