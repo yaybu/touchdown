@@ -24,3 +24,35 @@ Simple storage service
 
         The region of the bucket. The default is to create the bucket in the
         sane region as the region specified by the account.
+
+    .. attribute:: rules
+
+        A list of CORS rules::
+
+            aws.add_bucket(
+                name="my-test-bucket",
+                rules=[{
+                    "allowed_methods": ["PUT", "POST", "GET"],
+                    "allowed_origins": ["*"],
+                    "allowed_headers": ["content-md5"],
+                    "expose_headers" :["ETag"],
+                    "max_age_seconds": 3000,
+                }],
+            )
+
+    .. attribute:: policy
+
+        An S3 bucket policy string::
+
+            aws.add_bucket(
+                name="my-test-bucket",
+                policy= json.dumps({
+                    "Version":"2008-10-17",
+                    "Statement":[{
+                        "Sid":"AllowFullControlForBucketOwner",
+                        "Effect":"Allow",
+                        "Principal":{"AWS":"arn:aws:iam::111111111111:root"},
+                        "Action":"s3:*",
+                        "Resource":"arn:aws:s3:::my-test-bucket/*"}],
+                }),
+            )
