@@ -56,3 +56,16 @@ Simple storage service
                         "Resource":"arn:aws:s3:::my-test-bucket/*"}],
                 }),
             )
+
+
+Adding files to buckets
+-----------------------
+
+Touchdown has basic support for pushing files to S3. This is lightweight and
+basic. It's using for setting up things like crossdomain.xml::
+
+    bucket = aws.add_bucket(name="my-test-bucket")
+    bucket.add_file(
+        name="crossdomain.xml",
+        contents=open("crossdomain.xml").read(),
+    )
