@@ -220,7 +220,11 @@ class Describe(SimpleDescribe, Plan):
         distribution = super(Describe, self).describe_object()
         if distribution:
             result = self.client.get_distribution(Id=distribution['Id'])
-            distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
+            distribution = {
+                "ETag": result["ETag"],
+                "Id": distribution["Id"],
+                "DomainName": result["Distribution"]["DomainName"],
+            }
             distribution.update(result['Distribution']['DistributionConfig'])
             return distribution
 
