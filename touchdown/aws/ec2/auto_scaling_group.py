@@ -268,13 +268,7 @@ class Instance(ssh.Instance):
 
         # Annoyingly we have to get antother client (different API) to get info
         # on teh EC2 instances in our asg
-        client = plan.session.create_client(
-            service_name="ec2",
-            region_name=plan.session.region,
-            aws_access_key_id=plan.session.access_key_id,
-            aws_secret_access_key=plan.session.secret_access_key,
-            aws_session_token=plan.session.session_token,
-        )
+        client = plan.session.create_client("ec2")
 
         reservations = client.describe_instances(
             InstanceIds=[
