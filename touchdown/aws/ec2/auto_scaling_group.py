@@ -77,7 +77,7 @@ class ReplaceInstances(Action):
 
     @property
     def description(self):
-        yield "Replace stale inances"
+        yield "Replace stale instances"
         for instance_id in self.instance_ids:
             yield instance_id
 
