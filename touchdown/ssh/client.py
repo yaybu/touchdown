@@ -114,29 +114,40 @@ class Client(paramiko.SSHClient):
         finally:
             sftp.close()
 
+    def check_output(self, command):
+        result_buf = six.StringIO()
+        self._run(self.get_transport(), command, stdout=result_buf)
+        return 0, result_buf.getvalue(), ""
+
     def verify_transport(self):
-        # FIXME: Run a shell command like 'false' and make sure it returns false
-        # Then run a shell command like 'whoami' and make sure it has exit code 0 and returns the right user
         # Some weird AMI's hijack SSH a bit and allow authentication to succeed, but then return an error
         # when the user tries to run any command. Great if SSHing in from terminal
         # but rubbish for developers D:
-        return
 
-    def get_input_encoding(self):
-        result_buf = six.StringIO()
-        transport = self.get_transport()
+        # FIXME: Run a shell command like 'false' and make sure it returns false
+
         try:
-            self._run(transport, 'printenv LANG', stdout=result_buf)
+            whoami = self.check_output('whoami')[1].strip()
+        except errors.RemoteCommandFailed:
+            raise errors.Error("Unable to selftest SSH connection (whoami failed)")
+
+        if whoami != self.get_transport().get_username():
+            raise errors.Error(
+                "Tried to connect as {}, but ended up connected as {}".format(
+                    whoami,
+                    whoami,
+                )
+            )
+
+    def set_input_encoding(self):
+        try:
+            lang = self.check_output('printenv LANG')
         except errors.RemoteCommandFailed:
             try:
-                self._run(transport, 'printenv LC_CTYPE', stdout=result_buf)
+                lang = self.check_output('printenv LC_CTYPE')
             except errors.RemoteCommandFailed:
-                # Assume UTF-8
-                result_buf.write('UTF-8')
-        result_buf.seek(0)
-        lang = result_buf.read()
-        if '.' in lang:
-            self.input_encoding = lang.rsplit('.', 1)[-1]
+                lang = 'UTF-8'
+        self.input_encoding = lang.rsplit('.', 1)[-1]
 
     def connect(self, **kwargs):
         for i in range(self.connection_attempts):
@@ -151,4 +162,4 @@ class Client(paramiko.SSHClient):
             raise errors.Error("Unable to connect to remove server after {} tries".format(self.connection_attempts))
 
         self.verify_transport()
-        self.get_input_encoding()
+        self.set_input_encoding()
