@@ -54,15 +54,11 @@ class Client(paramiko.SSHClient):
             result = result.decode('utf8', 'replace')
         return result
 
-    def _run(self, transport, command, input_encoding=None,
-             output_encoding=None, stdout=None):
+    def _run(self, transport, command, input_encoding=None, stdout=None):
         if stdout is None:
             stdout = sys.stdout
         if input_encoding is None:
             input_encoding = self.input_encoding
-        if output_encoding is None and hasattr(stdout, 'encoding'):
-            # as in sys.stdout
-            output_encoding = stdout.encoding
         channel = transport.open_session()
         try:
             channel.exec_command(command)
