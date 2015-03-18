@@ -73,23 +73,23 @@ class Client(paramiko.SSHClient):
             while not exit_status_ready:
                 while channel.recv_ready():
                     buf = self._maybe_decode(channel.recv, 1024, input_encoding)
-                    print(buf, file=stdout)
+                    print(buf, file=stdout, end='')
                 while channel.recv_stderr_ready():
                     buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
-                    print(buf, file=stdout)
+                    print(buf, file=stdout, end='')
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
             while channel.recv_ready():
                 buf = self._maybe_decode(channel.recv, 1024, input_encoding)
-                print(buf, file=stdout)
+                print(buf, file=stdout, end='')
             while channel.recv_stderr_ready():
                 buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
-                print(buf, file=stdout)
+                print(buf, file=stdout, end='')
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
-                raise errors.Error("Bundle deployment failed with exit code: {}".format(exit_code))
+                raise errors.RemoteCommandFailed(exit_code)
         finally:
             channel.close()
 
@@ -123,7 +123,14 @@ class Client(paramiko.SSHClient):
     def get_input_encoding(self):
         result_buf = six.StringIO()
         transport = self.get_transport()
-        self._run(transport, 'printenv LANG', stdout=result_buf)
+        try:
+            self._run(transport, 'printenv LANG', stdout=result_buf)
+        except errors.RemoteCommandFailed:
+            try:
+                self._run(transport, 'printenv LC_CTYPE', stdout=result_buf)
+            except errors.RemoteCommandFailed:
+                # Assume UTF-8
+                result_buf.write('UTF-8')
         result_buf.seek(0)
         lang = result_buf.read()
         if '.' in lang:

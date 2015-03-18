@@ -84,7 +84,7 @@ class Apply(SimpleApply, Describe):
 
     def update_object(self):
         update_cors = False
-        if not self.object:
+        if not self.object and self.resource.rules:
             update_cors = True
         elif self.resource.rules:
             try:
@@ -92,7 +92,7 @@ class Apply(SimpleApply, Describe):
             except ClientError as e:
                 if e.response['Error']['Code'] != "NoSuchCORSConfiguration":
                     raise
-                remote = None
+                remote = []
             local = [serializers.Resource().render(self.runner, rule) for rule in self.resource.rules]
             if remote != local:
                 update_cors = True
@@ -108,7 +108,7 @@ class Apply(SimpleApply, Describe):
             )
 
         update_policy = False
-        if not self.object:
+        if not self.object and self.resource.policy:
             update_policy = True
         elif self.resource.policy:
             try:
@@ -118,7 +118,7 @@ class Apply(SimpleApply, Describe):
                     raise
                 remote = None
 
-            if self.resource.policy and json.loads(remote) != json.loads(self.resource.policy):
+            if self.resource.policy and (remote is None or json.loads(remote) != json.loads(self.resource.policy)):
                 update_policy = True
 
         if update_policy:
