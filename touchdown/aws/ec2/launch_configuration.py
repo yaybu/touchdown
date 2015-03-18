@@ -98,8 +98,11 @@ class Describe(SimpleDescribe, Plan):
         if not lc["LaunchConfigurationName"].startswith(self.resource.name + "."):
             return False
 
-        serial = lc["LaunchConfigurationName"].rsplit(".", 1)[1]
-        self.biggest_serial = max(int(serial), self.biggest_serial)
+        try:
+            serial = lc["LaunchConfigurationName"].rsplit(".", 1)[1]
+            self.biggest_serial = max(int(serial), self.biggest_serial)
+        except (IndexError, TypeError, ValueError):
+            pass
 
         if self.resource.matches(self.runner, lc):
             return True

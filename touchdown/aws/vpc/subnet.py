@@ -68,6 +68,7 @@ class Describe(SimpleDescribe, Plan):
         return {
             "Filters": [
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
+                {'Name': 'vpcId', 'Values': [vpc.resource_id]},
             ],
         }
 

@@ -17,6 +17,19 @@ class Error(Exception):
     pass
 
 
+class RemoteCommandFailed(Error):
+
+    def __init__(self, exit_code, stdout=None, stderr=None):
+        self.exit_code = exit_code
+        self.stdout = stdout
+        self.stderr = stderr
+        Error.__init__(self, str(self))
+
+    def __str__(self):
+        return "Bundle deployment failed with exit code: {}".format(
+            self.exit_code)
+
+
 class NothingChanged(Error):
     pass
 
