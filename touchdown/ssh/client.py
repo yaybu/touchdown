@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+
 import binascii
 import os
 import socket
+import sys
 import time
 
 import six
@@ -26,21 +29,36 @@ from touchdown.core import errors
 def private_key_from_string(private_key):
     for cls in (paramiko.RSAKey, paramiko.ECDSAKey, paramiko.DSSKey):
         try:
-            key = cls.from_private_key(six.BytesIO(private_key))
+            f = six.StringIO(private_key)
+            key = cls.from_private_key(f)
         except paramiko.SSHException:
             continue
         return key
+    raise paramiko.SSHException('not a valid private key file')
 
 
 class Client(paramiko.SSHClient):
 
     connection_attempts = 20
+    input_encoding = None
 
     def __init__(self, *args, **kwargs):
         super(Client, self).__init__(*args, **kwargs)
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    def _run(self, transport, command):
+    def _maybe_decode(self, recv, n, encoding=None):
+        result = recv(n)
+        if encoding is not None:
+            result = result.decode(encoding)
+        else:
+            result = result.decode('utf8', 'replace')
+        return result
+
+    def _run(self, transport, command, input_encoding=None, stdout=None):
+        if stdout is None:
+            stdout = sys.stdout
+        if input_encoding is None:
+            input_encoding = self.input_encoding
         channel = transport.open_session()
         try:
             channel.exec_command(command)
@@ -52,20 +70,24 @@ class Client(paramiko.SSHClient):
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    print(channel.recv(1024))
+                    buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+                    print(buf, file=stdout, end='')
                 while channel.recv_stderr_ready():
-                    print(channel.recv_stderr(1024))
+                    buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
+                    print(buf, file=stdout, end='')
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
             while channel.recv_ready():
-                print(channel.recv(1024))
+                buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+                print(buf, file=stdout, end='')
             while channel.recv_stderr_ready():
-                print(channel.recv_stderr(1024))
+                buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
+                print(buf, file=stdout, end='')
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
-                raise errors.Error("Bundle deployment failed with exit code: {}".format(exit_code))
+                raise errors.RemoteCommandFailed(exit_code)
         finally:
             channel.close()
 
@@ -88,13 +110,40 @@ class Client(paramiko.SSHClient):
         finally:
             sftp.close()
 
+    def check_output(self, command):
+        result_buf = six.StringIO()
+        self._run(self.get_transport(), command, stdout=result_buf)
+        return 0, result_buf.getvalue(), ""
+
     def verify_transport(self):
-        # FIXME: Run a shell command like 'false' and make sure it returns false
-        # Then run a shell command like 'whoami' and make sure it has exit code 0 and returns the right user
         # Some weird AMI's hijack SSH a bit and allow authentication to succeed, but then return an error
         # when the user tries to run any command. Great if SSHing in from terminal
         # but rubbish for developers D:
-        return
+
+        # FIXME: Run a shell command like 'false' and make sure it returns false
+
+        try:
+            whoami = self.check_output('whoami')[1].strip()
+        except errors.RemoteCommandFailed:
+            raise errors.Error("Unable to selftest SSH connection (whoami failed)")
+
+        if whoami != self.get_transport().get_username():
+            raise errors.Error(
+                "Tried to connect as {}, but ended up connected as {}".format(
+                    whoami,
+                    whoami,
+                )
+            )
+
+    def set_input_encoding(self):
+        try:
+            lang = self.check_output('printenv LANG')
+        except errors.RemoteCommandFailed:
+            try:
+                lang = self.check_output('printenv LC_CTYPE')
+            except errors.RemoteCommandFailed:
+                lang = 'UTF-8'
+        self.input_encoding = lang.rsplit('.', 1)[-1]
 
     def connect(self, **kwargs):
         for i in range(self.connection_attempts):
@@ -109,3 +158,4 @@ class Client(paramiko.SSHClient):
             raise errors.Error("Unable to connect to remove server after {} tries".format(self.connection_attempts))
 
         self.verify_transport()
+        self.set_input_encoding()
