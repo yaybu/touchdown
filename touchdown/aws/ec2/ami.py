@@ -39,6 +39,7 @@ class Image(Resource):
     description = argument.String(field="Description")
 
     source_ami = argument.String()
+    instance_type = argument.String(default="m3.medium")
 
     username = argument.String()
     steps = argument.List(argument.Resource(Step))
@@ -108,7 +109,7 @@ class BuildInstance(Action):
         self.plan.echo("Creating a source instance from {}".format(self.resource.source_ami))
         reservations = self.plan.client.run_instances(
             ImageId=self.resource.source_ami,
-            InstanceType="m1.small",
+            InstanceType=self.plan.resource.instance_type,
             MaxCount=1,
             MinCount=1,
             KeyName=keypair['KeyName'],
