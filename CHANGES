@@ -13,7 +13,15 @@ Changelog for Touchdown
   Users consuming the python API can switch from the ``Runner`` class to
   ``ThreadedRunner``.
 
-- StreamingDistribution should now work.
+- StreamingDistribution should now work. It's API has been simplified too. You
+  can set one up with::
+
+      aws.add_streaming_distribution(
+          name="streaming.example.com",
+          bucket=mybucket,
+      )
+
+  Where ``mybucket`` was previously defined with ``aws.add_bucket``.
 
 - You can now create ``ALIAS`` records for Distribution and
   StreamingDistribution resources::
@@ -35,6 +43,12 @@ Changelog for Touchdown
           name="crossdomain.xml",
           contents=open("crossdomain.xml").read(),
       )
+
+  You can set canned ACL's on the files as well.
+
+- You can now set the ``origin_path`` attribute of CloudFront.
+
+- Improved python 3 support.
 
 
 0.0.6 (2015-03-04)

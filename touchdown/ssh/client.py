@@ -137,10 +137,10 @@ class Client(paramiko.SSHClient):
 
     def set_input_encoding(self):
         try:
-            lang = self.check_output('printenv LANG')
+            lang = self.check_output('printenv LANG')[1]
         except errors.RemoteCommandFailed:
             try:
-                lang = self.check_output('printenv LC_CTYPE')
+                lang = self.check_output('printenv LC_CTYPE')[1]
             except errors.RemoteCommandFailed:
                 lang = 'UTF-8'
         self.input_encoding = lang.rsplit('.', 1)[-1]
