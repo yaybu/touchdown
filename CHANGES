@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.7 (unreleased)
+0.0.7 (2015-03-23)
 ------------------
 
 - Add an experimental threaded resolver for deploying infrastructure in
