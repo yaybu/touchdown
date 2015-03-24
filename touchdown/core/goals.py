@@ -14,23 +14,23 @@
 
 from __future__ import division
 
-import six
-
 from . import dependencies, plan
 
 
-class GoalType(type):
+class GoalFactory(object):
 
-    def __new__(meta, class_name, bases, new_attrs):
-        cls = type.__new__(meta, class_name, bases, new_attrs)
-        if hasattr(cls, "name"):
-            cls.goals[cls.name] = cls
-        return cls
+    def __init__(self):
+        self.goals = {}
+
+    def register(self, cls):
+        self.goals[cls.name] = cls
+
+    def create(self, name, workspace, ui):
+        return self.goals[name](workspace, ui)
 
 
-class Goal(six.with_metaclass(GoalType)):
+class Goal(object):
 
-    goals = {}
     execute_in_reverse = False
 
     def __init__(self, workspace, ui):
@@ -99,3 +99,9 @@ class Destroy(Goal):
         if not "never-destroy" in resource.policies:
             return resource.meta.plans.get("destroy", resource.meta.plans.get("describe", plan.NullPlan))
         return resource.meta.plans.get("describe", plan.NullPlan)
+
+
+goals = GoalFactory()
+goals.register(Describe)
+goals.register(Apply)
+goals.register(Destroy)
