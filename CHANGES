@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.0.8 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add's support for copying images created with ``add_image`` to other regions.
 
 
 0.0.7 (2015-03-23)

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
 try:
     from contextlib import ExitStack
 except ImportError:
@@ -172,20 +171,15 @@ class BuildInstance(Action):
             self.deploy_instance(keypair, instance)
 
             self.plan.echo("Creating image")
-            self.plan.client.create_image(
+            image = self.plan.client.create_image(
                 Name=self.resource.name,
                 InstanceId=instance['InstanceId'],
             )
 
             self.plan.echo("Waiting for image to become available")
-            # self.plan.client.get_waiter("ami_available").wait(ImageId=[image["ImageId"]])
-            for i in range(20):
-                self.plan.object = self.plan.describe_object()
-                if self.plan.object.get("State", "pending") == "available":
-                    self.plan.echo("Image '{}' built.".format(self.plan.object["ImageId"]))
-                    return
-                time.sleep(15)
-            raise errors.Error("Image didn't become available")
+            self.plan.client.get_waiter("image_available").wait(ImageId=[image["ImageId"]])
+
+        self.plan.echo("Image {} is now available".format(image["ImageId"]))
 
 
 class Describe(SimpleDescribe, Plan):

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .ami import Image
+from .ami_copy import ImageCopy
 from .keypair import KeyPair
 from .auto_scaling_group import AutoScalingGroup
 from .launch_configuration import LaunchConfiguration
@@ -20,6 +21,7 @@ from .launch_configuration import LaunchConfiguration
 
 __all__ = [
     'Image',
+    'ImageCopy',
     'KeyPair',
     'AutoScalingGroup',
     'LaunchConfiguration',
