@@ -4,6 +4,16 @@ Changelog for Touchdown
 0.0.8 (unreleased)
 ------------------
 
+- The s3 describe step now retrieves the location a bucket was created in.
+
+- S3 buckets are now created with a LocationConstraint based on the account
+  resource. For example::
+
+      aws = workspace.add_aws(region='eu-central-1')
+      aws.add_bucket(name='my-bucket')
+
+  Will now create the bucket in eu-central-1, like you would expect.
+
 - Add's support for copying images created with ``add_image`` to other regions.
 
 

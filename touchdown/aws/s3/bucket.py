@@ -43,6 +43,7 @@ class Bucket(Resource):
     name = argument.String(field="Bucket")
 
     region = argument.String(
+        default=lambda instance: instance.account.region,
         field="CreateBucketConfiguration",
         serializer=serializers.Dict(
             LocationConstraint=serializers.Identity(),
