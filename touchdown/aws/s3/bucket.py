@@ -78,7 +78,10 @@ class Describe(SimpleDescribe, Plan):
     def describe_object(self):
         bucket = super(Describe, self).describe_object()
         if bucket:
-            bucket["LocationConstraint"] = self.client.get_bucket_location(Bucket=self.resource.name)
+            bucket["LocationConstraint"] = self.client.get_bucket_location(
+                Bucket=self.resource.name)['LocationConstraint']
+            if bucket['LocationConstraint'] is None:
+                bucket['LocationConstraint'] = 'us-east-1'
         return bucket
 
 
