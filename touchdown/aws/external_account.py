@@ -67,5 +67,5 @@ class Describe(Plan):
     def client(self):
         session = self.runner.get_plan(self.resource.account).session
         if not self._client:
-            self._client = session.create_client(service_name="sts")
+            self._client = session.create_client("sts")
         return self._client

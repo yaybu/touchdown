@@ -130,7 +130,7 @@ class Client(paramiko.SSHClient):
         if whoami != self.get_transport().get_username():
             raise errors.Error(
                 "Tried to connect as {}, but ended up connected as {}".format(
-                    whoami,
+                    self.get_transport().get_username(),
                     whoami,
                 )
             )

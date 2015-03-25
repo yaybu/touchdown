@@ -35,10 +35,11 @@ session.create_client("ec2", "eu-west-1")
 
 class Session(object):
 
-    def __init__(self, access_key_id, secret_access_key, session_token, region):
+    def __init__(self, access_key_id, secret_access_key, session_token, expiration, region):
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.session_token = session_token
+        self.expiration = expiration
         self.region = region
 
     def create_client(self, service):

@@ -51,6 +51,7 @@ class Describe(Plan):
                 access_key_id=self.resource.access_key_id or None,
                 secret_access_key=self.resource.secret_access_key or None,
                 session_token=None,
+                expiration=None,
                 region=self.resource.region,
             )
         return self._session
