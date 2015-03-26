@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.8 (unreleased)
+0.0.8 (2015-03-26)
 ------------------
 
 - The s3 describe step now retrieves the location a bucket was created in.
