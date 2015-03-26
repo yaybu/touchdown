@@ -177,7 +177,7 @@ class BuildInstance(Action):
             )
 
             self.plan.echo("Waiting for image to become available")
-            self.plan.client.get_waiter("image_available").wait(ImageId=[image["ImageId"]])
+            self.plan.client.get_waiter("image_available").wait(ImageIds=[image["ImageId"]])
 
         self.plan.echo("Image {} is now available".format(image["ImageId"]))
 

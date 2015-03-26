@@ -36,15 +36,17 @@ class ImageCopy(Resource):
 
     account = argument.Resource(BaseAccount)
 
-    def get_serializer(self):
-        return serializers.Resource(
-            SourceRegion=self.source.account.region,
-        )
+    extra_serializers = {
+        "SourceRegion": serializers.Expression(lambda runner, obj: obj.source.account.region),
+    }
+
+    def __str__(self):
+        return "image_copy '{}' (copy from {} to {})".format(self.name, self.source.account.region, self.account.region)
 
 
 class Describe(SimpleDescribe, Plan):
 
-    resource = Image
+    resource = ImageCopy
     service_name = 'ec2'
     describe_action = "describe_images"
     describe_envelope = "Images"
