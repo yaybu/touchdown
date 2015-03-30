@@ -1,0 +1,35 @@
+version: '{build}'
+environment:
+  global:
+    CMD_IN_ENV: 'cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd'
+  matrix:
+  - PYTHON: "C:\Python27"
+    PYTHON_VERSION: "2.7.8"
+    PYTHON_ARCH: "32"
+  - PYTHON: "C:\Python27-x64"
+    PYTHON_VERSION: "2.7.8"
+    PYTHON_ARCH: "64"
+  - PYTHON: "C:\Python33"
+    PYTHON_VERSION: "3.3.5"
+    PYTHON_ARCH: "32"
+  - PYTHON: "C:\Python33-x64"
+    PYTHON_VERSION: "3.3.5"
+    PYTHON_ARCH: "64"
+  - PYTHON: "C:\Python34"
+    PYTHON_VERSION: "3.4.1"
+    PYTHON_ARCH: "32"
+  - PYTHON: "C:\Python34-x64"
+    PYTHON_VERSION: "3.4.1"
+    PYTHON_ARCH: "64"
+install:
+- powershell ./appveyor/install.ps1
+- SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+- python --version
+- python -c "import struct; print(struct.calcsize('P') * 8)"
+- '%CMD_IN_ENV% pip install --upgrade setuptools pip'
+- '%CMD_IN_ENV% pip wheel --find-links=C:\wheelhouse -r requirements.txt --wheel-dir=C:\wheelhouse'
+- '%CMD_IN_ENV% pip install --find-links=C:\wheelhouse -r requirements.txt'
+cache: C:\wheelhouse
+build: off
+test_script:
+- '%CMD_IN_ENV% python -m pytest fuselage'
