@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, action, resource, plan, serializers, workspace
-from touchdown.local import Step
-from touchdown.ssh import Connection
+import subprocess
+
+from touchdown.core import argument
+from touchdown.core import action
+from touchdown.core import errors
+from touchdown.core import plan
+from touchdown.core import resource
+from touchdown.core import serializers
+from touchdown.core import workspace
 
 
-class Provisioner(resource.Resource):
+class Step(resource.Resource):
+    pass
 
-    resource_name = "provisioner"
 
-    connection = argument.Resource(Connection)
+class Local(resource.Resource):
+
+    resource_name = "local"
+
     steps = argument.List(argument.Resource(Step))
     root = argument.Resource(workspace.Workspace)
 
@@ -34,18 +43,28 @@ class ApplyStep(action.Action):
 
     @property
     def description(self):
-        yield "Applying step {} to {}".format(self.step, self.resource.connection)
+        yield "Applying step {}".format(self.step)
 
     def run(self):
         kwargs = serializers.Resource().render(self.runner, self.step)
-        client = self.get_plan(self.resource.connection).get_client()
-        client.run_script(kwargs['script'])
+        self.run_script(kwargs['script'], sudo=kwargs['sudo'])
+
+    def run_script(self, script, sudo=True, stdout=None, stderr=None):
+        command = [script]
+        if sudo:
+            command = ['sudo', script]
+        proc = subprocess.Popen(
+            command, stdout=stdout, stderr=stderr)
+        output, error_output = proc.communicate()
+        exit_code = proc.returncode
+        if exit_code != 0:
+            raise errors.CommandFailed(exit_code, output, error_output)
 
 
 class Apply(plan.Plan):
 
     name = "apply"
-    resource = Provisioner
+    resource = Local
 
     def get_actions(self):
         for step in self.resource.steps:
