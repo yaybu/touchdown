@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import errno
+import os
+import tempfile
 import subprocess
 
 from touchdown.core import argument
@@ -50,15 +53,30 @@ class ApplyStep(action.Action):
         self.run_script(kwargs['script'], sudo=kwargs['sudo'])
 
     def run_script(self, script, sudo=True, stdout=None, stderr=None):
-        command = [script]
-        if sudo:
-            command = ['sudo', script]
-        proc = subprocess.Popen(
-            command, stdout=stdout, stderr=stderr)
-        output, error_output = proc.communicate()
-        exit_code = proc.returncode
-        if exit_code != 0:
-            raise errors.CommandFailed(exit_code, output, error_output)
+        fd, script_name = tempfile.mkstemp()
+        try:
+            with os.fdopen(fd, 'wb') as fh:
+                fh.write(script.read())
+            os.chmod(script_name, 0o755)
+            command = [script_name, '--no-changes-ok']
+            if sudo:
+                command = ['sudo'] + command
+            else:
+                command += ['--state', os.path.abspath('.fuselage')]
+            proc = subprocess.Popen(
+                command, stdout=stdout, stderr=stderr)
+            output, error_output = proc.communicate()
+            exit_code = proc.returncode
+            if exit_code != 0:
+                raise errors.CommandFailed(exit_code, output, error_output)
+        finally:
+            try:
+                os.close(fd)
+            except OSError as e:
+                if e.errno != errno.EBADF:
+                    raise
+            if os.path.exists(script_name):
+                os.unlink(script_name)
 
 
 class Apply(plan.Plan):

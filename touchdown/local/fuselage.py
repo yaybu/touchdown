@@ -18,7 +18,7 @@ import re
 
 import six
 
-from touchdown.core import argument, errors, resource
+from touchdown.core import argument, errors, resource, serializers
 from touchdown.local.local import Step
 
 try:
@@ -37,7 +37,7 @@ class FuselageArgument(argument.Argument):
     inner_arg = None
 
     def __init__(self, attr, default=None, help=None, **kwargs):
-        self.arg_id = attr
+        self.arg_id = self.field = attr
         argument.Argument.__init__(self, default=default, help=help, **kwargs)
 
     def get_default(self, instance):
@@ -54,17 +54,20 @@ class FuselageArgument(argument.Argument):
     def present(self, instance):
         return self.arg_id in instance._values
 
-    def serialize(self, instance, builder=None):
+    def serialize(self, instance, builder=None, runner=None):
         if self.present(instance):
-            value = getattr(instance, self.arg_id)
+            value = serializers.Argument(self.arg_id).render(runner, instance)
         else:
             value = self.get_default(instance)
+        return value
 
 
 class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType):
 
+    resources = {}
+
     def __new__(meta_cls, class_name, bases, attrs):
-        attrs.setdefault("__resource_name__", 'Touchdown{0}'.format(class_name))
+        attrs.setdefault("__resource_name__", class_name)
         attrs.setdefault("resource_name", underscore(class_name))
         tmp_cls = fuselage.resource.ResourceType.__new__(meta_cls, class_name, bases, attrs)
         args = tmp_cls.__args__
@@ -88,9 +91,9 @@ class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType
 class FuselageResource(six.with_metaclass(FuselageResourceType, resource.Resource)):
 
     fuselage_resource_class = None
-    serializer = lambda runner, obj: obj
+    serializer = serializers.Resource()
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         self._values = {}
         self.parent = parent
         self.dependencies = set()
@@ -99,18 +102,43 @@ class FuselageResource(six.with_metaclass(FuselageResourceType, resource.Resourc
     def clean(self, value):
         return value
 
+    def serialize(self, builder=None, runner=None):
+        retval = {}
+        for name, arg in self.__args__.items():
+            if arg.present(self):
+                retval[name] = arg.serialize(self, builder=builder, runner=runner)
+        return {self.__resource_name__: retval}
+
+
+class ResourceBundle(fuselage.bundle.ResourceBundle):
+
+    def __init__(self, runner, *args, **kwargs):
+        fuselage.bundle.ResourceBundle.__init__(self, *args, **kwargs)
+        self.runner = runner
+
+    def _serialize_bundle(self, builder):
+        obj = {"version": self.BUNDLE_VERSION}
+        resources = obj['resources'] = []
+        for r in self.resources:
+            if not getattr(r, "_implicit", False):
+                resources.append(r.serialize(builder, self.runner))
+        return obj
+
 
 class Bundle(Step):
 
     resource_name = "fuselage_bundle"
 
-    resources = argument.ResourceList(FuselageResource)
+    resources = argument.ResourceList(FuselageResource, field='script')
     sudo = argument.Boolean(field='sudo', default=True)
 
     def serialize_resources(self, runner, value):
-        b = bundle.ResourceBundle()
+        b = ResourceBundle(runner)
 
-        b.extend(iter(value))
+        for item in value:
+            # We call this to render any subobjects
+            _kwargs = item.serializer.render(runner, item)
+            b.add(item)
         return builder.build(b)
 
 
@@ -122,7 +150,10 @@ def make_fuselage_resource_serializer_compatible(resource_type):
         arguments = {'parent': self}
         arguments.update(kwargs)
         resource = cls(**arguments)
-        self.resources.append(resource)
+        if self.resources:
+            self.resources.append(resource)
+        else:
+            self.resources = [resource]
         self.add_dependency(resource)
         return resource
     setattr(Bundle, 'add_%s' % cls.resource_name, _)
