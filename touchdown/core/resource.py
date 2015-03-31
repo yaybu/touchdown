@@ -18,6 +18,7 @@ import six
 from . import argument, errors
 
 logger = logging.getLogger(__name__)
+marker = object()
 
 
 class Field(object):
@@ -31,8 +32,8 @@ class Field(object):
         return self.name in instance._values
 
     def get_value(self, instance):
-        retval = instance._values.get(self.name, None)
-        if retval is None:
+        retval = instance._values.get(self.name, marker)
+        if retval is marker:
             return self.argument.get_default(instance)
         return retval
 
