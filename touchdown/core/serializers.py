@@ -121,8 +121,9 @@ class Property(Serializer):
 
 class Argument(Serializer):
 
-    def __init__(self, attribute):
+    def __init__(self, attribute, field=None):
         self.attribute = attribute
+        self.field = field
 
     def render(self, runner, object):
         try:
@@ -133,6 +134,10 @@ class Argument(Serializer):
             if result is None:
                 raise FieldNotPresent(self.attribute)
             pass
+        if isinstance(result, Serializer):
+            result = result.render(runner, object)
+            if self.field:
+                result = self.field.clean_value(object, result)
         return result
 
 
@@ -286,7 +291,8 @@ class Resource(Dict):
 
         for argument_name, field in object.fields:
             arg = field.argument
-            if field.get_value(object) is None:
+            value = field.get_value(object)
+            if value is None:
                 continue
             if not hasattr(arg, "field"):
                 continue
@@ -305,7 +311,7 @@ class Resource(Dict):
                 serializer = arg.serializer
 
             kwargs[arg.field] = Context(
-                Argument(argument_name),
+                Argument(argument_name, field),
                 serializer,
             )
 
