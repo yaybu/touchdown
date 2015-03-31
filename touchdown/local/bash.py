@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import touchdown.aws  # noqa
-import touchdown.local  # noqa
-import touchdown.provisioner  # noqa
-import touchdown.ssh  # noqa
+import six
 
-from touchdown.core import Runner, Workspace
+from touchdown.core import argument, serializers
+from . import local
 
-__all__ = [
-    "Runner",
-    "Workspace",
-]
+
+class Script(local.Step):
+
+    resource_name = "script"
+
+    script = argument.String(
+        field="script",
+        serializer=serializers.Expression(lambda r, o: six.StringIO(o)),
+    )
+    sudo = argument.Boolean(field='sudo', default=True)
