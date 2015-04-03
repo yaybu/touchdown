@@ -31,6 +31,7 @@ setup(
         'six',
         'click',
         'contextlib2',
+        'netaddr',
     ],
     entry_points='''
         [console_scripts]
