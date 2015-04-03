@@ -292,14 +292,3 @@ class ResourceList(List):
                 return
             self.list_of.resource_class = ResourceType.__all_resources__[self.resource_class]
         super(ResourceList, self).contribute_to_class(cls)
-
-
-class Serializer(Argument):
-
-    serializer = serializers.Expression(lambda runner, object: object.render(runner, object))
-
-    def clean(self, instance, value):
-        for dep in value.dependencies(instance):
-            if dep != instance:
-                instance.add_dependency(dep)
-        return value

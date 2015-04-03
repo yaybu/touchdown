@@ -36,18 +36,30 @@ class Field(object):
             return self.argument.get_default(instance)
         return retval
 
-    def __set__(self, instance, value):
-        if value is None:
-            if self.name in instance._values:
-                del instance._values[self.name]
-            return
+    def delete_value(self, instance):
+        if self.name in instance._values:
+            del instance._values[self.name]
 
+    def clean_value(self, instance, value):
         try:
             value = self.argument.clean(instance, value)
             if hasattr(instance, "clean_{}".format(self.name)):
                 value = getattr(instance, "clean_{}".format(self.name))(value)
         except errors.InvalidParameter as e:
             raise errors.InvalidParameter("{}: {}".format(self.name, e.args[0]))
+        return value
+
+    def __set__(self, instance, value):
+        from . import serializers
+        if value is None:
+            self.delete_value(instance)
+
+        if isinstance(value, serializers.Serializer):
+            for dep in value.dependencies(instance):
+                if dep != instance:
+                    instance.add_dependency(dep)
+        else:
+            value = self.clean_value(instance, value)
         instance._values[self.name] = value
 
     def __get__(self, instance, owner):
