@@ -6,6 +6,11 @@ Changelog for Touchdown
 
 - rds: Add point in time restore and snashot restore.
 
+- cloudfront: By setting cname to '' you can create a alias-less distribution.
+
+- Any field can now accept a serializer. This means any field can be set
+  dynamically based on other resources outputs.
+
 
 0.0.8 (2015-03-26)
 ------------------

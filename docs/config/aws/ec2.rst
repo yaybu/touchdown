@@ -5,12 +5,19 @@ Elastic Compute Cloud
    :synopsis: Elastic Compute Cloud resources.
 
 
+EC2 is the main workhorse of an AWS solution. It allows you to (manually or
+automatically) start virtual machines to run your application code.
+
+.. note:: We recommend that your EC2 machines are stateless.
+
+
 Machine Images
 --------------
 
 .. class:: Image
 
-    This represents a base image that can be used for booting other machines.
+    This represents a virtual machine image that can be used to boot an EC2
+    instance.
 
     .. attribute:: name
 
@@ -31,6 +38,33 @@ Machine Images
     .. attribute:: launch_permissions
 
     .. attribute:: tags
+
+
+Key Pair
+--------
+
+.. class:: KeyPair
+
+    In order to securely use SSH with an EC2 instance (whether created directly
+    or via a AutoScalingGroup) you must first upload the key to the EC2 key
+    pairs database. The KeyPair resource imports and keeps up to date an ssh
+    public key.
+
+    It can be used with any AWS account resource::
+
+        aws.add_keypair(
+            name="my-keypair",
+            public_key=open(os.expanduser('~/.ssh/id_rsa.pub')),
+        )
+
+    .. attribute:: name
+
+        The name of the key. This field is required.
+
+    .. attribute:: public_key
+
+        The public key material, in PEM form. Must be supplied in order to
+        upload a key pair.
 
 
 Auto Scaling Group
@@ -80,33 +114,6 @@ Auto Scaling Group
         A list of :class:`~touchdown.aws.elb.LoadBalancer` resources. As
         instances are created by the auto scaling group they are added to these
         load balancers.
-
-
-Key Pair
---------
-
-.. class:: KeyPair
-
-    In order to securely use SSH with an EC2 instance (whether created directly
-    or via a AutoScalingGroup) you must first upload the key to the EC2 key
-    pairs database. The KeyPair resource imports and keeps up to date an ssh
-    public key.
-
-    It can be used with any AWS account resource::
-
-        aws.add_keypair(
-            name="my-keypair",
-            public_key=open(os.expanduser('~/.ssh/id_rsa.pub')),
-        )
-
-    .. attribute:: name
-
-        The name of the key. This field is required.
-
-    .. attribute:: public_key
-
-        The public key material, in PEM form. Must be supplied in order to
-        upload a key pair.
 
 
 Launch Configuration
