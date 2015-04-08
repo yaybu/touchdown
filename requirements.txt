@@ -1,4 +1,4 @@
-botocore==0.100.0
+botocore==0.101.0
 jmespath==0.6.1
 click==4.0
 netaddr==0.7.14
