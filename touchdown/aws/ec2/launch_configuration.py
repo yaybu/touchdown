@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
@@ -78,7 +80,6 @@ class LaunchConfiguration(Resource):
 
     def matches(self, runner, remote):
         if "UserData" in remote and remote["UserData"]:
-            import base64
             remote["UserData"] = force_str(base64.b64decode(remote["UserData"]))
         return super(LaunchConfiguration, self).matches(runner, remote)
 
