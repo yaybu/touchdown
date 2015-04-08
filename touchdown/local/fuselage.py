@@ -64,7 +64,8 @@ class FuselageArgument(argument.Argument):
 class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType):
 
     def __new__(meta_cls, class_name, bases, attrs):
-        attrs.setdefault("__resource_name__", 'Touchdown{0}'.format(class_name))
+        resource_name = attrs.pop('__resource_name__', class_name)
+        attrs.setdefault("__resource_name__", 'Touchdown{0}'.format(resource_name))
         attrs.setdefault("resource_name", underscore(class_name))
         tmp_cls = fuselage.resource.ResourceType.__new__(meta_cls, class_name, bases, attrs)
         args = tmp_cls.__args__
@@ -80,6 +81,9 @@ class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType
                 args[attr] = new_attrs[attr]
             else:
                 new_attrs[attr] = value
+        # Re-set the resource name so we serialize it as a resource the
+        # runner understands
+        new_attrs["__resource_name__"] = resource_name
 
         cls = resource.ResourceType.__new__(meta_cls, class_name, bases, new_attrs)
         return cls
@@ -122,6 +126,8 @@ def make_fuselage_resource_serializer_compatible(resource_type):
         arguments = {'parent': self}
         arguments.update(kwargs)
         resource = cls(**arguments)
+        if not self.resources:
+            self.resources = []
         self.resources.append(resource)
         self.add_dependency(resource)
         return resource
