@@ -59,6 +59,7 @@ class FuselageArgument(argument.Argument):
             value = getattr(instance, self.arg_id)
         else:
             value = self.get_default(instance)
+        return value
 
 
 class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType):
