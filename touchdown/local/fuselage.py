@@ -74,7 +74,7 @@ class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType
         attrs.setdefault("resource_name", underscore(class_name))
         tmp_cls = fuselage.resource.ResourceType.__new__(meta_cls, class_name, bases, attrs)
         args = tmp_cls.__args__
-        new_attrs = {'__args__': args, 'policies': tmp_cls.policies}
+        new_attrs = {'__args__': args}
         for attr, value in args.items():
             new_attrs[attr] = arguments[value.__class__](attr)
             new_attrs[attr].inner_arg = value
@@ -124,7 +124,8 @@ class Bundle(Step):
 
 
 def make_fuselage_resource_serializer_compatible(resource_type):
-    args = {'fuselage_resource_class': resource_type}
+    args = {'fuselage_resource_class': resource_type,
+            'policies': resource_type.policies}
     cls = type(resource_type.__name__, (FuselageResource, resource_type,), args)
 
     def _(self, **kwargs):
