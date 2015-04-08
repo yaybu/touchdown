@@ -23,9 +23,12 @@ from touchdown.local.local import Step
 
 try:
     import fuselage
-    from fuselage import argument as _arg, bundle, builder, resources
+    from fuselage import argument as f_args, bundle, builder, resources
 except ImportError:
     raise errors.Error("You need the fuselage package to use the fuselage_bundle resource")
+
+
+arguments = {}
 
 
 def underscore(title):
@@ -34,16 +37,18 @@ def underscore(title):
 
 class FuselageArgument(argument.Argument):
 
+    fuselage_argument_class = None
     inner_arg = None
 
     def __init__(self, attr, default=None, help=None, **kwargs):
         self.arg_id = attr
         argument.Argument.__init__(self, default=default, help=help, **kwargs)
 
+    def get(self, instance):
+        return self.fuselage_argument_class.get(self, instance)
+
     def get_default(self, instance):
-        if callable(self.inner_arg.default):
-            return self.inner_arg.default(instance)
-        return self.inner_arg.default
+        return self.inner_arg.get_default(instance)
 
     def clean(self, instance, value):
         return self.inner_arg.clean(instance, value)
@@ -54,12 +59,11 @@ class FuselageArgument(argument.Argument):
     def present(self, instance):
         return self.arg_id in instance._values
 
+    def get_raw(self, instance):
+        return getattr(instance, self.arg_id)
+
     def serialize(self, instance, builder=None):
-        if self.present(instance):
-            value = getattr(instance, self.arg_id)
-        else:
-            value = self.get_default(instance)
-        return value
+        return self.fuselage_argument_class.serialize(self, instance, builder=None)
 
 
 class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType):
@@ -72,12 +76,12 @@ class FuselageResourceType(resource.ResourceType, fuselage.resource.ResourceType
         args = tmp_cls.__args__
         new_attrs = {'__args__': args, 'policies': tmp_cls.policies}
         for attr, value in args.items():
-            new_attrs[attr] = FuselageArgument(attr)
+            new_attrs[attr] = arguments[value.__class__](attr)
             new_attrs[attr].inner_arg = value
             args[attr] = new_attrs[attr]
         for attr, value in attrs.items():
             if isinstance(value, fuselage.argument.Argument):
-                new_attrs[attr] = FuselageArgument(attr)
+                new_attrs[attr] = arguments[value.__class__](attr)
                 new_attrs[attr].inner_arg = value
                 args[attr] = new_attrs[attr]
             else:
@@ -134,6 +138,18 @@ def make_fuselage_resource_serializer_compatible(resource_type):
         return resource
     setattr(Bundle, 'add_%s' % cls.resource_name, _)
     return cls
+
+
+def make_fuselage_argument(arg_type):
+    return type(arg_type.__name__, (FuselageArgument, arg_type), {
+        'fuselage_argument_class': arg_type,
+        })
+
+
+for attr, value in vars(f_args).items():
+    if type(value) != type or not issubclass(value, fuselage.argument.Argument):
+        continue
+    arguments[value] = make_fuselage_argument(value)
 
 
 for attr, value in vars(resources).items():
