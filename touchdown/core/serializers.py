@@ -212,8 +212,19 @@ class Integer(Formatter):
 
 
 class ListOfOne(Formatter):
+
+    def __init__(self, *args, **kwargs):
+        self.maybe_empty = kwargs.pop('maybe_empty', False)
+        Formatter.__init__(self, *args, **kwargs)
+
     def render(self, runner, object):
-        return [self.inner.render(runner, object)]
+        value = self.inner.render(runner, object)
+        if not value:
+            if self.maybe_empty:
+                return []
+            else:
+                raise FieldNotPresent()
+        return [value]
 
 
 class CommaSeperatedList(Formatter):

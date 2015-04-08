@@ -123,7 +123,7 @@ class Distribution(Resource):
             lambda runner, object: runner.get_plan(object).object.get('CallerReference', str(uuid.uuid4()))
         ),
         "Aliases": CloudFrontList(serializers.Chain(
-            serializers.Context(serializers.Argument("name"), serializers.ListOfOne()),
+            serializers.Context(serializers.Argument("cname"), serializers.ListOfOne(maybe_empty=True)),
             serializers.Context(serializers.Argument("aliases"), serializers.List()),
         )),
         # We don't support GeoRestrictions yet - so include a stubbed default
@@ -141,6 +141,7 @@ class Distribution(Resource):
     }
 
     name = argument.String()
+    cname = argument.String(default=lambda instance: instance.name)
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
     aliases = argument.List()
     root_object = argument.String(default='/', field="DefaultRootObject")
@@ -214,7 +215,7 @@ class Describe(SimpleDescribe, Plan):
         return {"Id": self.object['Id']}
 
     def describe_object_matches(self, d):
-        return self.resource.name in d['Aliases'].get('Items', [])
+        return self.resource.name == d['Comment'] or self.resource.name in d['Aliases'].get('Items', [])
 
     def describe_object(self):
         distribution = super(Describe, self).describe_object()

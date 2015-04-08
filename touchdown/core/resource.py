@@ -53,6 +53,7 @@ class Field(object):
         from . import serializers
         if value is None:
             self.delete_value(instance)
+            return
 
         if isinstance(value, serializers.Serializer):
             for dep in value.dependencies(instance):
