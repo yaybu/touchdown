@@ -91,7 +91,7 @@ class Client(paramiko.SSHClient):
         finally:
             channel.close()
 
-    def run_script(self, script):
+    def run_script(self, script, sudo=True):
         sftp = self.open_sftp()
         sftp.chdir(".")
 
@@ -103,7 +103,10 @@ class Client(paramiko.SSHClient):
             sftp.chmod(path, 0o755)
             try:
                 transport = self.get_transport()
-                self._run(transport, "sudo " + path)
+                cmd = path
+                if sudo:
+                    cmd = "sudo " + path
+                self._run(transport, cmd)
             finally:
                 sftp.remove(path)
                 pass

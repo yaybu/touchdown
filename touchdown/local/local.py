@@ -27,7 +27,8 @@ from touchdown.core import workspace
 
 
 class Step(resource.Resource):
-    pass
+
+    dot_ignore = True
 
 
 class Local(resource.Resource):
