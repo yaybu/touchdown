@@ -104,7 +104,7 @@ class Bundle(Step):
 
     resource_name = "fuselage_bundle"
 
-    resources = argument.ResourceList(FuselageResource)
+    resources = argument.ResourceList(FuselageResource, field='script')
     sudo = argument.Boolean(field='sudo', default=True)
 
     def serialize_resources(self, runner, value):
