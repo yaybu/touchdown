@@ -68,7 +68,7 @@ class DiffSet(object):
                 # We kind of serialize twice here. First to serialize any
                 # serializers, second to ensure we have the right kind of thing.
                 # XXX: Consider rolling this into the Argument serializer.
-                rendered =  arg.serializer.render(
+                rendered = arg.serializer.render(
                     runner, serializers.Argument(name).render(runner, local))
             except serializers.FieldNotPresent:
                 continue
