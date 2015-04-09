@@ -62,7 +62,11 @@ class FuselageArgument(argument.Argument):
     def get_raw(self, instance):
         return getattr(instance, self.arg_id)
 
-    def serialize(self, instance, builder=None):
+    def serialize(self, instance, builder=None, runner=None):
+        if runner is not None:
+            value = serializers.Argument(self.arg_id).render(runner, instance)
+            value = self.clean(instance, value)
+            self.save(instance, value)
         return self.fuselage_argument_class.serialize(self, instance, builder=None)
 
 
@@ -114,7 +118,7 @@ class FuselageResource(six.with_metaclass(FuselageResourceType, resource.Resourc
         retval = {}
         for name, arg in self.__args__.items():
             if arg.present(self):
-                retval[name] = arg.serialize(self, builder=builder)
+                retval[name] = arg.serialize(self, builder=builder, runner=runner)
         return {self.__resource_name__: retval}
 
 
