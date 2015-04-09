@@ -114,7 +114,7 @@ class FuselageResource(six.with_metaclass(FuselageResourceType, resource.Resourc
         retval = {}
         for name, arg in self.__args__.items():
             if arg.present(self):
-                retval[name] = arg.serialize(self, builder=builder, runner=runner)
+                retval[name] = arg.serialize(self, builder=builder)
         return {self.__resource_name__: retval}
 
 
