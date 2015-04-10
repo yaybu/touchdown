@@ -31,6 +31,7 @@ install:
 - '%CMD_IN_ENV% python -m pip install --upgrade setuptools pip wheel'
 - '%CMD_IN_ENV% python -m pip wheel --find-links=C:\wheelhouse -r requirements.txt --wheel-dir=C:\wheelhouse'
 - '%CMD_IN_ENV% python -m pip install --find-links=C:\wheelhouse -r requirements.txt'
+- '%CMD_IN_ENV% easy_install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz'
 cache: C:\wheelhouse
 build: off
 test_script:
