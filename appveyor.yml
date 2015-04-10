@@ -28,9 +28,9 @@ install:
 - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
 - python --version
 - python -c "import struct; print(struct.calcsize('P') * 8)"
-- '%CMD_IN_ENV% pip install --upgrade setuptools pip wheel'
-- '%CMD_IN_ENV% pip wheel --find-links=C:\wheelhouse -r requirements.txt --wheel-dir=C:\wheelhouse'
-- '%CMD_IN_ENV% pip install --find-links=C:\wheelhouse -r requirements.txt'
+- '%CMD_IN_ENV% python -m pip install --upgrade setuptools pip wheel'
+- '%CMD_IN_ENV% python -m pip wheel --find-links=C:\wheelhouse -r requirements.txt --wheel-dir=C:\wheelhouse'
+- '%CMD_IN_ENV% python -m pip install --find-links=C:\wheelhouse -r requirements.txt'
 cache: C:\wheelhouse
 build: off
 test_script:
