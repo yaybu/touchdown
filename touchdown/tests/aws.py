@@ -215,7 +215,7 @@ class RecordedBotoCoreTest(unittest.TestCase):
         ))
 
         is_conn_dropped = self.stack.enter_context(mock.patch(
-            'botocore.vendored.requests.packages.urllib3.util.connection.is_connection_dropped',
+            'botocore.vendored.requests.packages.urllib3.connectionpool.is_connection_dropped',
         ))
         is_conn_dropped.return_value = True
 
