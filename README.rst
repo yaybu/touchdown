@@ -5,6 +5,9 @@ Touchdown
 .. image:: https://travis-ci.org/yaybu/touchdown.png?branch=master
    :target: https://travis-ci.org/#!/yaybu/touchdown
 
+.. image:: https://ci.appveyor.com/api/projects/status/1uscoxn229nq78tl?svg=true
+   :target: https://ci.appveyor.com/project/yaybu/touchdown
+
 .. image:: https://coveralls.io/repos/yaybu/touchdown/badge.png?branch=master
     :target: https://coveralls.io/r/yaybu/touchdown
 
