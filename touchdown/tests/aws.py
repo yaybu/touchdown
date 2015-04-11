@@ -214,6 +214,11 @@ class RecordedBotoCoreTest(unittest.TestCase):
             filter_headers=['authorization'],
         ))
 
+        is_conn_dropped = self.stack.enter_context(mock.patch(
+            'botocore.vendored.requests.packages.urllib3.util.connection.is_connection_dropped',
+        ))
+        is_conn_dropped.return_value = True
+
         self.workspace = workspace.Workspace()
         self.aws = self.workspace.add_aws(region='eu-west-1')
 
