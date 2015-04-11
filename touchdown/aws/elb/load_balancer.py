@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
+from touchdown.core.action import Action
+from touchdown.core import errors
 
 from ..account import Account
 from ..iam import ServerCertificate
@@ -192,10 +196,52 @@ class Apply(SimpleApply, Describe):
             yield action
 
 
+class WaitForNetworkInterfaces(Action):
+
+    description = ["Wait for network interfaces to be released"]
+
+    def ready(self, ifaces):
+        look_for = "ELB " + self.plan.resource.name
+        for iface in ifaces:
+            if iface.get("Description", "") == look_for:
+                return False
+        return True
+
+    def run(self):
+        vpc = self.runner.get_plan(self.resource.vpc)
+        if not vpc:
+            return
+
+        # We have to query ec2 and not elb api, so create a new client
+        client = self.plan.session.create_client("ec2")
+
+        for i in range(120):
+            interfaces = client.describe_network_interfaces(
+                Filters=[
+                    {"Name": "vpc-id", "Values": [vpc.resource_id]},
+                ]
+            ).get('NetworkInterfaces', [])
+
+            if self.ready(interfaces):
+                return
+
+            time.sleep(1)
+
+        raise errors.Error(
+            "Load balancer {} still hanging around in Elastic Network Interfaces after deletion for over 2 minutes.".format(
+                self.plan.resource_id,
+            )
+        )
+
+
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_load_balancer"
-    waiter = "load_balancer_deleted"
+
+    def destroy_object(self):
+        for change in super(Destroy, self).destroy_object():
+            yield change
+        yield WaitForNetworkInterfaces(self)
 
 
 class AliasTarget(route53.AliasTarget):

@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
-
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers, errors
-from touchdown.core.action import Action
 
 from .vpc import VPC
 from .route_table import RouteTable
@@ -161,61 +158,6 @@ class Apply(SimpleApply, Describe):
             )
 
 
-class WaitForNetworkInterfaces(Action):
-
-    description = ["Wait for network interfaces to be released"]
-
-    def check_interface(self, iface):
-        # When an ELB is destroyed its attachment will enter the 'detaching' state
-        # It will eventually leave the subnet, allowing a delete to progress
-        if "Attachment" in iface:
-            if iface['Attachment']['InstanceOwnerId'] == 'amazon-elb' and iface["Attachment"]["Status"] == "detaching":
-                return True
-
-        # An 'available' interface that belongs to an ELB will be cleaned up
-        # within 2 minutes
-        if iface["Description"] == "ELB balancer":
-            return True
-
-        # Abort! There are interfaces resent that aren't pending removal
-        return False
-
-    def run(self):
-        vpc = self.runner.get_plan(self.resource.vpc)
-        if not vpc:
-            return
-
-        for i in range(120):
-            interfaces = self.plan.client.describe_network_interfaces(
-                Filters=[
-                    {"Name": "vpc-id", "Values": [vpc.resource_id]},
-                    {"Name": "subnet-id", "Values": [self.plan.resource_id]},
-                ]
-            ).get('NetworkInterfaces', [])
-
-            if not interfaces:
-                return
-
-            for interface in interfaces:
-                if not self.check_interface(interface):
-                    raise errors.Error(
-                        "Subnet {} cannot be deleted until network interface {} ({}) is removed\n{}".format(
-                            self.plan.resource_id,
-                            interface["NetworkInterfaceId"],
-                            interface.get("Description", "No description available"),
-                            interface
-                        )
-                    )
-
-            time.sleep(1)
-
-
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_subnet"
-
-    def destroy_object(self):
-        yield WaitForNetworkInterfaces(self)
-
-        for change in super(Destroy, self).destroy_object():
-            yield change
