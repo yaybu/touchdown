@@ -69,3 +69,12 @@ class Describe(Plan):
         if not self._client:
             self._client = session.create_client("sts")
         return self._client
+
+    #def get_actions(self):
+    #    response = self.session.create_client("iam").get_user()
+    #    if not "User" in response:
+    #        raise error.Error("Unable to call GetUser on self")
+    #    self.object = {
+    #        "AccountNumber": response["User"]["Arn"].split(":")[4]
+    #    }
+    #    return []

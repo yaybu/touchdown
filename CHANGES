@@ -4,6 +4,8 @@ Changelog for Touchdown
 0.0.9 (unreleased)
 ------------------
 
+- s3: Add very basic support for syncing entire folders to s3.
+
 - rds: Add point in time restore and snashot restore.
 
 - cloudfront: By setting cname to '' you can create a alias-less distribution.

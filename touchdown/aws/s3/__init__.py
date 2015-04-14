@@ -14,8 +14,10 @@
 
 from .bucket import Bucket
 from .file import File
+from .folder import Folder
 
 __all__ = [
     'Bucket',
     'File',
+    'Folder',
 ]
