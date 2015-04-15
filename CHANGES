@@ -9,9 +9,17 @@ Changelog for Touchdown
 - rds: Add point in time restore and snashot restore.
 
 - cloudfront: By setting cname to '' you can create a alias-less distribution.
+  [@mitchellrj]
 
 - Any field can now accept a serializer. This means any field can be set
   dynamically based on other resources outputs.
+  [@mitchellrj]
+
+- We now run our tests on AppVeyor on python 2.7 (32 bit) and python 3.4
+  (32 bit and 64 bit).
+
+- elb: Now waits for Elastic Network Interfaces to go away before considering
+  an elb deleted.
 
 
 0.0.8 (2015-03-26)
