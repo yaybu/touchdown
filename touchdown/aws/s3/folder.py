@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import mimetypes
 import hashlib
 
 from touchdown.core.resource import Resource
@@ -95,23 +96,28 @@ class Apply(SimpleApply, Describe):
             remote = {k: v for k, v in self.get_folder_contents()}
 
         for path in local:
+            contenttype = mimetypes.guess_type(path)[0]
             if not path in remote:
                 yield self.generic_action(
-                    "Add {}".format(path),
+                    "Add {} ({})".format(path, contenttype),
                     self.client.put_object,
                     Key=os.path.join(self.resource.name, path),
                     Body=open(os.path.join(base, path)).read(),
                     ACL=self.resource.acl,
                     Bucket=self.resource.bucket.name,
+                    CacheControl="max-age=0",
+                    ContentType=contenttype,
                 )
             elif local[path]['Md5'] != remote[path]['Md5']:
                 yield self.generic_action(
-                    "Update {}".format(path),
+                    "Update {} ({})".format(path, contenttype),
                     self.client.put_object,
                     Key=os.path.join(self.resource.name, path),
                     Body=open(os.path.join(base, path)).read(),
                     ACL=self.resource.acl,
                     Bucket=self.resource.bucket.name,
+                    CacheControl="max-age=0",
+                    ContentType=contenttype,
                 )
 
         for path in remote:
