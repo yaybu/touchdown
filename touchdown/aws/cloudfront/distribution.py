@@ -97,9 +97,16 @@ class ErrorResponse(Resource):
     resource_name = "error_response"
     dot_ignore = True
 
-    error_code = argument.Integer(field="ErrorCode")
+    error_code = argument.Integer(field="ErrorCode", choices=[
+        "400", "403", "404", "405", "414",
+        "500", "501", "502", "503", "504",
+    ])
     response_page_path = argument.String(field="ResponsePagePath")
-    response_code = argument.Integer(field="ResponseCode")
+    response_code = argument.String(field="ResponseCode", choices=[
+        "200",
+        "400", "403", "404", "405", "414",
+        "500", "501", "502", "503", "504",
+    ])
     min_ttl = argument.Integer(field="ErrorCachingMinTTL")
 
 
