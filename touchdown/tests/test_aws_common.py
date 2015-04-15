@@ -55,6 +55,9 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             if issubclass(impl, self.ignore):
                 continue
 
+            if impl.describe_action is None:
+                continue
+
             service = session.get_service_model(impl.service_name)
             methods = {xform_name(s): s for s in service.operation_names}
             operation = service.operation_model(methods[impl.describe_action])

@@ -45,6 +45,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Folder
     service_name = 's3'
     key = 'Name'
+    describe_action = None
 
     def get_folder_contents(self):
         paginator = self.client.get_paginator("list_objects")
