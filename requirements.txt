@@ -1,5 +1,5 @@
-botocore==0.103.0
-jmespath==0.6.2
+botocore==0.104.0
+jmespath==0.7.0
 click==4.0
 netaddr==0.7.14
 contextlib2==0.4.0
