@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.9 (unreleased)
+0.0.9 (2015-04-22)
 ------------------
 
 - s3: Add very basic support for syncing entire folders to s3.
