@@ -22,7 +22,7 @@ session = session.get_session({
     # timeouts
     "data_path": (
         'data_path',
-        'BOTO_DATA_PATH',
+        'AWS_DATA_PATH',
         os.path.join(os.path.dirname(__file__), "data"),
     ),
 })
