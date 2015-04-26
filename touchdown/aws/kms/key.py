@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from botocore.exceptions import ClientError
+
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
@@ -40,13 +42,21 @@ class Describe(SimpleDescribe, Plan):
     describe_filters = {}
     key = 'KeyId'
 
-    def describe_object_matches(self, role):
-        return role['Description'] == self.resource.description
+    def describe_object_matches(self, key):
+        try:
+            metadata = self.client.describe_key(KeyId=key['KeyId'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDeniedException':
+                return False
+            raise
+        return metadata['Description'] == self.resource.description
 
 
 class Apply(SimpleApply, Describe):
 
     create_action = "create_key"
+
+    signature = []
 
     def update_object(self):
         for change in super(Apply, self).update_object():

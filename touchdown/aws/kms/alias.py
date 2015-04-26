@@ -42,7 +42,7 @@ class Describe(SimpleDescribe, Plan):
     key = 'AliasName'
 
     def describe_object_matches(self, role):
-        return role['Name'] == self.resource.name
+        return role['AliasName'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
@@ -51,7 +51,7 @@ class Apply(SimpleApply, Describe):
 
     def update_object(self):
         # FIXME: Can't update an Alias so need to Delete it and then recreate it
-        pass
+        return []
 
 
 class Destroy(SimpleDestroy, Describe):
