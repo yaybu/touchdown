@@ -42,6 +42,7 @@ Resources
    :doc:`CDN <config/aws/cloudfront>` |
    :doc:`Compute <config/aws/ec2>` |
    :doc:`DNS <config/aws/route53>` |
+   :doc:`Encryption Key Management <config/aws/kms>` |
    :doc:`Key Value Stores <config/aws/elasticache>` |
    :doc:`Identity & Access Management <config/aws/iam>` |
    :doc:`Load Balancing <config/aws/elb>` |
