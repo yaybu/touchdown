@@ -19,6 +19,7 @@ from touchdown.core import argument, serializers
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
+from ..kms import Key
 from ..vpc import SecurityGroup
 from .subnet_group import SubnetGroup
 
@@ -44,6 +45,8 @@ class Database(Resource):
     preferred_maintenance_window = argument.String(field="PreferredMaintenanceWindow")
     multi_az = argument.Boolean(field="MultiAZ")
     storage_type = argument.String(field="StorageType")
+    storage_encrypted = argument.Boolean(default=False, field="StorageEncrypted")
+    key = argument.Resource(Key, field="KmsKeyId")
     allow_major_version_upgrade = argument.Boolean(field="AllowMajorVersionUpgrade")
     auto_minor_version_upgrade = argument.Boolean(field="AutoMinorVersionUpgrade")
     character_set_name = argument.String(field="CharacterSetName")

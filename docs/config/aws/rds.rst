@@ -64,6 +64,14 @@ Database
 
     .. ..attribute:: storage_type
 
+    .. attribute:: storage_encrypted
+
+        Specifies whether or not he database instance has encrypted storage.
+        By default it does not.
+
+        If set to true you can also set ``key`` to a KMS key. If you do not
+        the default KMS key is used.
+
     .. ..attribute:: allow_major_version_upgrade
 
     .. ..attribute:: auto_minor_version_upgrade
