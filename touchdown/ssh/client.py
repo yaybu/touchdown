@@ -49,7 +49,7 @@ class Client(paramiko.SSHClient):
     def _maybe_decode(self, recv, n, encoding=None):
         result = recv(n)
         if encoding is not None:
-            result = result.decode(encoding)
+            result = result.decode(encoding, 'replace')
         else:
             result = result.decode('utf8', 'replace')
         return result
