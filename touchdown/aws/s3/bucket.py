@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import json
+import re
 
 from botocore.exceptions import ClientError
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
+from touchdown.core.errors import InvalidParameter
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -41,6 +43,23 @@ class Bucket(Resource):
     resource_name = "bucket"
 
     name = argument.String(field="Bucket")
+
+    def clean_name(self, value):
+        # This could be enforced with a regex:
+        #     ^([a-z0-9]{1})([a-z0-9\-]*[a-z0-9])(\.([a-z0-9]{1})([a-z0-9\-]*[a-z0-9]))*$
+        # But we can give better error messages with this
+        if value.startswith("."):
+            raise InvalidParameter("Cannot start with a period")
+        if value.endswith("."):
+            raise InvalidParameter("Cannot end with a period")
+        if value.lower() != value:
+            raise InvalidParameter("Cannot have uppercase letters")
+        for section in value.split("."):
+            if len(section) == 0:
+                raise InvalidParameter("There can be only one period between labels")
+            if not re.search(r"^([a-z0-9]{1})([a-z0-9\-]*[a-z0-9])$", value):
+                raise InvalidParameter("Value must start and end with a number or letter and can only contain numbers, letters and hyphens")
+        return value
 
     region = argument.String(
         default=lambda instance: instance.account.region,
