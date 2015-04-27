@@ -232,6 +232,7 @@ class Describe(SimpleDescribe, Plan):
                 "ETag": result["ETag"],
                 "Id": distribution["Id"],
                 "DomainName": result["Distribution"]["DomainName"],
+                "Status": result["Distribution"]["Status"],
             }
             distribution.update(result['Distribution']['DistributionConfig'])
             return distribution
@@ -288,11 +289,13 @@ class Destroy(SimpleDestroy, Describe):
                 ),
             )
 
+        if self.object.get('Enabled', False) or self.object.get('Status', '') == "InProgress":
             yield self.get_waiter(
-                ["Waiting for distribution to enter disabled state"],
+                ["Waiting for distribution to be disabled and enter state 'Deployed'"],
                 "distribution_deployed",
             )
 
+        if self.object.get('Enabled', False):
             yield RefreshMetadata(self)
 
         for change in super(Destroy, self).destroy_object():
