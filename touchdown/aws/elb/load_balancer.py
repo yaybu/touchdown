@@ -201,10 +201,6 @@ class WaitForNetworkInterfaces(Action):
     description = ["Wait for network interfaces to be released"]
 
     def run(self):
-        vpc = self.runner.get_plan(self.resource.vpc)
-        if not vpc:
-            return
-
         # We have to query ec2 and not elb api, so create a new client
         client = self.plan.session.create_client("ec2")
 
@@ -212,7 +208,6 @@ class WaitForNetworkInterfaces(Action):
         for i in range(120):
             interfaces = client.describe_network_interfaces(
                 Filters=[
-                    {"Name": "vpc-id", "Values": [vpc.resource_id]},
                     {"Name": "description", "Values": [description]},
                 ]
             ).get('NetworkInterfaces', [])
