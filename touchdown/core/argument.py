@@ -274,6 +274,15 @@ class Resource(Argument):
             return resource
         setattr(self.resource_class, 'add_%s' % cls.resource_name, _)
 
+        def _(self, **kwargs):
+            arguments = {argument_name: self}
+            arguments.update(kwargs)
+            arguments['policies'] = ['never-create']
+            resource = cls(self, **arguments)
+            self.workspace.add_dependency(resource)
+            return resource
+        setattr(self.resource_class, 'get_%s' % cls.resource_name, _)
+
 
 class ResourceList(List):
 
