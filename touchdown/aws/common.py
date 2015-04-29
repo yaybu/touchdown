@@ -292,6 +292,11 @@ class SimpleApply(SimpleDescribe):
     def get_update_serializer(self):
         return serializers.Resource(mode="update")
 
+    def prepare_to_create(self):
+        # This is a hook for changes you want to make *before* creating an object
+        # For example, you want to delete old launch configurations before creating new ones
+        return []
+
     def create_object(self):
         g = self.generic_action(
             "Creating {}".format(self.resource),
@@ -336,6 +341,9 @@ class SimpleApply(SimpleDescribe):
 
     def get_actions(self):
         self.object = self.describe_object()
+
+        for change in self.prepare_to_create():
+            yield change
 
         created = False
 
