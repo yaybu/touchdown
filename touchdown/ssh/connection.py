@@ -16,6 +16,7 @@ from touchdown.core import adapters, argument, errors, resource, plan, serialize
 
 try:
     from . import client
+    from paramiko import ssh_exception
 except ImportError:
     client = None
 
@@ -64,11 +65,16 @@ class ConnectionPlan(plan.Plan):
             proxy = self.runner.get_plan(self.resource.proxy)
             transport = proxy.get_client().get_transport()
             self.echo("Setting up proxy channel to {}".format(kwargs['hostname']))
-            kwargs['sock'] = transport.open_channel(
-                'direct-tcpip',
-                (kwargs['hostname'], kwargs['port']),
-                ('', 0)
-            )
+            for i in range(10):
+                try:
+                    kwargs['sock'] = transport.open_channel(
+                        'direct-tcpip',
+                        (kwargs['hostname'], kwargs['port']),
+                        ('', 0)
+                    )
+                    break
+                except ssh_exception.ChannelException:
+                    pass
             self.echo("Proxy setup")
 
         if not self.resource.password and not self.resource.private_key:
