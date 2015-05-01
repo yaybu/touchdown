@@ -241,7 +241,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_distribution"
-    #update_action = "update_distribution"
+    # update_action = "update_distribution"
     create_response = "not-that-useful"
     waiter = "distribution_deployed"
 

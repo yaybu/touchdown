@@ -43,14 +43,14 @@ class Image(Resource):
     username = argument.String()
     steps = argument.List(argument.Resource(Step))
 
-    #architecture = argument.String(field="Architecture", default="x86_64", choices=["x86_64", "i386"])
-    #kernel = argument.String(field="KernelId")
-    #ramdisk = argument.String(field="RamdiskId")
-    #root_device_name = argument.String(field="RootDeviceName")
-    #virtualization_type = argument.String(choices=["paravirtual", "hvm"], field="VirtualizationType")
-    #sriov_net_support = argument.String(choices=["simple"], field="SriovNetSupport")
-    #location = argument.String()
-    #snapshot_id = argument.String()
+    # architecture = argument.String(field="Architecture", default="x86_64", choices=["x86_64", "i386"])
+    # kernel = argument.String(field="KernelId")
+    # ramdisk = argument.String(field="RamdiskId")
+    # root_device_name = argument.String(field="RootDeviceName")
+    # virtualization_type = argument.String(choices=["paravirtual", "hvm"], field="VirtualizationType")
+    # sriov_net_support = argument.String(choices=["simple"], field="SriovNetSupport")
+    # location = argument.String()
+    # snapshot_id = argument.String()
 
     launch_permissions = argument.List()
 
@@ -146,7 +146,6 @@ class BuildInstance(Action):
             username=self.resource.username,
             pkey=ssh.private_key_from_string(keypair['KeyMaterial']),
             look_for_keys=False,
-            #use_agent=False,
         )
         for step in self.resource.steps:
             cli.run_script(**serializers.Resource().render(self.runner, step))
@@ -222,13 +221,13 @@ class Apply(SimpleApply, Describe):
 
         add = []
         for userid in self.resource.launch_permissions:
-            if not userid in remote_userids:
+            if userid not in remote_userids:
                 description.append("Add launch permission for '{}'".format(userid))
                 add.append({"UserId": userid})
 
         remove = []
         for userid in remote_userids:
-            if not userid in self.resource.launch_permissions:
+            if userid not in self.resource.launch_permissions:
                 description.append("Remove launch permission for '{}'".format(userid))
                 remove.append({"UserId": userid})
 

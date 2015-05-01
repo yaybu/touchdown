@@ -57,7 +57,7 @@ class Goal(object):
         return self.resources[resource]
 
     def get_changes(self, resource):
-        if not resource in self.changes:
+        if resource not in self.changes:
             self.changes[resource] = list(self.get_plan(resource).get_actions())
         return self.changes[resource]
 
@@ -96,7 +96,7 @@ class Destroy(Goal):
     execute_in_reverse = True
 
     def get_plan_class(self, resource):
-        if not "never-destroy" in resource.policies:
+        if "never-destroy" not in resource.policies:
             return resource.meta.plans.get("destroy", resource.meta.plans.get("describe", plan.NullPlan))
         return resource.meta.plans.get("describe", plan.NullPlan)
 

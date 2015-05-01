@@ -62,7 +62,7 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             methods = {xform_name(s): s for s in service.operation_names}
             operation = service.operation_model(methods[impl.describe_action])
 
-            if not "." in impl.describe_envelope and not ":" in impl.describe_envelope:
+            if "." not in impl.describe_envelope and ":" not in impl.describe_envelope:
                 self.assertEqual(
                     impl.describe_envelope in operation.output_shape.members,
                     True

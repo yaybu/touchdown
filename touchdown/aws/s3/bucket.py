@@ -109,7 +109,7 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_bucket"
     create_response = "not-that-useful"
-    #waiter = "bucket_exists"
+    # waiter = "bucket_exists"
 
     def update_object(self):
         update_cors = False
@@ -155,7 +155,6 @@ class Apply(SimpleApply, Describe):
                 "Update bucket policy",
                 self.client.put_bucket_policy,
                 Bucket=self.resource.name,
-                #ContentMD5="",
                 Policy=self.resource.policy,
             )
 
@@ -163,7 +162,7 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_bucket"
-    #waiter = "bucket_not_exists"
+    # waiter = "bucket_not_exists"
 
     def get_destroy_serializer(self):
         return serializers.Dict(

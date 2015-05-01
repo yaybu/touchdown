@@ -98,7 +98,7 @@ class Apply(SimpleApply, Describe):
 
         for path in local:
             contenttype = mimetypes.guess_type(path)[0]
-            if not path in remote:
+            if path not in remote:
                 yield self.generic_action(
                     "Add {} ({})".format(path, contenttype),
                     self.client.put_object,
@@ -122,7 +122,7 @@ class Apply(SimpleApply, Describe):
                 )
 
         for path in remote:
-            if not path in local:
+            if path not in local:
                 yield self.generic_action(
                     "Remove {}".format(path),
                     self.client.delete_object,

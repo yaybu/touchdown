@@ -82,13 +82,13 @@ class Apply(SimpleApply, Describe):
 
         add = []
         for userid in self.resource.launch_permissions:
-            if not userid in remote_userids:
+            if userid not in remote_userids:
                 description.append("Add launch permission for '{}'".format(userid))
                 add.append({"UserId": userid})
 
         remove = []
         for userid in remote_userids:
-            if not userid in self.resource.launch_permissions:
+            if userid not in self.resource.launch_permissions:
                 description.append("Remove launch permission for '{}'".format(userid))
                 remove.append({"UserId": userid})
 

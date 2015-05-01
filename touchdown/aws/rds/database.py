@@ -74,7 +74,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_db_instance"
-    #update_action = "modify_db_instance"
+    # update_action = "modify_db_instance"
     waiter = "db_instance_available"
 
     signature = (

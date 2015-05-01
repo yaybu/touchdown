@@ -67,8 +67,8 @@ class Pipeline(Resource):
         group="notifications"
     )
 
-    #content_config = argument.Dict(field="ContentConfig", default=None)
-    #thumbnail_config = argument.Dict(field="ThumbnailConfig", default=None)
+    # content_config = argument.Dict(field="ContentConfig", default=None)
+    # thumbnail_config = argument.Dict(field="ThumbnailConfig", default=None)
 
     account = argument.Resource(Account)
 

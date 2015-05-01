@@ -57,12 +57,12 @@ class Record(Resource):
     def clean_name(self, name):
         return _normalize(name)
 
-    #weight = argument.Integer(min=1, max=255, field="Weight")
-    #region = argument.String(field="Region")
-    #geo_location = argument.String(field="GeoLocation")
-    #failover = argument.String(choices=["PRIMARY", "SECONDARY"], field="Failover")
-    #alias_target = argument.Resource(field="AliasTarget")
-    #health_check = argument.Resource(field="HealthCheckId")
+    # weight = argument.Integer(min=1, max=255, field="Weight")
+    # region = argument.String(field="Region")
+    # geo_location = argument.String(field="GeoLocation")
+    # failover = argument.String(choices=["PRIMARY", "SECONDARY"], field="Failover")
+    # alias_target = argument.Resource(field="AliasTarget")
+    # health_check = argument.Resource(field="HealthCheckId")
 
 
 class HostedZone(Resource):
@@ -159,7 +159,6 @@ class Apply(SimpleApply, Describe):
                 serializers.Dict(
                     HostedZoneId=serializers.Identifier(),
                     ChangeBatch=serializers.Dict(
-                        #Comment="",
                         Changes=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
                     )
                 ),

@@ -65,4 +65,4 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_vpc"
-    #waiter = 'vpc_terminated'
+    # waiter = 'vpc_terminated'
