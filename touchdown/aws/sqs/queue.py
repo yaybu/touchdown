@@ -30,11 +30,36 @@ class Queue(Resource):
     name = argument.String(field="QueueName")
 
     delay_seconds = argument.Integer(min=0, max=900, field="DelaySeconds", serializer=serializers.String(), group="attributes")
-    maximum_message_size = argument.Integer(min=1024, max=262144, field="MaximumMessageSize", serializer=serializers.String(), group="attributes")
-    message_retention_period = argument.Integer(min=60, max=1209600, field="MessageRetentionPeriod", serializer=serializers.String(), group="attributes")
+    maximum_message_size = argument.Integer(
+        min=1024,
+        max=262144,
+        field="MaximumMessageSize",
+        serializer=serializers.String(),
+        group="attributes"
+    )
+    message_retention_period = argument.Integer(
+        min=60,
+        max=1209600,
+        field="MessageRetentionPeriod",
+        serializer=serializers.String(),
+        group="attributes"
+    )
     policy = argument.String(field="Policy", group="attributes")
-    receive_message_wait_time_seconds = argument.Integer(min=0, max=20, field="ReceiveMessageWaitTimeSeconds", serializer=serializers.String(), group="attributes")
-    visibility_timeout = argument.Integer(default=30, min=0, max=43200, field="VisibilityTimeout", serializer=serializers.String(), group="attributes")
+    receive_message_wait_time_seconds = argument.Integer(
+        min=0,
+        max=20,
+        field="ReceiveMessageWaitTimeSeconds",
+        serializer=serializers.String(),
+        group="attributes"
+    )
+    visibility_timeout = argument.Integer(
+        default=30,
+        min=0,
+        max=43200,
+        field="VisibilityTimeout",
+        serializer=serializers.String(),
+        group="attributes"
+    )
 
     account = argument.Resource(Account)
 

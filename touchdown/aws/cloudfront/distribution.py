@@ -67,7 +67,9 @@ class DefaultCacheBehavior(Resource):
             group="forwarded-values",
             Cookies=serializers.Resource(
                 group="cookies",
-                Forward=serializers.Expression(lambda r, o: "all" if o.forward_cookies == ["*"] else "none" if len(o.forward_cookies) == 0 else "whitelist"),
+                Forward=serializers.Expression(
+                    lambda r, o: "all" if o.forward_cookies == ["*"] else "none" if len(o.forward_cookies) == 0 else "whitelist"
+                ),
             )
         )
     }
@@ -76,13 +78,19 @@ class DefaultCacheBehavior(Resource):
 
     forward_query_string = argument.Boolean(default=True, field="QueryString", group="forwarded-values")
     forward_headers = argument.List(field="Headers", serializer=CloudFrontList(serializers.List()), group="forwarded-values")
-    forward_cookies = argument.List(field="WhitelistedNames", serializer=CloudFrontList(serializers.Expression(lambda r, o: [] if o == ['*'] else o)), group="cookies")
+    forward_cookies = argument.List(field="WhitelistedNames", serializer=CloudFrontList(
+        serializers.Expression(lambda r, o: [] if o == ['*'] else o)), group="cookies"
+    )
 
     allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
     cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
 
     min_ttl = argument.Integer(default=0, field="MinTTL")
-    viewer_protocol_policy = argument.String(choices=['allow-all', 'https-only', 'redirect-to-https'], default='allow-all', field="ViewerProtocolPolicy")
+    viewer_protocol_policy = argument.String(
+        choices=['allow-all', 'https-only', 'redirect-to-https'],
+        default='allow-all',
+        field="ViewerProtocolPolicy"
+    )
     smooth_streaming = argument.Boolean(default=False, field='SmoothStreaming')
 
 

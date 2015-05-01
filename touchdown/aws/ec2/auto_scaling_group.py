@@ -283,10 +283,11 @@ class Instance(ssh.Instance):
         if len(instances) == 0:
             raise errors.Error("No instances available in {}".format(self.adapts))
 
-        if hasattr(self.parent, "proxy") and self.parent.proxy and self.parent.proxy.instance and self.parent.proxy.instance.adapts.subnets[0].vpc == self.adapts.subnets[0].vpc:
-            for instance in instances:
-                if 'PrivateIpAddress' in instance:
-                    return serializers.Const(instance['PrivateIpAddress'])
+        if hasattr(self.parent, "proxy") and self.parent.proxy and self.parent.proxy.instance:
+            if self.parent.proxy.instance.adapts.subnets[0].vpc == self.adapts.subnets[0].vpc:
+                for instance in instances:
+                    if 'PrivateIpAddress' in instance:
+                        return serializers.Const(instance['PrivateIpAddress'])
 
         for instance in instances:
             for k in ('PublicDnsName', 'PublicIpAddress'):

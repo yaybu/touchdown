@@ -89,7 +89,9 @@ class GenericAction(Action):
         if serializer:
             self.serializer = serializer
         else:
-            self.serializer = serializers.Dict(**{k: v if isinstance(v, serializers.Serializer) else serializers.Const(v) for (k, v) in kwargs.items()})
+            self.serializer = serializers.Dict(
+                **{k: v if isinstance(v, serializers.Serializer) else serializers.Const(v) for (k, v) in kwargs.items()}
+            )
 
     @property
     def description(self):

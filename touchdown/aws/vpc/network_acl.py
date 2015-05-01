@@ -149,12 +149,12 @@ class Apply(SimpleApply, Describe):
         for key, rule in local_rules.items():
             if key not in remote_rules or remote_rules[key] != rule:
                 if rule['Egress']:
-                    description = "Add rule: {0[RuleAction]} egress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
+                    desc = "Add rule: {0[RuleAction]} egress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
                 else:
-                    description = "Add rule: {0[RuleAction]} ingress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
+                    desc = "Add rule: {0[RuleAction]} ingress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
 
                 yield self.generic_action(
-                    description,
+                    desc,
                     self.client.create_network_acl_entry,
                     NetworkAclId=serializers.Identifier(),
                     **rule

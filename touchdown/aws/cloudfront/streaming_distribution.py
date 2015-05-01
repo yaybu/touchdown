@@ -62,7 +62,12 @@ class StreamingDistribution(Resource):
     aliases = argument.List()
     enabled = argument.Boolean(default=True, field="Enabled")
 
-    bucket = argument.Resource(Bucket, field="DomainName", serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()), group="s3origin")
+    bucket = argument.Resource(
+        Bucket,
+        field="DomainName",
+        serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()),
+        group="s3origin"
+    )
     origin_access_identity = argument.String(default='', field="OriginAccessIdentity", group="s3origin")
     logging = argument.Resource(
         StreamingLoggingConfig,
