@@ -194,6 +194,36 @@ class SimpleDescribe(object):
     def describe_object_matches(self, object):
         return True
 
+    def _get_paginated_matches(self, filters):
+        paginator = self.client.get_paginator(self.describe_action)
+        try:
+            for page in paginator.paginate(**filters):
+                for result in jmespath.search(self.describe_envelope, page) or []:
+                    yield result
+        except ClientError as e:
+            if e.response['Error']['Code'] == self.describe_notfound_exception:
+                raise StopIteration
+            raise errors.Error("{}: {}".format(self.resource, e))
+        except Exception as e:
+            raise errors.Error("{}: {}".format(self.resource, e))
+
+    def _get_unpaginated_matches(self, filters):
+        try:
+            results = getattr(self.client, self.describe_action)(**filters)
+        except ClientError as e:
+            if e.response['Error']['Code'] == self.describe_notfound_exception:
+                return []
+            raise errors.Error("{}: {}".format(self.resource, e))
+        except Exception as e:
+            raise errors.Error("{}: {}".format(self.resource, e))
+
+        results = jmespath.search(self.describe_envelope, results)
+        if results is None:
+            return []
+        elif not isgeneratorfunction(results) and not isinstance(results, list):
+            return [results]
+        return results
+
     def describe_object(self):
         logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
 
@@ -209,36 +239,9 @@ class SimpleDescribe(object):
         logger.debug("Filters are: {}".format(filters))
 
         if self.client.can_paginate(self.describe_action):
-            paginator = self.client.get_paginator(self.describe_action)
-
-            def _():
-                try:
-                    for page in paginator.paginate(**filters):
-                        for result in jmespath.search(self.describe_envelope, page) or []:
-                            yield result
-                except ClientError as e:
-                    if e.response['Error']['Code'] == self.describe_notfound_exception:
-                        raise StopIteration
-                    raise errors.Error("{}: {}".format(self.resource, e))
-                except Exception as e:
-                    raise errors.Error("{}: {}".format(self.resource, e))
-
-            results = _()
+            results = self._get_paginated_matches(filters)
         else:
-            try:
-                results = getattr(self.client, self.describe_action)(**filters)
-            except ClientError as e:
-                if e.response['Error']['Code'] == self.describe_notfound_exception:
-                    return {}
-                raise errors.Error("{}: {}".format(self.resource, e))
-            except Exception as e:
-                raise errors.Error("{}: {}".format(self.resource, e))
-
-            results = jmespath.search(self.describe_envelope, results)
-            if results is None:
-                results = []
-            elif not isgeneratorfunction(results) and not isinstance(results, list):
-                results = [results]
+            results = self._get_unpaginated_matches(filters)
 
         objects = list(filter(self.describe_object_matches, results or []))
 
