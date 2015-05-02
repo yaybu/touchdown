@@ -48,12 +48,13 @@ class DiffSet(object):
 
         self.diffs = []
 
-        if not self.local:
-            return
+        if self.local:
+            self.build_diffs()
 
-        for name, field in local.fields:
+    def build_diffs(self):
+        for name, field in self.local.fields:
             arg = field.argument
-            if not field.present(local):
+            if not field.present(self.local):
                 continue
             if not getattr(arg, "field", ""):
                 continue
@@ -61,7 +62,7 @@ class DiffSet(object):
                 continue
             if getattr(arg, "group", "") != self.group:
                 continue
-            if not getattr(local, name) and arg.field not in remote:
+            if not getattr(self.local, name) and arg.field not in self.remote:
                 continue
 
             try:
@@ -69,14 +70,14 @@ class DiffSet(object):
                 # serializers, second to ensure we have the right kind of thing.
                 # XXX: Consider rolling this into the Argument serializer.
                 rendered = arg.serializer.render(
-                    runner, serializers.Argument(name).render(runner, local))
+                    self.runner, serializers.Argument(name).render(self.runner, self.local))
             except serializers.FieldNotPresent:
                 continue
 
-            if arg.field not in remote:
+            if arg.field not in self.remote:
                 self.diffs.append(Diff(arg, "", rendered))
-            elif rendered != remote[arg.field]:
-                self.diffs.append(Diff(arg, remote[arg.field], rendered))
+            elif rendered != self.remote[arg.field]:
+                self.diffs.append(Diff(arg, self.remote[arg.field], rendered))
 
     def get_descriptions(self):
         for diff in self.diffs:

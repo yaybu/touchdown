@@ -111,19 +111,30 @@ class Apply(SimpleApply, Describe):
     create_response = "not-that-useful"
     # waiter = "bucket_exists"
 
+    def get_remote_cors_rules(self):
+        try:
+            return self.client.get_bucket_cors(Bucket=self.resource.name)["CORSRules"]
+        except ClientError as e:
+            if e.response['Error']['Code'] != "NoSuchCORSConfiguration":
+                raise
+        return []
+
+    def get_remote_bucket_policy(self):
+        try:
+            remote = self.client.get_bucket_policy(Bucket=self.resource.name)["Policy"]
+        except ClientError as e:
+            if e.response['Error']['Code'] != "NoSuchBucketPolicy":
+                raise
+            return {}
+        return json.loads(remote)
+
     def update_object(self):
         update_cors = False
         if not self.object and self.resource.rules:
             update_cors = True
         elif self.resource.rules:
-            try:
-                remote = self.client.get_bucket_cors(Bucket=self.resource.name)["CORSRules"]
-            except ClientError as e:
-                if e.response['Error']['Code'] != "NoSuchCORSConfiguration":
-                    raise
-                remote = []
             local = [serializers.Resource().render(self.runner, rule) for rule in self.resource.rules]
-            if remote != local:
+            if self.get_remote_cors_rules() != local:
                 update_cors = True
 
         if update_cors:
@@ -140,14 +151,7 @@ class Apply(SimpleApply, Describe):
         if not self.object and self.resource.policy:
             update_policy = True
         elif self.resource.policy:
-            try:
-                remote = self.client.get_bucket_policy(Bucket=self.resource.name)["Policy"]
-            except ClientError as e:
-                if e.response['Error']['Code'] != "NoSuchBucketPolicy":
-                    raise
-                remote = None
-
-            if self.resource.policy and (remote is None or json.loads(remote) != json.loads(self.resource.policy)):
+            if self.get_remote_bucket_policy() != json.loads(self.resource.policy):
                 update_policy = True
 
         if update_policy:

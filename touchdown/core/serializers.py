@@ -290,6 +290,22 @@ class Resource(Dict):
         self.group = group
         super(Resource, self).__init__(**kwargs)
 
+    def should_ignore_field(self, field, value):
+        arg = field.argument
+        if value is None:
+            return True
+        if not hasattr(arg, "field"):
+            return True
+        if arg.field in self.kwargs:
+            return True
+        if self.mode == "create" and not getattr(arg, "create", True):
+            return True
+        if self.mode == "update" and not getattr(arg, "update", True):
+            return True
+        if self.group != getattr(arg, "group", ""):
+            return True
+        return False
+
     def render(self, runner, object):
         if hasattr(object, "get_serializer"):
             return object.get_serializer(runner, **self.kwargs).render(runner, object)
@@ -301,27 +317,16 @@ class Resource(Dict):
                 kwargs[name] = serializer
 
         for argument_name, field in object.fields:
-            arg = field.argument
             value = field.get_value(object)
-            if value is None:
-                continue
-            if not hasattr(arg, "field"):
-                continue
-            if arg.field in self.kwargs:
-                continue
-            if self.mode == "create" and not getattr(arg, "create", True):
-                continue
-            if self.mode == "update" and not getattr(arg, "update", True):
-                continue
-            if self.group != getattr(arg, "group", ""):
+            if self.should_ignore_field(field, value):
                 continue
 
             if hasattr(object, "serialize_" + argument_name):
                 serializer = Expression(getattr(object, "serialize_" + argument_name))
             else:
-                serializer = arg.serializer
+                serializer = field.argument.serializer
 
-            kwargs[arg.field] = Context(
+            kwargs[field.argument.field] = Context(
                 Argument(argument_name, field),
                 serializer,
             )

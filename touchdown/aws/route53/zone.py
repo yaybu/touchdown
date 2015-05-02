@@ -114,19 +114,23 @@ class Apply(SimpleApply, Describe):
     create_response = "not-that-useful"
     # update_action = "update_hosted_zone_comment"
 
-    def update_object(self):
-        changes = []
-        description = ["Update hosted zone records"]
+    def get_remote_records(self):
+        if not self.resource_id:
+            return
 
         # Retrieve all DNS records associated with this hosted zone
         # Ignore SOA and NS records for the top level domain
-        remote_records = []
         if self.resource_id:
             for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
                 if record['Type'] in ('SOA', 'NS') and record['Name'] == self.resource.name:
                     continue
-                remote_records.append(record)
+                yield record
 
+    def update_object(self):
+        changes = []
+        description = ["Update hosted zone records"]
+
+        remote_records = list(self.get_remote_records())
         for local in self.resource.records:
             for remote in remote_records:
                 if local.matches(self.runner, remote):
@@ -149,8 +153,8 @@ class Apply(SimpleApply, Describe):
                         continue
                     break
                 else:
-                    changes.append(serializers.Const({"Action": "DELETE", "ResourceRecordSet": record}))
-                    description.append("Name => {}, Type={}, Action=DELETE".format(record["Name"], record["Type"]))
+                    changes.append(serializers.Const({"Action": "DELETE", "ResourceRecordSet": remote}))
+                    description.append("Name => {}, Type={}, Action=DELETE".format(remote["Name"], remote["Type"]))
 
         if changes:
             yield self.generic_action(

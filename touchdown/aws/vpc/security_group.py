@@ -50,14 +50,33 @@ class Rule(Resource):
         )),
     )
 
-    def matches(self, runner, rule):
-        sg = None
+    def exists(self, runner):
         if self.security_group:
-            sg = runner.get_plan(self.security_group)
             # If the SecurityGroup doesn't exist yet then this rule can't exist
             # yet - so we can bail early!
-            if not sg.resource_id:
+            if runner.get_plan(self.security_group).resource_id:
                 return False
+        return True
+
+    def match_security_group(self, runner, rule):
+        if self.security_group:
+            sg = runner.get_plan(self.security_group)
+            if sg and sg.object:
+                for group in rule.get('UserIdGroupPairs', []):
+                    if group['GroupId'] == sg.resource_id and group['UserId'] == sg.object['OwnerId']:
+                        return True
+        return False
+
+    def match_network(self, runner, rule):
+        if self.network:
+            for network in rule.get('IpRanges', []):
+                if network['CidrIp'] == str(self.network):
+                    return True
+        return False
+
+    def matches(self, runner, rule):
+        if not self.exists(runner):
+            return False
 
         if self.protocol != rule['IpProtocol']:
             return False
@@ -65,18 +84,7 @@ class Rule(Resource):
             return False
         if self.to_port != rule.get('ToPort', None):
             return False
-
-        if sg and sg.object:
-            for group in rule.get('UserIdGroupPairs', []):
-                if group['GroupId'] == sg.resource_id and group['UserId'] == sg.object['OwnerId']:
-                    return True
-
-        if self.network:
-            for network in rule.get('IpRanges', []):
-                if network['CidrIp'] == str(self.network):
-                    return True
-
-        return False
+        return self.match_security_group(runner, rule) or self.match_network(runner, rule)
 
     def __str__(self):
         name = super(Rule, self).__str__()
