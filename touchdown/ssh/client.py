@@ -78,12 +78,17 @@ class Client(paramiko.SSHClient):
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
-            while channel.recv_ready():
+            buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+            while buf:
+                print(buf, file=stdout, end='')
                 buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+            print(channel.in_buffer.empty(), file=stdout, end='')
+
+            buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
+            while buf:
                 print(buf, file=stdout, end='')
-            while channel.recv_stderr_ready():
                 buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
-                print(buf, file=stdout, end='')
+            print(channel.in_stderr_buffer.empty(), file=stdout, end='')
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
