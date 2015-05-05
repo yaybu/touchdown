@@ -172,3 +172,21 @@ class Destroy(SimpleDestroy, Describe):
         return serializers.Dict(
             Bucket=self.resource.name,
         )
+
+    def destroy_object(self):
+        keys = []
+        for page in self.client.get_paginator("list_objects").paginate(Bucket=self.resource.name):
+            keys.extend(o['Key'] for o in page.get("Contents", []))
+        keys.sort()
+
+        for i in range(0, len(keys), 1000):
+            chunk = keys[i:i+1000]
+            yield self.generic_action(
+                "Delete items '{}' through '{}'".format(chunk[0], chunk[-1]),
+                self.client.delete_objects,
+                Bucket=self.resource.name,
+                Delete={"Objects": [{"Key": k} for k in chunk], "Quiet": True},
+            )
+
+        for action in super(Destroy, self).destroy_object():
+            yield action
