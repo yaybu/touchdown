@@ -66,7 +66,7 @@ class WaitForHealthy(Action):
     @property
     def description(self):
         yield "Wait for there to be {} healthy instance(s)".format(
-            self.resource.desired_capacity,
+            self.resource.min_size,
         )
 
     def run(self):
