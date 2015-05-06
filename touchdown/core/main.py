@@ -52,14 +52,14 @@ class ConsoleInterface(object):
 
 
 def get_runner(ctx, target):
-    if ctx.parent.params['parallel']:
-        return ThreadedRunner(target, ctx.parent.obj, ConsoleInterface())
-    return Runner(target, ctx.parent.obj, ConsoleInterface())
+    if ctx.parent.params['serial']:
+        return Runner(target, ctx.parent.obj, ConsoleInterface())
+    return ThreadedRunner(target, ctx.parent.obj, ConsoleInterface())
 
 
 @click.group()
 @click.option('--debug/--no-debug', default=False, envvar='DEBUG')
-@click.option('--parallel/--serial', default=False, envvar='PARALLEL')
+@click.option('--serial/--parallel', default=False, envvar='SERIAL')
 @click.pass_context
 def main(ctx, debug, parallel):
     if debug:

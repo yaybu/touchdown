@@ -4,6 +4,8 @@ Changelog for Touchdown
 0.0.10 (unreleased)
 -------------------
 
+- The parallel resolver introduced in 0.0.7 is now enabled by default.
+
 - kms: Add initial support for managing Key and Alias resources.
 
 

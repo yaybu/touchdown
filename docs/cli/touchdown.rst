@@ -23,18 +23,17 @@ It takes the following arguments:
 
     Deploy this configuration in parallel. Uses the dependency information
     inferred from your configuration to do this safely. This is useful
-    on AWS, where it allows Touchdown to create ElastiCache instances and
-    RDS instances (which are slow to provisoion) at the same time.
+    on AWS, where it allows Touchdown to do things like create ElastiCache
+    instances and RDS instances (which are slow to provisoion) at the same
+    time.
 
-    This will become the default in a future release.
+    This is enabled by default.
 
 .. option:: --serial
 
     Force Touchdown to deploy a configuration in serial.
 
     Unlike parallel mode, serial mode is deterministic.
-
-    This is the default.
 
 .. option:: --debug
 
