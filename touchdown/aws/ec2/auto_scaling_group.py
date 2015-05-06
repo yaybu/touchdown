@@ -61,6 +61,23 @@ class AutoScalingGroup(Resource):
     account = argument.Resource(BaseAccount)
 
 
+class WaitForHealthy(Action):
+
+    @property
+    def description(self):
+        yield "Wait for there to be {} healthy instance(s)".format(
+            self.resource.desired_capacity,
+        )
+
+    def run(self):
+        self.plan.echo("Waiting for scaling group to become healthy")
+        while True:
+            asg = self.plan.describe_object()
+            if self.desired_capacity == len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']):
+                return True
+            time.sleep(5)
+
+
 class ReplaceInstances(Action):
 
     scaling_processes = [
@@ -193,6 +210,9 @@ class Apply(SimpleApply, Describe):
     def update_object(self):
         for change in super(Apply, self).update_object():
             yield change
+
+        if not self.object:
+            yield WaitForHealthy()
 
         launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
         instances = []
