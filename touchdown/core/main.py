@@ -26,8 +26,11 @@ class ConsoleInterface(object):
     def __init__(self, interactive=True):
         self.interactive = interactive
 
-    def echo(self, text, **kwargs):
-        click.echo(text, **kwargs)
+    def echo(self, text, nl=True, **kwargs):
+        if nl:
+            click.echo("{}\n".join(text), nl=False, **kwargs)
+        else:
+            click.echo("{}".join(text), nl=False, **kwargs)
 
     def render_plan(self, plan):
         for resource, actions in plan:
