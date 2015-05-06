@@ -70,10 +70,9 @@ class WaitForHealthy(Action):
         )
 
     def run(self):
-        self.plan.echo("Waiting for scaling group to become healthy")
         while True:
             asg = self.plan.describe_object()
-            if self.desired_capacity == len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']):
+            if len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']) >= self.resource.min_size:
                 return True
             time.sleep(5)
 
@@ -211,8 +210,8 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
-        if not self.object:
-            yield WaitForHealthy()
+        if not self.object and self.resource.min_size and self.resource.min_size > 0:
+            yield WaitForHealthy(self)
 
         launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
         instances = []
