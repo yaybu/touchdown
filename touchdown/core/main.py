@@ -28,9 +28,9 @@ class ConsoleInterface(object):
 
     def echo(self, text, nl=True, **kwargs):
         if nl:
-            click.echo("{}\n".join(text), nl=False, **kwargs)
+            click.echo("{}\n".format(text), nl=False, **kwargs)
         else:
-            click.echo("{}".join(text), nl=False, **kwargs)
+            click.echo("{}".format(text), nl=False, **kwargs)
 
     def render_plan(self, plan):
         for resource, actions in plan:
