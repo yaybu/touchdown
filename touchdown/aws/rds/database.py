@@ -15,6 +15,7 @@
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
+from touchdown.core.errors import InvalidParameter
 
 from ..account import Account
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -44,7 +45,7 @@ class Database(Resource):
     subnet_group = argument.Resource(SubnetGroup, field="DBSubnetGroupName", update=False)
     preferred_maintenance_window = argument.String(field="PreferredMaintenanceWindow")
     multi_az = argument.Boolean(field="MultiAZ")
-    storage_type = argument.String(field="StorageType")
+    storage_type = argument.String(field="StorageType", choices=["standard", "gp2", "io1"])
     storage_encrypted = argument.Boolean(default=False, field="StorageEncrypted")
     key = argument.Resource(Key, field="KmsKeyId")
     allow_major_version_upgrade = argument.Boolean(field="AllowMajorVersionUpgrade")
@@ -59,6 +60,25 @@ class Database(Resource):
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
     # tags = argument.Dict()
     account = argument.Resource(Account)
+
+    def clean_storage_encrypted(self, value):
+        if not value:
+            return False
+        supported_instances = [
+            "db.m3.medium",
+            "db.m3.large",
+            "db.m3.xlarge",
+            "db.m3.2xlarge",
+            "db.r3.large",
+            "db.r3.xlarge",
+            "db.r3.2xlarge",
+            "db.r3.4xlarge",
+            "db.r3.8xlarge",
+            "db.cr1.8xlarge",
+        ]
+        if self.instance_class not in supported_instances:
+            raise InvalidParameter("Encryption-at-rest is only supported for a subset of instance classes (such as db.m3.medium)")
+        return True
 
 
 class Describe(SimpleDescribe, Plan):
