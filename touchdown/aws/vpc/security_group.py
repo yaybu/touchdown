@@ -54,7 +54,7 @@ class Rule(Resource):
         if self.security_group:
             # If the SecurityGroup doesn't exist yet then this rule can't exist
             # yet - so we can bail early!
-            if runner.get_plan(self.security_group).resource_id:
+            if not runner.get_plan(self.security_group).resource_id:
                 return False
         return True
 
