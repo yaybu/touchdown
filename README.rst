@@ -22,9 +22,6 @@ blueprints in an idempotent way.
 You can find us in #yaybu on irc.oftc.net.
 
 Here is an example ``Touchdownfile``::
-
-    from touchdown.core.renderable import Format, Json, Property
-
     aws = workspace.add_aws(
         region='eu-west-1',
     )
