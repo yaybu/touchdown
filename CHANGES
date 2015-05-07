@@ -6,7 +6,36 @@ Changelog for Touchdown
 
 - The parallel resolver introduced in 0.0.7 is now enabled by default.
 
+- We've added more validation! Bucket names are now validated with the same
+  rules as the web console. You can only use storage_encrypted with a subset of
+  RDS instance sizes. We know capture that before making a single AWS call.
+
+- asg: We now wait for there to be at least one healthy instance when creating
+  a new auto scaling group.
+
+- asg: We now clean up old launch configs (you can only create a hundred, and
+  with 5 server types you can hit that in 20 deployments!).
+
 - kms: Add initial support for managing Key and Alias resources.
+
+- ssh: Fix streaming from paramiko channels. It was racy, and this meant that
+  short lived commands (such as ``whoami``) were prone to not returning all
+  their stdout. This mean that our connection health checks would fail.
+
+- ssh: When using ssh-over-ssh the inner connection might fail with
+  ChannelException. Assuming that an instance might still be booting we now
+  retry in this case.
+
+- elb: Fix failure in elb teardown.
+
+- cloudfront: If resuming a teardown touchdown will now resume waiting for
+  web distributions to enter the 'deployed' state before attempting to delete
+  them.
+
+- Of interested to developers: we've switched to stricter flake8 settings. We
+  are no longer inhibiting any of the default errors. Our ``max-line-length``
+  is 150 and our ``max-complexity`` is 11. We will be reducing these further in
+  the coming months.
 
 
 0.0.9 (2015-04-22)
