@@ -22,6 +22,7 @@ blueprints in an idempotent way.
 You can find us in #yaybu on irc.oftc.net.
 
 Here is an example ``Touchdownfile``::
+
     aws = workspace.add_aws(
         region='eu-west-1',
     )
