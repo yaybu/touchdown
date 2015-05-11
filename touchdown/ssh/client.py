@@ -52,9 +52,11 @@ class Client(paramiko.SSHClient):
 
         if input_encoding is None:
             input_encoding = self.input_encoding
+        if input_encoding is None:
+            input_encoding = "utf-8"
 
         def d(data):
-            return result.decode(input_encoding, 'replace')
+            return data.decode(input_encoding, 'replace')
 
         channel = transport.open_session()
         try:

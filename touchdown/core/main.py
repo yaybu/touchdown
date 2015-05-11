@@ -64,7 +64,7 @@ def get_runner(ctx, target):
 @click.option('--debug/--no-debug', default=False, envvar='DEBUG')
 @click.option('--serial/--parallel', default=False, envvar='SERIAL')
 @click.pass_context
-def main(ctx, debug, parallel):
+def main(ctx, debug, serial):
     if debug:
         logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
     g = {"workspace": Workspace()}

@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.local.local import Local, Step
-from touchdown.local.bash import Script
-from touchdown.local.fuselage import Bundle
+import six
 
-__all__ = [
-    "Local",
-    "Step",
-    "Script",
-    "Bundle",
-]
+from touchdown.core import argument, serializers
+from . import provisioner
+
+
+class Script(provisioner.Step):
+
+    resource_name = "script"
+
+    script = argument.String(
+        field="script",
+        serializer=serializers.Expression(lambda r, o: six.StringIO(o)),
+    )
+    sudo = argument.Boolean(field='sudo', default=True)

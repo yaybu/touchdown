@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .provisioner import Provisioner
-from touchdown.local import Step
-from touchdown.local import Script
-from touchdown.local import Bundle
+from .provisioner import Provisioner, Step, Target
+from .bash import Script
+from .fuselage import Bundle
+from .local import Local
+
 
 __all__ = [
     "Provisioner",
     "Step",
+    "Target",
     "Script",
     "Bundle",
+    "Local",
 ]

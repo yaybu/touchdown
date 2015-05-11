@@ -25,33 +25,24 @@ from touchdown.core import resource
 from touchdown.core import serializers
 from touchdown.core import workspace
 
-
-class Step(resource.Resource):
-
-    dot_ignore = True
+from .provisioner import Target
 
 
-class Local(resource.Resource):
+class Local(Target):
 
     resource_name = "local"
 
-    steps = argument.List(argument.Resource(Step))
+    user = argument.String()
+    state = argument.String(default=os.path.abspath('.fuselage'))
+
     root = argument.Resource(workspace.Workspace)
 
 
-class ApplyStep(action.Action):
+class Connection(object):
 
-    def __init__(self, plan, step):
-        super(ApplyStep, self).__init__(plan)
-        self.step = step
-
-    @property
-    def description(self):
-        yield "Applying step {}".format(self.step)
-
-    def run(self):
-        kwargs = serializers.Resource().render(self.runner, self.step)
-        self.run_script(kwargs['script'], sudo=kwargs['sudo'])
+    def __init__(self, plan):
+        self.plan = plan
+        self.resource = plan.resource
 
     def run_script(self, script, sudo=True, stdout=None, stderr=None):
         fd, script_name = tempfile.mkstemp()
@@ -59,11 +50,16 @@ class ApplyStep(action.Action):
             with os.fdopen(fd, 'wb') as fh:
                 fh.write(script.read())
             os.chmod(script_name, 0o755)
-            command = [script_name, '--no-changes-ok']
-            if sudo:
-                command = ['sudo'] + command
-            else:
-                command += ['--state', os.path.abspath('.fuselage')]
+
+            command = []
+            if self.resource.user:
+                command = ['sudo', '-u', self.resource.user]
+
+            command.extend([script_name, '--no-changes-ok'])
+
+            if self.resource.state:
+                command.extend(['--state', os.path.abspath('.fuselage')])
+
             proc = subprocess.Popen(
                 command, stdout=stdout, stderr=stderr)
             output, error_output = proc.communicate()
@@ -80,11 +76,13 @@ class ApplyStep(action.Action):
                 os.unlink(script_name)
 
 
-class Apply(plan.Plan):
+class LocalPlan(plan.Plan):
 
-    name = "apply"
+    name = "describe"
     resource = Local
 
+    def get_client(self):
+        return Connection(self)
+
     def get_actions(self):
-        for step in self.resource.steps:
-            yield ApplyStep(self, step)
+        return []

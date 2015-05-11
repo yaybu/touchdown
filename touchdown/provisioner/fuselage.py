@@ -19,7 +19,7 @@ import re
 import six
 
 from touchdown.core import argument, errors, resource, serializers
-from touchdown.local.local import Step
+from .provisioner import Step
 
 try:
     import fuselage

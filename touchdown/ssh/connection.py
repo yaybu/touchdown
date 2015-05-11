@@ -20,12 +20,14 @@ try:
 except ImportError:
     client = None
 
+from touchdown.provisioner import Target
+
 
 class Instance(adapters.Adapter):
     pass
 
 
-class Connection(resource.Resource):
+class Connection(Target):
 
     resource_name = "ssh_connection"
 

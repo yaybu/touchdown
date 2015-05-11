@@ -13,15 +13,21 @@
 # limitations under the License.
 
 from touchdown.core import argument, action, resource, plan, serializers, workspace
-from touchdown.local import Step
-from touchdown.ssh import Connection
+
+
+class Step(resource.Resource):
+    resource_name = "step"
+
+
+class Target(resource.Resource):
+    resource_name = "target"
 
 
 class Provisioner(resource.Resource):
 
     resource_name = "provisioner"
 
-    connection = argument.Resource(Connection)
+    target = argument.Resource(Target)
     steps = argument.List(argument.Resource(Step))
     root = argument.Resource(workspace.Workspace)
 
@@ -34,11 +40,11 @@ class ApplyStep(action.Action):
 
     @property
     def description(self):
-        yield "Applying step {} to {}".format(self.step, self.resource.connection)
+        yield "Applying step {} to {}".format(self.step, self.resource.target)
 
     def run(self):
         kwargs = serializers.Resource().render(self.runner, self.step)
-        client = self.get_plan(self.resource.connection).get_client()
+        client = self.get_plan(self.resource.target).get_client()
         client.run_script(kwargs['script'])
 
 
