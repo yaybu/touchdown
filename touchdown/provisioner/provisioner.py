@@ -15,10 +15,6 @@
 from touchdown.core import argument, action, resource, plan, serializers, workspace
 
 
-class Step(resource.Resource):
-    resource_name = "step"
-
-
 class Target(resource.Resource):
     resource_name = "target"
 
@@ -28,19 +24,14 @@ class Provisioner(resource.Resource):
     resource_name = "provisioner"
 
     target = argument.Resource(Target)
-    steps = argument.ResourceList(Step)
     root = argument.Resource(workspace.Workspace)
 
 
-class ApplyStep(action.Action):
-
-    def __init__(self, plan, step):
-        super(ApplyStep, self).__init__(plan)
-        self.step = step
+class RunScript(action.Action):
 
     @property
     def description(self):
-        yield "Applying step {} to {}".format(self.step, self.resource.target)
+        yield "Applying {} to {}".format(self.resource, self.resource.target)
 
     def run(self):
         kwargs = serializers.Resource().render(self.runner, self.step)
@@ -54,5 +45,4 @@ class Apply(plan.Plan):
     resource = Provisioner
 
     def get_actions(self):
-        for step in self.resource.steps:
-            yield ApplyStep(self, step)
+        yield RunScript(self)

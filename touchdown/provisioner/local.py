@@ -18,11 +18,8 @@ import tempfile
 import subprocess
 
 from touchdown.core import argument
-from touchdown.core import action
 from touchdown.core import errors
 from touchdown.core import plan
-from touchdown.core import resource
-from touchdown.core import serializers
 from touchdown.core import workspace
 
 from .provisioner import Target

@@ -18,7 +18,7 @@ from touchdown.core import argument, serializers
 from . import provisioner
 
 
-class Script(provisioner.Step):
+class Script(provisioner.Provisioner):
 
     resource_name = "script"
 
@@ -27,3 +27,8 @@ class Script(provisioner.Step):
         serializer=serializers.Expression(lambda r, o: six.StringIO(o)),
     )
     sudo = argument.Boolean(field='sudo', default=True)
+
+
+class Apply(provisioner.Apply):
+
+    resource = Script

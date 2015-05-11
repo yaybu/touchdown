@@ -22,7 +22,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, errors, serializers
 
-from touchdown.provisioner import Step
+from touchdown.provisioner import Provisioner
 from touchdown import ssh
 
 from ..account import BaseAccount
@@ -41,7 +41,7 @@ class Image(Resource):
     instance_type = argument.String(default="m3.medium")
 
     username = argument.String()
-    steps = argument.List(argument.Resource(Step))
+    provisioner = argument.Resource(Provisioner)
 
     # architecture = argument.String(field="Architecture", default="x86_64", choices=["x86_64", "i386"])
     # kernel = argument.String(field="KernelId")
@@ -140,15 +140,13 @@ class BuildInstance(Action):
 
     def deploy_instance(self, keypair, instance):
         cli = ssh.Client()
-
         cli.connect(
             hostname=instance['PublicIpAddress'],
             username=self.resource.username,
             pkey=ssh.private_key_from_string(keypair['KeyMaterial']),
             look_for_keys=False,
         )
-        for step in self.resource.steps:
-            cli.run_script(**serializers.Resource().render(self.runner, step))
+        cli.run_script(**serializers.Resource().render(self.runner, self.resource.provisioner))
 
     def terminate_instance(self, instance):
         self.plan.echo("Terminating instance")

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import adapters, argument, errors, resource, plan, serializers, workspace
+from touchdown.core import adapters, argument, errors, plan, serializers, workspace
 
 try:
     from . import client

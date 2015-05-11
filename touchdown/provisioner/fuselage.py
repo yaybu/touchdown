@@ -19,7 +19,7 @@ import re
 import six
 
 from touchdown.core import argument, errors, resource, serializers
-from .provisioner import Step
+from . import provisioner
 
 try:
     import fuselage
@@ -137,7 +137,7 @@ class ResourceBundle(bundle.ResourceBundle):
         return obj
 
 
-class Bundle(Step):
+class Bundle(provisioner.Provisioner):
 
     resource_name = "fuselage_bundle"
 
@@ -152,6 +152,11 @@ class Bundle(Step):
             item.serializer.render(runner, item)
             b.add(item)
         return builder.build(b)
+
+
+class Apply(provisioner.Apply):
+
+    resource = Bundle
 
 
 def make_fuselage_resource_serializer_compatible(resource_type):
