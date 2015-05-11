@@ -46,19 +46,16 @@ class Client(paramiko.SSHClient):
         super(Client, self).__init__(*args, **kwargs)
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    def _maybe_decode(self, recv, n, encoding=None):
-        result = recv(n)
-        if encoding is not None:
-            result = result.decode(encoding, 'replace')
-        else:
-            result = result.decode('utf8', 'replace')
-        return result
-
     def _run(self, transport, command, input_encoding=None, stdout=None):
         if stdout is None:
             stdout = sys.stdout
+
         if input_encoding is None:
             input_encoding = self.input_encoding
+
+        def d(data):
+            return result.decode(input_encoding, 'replace')
+
         channel = transport.open_session()
         try:
             channel.exec_command(command)
@@ -70,25 +67,23 @@ class Client(paramiko.SSHClient):
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    buf = self._maybe_decode(channel.recv, 1024, input_encoding)
-                    print(buf, file=stdout, end='')
+                    print(d(channel.recv(1024)), file=stdout, end='')
                 while channel.recv_stderr_ready():
-                    buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
-                    print(buf, file=stdout, end='')
+                    print(d(channel.recv_stderr(1024)), file=stdout, end='')
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
-            buf = self._maybe_decode(channel.recv, 1024, input_encoding)
+            buf = d(channel.recv(1024))
             while buf:
                 print(buf, file=stdout, end='')
-                buf = self._maybe_decode(channel.recv, 1024, input_encoding)
-            print(channel.in_buffer.empty(), file=stdout, end='')
+                buf = d(channel.recv(1024))
+            print(d(channel.in_buffer.empty()), file=stdout, end='')
 
-            buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
+            buf = d(channel.recv_stderr(1024))
             while buf:
                 print(buf, file=stdout, end='')
-                buf = self._maybe_decode(channel.recv_stderr, 1024, input_encoding)
-            print(channel.in_stderr_buffer.empty(), file=stdout, end='')
+                buf = d(channel.recv_stderr(1024))
+            print(d(channel.in_stderr_buffer.empty()), file=stdout, end='')
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
