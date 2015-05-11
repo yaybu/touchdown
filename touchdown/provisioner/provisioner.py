@@ -13,11 +13,8 @@
 # limitations under the License.
 
 from touchdown.core import argument, action, resource, plan, serializers, workspace
+from touchdown.local import Step
 from touchdown.ssh import Connection
-
-
-class Step(resource.Resource):
-    pass
 
 
 class Provisioner(resource.Resource):
