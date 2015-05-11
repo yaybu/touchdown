@@ -44,7 +44,7 @@ class Connection(object):
         self.plan = plan
         self.resource = plan.resource
 
-    def run_script(self, script, sudo=True, stdout=None, stderr=None):
+    def run_script(self, script, stdout=None, stderr=None):
         fd, script_name = tempfile.mkstemp()
         try:
             with os.fdopen(fd, 'wb') as fh:

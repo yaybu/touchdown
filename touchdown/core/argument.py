@@ -258,13 +258,13 @@ class Resource(Argument):
                 return
             self.resource_class = ResourceType.__all_resources__[self.resource_class]
 
-        argument_name = self.name
-
         if hasattr(cls, "wrap"):
             return
 
         if not hasattr(cls, "resource_name"):
             return
+
+        argument_name = self.name
 
         def _(self, **kwargs):
             arguments = {argument_name: self}
@@ -301,3 +301,13 @@ class ResourceList(List):
                 return
             self.list_of.resource_class = ResourceType.__all_resources__[self.resource_class]
         super(ResourceList, self).contribute_to_class(cls)
+
+        self.list_of.name = self.name
+        self.list_of.contribute_to_class(cls)
+        add = getattr(resource_class, 'add_%s' % cls.resource_name)
+        argument_name = self.name
+        def _(self, **kwargs):
+            resource = add(**kwargs)
+            getattr(self, argument_name).append(resource)
+            return resource
+        setattr(resource_class, 'add_%s' % cls.resource_name, _)

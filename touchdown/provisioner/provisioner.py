@@ -28,7 +28,7 @@ class Provisioner(resource.Resource):
     resource_name = "provisioner"
 
     target = argument.Resource(Target)
-    steps = argument.List(argument.Resource(Step))
+    steps = argument.ResourceList(Step)
     root = argument.Resource(workspace.Workspace)
 
 
