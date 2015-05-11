@@ -23,7 +23,7 @@ from touchdown.local.local import Step
 
 try:
     import fuselage
-    from fuselage import argument as f_args, builder, resources
+    from fuselage import argument as f_args, builder, bundle, resources
 except ImportError:
     raise errors.Error("You need the fuselage package to use the fuselage_bundle resource")
 
@@ -122,7 +122,7 @@ class FuselageResource(six.with_metaclass(FuselageResourceType, resource.Resourc
         return {self.__resource_name__: retval}
 
 
-class ResourceBundle(fuselage.bundle.ResourceBundle):
+class ResourceBundle(bundle.ResourceBundle):
 
     def __init__(self, runner, *args, **kwargs):
         fuselage.bundle.ResourceBundle.__init__(self, *args, **kwargs)
