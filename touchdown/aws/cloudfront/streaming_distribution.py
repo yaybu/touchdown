@@ -105,7 +105,7 @@ class Describe(SimpleDescribe, Plan):
             result = self.client.get_streaming_distribution(Id=distribution['Id'])
             distribution = {"ETag": result["ETag"], "Id": distribution["Id"]}
             distribution.update(result['StreamingDistribution'])
-            return distribution
+        return distribution
 
 
 class Apply(SimpleApply, Describe):

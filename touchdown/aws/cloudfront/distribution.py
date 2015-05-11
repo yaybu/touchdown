@@ -243,7 +243,7 @@ class Describe(SimpleDescribe, Plan):
                 "Status": result["Distribution"]["Status"],
             }
             distribution.update(result['Distribution']['DistributionConfig'])
-            return distribution
+        return distribution
 
 
 class Apply(SimpleApply, Describe):

@@ -113,7 +113,8 @@ class Property(Serializer):
         self.inner = inner
 
     def render(self, runner, object):
-        return runner.get_plan(self.inner.render(runner, object)).object.get(self.property, "dummy")
+        obj = runner.get_plan(self.inner.render(runner, object)).object
+        return obj.get(self.property, "dummy")
 
     def dependencies(self, object):
         return self.inner.dependencies(object)
