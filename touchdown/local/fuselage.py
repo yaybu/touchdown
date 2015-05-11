@@ -23,7 +23,7 @@ from touchdown.local.local import Step
 
 try:
     import fuselage
-    from fuselage import argument as f_args, bundle, builder, resources
+    from fuselage import argument as f_args, builder, resources
 except ImportError:
     raise errors.Error("You need the fuselage package to use the fuselage_bundle resource")
 
@@ -149,7 +149,7 @@ class Bundle(Step):
 
         for item in value:
             # We call this to render any subobjects
-            _kwargs = item.serializer.render(runner, item)
+            item.serializer.render(runner, item)
             b.add(item)
         return builder.build(b)
 
