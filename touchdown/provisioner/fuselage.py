@@ -32,6 +32,22 @@ def underscore(title):
     return re.sub(r'(?<=[a-z])(?=[A-Z])', u'_', title).lower()
 
 
+class FuselageArgument(argument.Argument):
+
+    def __init__(self, inner_arg, *args, **kwargs):
+        super(FuselageArgument, self).__init__(*args, **kwargs)
+        self.inner_arg = inner_arg
+
+    def clean(self, instance, value):
+        # NOTE: We deliberately don't consume the value of clean - otherwise
+        # we'll end up double-cleaning! We just want to validate the input.
+        try:
+            self.inner_arg.clean(instance, value)
+        except Exception as e:
+            raise errors.InvalidParameter(e)
+        return value
+
+
 class FuselageResource(resource.Resource):
 
     @classmethod
@@ -43,7 +59,7 @@ class FuselageResource(resource.Resource):
         }
 
         for arg, klass in resource_type.__args__.items():
-            args[arg] = argument.String(field=arg)
+            args[arg] = FuselageArgument(klass, field=arg)
 
         cls = type(
             resource_type.__resource_name__,
