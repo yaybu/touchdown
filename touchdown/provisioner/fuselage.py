@@ -82,7 +82,7 @@ class BundleSerializer(serializers.Serializer):
     def render(self, runner, value):
         b = bundle.ResourceBundle()
         for res in value:
-            b.add(resource.fuselage_class(
+            b.add(res.fuselage_class(
                 **serializers.Resource().render(runner, res)
             ))
         return builder.build(b)
