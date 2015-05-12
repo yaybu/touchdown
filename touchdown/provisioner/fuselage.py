@@ -32,20 +32,18 @@ def underscore(title):
     return re.sub(r'(?<=[a-z])(?=[A-Z])', u'_', title).lower()
 
 
-class FuselageArgument(argument.Argument):
-
-    def __init__(self, inner_arg, *args, **kwargs):
-        super(FuselageArgument, self).__init__(*args, **kwargs)
-        self.inner_arg = inner_arg
-
-    def clean(self, instance, value):
-        # NOTE: We deliberately don't consume the value of clean - otherwise
-        # we'll end up double-cleaning! We just want to validate the input.
-        try:
-            self.inner_arg.clean(instance, value)
-        except Exception as e:
-            raise errors.InvalidParameter(e)
-        return value
+arguments = {
+    f_args.Boolean: lambda resource_type, klass, arg: argument.Boolean(field=arg),
+    f_args.String: lambda resource_type, klass, arg: argument.String(field=arg),
+    f_args.FullPath: lambda resource_type, klass, arg: argument.String(field=arg),
+    f_args.File: lambda resource_type, klass, arg: argument.String(field=arg),
+    f_args.Integer: lambda resource_type, klass, arg: argument.Integer(field=arg),
+    f_args.Octal: lambda resource_type, klass, arg: argument.Integer(field=arg),
+    f_args.Dict: lambda resource_type, klass, arg: argument.Dict(field=arg),
+    f_args.List: lambda resource_type, klass, arg: argument.List(field=arg),
+    f_args.SubscriptionArgument: lambda resource_type, klass, arg: argument.List(field=arg),
+    f_args.PolicyArgument: lambda resource_type, klass, arg: argument.String(field=arg, choices=resource_type.policies.keys()),
+}
 
 
 class FuselageResource(resource.Resource):
@@ -59,7 +57,7 @@ class FuselageResource(resource.Resource):
         }
 
         for arg, klass in resource_type.__args__.items():
-            args[arg] = FuselageArgument(klass, field=arg)
+            args[arg] = arguments[klass.__class__](resource_type, klass, arg)
 
         cls = type(
             resource_type.__resource_name__,
