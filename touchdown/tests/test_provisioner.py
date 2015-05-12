@@ -61,7 +61,7 @@ class TestCase(unittest.TestCase):
 
     def test_file_remove(self):
         with tempfile.NamedTemporaryFile(delete=False) as fp:
-            fp.write("HELLO")
+            fp.write(b"HELLO")
 
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local(),
