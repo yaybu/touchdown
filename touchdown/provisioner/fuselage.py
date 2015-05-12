@@ -16,8 +16,6 @@ from __future__ import absolute_import
 
 import re
 
-import six
-
 from touchdown.core import argument, errors, resource, serializers
 from . import provisioner
 
@@ -65,7 +63,6 @@ class FuselageResource(resource.Resource):
             args
         )
 
-
         def _(self, **kwargs):
             arguments = {'parent': self}
             arguments.update(kwargs)
@@ -84,9 +81,9 @@ class BundleSerializer(serializers.Serializer):
 
     def render(self, runner, value):
         b = bundle.ResourceBundle()
-        for resource in value:
+        for res in value:
             b.add(resource.fuselage_class(
-                **serializers.Resource().render(runner, resource)
+                **serializers.Resource().render(runner, res)
             ))
         return builder.build(b)
 
