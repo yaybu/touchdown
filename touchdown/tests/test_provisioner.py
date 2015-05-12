@@ -14,13 +14,11 @@
 
 import os
 import unittest
-import six
 import tempfile
 
-from touchdown.core import workspace, errors
+from touchdown.core import workspace, errors, serializers
 from touchdown.core.runner import Runner
 from touchdown.core.main import ConsoleInterface
-from touchdown.core.utils import force_bytes
 
 
 class TestCase(unittest.TestCase):
@@ -47,6 +45,18 @@ class TestCase(unittest.TestCase):
             )
             self.apply()
             self.assertTrue(os.path.exists(fp.name))
+            self.assertEquals(open(fp.name, "r").read(), "hello")
+
+    def test_file_apply_serializers(self):
+        with tempfile.NamedTemporaryFile(delete=True) as fp:
+            bundle = self.workspace.add_fuselage_bundle(
+                target=self.workspace.add_local(),
+            )
+            bundle.add_file(
+                name=fp.name,
+                contents=serializers.Const("hello"),
+            )
+            self.apply()
             self.assertEquals(open(fp.name, "r").read(), "hello")
 
     def test_file_remove(self):
