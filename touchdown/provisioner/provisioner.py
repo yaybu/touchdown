@@ -34,7 +34,7 @@ class RunScript(action.Action):
         yield "Applying {} to {}".format(self.resource, self.resource.target)
 
     def run(self):
-        kwargs = serializers.Resource().render(self.runner, self.step)
+        kwargs = serializers.Resource().render(self.runner, self.resource)
         client = self.get_plan(self.resource.target).get_client()
         client.run_script(kwargs['script'])
 
@@ -45,4 +45,5 @@ class Apply(plan.Plan):
     resource = Provisioner
 
     def get_actions(self):
-        yield RunScript(self)
+        if self.resource.target:
+            yield RunScript(self)

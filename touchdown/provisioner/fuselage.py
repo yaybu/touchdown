@@ -63,10 +63,6 @@ class FuselageArgument(argument.Argument):
         return getattr(instance, self.arg_id)
 
     def serialize(self, instance, builder=None, runner=None):
-        if runner is not None:
-            value = serializers.Argument(self.arg_id).render(runner, instance)
-            value = self.clean(instance, value)
-            self.save(instance, value)
         return self.fuselage_argument_class.serialize(self, instance, builder=None)
 
 
