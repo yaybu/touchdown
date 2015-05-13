@@ -40,7 +40,7 @@ def private_key_from_string(private_key):
 class Client(paramiko.SSHClient):
 
     connection_attempts = 20
-    input_encoding = None
+    input_encoding = "utf-8"
 
     def __init__(self, *args, **kwargs):
         super(Client, self).__init__(*args, **kwargs)
@@ -52,8 +52,6 @@ class Client(paramiko.SSHClient):
 
         if input_encoding is None:
             input_encoding = self.input_encoding
-        if input_encoding is None:
-            input_encoding = "utf-8"
 
         def d(data):
             return data.decode(input_encoding, 'replace')
