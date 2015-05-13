@@ -23,6 +23,8 @@ Changelog for Touchdown
           contents=serializers.Const("HELLO!!"),
       )
 
+  Thanks to @mitchellrj for this feature.
+
 
 0.0.10 (2015-05-07)
 -------------------
