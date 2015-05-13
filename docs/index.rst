@@ -55,9 +55,9 @@ Resources
    :doc:`VPNs <config/aws/vpn>`
 
  * **Provisioning:**
-   :doc:`Provisioner targets <config/targets>` |
-   :doc:`Deploying scripts <config/bash>` |
-   :doc:`Deploying fuselage bundles <config/fuselage>`
+   :doc:`Provisioner targets <config/provisioner/targets>` |
+   :doc:`Deploying scripts <config/provisioner/bash>` |
+   :doc:`Deploying fuselage bundles <config/provisioner/fuselage>`
 
 
 Getting help
