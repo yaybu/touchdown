@@ -54,8 +54,10 @@ Resources
    :doc:`Transcoding <config/aws/elastictranscoder>` |
    :doc:`VPNs <config/aws/vpn>`
 
- * **Fuselage:**
-   :doc:`Deploying over SSH <config/fuselage>`
+ * **Provisioning:**
+   :doc:`Provisioner targets <config/targets>` |
+   :doc:`Deploying scripts <config/bash>` |
+   :doc:`Deploying fuselage bundles <config/fuselage>`
 
 
 Getting help

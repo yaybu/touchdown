@@ -197,4 +197,6 @@ latex_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {
+    'fuselage': ('http://docs.yaybu.com/projects/fuselage/en/latest/', None),
+}
