@@ -13,55 +13,71 @@ interpreter.
 
     You can create a bundle from the workspace::
 
-        bundle = workspace.add_bundle(
-            connection={
+        bundle = workspace.add_fuselage_bundle(
+            target={
                 "hostname": "localhost",
                 "username": "user",
             }
-            resources=[
-                File(
-                    name="/etc/apt/sources.list",
-                    contents="...",
-                )
-            ]
         )
 
-    When using bastion hosts you can chain connections::
+        bundle.add_file(
+            name="/etc/apt/sources.list",
+            contents="...",
+        )
 
-        bundle = workspace.add_bundle(
-            connection={
-                "hostname": "host1",
-                "username": "user",
-                "proxy": {
-                    "hostname": "host2",
-                    "username": "fred",
+
+    .. attribute:: target
+
+        The target of the deployment. A fuselage "bundle" will be built, copied
+        to this target and executed.
+
+        You can create a bundle from the workspace::
+
+            bundle = workspace.add_fuselage_bundle(
+                target={
+                    "hostname": "localhost",
+                    "username": "user",
                 }
-            },
-            resources=[<snip>],
-        )
+            )
 
-    When used like this a connection will be made to host2. From there a second
-    connection will be made from host2 to host1. This will be tunnelled inside
-    the first connection using the ``direct-tcpip`` feature of SSH.
+        This will SSH to ``localhost`` as user ``user`` to execute the bundle.
+        You can chain connections (a technique called jump-off hosts) to
+        traverse bastions::
 
-    Instead of passing a ``hostname`` you can pass ``instance``. This lets you
-    connect to resources defined elsewhere in your configuration. This even
-    works on :class:`~touchdown.aws.ec2.AutoScalingGroup` instances!::
+            bundle = workspace.add_fuselage_bundle(
+                target={
+                    "hostname": "host1",
+                    "username": "user",
+                    "proxy": {
+                        "hostname": "host2",
+                        "username": "fred",
+                    }
+                },
+            )
 
-        application_servers = aws.add_auto_scaling_group(
-            name='my-application-servers',
-        )
+        When used like this a connection will be made to host2. From there a
+        second connection will be made from host2 to host1. This will be
+        tunnelled inside the first connection using the ``direct-tcpip`` feature
+        of SSH.
 
-        bundle = workspace.add_bundle(
-            connection={
-                "instance": application_servers,
-                "username": "user",
-            },
-            resources=[<snip>],
-        )
+        Instead of passing a ``hostname`` you can pass ``instance``. This lets
+        you connect to resources defined elsewhere in your configuration. This
+        even works on :class:`~touchdown.aws.ec2.AutoScalingGroup` instances!::
 
-    .. attribute:: connection
+            application_servers = aws.add_auto_scaling_group(
+                name='my-application-servers',
+            )
 
-    .. attribute:: resources
+            bundle = workspace.add_fuselage_bundle(
+                target={
+                    "instance": application_servers,
+                    "username": "user",
+                },
+            )
 
-        This is a list of fuselage resources to apply.
+        You can also target your local machine directly. This won't use SSH.
+        It's a dedicated transport that runs locally::
+
+            bundle = workspace.add_fuselage_bundle(
+                target=workspace.add_local(),
+            )
