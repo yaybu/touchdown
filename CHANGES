@@ -4,7 +4,24 @@ Changelog for Touchdown
 0.0.11 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- The release merges the fuselage integration refactor. You no longer have to
+  import bits of fuselage to use it, you can use touchdown serializers and you
+  can use it against your local machine. This means you can generate a
+  ``local_settings.py`` for your Django dev environment with AWS resource
+  details in it!
+
+  A simple example is just::
+
+      from touchdown.core import serializers
+
+      provisioner = workspace.add_fuselage_bundle(
+          target=workspace.add_local(),
+      )
+
+      provisioner.add_file(
+          name="/home/john/hello",
+          contents=serializers.Const("HELLO!!"),
+      )
 
 
 0.0.10 (2015-05-07)
