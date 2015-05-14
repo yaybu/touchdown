@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.12 (unreleased)
+0.0.12 (2015-05-14)
 -------------------
 
 - We now use botocore at least 0.107.0. This version changed the structure of
