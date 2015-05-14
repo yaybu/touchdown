@@ -25,6 +25,9 @@ Changelog for Touchdown
 
   Thanks to @mitchellrj for this feature.
 
+- Print our resource ids after resource creation. This is particularly useful
+  for AMI creation and copying.
+
 
 0.0.10 (2015-05-07)
 -------------------

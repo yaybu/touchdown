@@ -131,6 +131,20 @@ class PostCreation(Action):
             raise errors.Error("Object creation failed")
 
 
+class PrintMetadata(Action):
+
+    @property
+    def description(self):
+        if not self.plan.resource_id:
+            yield "Display resource metadata"
+            return
+        yield "Resource metadata:"
+        yield "{} = {}".format(self.plan.key, self.plan.resource_id)
+
+    def run(self):
+        pass
+
+
 class RefreshMetadata(Action):
 
     description = ["Refresh resource metadata"]
@@ -369,6 +383,8 @@ class SimpleApply(SimpleDescribe):
 
             if self.create_response != "full-description" and not self.waiter:
                 yield PostCreation(self)
+
+            yield PrintMetadata(self)
 
         for change in self.update_tags():
             yield change
