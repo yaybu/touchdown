@@ -18,7 +18,7 @@ pep8==1.5.7  # rq.filter: <1.6
 py==1.4.27
 pyflakes==0.8.1
 pytest==2.7.0
-vcrpy==1.4.2
+vcrpy==1.5.0
 wrapt==1.10.4
 
 -e .
