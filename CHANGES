@@ -28,6 +28,8 @@ Changelog for Touchdown
 - Print our resource ids after resource creation. This is particularly useful
   for AMI creation and copying.
 
+- Better SSH connection retrying when tunneling.
+
 
 0.0.10 (2015-05-07)
 -------------------

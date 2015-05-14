@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from touchdown.core import adapters, argument, errors, plan, serializers, workspace
 
 try:
@@ -67,7 +69,7 @@ class ConnectionPlan(plan.Plan):
             proxy = self.runner.get_plan(self.resource.proxy)
             transport = proxy.get_client().get_transport()
             self.echo("Setting up proxy channel to {}".format(kwargs['hostname']))
-            for i in range(10):
+            for i in range(20):
                 try:
                     kwargs['sock'] = transport.open_channel(
                         'direct-tcpip',
@@ -76,7 +78,12 @@ class ConnectionPlan(plan.Plan):
                     )
                     break
                 except ssh_exception.ChannelException:
-                    pass
+                    time.sleep(i)
+                    continue
+
+            if 'sock' not in kwargs:
+                raise errors.Error("Error setting up proxy channel to {} after 20 tries".format(kwargs['hostname']))
+
             self.echo("Proxy setup")
 
         if not self.resource.password and not self.resource.private_key:
