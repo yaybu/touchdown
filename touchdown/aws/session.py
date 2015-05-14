@@ -17,20 +17,14 @@ import os
 from botocore import session
 
 
-session = session.get_session({
-    # Allow providing our own botocore json to override (and increase) various
-    # timeouts
-    "data_path": (
-        'data_path',
-        'AWS_DATA_PATH',
-        os.path.join(os.path.dirname(__file__), "data"),
-    ),
-})
-
+session = session.get_session()
 
 # Force botocore to initialise - this avoids race conditions around
 # get_component
 session.create_client("ec2", "eu-west-1")
+
+# Provide our own botocore json to override (and increase) various timeouts
+session.get_component('data_loader')._search_paths[1:1] = [os.path.join(os.path.dirname(__file__), "data")]
 
 
 class Session(object):

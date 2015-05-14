@@ -33,7 +33,7 @@ setup(
         'contextlib2',
         'netaddr',
         'fuselage>=0.0.6',
-        'botocore>=0.104.0',
+        'botocore>=0.107.0',
     ],
     entry_points='''
         [console_scripts]

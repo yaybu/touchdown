@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.0.12 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- We now use botocore at least 0.107.0. This version changed the structure of
+  its metadata folders. In order to continue overriding some values we've had
+  to mirror that change, which breaks support for older versions.
 
 
 0.0.11 (2015-05-14)
