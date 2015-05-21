@@ -285,6 +285,9 @@ class Instance(ssh.Instance):
 
         plan.echo("Scanning for healthy instances to SSH to")
 
+        if len(plan.object.get("Instances", [])) == 0:
+            raise errors.Error("No instances currently running in group {}".format(self.adapts))
+
         # Annoyingly we have to get antother client (different API) to get info
         # on teh EC2 instances in our asg
         client = plan.session.create_client("ec2")

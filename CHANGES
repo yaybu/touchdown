@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.0.13 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Avoid a case where SSHing into an ASG can actually log into a random instance
+  in the cluster. It looks like ``DescribeInstances(InstanceIds=[])`` is
+  interpreted as 'any instance'.
 
 
 0.0.12 (2015-05-14)
