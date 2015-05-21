@@ -71,7 +71,7 @@ class WaitForHealthy(Action):
 
     def run(self):
         while True:
-            asg = self.plan.describe_object()
+            asg = self.plan.object = self.plan.describe_object()
             if len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']) >= self.resource.min_size:
                 return True
             time.sleep(5)

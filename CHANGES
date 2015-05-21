@@ -8,6 +8,10 @@ Changelog for Touchdown
   in the cluster. It looks like ``DescribeInstances(InstanceIds=[])`` is
   interpreted as 'any instance'.
 
+- Make sure when bringing up an ASG for the first time it's metadata is updated
+  after at least one instance becomes healthy. This avoids cases where the ASG
+  looks empty to later steps of the deployment.
+
 
 0.0.12 (2015-05-14)
 -------------------
