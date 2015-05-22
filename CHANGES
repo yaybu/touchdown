@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.13 (unreleased)
+0.0.13 (2015-05-22)
 -------------------
 
 - Avoid a case where SSHing into an ASG can actually log into a random instance
