@@ -110,11 +110,29 @@ class ReplaceInstances(Action):
             ShouldDecrementDesiredCapacity=False,
         )
 
+    def wait_for_healthy_elb(self, elb):
+        self.plan.echo("Waiting for load balancer {} to report healthy")
+        elb = self.plan.session.create_client("elb")
+        while True:
+            result = elb.describe_instance_health(
+                LoadBalancerName=self.plan.runner.get_plan(elb).resource_id,
+            )
+
+            for instance in result.get("InstanceStates", []):
+                if instance["State"] != "InService":
+                    break
+            else:
+                return True
+
+            time.sleep(5)
+
     def wait_for_healthy_asg(self):
         self.plan.echo("Waiting for scaling group to become healthy")
         while True:
             asg = self.plan.describe_object()
             if self.desired_capacity == len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']):
+                for elb in self.resource.load_balancers:
+                    self.wait_for_healthy_elb(elb)
                 return True
             time.sleep(5)
 
