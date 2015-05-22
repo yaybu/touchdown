@@ -12,6 +12,9 @@ Changelog for Touchdown
   after at least one instance becomes healthy. This avoids cases where the ASG
   looks empty to later steps of the deployment.
 
+- When syncing a folder to S3 use application/octet-stream if unable to guess
+  mimetype.
+
 
 0.0.12 (2015-05-14)
 -------------------

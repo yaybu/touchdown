@@ -79,6 +79,8 @@ class Apply(SimpleApply, Describe):
     create_action = "put_object"
     create_response = "not-that-useful"
 
+    default_content_type = 'application/octet-stream'
+
     def update_object(self):
         remote = {}
         local = {}
@@ -97,7 +99,8 @@ class Apply(SimpleApply, Describe):
             remote = {k: v for k, v in self.get_folder_contents()}
 
         for path in local:
-            contenttype = mimetypes.guess_type(path)[0]
+            contenttype = mimetypes.guess_type(path)[0] or self.default_content_type
+
             if path not in remote:
                 yield self.generic_action(
                     "Add {} ({})".format(path, contenttype),
