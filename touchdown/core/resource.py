@@ -77,6 +77,11 @@ class Meta(object):
         self.fields = {}
         self.field_order = []
 
+    def get_plan(self, plan):
+        for cls in self.mro:
+            if hasattr(cls, "meta") and plan in cls.meta.plans:
+                return cls.meta.plans[plan]
+
     def iter_fields_in_order(self):
         for name in self.field_order:
             yield self.fields[name]
@@ -124,6 +129,7 @@ class ResourceType(type):
 
         # Actually build a class
         cls = type.__new__(meta_cls, class_name, bases, new_attrs)
+        cls.meta.mro = cls.mro()
 
         # Allow fields to contribute to the class...
         for field in cls.meta.iter_fields_in_order():

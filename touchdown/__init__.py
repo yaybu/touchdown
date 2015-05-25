@@ -15,10 +15,10 @@
 import touchdown.aws  # noqa
 import touchdown.provisioner  # noqa
 import touchdown.ssh  # noqa
+import touchdown.goals  # noqa
 
-from touchdown.core import Runner, Workspace
+from touchdown.core import Workspace
 
 __all__ = [
-    "Runner",
     "Workspace",
 ]

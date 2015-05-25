@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .workspace import Workspace
+from .apply import Apply
+from .destroy import Destroy
+from .dot import Dot
+from .rollback import Rollback
+from .tail import Tail
 
 
 __all__ = [
-    "Workspace",
+    "Apply",
+    "Destroy",
+    "Dot",
+    "Rollback",
+    "Tail",
 ]

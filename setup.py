@@ -29,7 +29,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'six',
-        'click',
         'contextlib2',
         'netaddr',
         'fuselage>=0.0.6',

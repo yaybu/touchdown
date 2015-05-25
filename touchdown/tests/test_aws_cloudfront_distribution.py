@@ -110,7 +110,7 @@ class TestCloudFront(aws.TestBasicUsage):
             "aws_distribution_get",
             expires=1
         )
-        self.assertRaises(errors.NothingChanged, self.runner.apply)
+        self.assertRaises(errors.NothingChanged, self.goal.execute)
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     # FIXME: Refactor tests so matching can be done in a generic way
@@ -119,5 +119,5 @@ class TestCloudFront(aws.TestBasicUsage):
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-11-06/distribution", self.fixture_found)
         self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2014-11-06/distribution/EDFDVBD6EXAMPLE", "aws_distribution_get")
-        self.runner.apply()
+        self.goal.execute()
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)

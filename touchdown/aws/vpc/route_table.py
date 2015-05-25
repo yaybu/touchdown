@@ -80,6 +80,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_route_table"
+    waiter = "route_table_available"
 
     def update_vpgw_associations(self):
         remote = set(r['GatewayId'] for r in self.object.get("PropagatingVgws", []))

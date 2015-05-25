@@ -37,11 +37,11 @@ class Account(BaseAccount):
     root = argument.Resource(Workspace)
 
 
-class Describe(Plan):
+class Null(Plan):
 
     resource = Account
     default = True
-    name = "describe"
+    name = "null"
     _session = None
 
     @property

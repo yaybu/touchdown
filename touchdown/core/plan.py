@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import six
-from . import errors
+from . import errors, resource
 
 
 class PlanType(type):
@@ -75,6 +75,9 @@ class Plan(six.with_metaclass(PlanType)):
 
 class NullPlan(Plan):
     """ A plan that doesn't do anything """
+
+    resource = resource.Resource
+    name = "null"
 
 
 class ArgumentAssertion(object):

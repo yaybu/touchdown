@@ -12,10 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .group import LogGroup
-from . import tail  # noqa
+from touchdown.core.goals import Goal, register
+from touchdown.goals.action import ActionGoalMixin
 
 
-__all__ = [
-    'LogGroup',
-]
+class Destroy(ActionGoalMixin, Goal):
+
+    """ Tear down this infrastructure """
+
+    name = "destroy"
+    execute_in_reverse = True
+
+    def get_plan_class(self, resource):
+        if "never-destroy" not in resource.policies:
+            return resource.meta.get_plan("destroy") or resource.meta.get_plan("describe") or resource.meta.get_plan("null")
+        return resource.meta.get_plan("describe") or resource.meta.get_plan("null")
+
+
+register(Destroy)

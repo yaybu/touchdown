@@ -25,3 +25,17 @@ class Workspace(Resource):
     @property
     def workspace(self):
         return self
+
+    def load(self):
+        pass
+
+
+class Touchdownfile(Workspace):
+
+    resource_name = "touchdown_file"
+
+    def load(self):
+        g = {"workspace": self}
+        with open("Touchdownfile") as f:
+            code = compile(f.read(), "Touchdownfile", "exec")
+            exec(code, g)
