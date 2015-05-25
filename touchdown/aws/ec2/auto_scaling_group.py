@@ -228,8 +228,9 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
-        if not self.object and self.resource.min_size and self.resource.min_size > 0:
-            yield WaitForHealthy(self)
+        if self.resource.min_size and self.resource.min_size > 0:
+            if len(self.object.get("Instances", [])) < self.resource.min_size:
+                yield WaitForHealthy(self)
 
         launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
         instances = []
