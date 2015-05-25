@@ -36,6 +36,4 @@ class Tail(Goal):
             self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
         self.ui.echo("")
 
-        print tailers
-
 register(Tail)
