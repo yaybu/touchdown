@@ -60,7 +60,10 @@ class Apply(SimpleApply, Describe):
             yield self.generic_action(
                 "Set log group retention to {} days".format(
                     self.resource.retention
-                )
+                ),
+                self.client.put_retention_policy,
+                logGroupName=self.resource.name,
+                retentionInDays=self.resource.retention,
             )
 
 
