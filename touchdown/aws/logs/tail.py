@@ -19,13 +19,15 @@ import time
 
 from touchdown.core import plan
 from touchdown.core.datetime import parse_datetime_as_seconds
+from touchdown.aws import common
 from touchdown.aws.logs import LogGroup
 
 
-class Plan(plan.Plan):
+class Plan(common.SimplePlan, plan.Plan):
 
     name = "tail"
     resource = LogGroup
+    service_name = "logs"
 
     def tail(self, start, end, follow):
         kwargs = {

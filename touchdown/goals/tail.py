@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import plan
 from touchdown.core.goals import Goal, register
 
 
@@ -21,19 +20,23 @@ class Tail(Goal):
     name = "tail"
 
     def get_plan_class(self, resource):
-        return resource.meta.plans.get("tail", plan.NullPlan)
+        plan_class = resource.meta.get_plan("tail")
+        if not plan_class:
+            plan_class = resource.meta.get_plan("null")
+        return plan_class
 
     def execute(self):
         tailers = {}
 
         def _(e, r):
-            plan = self.get_plan(r)
-            if not plan.name:
-                return
-            tailers[plan.name] = plan
+            p = self.get_plan(r)
+            if p.name == "tail":
+                tailers[p.resource.name] = p
 
         for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
             self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
         self.ui.echo("")
+
+        tailers["application.log"].tail("5m", None, True)
 
 register(Tail)

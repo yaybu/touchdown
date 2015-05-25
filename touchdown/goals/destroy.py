@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import plan
 from touchdown.core.goals import Goal, register
 from touchdown.goals.action import ActionGoalMixin
 
@@ -24,8 +23,8 @@ class Destroy(ActionGoalMixin, Goal):
 
     def get_plan_class(self, resource):
         if "never-destroy" not in resource.policies:
-            return resource.meta.plans.get("destroy", resource.meta.plans.get("describe", plan.NullPlan))
-        return resource.meta.plans.get("describe", plan.NullPlan)
+            return resource.meta.get_plan("destroy") or resource.meta.get_plan("describe") or resource.meta.get_plan("null")
+        return resource.meta.get_plan("describe") or resource.meta.get_plan("null")
 
 
 register(Destroy)

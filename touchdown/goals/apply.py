@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import plan
 from touchdown.core.goals import Goal, register
 from touchdown.goals.action import ActionGoalMixin
 
@@ -23,12 +22,12 @@ class Apply(ActionGoalMixin, Goal):
 
     def get_plan_class(self, resource):
         if "destroy" in resource.policies:
-            return resource.meta.plans["destroy"]
+            return resource.meta.get_plan("destroy")
 
         if "never-create" in resource.policies:
-            return resource.meta.plans["describe"]
+            return resource.meta.get_plan("describe")
 
-        return resource.meta.plans.get("apply", resource.meta.plans.get("describe", plan.NullPlan))
+        return resource.meta.get_plan("apply") or resource.meta.get_plan("describe") or resource.meta.get_plan("null")
 
 
 register(Apply)
