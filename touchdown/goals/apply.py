@@ -12,10 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .group import LogGroup
-from . import tail  # noqa
+from touchdown.core import plan
+from touchdown.core.goals import Goal, register
+from touchdown.goals.action import ActionGoalMixin
 
 
-__all__ = [
-    'LogGroup',
-]
+class Apply(ActionGoalMixin, Goal):
+
+    name = "apply"
+
+    def get_plan_class(self, resource):
+        if "destroy" in resource.policies:
+            return resource.meta.plans["destroy"]
+
+        if "never-create" in resource.policies:
+            return resource.meta.plans["describe"]
+
+        return resource.meta.plans.get("apply", resource.meta.plans.get("describe", plan.NullPlan))
+
+
+register(Apply)

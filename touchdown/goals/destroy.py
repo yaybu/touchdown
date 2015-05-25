@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .workspace import Workspace
+from touchdown.core import plan
+from touchdown.core.goals import Goal, register
+from touchdown.goals.action import ActionGoalMixin
 
 
-__all__ = [
-    "Workspace",
-]
+class Destroy(ActionGoalMixin, Goal):
+
+    name = "destroy"
+    execute_in_reverse = True
+
+    def get_plan_class(self, resource):
+        if "never-destroy" not in resource.policies:
+            return resource.meta.plans.get("destroy", resource.meta.plans.get("describe", plan.NullPlan))
+        return resource.meta.plans.get("describe", plan.NullPlan)
+
+
+register(Destroy)

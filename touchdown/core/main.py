@@ -16,9 +16,8 @@ import logging
 
 import click
 
-from touchdown.core.runner import ThreadedRunner, Runner
 from touchdown.core.workspace import Workspace
-from touchdown.core import errors
+from touchdown.core import errors, goals, map
 
 
 class ConsoleInterface(object):
@@ -54,10 +53,13 @@ class ConsoleInterface(object):
         return click.confirm("Do you want to continue?")
 
 
-def get_runner(ctx, target):
-    if ctx.parent.params['serial']:
-        return Runner(target, ctx.parent.obj, ConsoleInterface())
-    return ThreadedRunner(target, ctx.parent.obj, ConsoleInterface())
+def get_goal(ctx, target):
+    return goals.create(
+        target,
+        ctx.parent.obj,
+        ConsoleInterface(),
+        map=map.ParallelMap if not ctx.parent.params['serial'] else map.SerialMap
+    )
 
 
 @click.group()
@@ -77,7 +79,7 @@ def main(ctx, debug, serial):
 @main.command()
 @click.pass_context
 def apply(ctx):
-    r = get_runner(ctx, "apply")
+    r = get_goal(ctx, "apply")
     try:
         r.apply()
     except errors.Error as e:
@@ -87,7 +89,7 @@ def apply(ctx):
 @main.command()
 @click.pass_context
 def destroy(ctx):
-    r = get_runner(ctx, "destroy")
+    r = get_goal(ctx, "destroy")
     try:
         r.apply()
     except errors.Error as e:
@@ -97,15 +99,20 @@ def destroy(ctx):
 @main.command()
 @click.pass_context
 def plan(ctx):
-    r = get_runner(ctx, "apply")
+    r = get_goal(ctx, "apply")
     r.ui.render_plan(r.plan())
 
 
 @main.command()
 @click.pass_context
 def dot(ctx):
-    r = get_runner(ctx, "apply")
-    click.echo(r.dot())
+    get_goal(ctx, "dot").execute()
+
+
+@main.command()
+@click.pass_context
+def tail(ctx):
+    get_goal(ctx, "tail").execute()
 
 
 if __name__ == "__main__":

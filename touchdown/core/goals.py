@@ -14,7 +14,7 @@
 
 from __future__ import division
 
-from . import dependencies, plan
+from . import dependencies, plan, map, errors
 
 
 class GoalFactory(object):
@@ -25,22 +25,23 @@ class GoalFactory(object):
     def register(self, cls):
         self.goals[cls.name] = cls
 
-    def create(self, name, workspace, ui):
-        return self.goals[name](workspace, ui)
+    def create(self, name, workspace, ui, map=map.ParallelMap):
+        try:
+            goal_class = self.goals[name]
+        except KeyError:
+            raise errors.Error("No such goal '{}'".format(name))
+        return goal_class(workspace, ui, map=map)
 
 
 class Goal(object):
 
     execute_in_reverse = False
 
-    def __init__(self, workspace, ui):
+    def __init__(self, workspace, ui, map=map.ParallelMap):
         self.ui = ui
         self.workspace = workspace
         self.resources = {}
-        self.reset_changes()
-
-    def reset_changes(self):
-        self.changes = {}
+        self.Map = map
 
     def get_plan_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=False)
@@ -56,14 +57,6 @@ class Goal(object):
             self.resources[resource] = plan
         return self.resources[resource]
 
-    def get_changes(self, resource):
-        if resource not in self.changes:
-            self.changes[resource] = list(self.get_plan(resource).get_actions())
-        return self.changes[resource]
-
-    def is_stale(self):
-        return len(self.changes) != 0
-
     def get_execution_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
 
@@ -76,32 +69,7 @@ class Describe(Goal):
         return resource.meta.plans.get("describe", plan.NullPlan)
 
 
-class Apply(Goal):
-
-    name = "apply"
-
-    def get_plan_class(self, resource):
-        if "destroy" in resource.policies:
-            return resource.meta.plans["destroy"]
-
-        if "never-create" in resource.policies:
-            return resource.meta.plans["describe"]
-
-        return resource.meta.plans.get("apply", resource.meta.plans.get("describe", plan.NullPlan))
-
-
-class Destroy(Goal):
-
-    name = "destroy"
-    execute_in_reverse = True
-
-    def get_plan_class(self, resource):
-        if "never-destroy" not in resource.policies:
-            return resource.meta.plans.get("destroy", resource.meta.plans.get("describe", plan.NullPlan))
-        return resource.meta.plans.get("describe", plan.NullPlan)
-
-
 goals = GoalFactory()
-goals.register(Describe)
-goals.register(Apply)
-goals.register(Destroy)
+register = goals.register
+create = goals.create
+register(Describe)

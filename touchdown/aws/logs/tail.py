@@ -17,40 +17,44 @@
 
 import time
 
+from touchdown.core import plan
 from touchdown.core.datetime import parse_datetime_as_seconds
+from touchdown.aws.logs import LogGroup
 
 
-def tail(runner, log_group, start=None, end=None, follow=False):
-    plan = runner.goal.get_plan(log_group)
-    client = plan.client
+class Plan(plan.Plan):
 
-    kwargs = {
-        'logGroupName': log_group.name,
-    }
-    if start:
-        kwargs['startTime'] = parse_datetime_as_seconds(start)
-    if end:
-        kwargs['endTime'] = parse_datetime_as_seconds(end)
+    name = "tail"
+    resource = LogGroup
 
-    def pull(kwargs, previous_events):
-        seen = set()
-        filters = {}
-        filters.update(kwargs)
-        results = client.filter_log_events(**filters)
-        while True:
-            for event in results.get('events', []):
-                seen.add(event['eventId'])
-                if event['eventId'] in previous_events:
-                    continue
-                print(u"[{logStreamName}] {message}".format(**event))
-                kwargs['startTime'] = event['timestamp']
-            if 'nextToken' not in results:
-                break
-            filters['nextToken'] = results['nextToken']
-            results = client.filter_log_events(**filters)
-        return seen
+    def tail(self, start, end, follow):
+        kwargs = {
+            'logGroupName': self.resource.name,
+        }
+        if start:
+            kwargs['startTime'] = parse_datetime_as_seconds(start)
+        if end:
+            kwargs['endTime'] = parse_datetime_as_seconds(end)
 
-    seen = pull(kwargs, set())
-    while follow:
-        seen = pull(kwargs, seen)
-        time.sleep(2)
+        def pull(kwargs, previous_events):
+            seen = set()
+            filters = {}
+            filters.update(kwargs)
+            results = self.client.filter_log_events(**filters)
+            while True:
+                for event in results.get('events', []):
+                    seen.add(event['eventId'])
+                    if event['eventId'] in previous_events:
+                        continue
+                    print(u"[{logStreamName}] {message}".format(**event))
+                    kwargs['startTime'] = event['timestamp']
+                if 'nextToken' not in results:
+                    break
+                filters['nextToken'] = results['nextToken']
+                results = self.client.filter_log_events(**filters)
+            return seen
+
+        seen = pull(kwargs, set())
+        while follow:
+            seen = pull(kwargs, seen)
+            time.sleep(2)

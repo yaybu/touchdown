@@ -24,9 +24,9 @@ except ImportError:
 
 import vcr
 
-from touchdown.core import workspace, errors
-from touchdown.core.runner import Runner
+from touchdown.core import workspace, errors, goals
 from touchdown.core.main import ConsoleInterface
+from touchdown.core.map import SerialMap
 from touchdown.core.utils import force_bytes
 
 from botocore.vendored.requests.exceptions import ConnectionError
@@ -148,7 +148,12 @@ class TestCase(unittest.TestCase):
 
         self.workspace = workspace.Workspace()
         self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.runner = Runner("apply", self.workspace, ConsoleInterface(interactive=False))
+        self.goal = goals.create(
+            "apply",
+            self.workspace,
+            ConsoleInterface(interactive=False),
+            map=SerialMap
+        )
 
     def tearDown(self):
         self._patcher.stop()
@@ -165,7 +170,7 @@ class TestBasicUsage(TestCase):
         self.fixture_404 = "aws_{}_describe_404".format(self.resource.resource_name)
         self.fixture_create = "aws_{}_create".format(self.resource.resource_name)
 
-        self.plan = self.runner.goal.get_plan(self.resource)
+        self.plan = self.goal.get_plan(self.resource)
         self.base_url = 'https://{}.eu-west-1.amazonaws.com/'.format(self.plan.service_name)
 
     def setUpResource(self):
@@ -173,16 +178,14 @@ class TestBasicUsage(TestCase):
 
     def test_no_change(self):
         self.responses.add_fixture("POST", self.base_url, self.fixture_found, expires=1)
-        self.runner.dot()
-        self.assertRaises(errors.NothingChanged, self.runner.apply)
+        self.assertRaises(errors.NothingChanged, self.goal.execute)
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
     def test_create(self):
         self.responses.add_fixture("POST", self.base_url, self.fixture_404, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_found)
-        self.runner.dot()
-        self.runner.apply()
+        self.goal.execute()
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
 
 
@@ -226,11 +229,11 @@ class RecordedBotoCoreTest(unittest.TestCase):
         self.stack.close()
 
     def apply(self):
-        self.apply_runner = Runner("apply", self.workspace, ConsoleInterface(interactive=False))
-        self.apply_runner.apply()
-        self.assertRaises(errors.NothingChanged, self.apply_runner.apply)
+        self.apply_runner = goals.create("apply", self.workspace, ConsoleInterface(interactive=False), map=SerialMap)
+        self.apply_runner.execute()
+        self.assertRaises(errors.NothingChanged, self.apply_runner.execute)
 
     def destroy(self):
-        self.destroy_runner = Runner("destroy", self.workspace, ConsoleInterface(interactive=False))
-        self.destroy_runner.apply()
-        self.assertRaises(errors.NothingChanged, self.destroy_runner.apply)
+        self.destroy_runner = goals.create("destroy", self.workspace, ConsoleInterface(interactive=False), map=SerialMap)
+        self.destroy_runner.execute()
+        self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
