@@ -18,7 +18,7 @@
 import time
 
 from touchdown.core import plan
-from touchdown.core.datetime import parse_datetime_as_seconds
+from touchdown.core.datetime import as_seconds
 from touchdown.aws import common
 from touchdown.aws.logs import LogGroup
 
@@ -34,9 +34,9 @@ class Plan(common.SimplePlan, plan.Plan):
             'logGroupName': self.resource.name,
         }
         if start:
-            kwargs['startTime'] = parse_datetime_as_seconds(start)
+            kwargs['startTime'] = as_seconds(start)
         if end:
-            kwargs['endTime'] = parse_datetime_as_seconds(end)
+            kwargs['endTime'] = as_seconds(end)
 
         def pull(kwargs, previous_events):
             seen = set()

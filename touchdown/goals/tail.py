@@ -13,7 +13,18 @@
 # limitations under the License.
 
 from touchdown.core import errors
+from touchdown.core.datetime import parse_datetime
 from touchdown.core.goals import Goal, register
+
+
+def datetime(value):
+    try:
+        return parse_datetime(value)
+    except errors.Error:
+        import argparse
+        raise argparse.ArgumentTypeError(
+            "{} is not a valid date/time".format(value),
+        )
 
 
 class Tail(Goal):
@@ -30,10 +41,35 @@ class Tail(Goal):
 
     @classmethod
     def setup_argparse(cls, parser):
-        parser.add_argument("stream", metavar="STREAM", type=str, help="The logstream to tail")
-        parser.add_argument("-f", "--follow", default=False, action="store_true", help="Don't exit and continue to print new events in the stream")
-        parser.add_argument("-s", "--start", default="5m ago", action="store", help="The earliest event to retrieve")
-        parser.add_argument("-e", "--end", default=None, action="store", help="The latest event to retrieve")
+        parser.add_argument(
+            "stream",
+            metavar="STREAM",
+            type=str,
+            help="The logstream to tail"
+        )
+        parser.add_argument(
+            "-f",
+            "--follow",
+            default=False,
+            action="store_true",
+            help="Don't exit and continue to print new events in the stream"
+        )
+        parser.add_argument(
+            "-s",
+            "--start",
+            default="5m ago",
+            action="store",
+            type=datetime,
+            help="The earliest event to retrieve"
+        )
+        parser.add_argument(
+            "-e",
+            "--end",
+            default=None,
+            action="store",
+            type=datetime,
+            help="The latest event to retrieve"
+        )
 
     def execute(self, stream, start="5m ago", end=None, follow=False):
         tailers = {}
