@@ -18,6 +18,8 @@ from touchdown.goals.action import ActionGoalMixin
 
 class Apply(ActionGoalMixin, Goal):
 
+    """ Converge infrastructure on the state defined """
+
     name = "apply"
 
     def get_plan_class(self, resource):

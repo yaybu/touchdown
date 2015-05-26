@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core import errors
 from touchdown.core.goals import Goal, register
 
 
 class Tail(Goal):
+
+    """ Inspect (and stream) your logs """
 
     name = "tail"
 
@@ -25,7 +28,14 @@ class Tail(Goal):
             plan_class = resource.meta.get_plan("null")
         return plan_class
 
-    def execute(self):
+    @classmethod
+    def setup_argparse(cls, parser):
+        parser.add_argument("stream", metavar="STREAM", type=str, help="The logstream to tail")
+        parser.add_argument("-f", "--follow", default=False, action="store_true", help="Don't exit and continue to print new events in the log stream")
+        parser.add_argument("-s", "--start", default="5m ago", action="store", help="The earliest event to retrieve")
+        parser.add_argument("-e", "--end", default=None, action="store", help="The latest event to retrieve")
+
+    def execute(self, args):
         tailers = {}
 
         def _(e, r):
@@ -37,6 +47,9 @@ class Tail(Goal):
             self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
         self.ui.echo("")
 
-        tailers["application.log"].tail("5m", None, True)
+        if args.stream not in tailers:
+            raise errors.Error("No such log group '{}'".format(args.stream))
+
+        tailers[args.stream].tail(args.start, args.end, args.tail)
 
 register(Tail)

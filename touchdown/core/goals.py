@@ -25,6 +25,9 @@ class GoalFactory(object):
     def register(self, cls):
         self.goals[cls.name] = cls
 
+    def registered(self):
+        return self.goals.items()
+
     def create(self, name, workspace, ui, map=map.ParallelMap):
         try:
             goal_class = self.goals[name]
@@ -42,6 +45,10 @@ class Goal(object):
         self.workspace = workspace
         self.resources = {}
         self.Map = map
+
+    @classmethod
+    def setup_argparse(cls, parser):
+        pass
 
     def get_plan_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=False)
@@ -71,5 +78,7 @@ class Describe(Goal):
 
 goals = GoalFactory()
 register = goals.register
+registered = goals.registered
 create = goals.create
+
 register(Describe)

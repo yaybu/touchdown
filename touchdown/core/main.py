@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
+from __future__ import print_function
 
-import click
+import argparse
+import logging
+import sys
 
 from touchdown.core.workspace import Workspace
 from touchdown.core import errors, goals, map
@@ -27,92 +29,88 @@ class ConsoleInterface(object):
 
     def echo(self, text, nl=True, **kwargs):
         if nl:
-            click.echo("{}\n".format(text), nl=False, **kwargs)
+            print("{}\n".format(text), end='')
         else:
-            click.echo("{}".format(text), nl=False, **kwargs)
+            print("{}".format(text), end='')
+
+    def confirm(self, message):
+        response = raw_input('{} [Y/n] '.format(message))
+        while response.lower() not in ('y', 'n', ''):
+            response = raw_input('{} [Y/n] '.format(message))
+        return response.lower() == 'y'
 
     def render_plan(self, plan):
         for resource, actions in plan:
-            click.echo("%s:" % resource)
+            print("%s:" % resource)
             for action in actions:
                 description = list(action.description)
-                click.echo("  * %s" % description[0])
+                print("  * %s" % description[0])
                 for line in description[1:]:
-                    click.echo("      %s" % line)
-            click.echo("")
+                    print("      %s" % line)
+            print("")
 
     def confirm_plan(self, plan):
-        click.echo("Generated a plan to update infrastructure configuration:")
-        click.echo()
+        print("Generated a plan to update infrastructure configuration:")
+        print()
 
         self.render_plan(plan)
 
         if not self.interactive:
             return True
 
-        return click.confirm("Do you want to continue?")
+        return self.confirm("Do you want to continue?")
 
 
-def get_goal(ctx, target):
-    return goals.create(
-        target,
-        ctx.parent.obj,
-        ConsoleInterface(),
-        map=map.ParallelMap if not ctx.parent.params['serial'] else map.SerialMap
-    )
+class SubCommand(object):
+
+    def __init__(self, goal, workspace, console):
+        self.goal = goal
+        self.workspace = workspace
+        self.console = console
+
+    def __call__(self, args):
+        try:
+            g = self.goal(
+                self.workspace,
+                self.console,
+                map.ParallelMap if not args.serial else map.SerialMap
+            )
+            return g.execute(args)
+        except errors.Error as e:
+            self.console.echo(str(e))
+            sys.exit(1)
 
 
-@click.group()
-@click.option('--debug/--no-debug', default=False, envvar='DEBUG')
-@click.option('--serial/--parallel', default=False, envvar='SERIAL')
-@click.pass_context
-def main(ctx, debug, serial):
-    if debug:
-        logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
+def configure_parser(parser, workspace, console):
+    parser.add_argument("--debug", default=False, action="store_true")
+    parser.add_argument("--serial", default=False, action="store_true")
+
+    sub = parser.add_subparsers()
+    for name, goal in goals.registered():
+        p = sub.add_parser(name, help=getattr(goal, "__doc__", ""))
+        goal.setup_argparse(p)
+        p.set_defaults(func=SubCommand(
+            goal,
+            workspace,
+            console,
+        ))
+
+
+def main():
     g = {"workspace": Workspace()}
     with open("Touchdownfile") as f:
         code = compile(f.read(), "Touchdownfile", "exec")
         exec(code, g)
-    ctx.obj = g['workspace']
 
+    parser = argparse.ArgumentParser(description="Manage your infrastructure")
+    console = ConsoleInterface()
+    configure_parser(parser, g['workspace'], console)
+    args = parser.parse_args()
 
-@main.command()
-@click.pass_context
-def apply(ctx):
-    r = get_goal(ctx, "apply")
-    try:
-        r.apply()
-    except errors.Error as e:
-        raise click.ClickException(str(e))
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
 
-
-@main.command()
-@click.pass_context
-def destroy(ctx):
-    r = get_goal(ctx, "destroy")
-    try:
-        r.apply()
-    except errors.Error as e:
-        raise click.ClickException(str(e))
-
-
-@main.command()
-@click.pass_context
-def plan(ctx):
-    r = get_goal(ctx, "apply")
-    r.ui.render_plan(r.plan())
-
-
-@main.command()
-@click.pass_context
-def dot(ctx):
-    get_goal(ctx, "dot").execute()
-
-
-@main.command()
-@click.pass_context
-def tail(ctx):
-    get_goal(ctx, "tail").execute()
+    args.func(args)
 
 
 if __name__ == "__main__":

@@ -18,6 +18,8 @@ from touchdown.core.goals import Goal, register
 
 class Dot(Goal):
 
+    """ Generate a dot graph of all resources and their interconnections """
+
     name = "dot"
 
     def get_plan_class(self, resource):
@@ -36,7 +38,7 @@ class Dot(Goal):
         graph.append("}")
         return "\n".join(graph)
 
-    def execute(self):
+    def execute(self, args):
         self.ui.echo(self.get_digraph())
 
 register(Dot)

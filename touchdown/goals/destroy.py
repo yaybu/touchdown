@@ -18,6 +18,8 @@ from touchdown.goals.action import ActionGoalMixin
 
 class Destroy(ActionGoalMixin, Goal):
 
+    """ Tear down this infrastructure """
+
     name = "destroy"
     execute_in_reverse = True
 
