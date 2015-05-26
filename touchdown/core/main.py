@@ -18,6 +18,7 @@ import argparse
 import inspect
 import logging
 import sys
+import six
 
 from touchdown.core.workspace import Workspace
 from touchdown.core import errors, goals, map
@@ -35,9 +36,9 @@ class ConsoleInterface(object):
             print("{}".format(text), end='')
 
     def confirm(self, message):
-        response = raw_input('{} [Y/n] '.format(message))
+        response = six.input('{} [Y/n] '.format(message))
         while response.lower() not in ('y', 'n', ''):
-            response = raw_input('{} [Y/n] '.format(message))
+            response = six.input('{} [Y/n] '.format(message))
         return response.lower() == 'y'
 
     def render_plan(self, plan):
