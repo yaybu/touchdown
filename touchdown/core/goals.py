@@ -67,6 +67,20 @@ class Goal(object):
     def get_execution_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
 
+    def collect_as_dict(self, plan_name):
+        collected = {}
+
+        def _(echo, resource):
+            plan = self.get_plan(resource)
+            if plan.name == plan_name:
+                collected[plan.resource.name] = plan
+
+        for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
+            self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
+        self.ui.echo("")
+
+        return collected
+
 
 class Describe(Goal):
 

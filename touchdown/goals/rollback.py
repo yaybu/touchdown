@@ -30,23 +30,23 @@ class Rollback(Goal):
 
     @classmethod
     def setup_argparse(cls, parser):
-        parser.add_argument("target", metavar="TARGET", type=str, help="A datetime or named snapshot to rollback to")
+        parser.add_argument(
+            "target",
+            metavar="TARGET",
+            type=str,
+            help="The resource to rollback",
+        )
+        parser.add_argument(
+            "from_backup",
+            metavar="FROM",
+            type=str,
+            help="When or what to rollback to",
+        )
 
-    def execute(self, target):
-        restorable = {}
-
-        def _(e, r):
-            p = self.get_plan(r)
-            if p.name == "rollback":
-                restorable[p.resource.name] = p
-
-        for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
-            self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
-        self.ui.echo("")
-
-        if "some_db" not in restorable:
-            raise errors.Error("No such resource '{}'".format("some_db"))
-
-        restorable["some_db"].restore(target)
+    def execute(self, target, from_backup):
+        restorable = self.collect_as_dict("rollback")
+        if target not in restorable:
+            raise errors.Error("No such resource '{}'".format(target))
+        restorable[target].restore(from_backup)
 
 register(Rollback)

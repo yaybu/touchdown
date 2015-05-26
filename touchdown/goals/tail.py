@@ -72,20 +72,9 @@ class Tail(Goal):
         )
 
     def execute(self, stream, start="5m ago", end=None, follow=False):
-        tailers = {}
-
-        def _(e, r):
-            p = self.get_plan(r)
-            if p.name == "tail":
-                tailers[p.resource.name] = p
-
-        for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
-            self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
-        self.ui.echo("")
-
+        tailers = self.collect_as_dict("tail")
         if stream not in tailers:
             raise errors.Error("No such log group '{}'".format(stream))
-
         tailers[stream].tail(start, end, follow)
 
 register(Tail)
