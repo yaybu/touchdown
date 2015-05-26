@@ -15,6 +15,7 @@
 from .apply import Apply
 from .destroy import Destroy
 from .dot import Dot
+from .rollback import Rollback
 from .tail import Tail
 
 
@@ -22,5 +23,6 @@ __all__ = [
     "Apply",
     "Destroy",
     "Dot",
+    "Rollback",
     "Tail",
 ]

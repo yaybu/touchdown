@@ -16,6 +16,7 @@ from .subnet_group import SubnetGroup
 from .database import Database
 from .point_in_time_restore import PointInTimeRestore
 from .snapshot_restore import SnapshotRestore
+from . import rollback  # noqa
 
 
 __all__ = [

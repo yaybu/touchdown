@@ -16,40 +16,37 @@ from touchdown.core import errors
 from touchdown.core.goals import Goal, register
 
 
-class Tail(Goal):
+class Rollback(Goal):
 
-    """ Inspect (and stream) your logs """
+    """ Rollback a database to a point in time or a backup """
 
-    name = "tail"
+    name = "rollback"
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("tail")
+        plan_class = resource.meta.get_plan("rollback")
         if not plan_class:
             plan_class = resource.meta.get_plan("null")
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
-        parser.add_argument("stream", metavar="STREAM", type=str, help="The logstream to tail")
-        parser.add_argument("-f", "--follow", default=False, action="store_true", help="Don't exit and continue to print new events in the stream")
-        parser.add_argument("-s", "--start", default="5m ago", action="store", help="The earliest event to retrieve")
-        parser.add_argument("-e", "--end", default=None, action="store", help="The latest event to retrieve")
+        parser.add_argument("target", metavar="TARGET", type=str, help="A datetime or named snapshot to rollback to")
 
-    def execute(self, stream, start="5m ago", end=None, follow=False):
-        tailers = {}
+    def execute(self, target):
+        restorable = {}
 
         def _(e, r):
             p = self.get_plan(r)
-            if p.name == "tail":
-                tailers[p.resource.name] = p
+            if p.name == "rollback":
+                restorable[p.resource.name] = p
 
         for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
             self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
         self.ui.echo("")
 
-        if stream not in tailers:
-            raise errors.Error("No such log group '{}'".format(stream))
+        if "some_db" not in restorable:
+            raise errors.Error("No such resource '{}'".format("some_db"))
 
-        tailers[stream].tail(start, end, follow)
+        restorable["some_db"].restore(target)
 
-register(Tail)
+register(Rollback)

@@ -15,6 +15,7 @@
 from __future__ import print_function
 
 import argparse
+import inspect
 import logging
 import sys
 
@@ -68,6 +69,17 @@ class SubCommand(object):
         self.workspace = workspace
         self.console = console
 
+    def get_args_and_kwargs(self, callable, namespace):
+        argspec = inspect.getargspec(callable)
+        args = []
+        for arg in argspec.args[1:]:
+            args.append(getattr(namespace, arg))
+        kwargs = {}
+        for k, v in namespace._get_kwargs():
+            if k not in argspec.args and argspec.keywords:
+                kwargs[k] = v
+        return args, kwargs
+
     def __call__(self, args):
         try:
             g = self.goal(
@@ -75,7 +87,8 @@ class SubCommand(object):
                 self.console,
                 map.ParallelMap if not args.serial else map.SerialMap
             )
-            return g.execute(args)
+            args, kwargs = self.get_args_and_kwargs(g.execute, args)
+            return g.execute(*args, **kwargs)
         except errors.Error as e:
             self.console.echo(str(e))
             sys.exit(1)

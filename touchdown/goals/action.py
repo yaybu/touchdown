@@ -54,7 +54,7 @@ class ActionGoalMixin(object):
     def is_stale(self):
         return len(self.changes) != 0
 
-    def execute(self, args):
+    def execute(self):
         plan = list(self.plan())
 
         if not len(plan):
