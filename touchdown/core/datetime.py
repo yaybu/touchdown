@@ -89,6 +89,5 @@ def parse_datetime(value):
     )
 
 
-def parse_datetime_as_seconds(value):
-    date = parse_datetime(value)
-    return int(date.strftime("%s")) * 1000
+def as_seconds(value):
+    return int(value.strftime("%s")) * 1000

@@ -172,22 +172,9 @@ class SetTags(Action):
         )
 
 
-class SimpleDescribe(object):
-
-    name = "describe"
-
-    describe_filters = None
-    describe_notfound_exception = None
-
-    signature = (
-        Present('name'),
-    )
+class SimplePlan(object):
 
     _client = None
-
-    def __init__(self, runner, resource):
-        super(SimpleDescribe, self).__init__(runner, resource)
-        self.object = {}
 
     @property
     def session(self):
@@ -199,6 +186,22 @@ class SimpleDescribe(object):
         if not self._client:
             self._client = session.create_client(self.service_name)
         return self._client
+
+
+class SimpleDescribe(SimplePlan):
+
+    name = "describe"
+
+    describe_filters = None
+    describe_notfound_exception = None
+
+    signature = (
+        Present('name'),
+    )
+
+    def __init__(self, runner, resource):
+        super(SimpleDescribe, self).__init__(runner, resource)
+        self.object = {}
 
     def get_describe_filters(self):
         return {

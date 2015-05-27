@@ -16,9 +16,9 @@ import os
 import unittest
 import tempfile
 
-from touchdown.core import workspace, errors, serializers
-from touchdown.core.runner import Runner
+from touchdown.core import workspace, errors, serializers, goals
 from touchdown.core.main import ConsoleInterface
+from touchdown.core.map import SerialMap
 
 
 class TestCase(unittest.TestCase):
@@ -27,12 +27,22 @@ class TestCase(unittest.TestCase):
         self.workspace = workspace.Workspace()
 
     def apply(self):
-        self.apply_runner = Runner("apply", self.workspace, ConsoleInterface(interactive=False))
-        self.apply_runner.apply()
+        self.apply_runner = goals.create(
+            "apply",
+            self.workspace,
+            ConsoleInterface(interactive=False),
+            map=SerialMap
+        )
+        self.apply_runner.execute()
 
     def test_destroy(self):
-        self.destroy_runner = Runner("destroy", self.workspace, ConsoleInterface(interactive=False))
-        self.assertRaises(errors.NothingChanged, self.destroy_runner.apply)
+        self.destroy_runner = goals.create(
+            "destroy",
+            self.workspace,
+            ConsoleInterface(interactive=False),
+            map=SerialMap
+        )
+        self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
 
     def test_file_apply(self):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
