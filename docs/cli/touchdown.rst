@@ -47,4 +47,6 @@ There are a bunch of commands you can run against your Touchdown config:
 
    apply
    destroy
+   tail
+   rollback
    dot

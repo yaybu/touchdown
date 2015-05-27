@@ -27,6 +27,8 @@ Getting started
    :doc:`The touchdown command <cli/touchdown>` |
    :doc:`Applying changes <cli/apply>` |
    :doc:`Tearing down environments <cli/destroy>` |
+   :doc:`Viewing logs <cli/tail>` |
+   :doc:`Rolling back data <cli/rollback>` |
    :doc:`Generating graphs <cli/dot>`
 
  * **Tutorial:**
