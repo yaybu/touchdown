@@ -4,7 +4,34 @@ Changelog for Touchdown
 0.0.14 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add support for AWS CloudWatch Logs. In this initial release you can
+  pre-create your log groups and manage the log retention period::
+
+      aws.add_log_group(
+          name="application.log",
+          retention=3,
+      )
+
+- Add a new tail command. This can grab events from any touchdown managed
+  CloudWatch log group. For the example above you could get the last 15m of
+  logs with::
+
+      touchdown tail application.log -s 15m
+
+  And stream all new logs to that group with::
+
+      touchdown tail application.log -f
+
+- Add a new rollback command. This can restore a snapshot or restore to a point
+  in time for any RDS database. For example to rewind your database ``foo`` to
+  an hour ago you could::
+
+      touchdown rollback foo 1h
+
+- Both of these commands are written to be pluggable. For example in future you
+  might be able to use the same ``tail`` command against a heroku app.
+
+- Touchdown no longer depends on click.
 
 
 0.0.13 (2015-05-22)
