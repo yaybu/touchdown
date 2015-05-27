@@ -38,7 +38,7 @@ class Dot(Goal):
         graph.append("}")
         return "\n".join(graph)
 
-    def execute(self, args):
+    def execute(self):
         self.ui.echo(self.get_digraph())
 
 register(Dot)

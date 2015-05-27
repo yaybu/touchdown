@@ -20,7 +20,7 @@ import logging
 import sys
 import six
 
-from touchdown.core.workspace import Workspace
+from touchdown.core.workspace import Touchdownfile
 from touchdown.core import errors, goals, map
 
 
@@ -36,9 +36,9 @@ class ConsoleInterface(object):
             print("{}".format(text), end='')
 
     def confirm(self, message):
-        response = six.input('{} [Y/n] '.format(message))
+        response = six.moves.input('{} [Y/n] '.format(message))
         while response.lower() not in ('y', 'n', ''):
-            response = six.input('{} [Y/n] '.format(message))
+            response = six.moves.input('{} [Y/n] '.format(message))
         return response.lower() == 'y'
 
     def render_plan(self, plan):
@@ -82,6 +82,7 @@ class SubCommand(object):
         return args, kwargs
 
     def __call__(self, args):
+        self.workspace.load()
         try:
             g = self.goal(
                 self.workspace,
@@ -111,14 +112,9 @@ def configure_parser(parser, workspace, console):
 
 
 def main():
-    g = {"workspace": Workspace()}
-    with open("Touchdownfile") as f:
-        code = compile(f.read(), "Touchdownfile", "exec")
-        exec(code, g)
-
     parser = argparse.ArgumentParser(description="Manage your infrastructure")
     console = ConsoleInterface()
-    configure_parser(parser, g['workspace'], console)
+    configure_parser(parser, Touchdownfile(), console)
     args = parser.parse_args()
 
     if args.debug:
