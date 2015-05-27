@@ -36,6 +36,8 @@ class TestCase(unittest.TestCase):
 
     def test_file_apply(self):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
+            fp.close()
+
             bundle = self.workspace.add_fuselage_bundle(
                 target=self.workspace.add_local(),
             )
@@ -49,6 +51,8 @@ class TestCase(unittest.TestCase):
 
     def test_file_apply_serializers(self):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
+            fp.close()
+
             bundle = self.workspace.add_fuselage_bundle(
                 target=self.workspace.add_local(),
             )
