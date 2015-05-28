@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.0.14.dev0'
+version = '0.0.15.dev0'
 
 setup(
     name='touchdown',
@@ -29,7 +29,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'six',
-        'click',
         'contextlib2',
         'netaddr',
         'fuselage>=0.0.6',
