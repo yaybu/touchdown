@@ -129,7 +129,6 @@ class ParallelMap(object):
         # Start up as many workers as requested.
         for i in range(self.workers):
             t = threading.Thread(target=self.worker, name="worker{}".format(i))
-            t.daemon = True
             t.start()
 
         # Seed the workers with the initial batch of work
