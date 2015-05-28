@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.14 (unreleased)
+0.0.14 (2015-05-28)
 -------------------
 
 - Add support for AWS CloudWatch Logs. In this initial release you can
