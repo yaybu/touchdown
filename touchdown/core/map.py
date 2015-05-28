@@ -125,6 +125,22 @@ class ParallelMap(object):
                 self.ready.stop()
                 raise
 
+    def wait_for_remaining(self):
+        # No more dependencies to process - we just need to wait for any
+        # remaining tasks to complete
+        remaining = None
+        while len(self.active) > 0:
+            if len(self.active) != remaining:
+                remaining = len(self.active)
+                self.current = self.total - remaining
+
+                if remaining == 1:
+                    self.echo("{} remaining".format(list(self.active)[0]))
+                else:
+                    self.echo("{} tasks remaining".format(remaining))
+            time.sleep(1)
+            yield self.current / self.total
+
     def __iter__(self):
         # Start up as many workers as requested.
         for i in range(self.workers):
@@ -156,20 +172,10 @@ class ParallelMap(object):
 
             yield self.current / self.total
 
-        # No more dependencies to process - we just need to wait for any
-        # remaining tasks to complete
-        remaining = None
-        while len(self.active) > 0:
-            if len(self.active) != remaining:
-                remaining = len(self.active)
-                self.current = self.total - remaining
+        for progress in self.wait_for_remaining():
+            yield progress
 
-                if remaining == 1:
-                    self.echo("{} remaining".format(list(self.active)[0]))
-                else:
-                    self.echo("{} tasks remaining".format(remaining))
-            time.sleep(1)
-            yield self.current / self.total
+        self.ready.stop()
 
     def __call__(self):
         list(iter(self))
