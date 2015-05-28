@@ -51,6 +51,95 @@ class Plan(common.SimplePlan, plan.Plan):
             return None
         return dbs[0]
 
+    def check_snapshot(self, db, snapshot_name):
+        try:
+            snapshots = self.client.describe_db_snapshots(
+                DBInstanceIdentifier=db['DBInstanceIdentifier'],
+                DBSnapshotIdentifier=snapshot_name
+            ).get('DBSnapshots', [])
+        except ClientError:
+            raise errors.Error("Could not find snapshot {}".format(snapshot_name))
+        if len(snapshots) == 0:
+            raise errors.Error("Could not find snapshot {}".format(snapshot_name))
+
+    def check_point_in_time(self, db, point_in_time):
+        # Ensure we don't restore too recently. For example:
+        #  1. Obviously we can't restore the future
+        #  2. Equally, there is about 5 minutes of replication lag. We can only
+        #     restore to periods that were over 5 minutes ago.
+        if point_in_time > db['LatestRestorableTime']:
+            raise errors.Error("You cannot restore to {}. The most recent restorable time is {}".format(
+                point_in_time,
+                db['LatestRestorableTime'],
+            ))
+
+        # Ensure we don't restore before this instance even existed
+        if point_in_time < db['InstanceCreateTime']:
+            raise errors.Error('You cannot restore to {} because it is before the instance was created ({})'.format(
+                point_in_time,
+                db['InstanceCreateTime'],
+            ))
+
+        # We can't restore earlier than the oldest backup either
+        # With a caveat that InstanceIdentifier might imply a snapshot belongs
+        # to the current database when it doesn't. We filter on matching
+        # InstanceCreateTime to avoid that.
+        results = self.client.describe_db_snapshots(
+            DBInstanceIdentifier=db['DBInstanceIdentifier']
+        )
+        snapshots = filter(
+            lambda snapshot: snapshot['InstanceCreateTime'] == db['InstanceCreateTime'],
+            results.get('DBSnapshots', [])
+        )
+        snapshots.sort(key=lambda snapshot: snapshot['SnapshotCreateTime'])
+        if not snapshots or point_in_time < snapshots[0]['SnapshotCreateTime']:
+            raise errors.Error('You cannot restore to {} because it is before the first available backup was created ({})'.format(
+                point_in_time,
+                snapshots[0]['SnapshotCreateTime'],
+            ))
+
+    def rename_database(self, from_name, to_name):
+        print("Renaming {} to {}".format(from_name, to_name))
+        self.client.modify_db_instance(
+            DBInstanceIdentifier=from_name,
+            NewDBInstanceIdentifier=to_name,
+            ApplyImmediately=True,
+        )
+
+    def delete_database(self, name):
+        print("Deleting old database")
+        self.client.delete_db_instance(
+            DBInstanceIdentifier=name,
+            SkipFinalSnapshot=True,
+        )
+
+    def wait_for_database(self, name):
+        print("Waiting for database to be ready")
+        while True:
+            db = self.get_database(name)
+            if db and db['DBInstanceStatus'] == 'available' and len(db['PendingModifiedValues']) == 0:
+                return
+            time.sleep(10)
+
+    def copy_database_settings(self, db_name, db):
+        print("Restoring database settings")
+        self.client.modify_db_instance(
+            DBInstanceIdentifier=db_name,
+            ApplyImmediately=True,
+            **get_from_jmes(
+                db,
+                AllocatedStorage="AllocatedStorage",
+                DBSecurityGroups="DBSecurityGroups[?Status == 'active'].DBSecurityGroupName",
+                VpcSecurityGroupIds="VpcSecurityGroups[?Status == 'active'].VpcSecurityGroupId",
+                DBParameterGroupName="DBParameterGroups[0].DBParameterGroupName",
+                BackupRetentionPeriod="BackupRetentionPeriod",
+                PreferredBackupWindow="PreferredBackupWindow",
+                PreferredMaintenanceWindow="PreferredMaintenanceWindow",
+                EngineVersion="EngineVersion",
+                CACertificateIdentifier="CACertificateIdentifier",
+            )
+        )
+
     def rollback(self, target):
         db_name = self.resource.name
         old_db_name = "{}-{:%Y%m%d%H%M%S}".format(db_name, now())
@@ -65,50 +154,12 @@ class Plan(common.SimplePlan, plan.Plan):
         datetime_target = None
         try:
             datetime_target = parse_datetime(target)
-            if datetime_target > db['LatestRestorableTime']:
-                raise errors.Error("You cannot restore to {}. The most recent restorable time is {}".format(
-                    datetime_target,
-                    db['LatestRestorableTime'],
-                ))
-            if datetime_target < db['InstanceCreateTime']:
-                raise errors.Error('You cannot restore to {} because it is before the instance was created ({})'.format(
-                    datetime_target,
-                    db['InstanceCreateTime'],
-                ))
-            snapshots = self.client.describe_db_snapshots(DBInstanceIdentifier=db_name).get('DBSnapshots', [])
-            snapshots = filter(lambda snapshot: snapshot['InstanceCreateTime'] == db['InstanceCreateTime'], snapshots)
-            snapshots.sort(key=lambda snapshot: snapshot['SnapshotCreateTime'])
-            if not snapshots or datetime_target < snapshots[0]['SnapshotCreateTime']:
-                raise errors.Error('You cannot restore to {} because it is before the first available backup was created ({})'.format(
-                    datetime_target,
-                    snapshots[0]['SnapshotCreateTime'],
-                ))
-
+            self.check_point_in_time(db, datetime_target)
         except ValueError:
-            try:
-                snapshots = self.client.describe_db_snapshots(DBInstanceIdentifier=db_name, DBSnapshotIdentifier=target).get('DBSnapshots', [])
-            except ClientError:
-                raise errors.Error("Could not find snapshot {}".format(target))
-            if len(snapshots) == 0:
-                raise errors.Error("Could not find snapshot {}".format(target))
+            self.check_snapshot(db, target)
 
-        print("Renaming {} to {}".format(db_name, old_db_name))
-        self.client.modify_db_instance(
-            DBInstanceIdentifier=db_name,
-            NewDBInstanceIdentifier=old_db_name,
-            ApplyImmediately=True,
-        )
-
-        print("Waiting for rename to be completed")
-        while True:
-            try:
-                self.client.get_waiter("db_instance_available").wait(
-                    DBInstanceIdentifier=old_db_name,
-                )
-            except:
-                time.sleep(10)
-            else:
-                break
+        self.rename_database(db_name, old_db_name)
+        self.wait_for_database(old_db_name)
 
         kwargs = get_from_jmes(
             db,
@@ -143,44 +194,9 @@ class Plan(common.SimplePlan, plan.Plan):
                 **kwargs
             )
 
-        for i in range(10):
-            print("Waiting for database to be ready")
-            try:
-                self.client.get_waiter("db_instance_available").wait(
-                    DBInstanceIdentifier=db_name,
-                )
-                break
-            except Exception as e:
-                print(e)
-                time.sleep(10)
+        self.wait_for_database(db_name)
 
-        kwargs = get_from_jmes(
-            db,
-            AllocatedStorage="AllocatedStorage",
-            DBSecurityGroups="DBSecurityGroups[?Status == 'active'].DBSecurityGroupName",
-            VpcSecurityGroupIds="VpcSecurityGroups[?Status == 'active'].VpcSecurityGroupId",
-            DBParameterGroupName="DBParameterGroups[0].DBParameterGroupName",
-            BackupRetentionPeriod="BackupRetentionPeriod",
-            PreferredBackupWindow="PreferredBackupWindow",
-            PreferredMaintenanceWindow="PreferredMaintenanceWindow",
-            EngineVersion="EngineVersion",
-            CACertificateIdentifier="CACertificateIdentifier",
-        )
+        self.copy_database_settings(db_name, db)
+        self.wait_for_database(db_name)
 
-        print("Restoring database settings")
-        self.client.modify_db_instance(
-            DBInstanceIdentifier=db_name,
-            ApplyImmediately=True,
-            **kwargs
-        )
-
-        print("Waiting for database to be ready")
-        self.client.get_waiter("db_instance_available").wait(
-            DBInstanceIdentifier=db_name,
-        )
-
-        print("Deleting old database")
-        self.client.delete_db_instance(
-            DBInstanceIdentifier=old_db_name,
-            SkipFinalSnapshot=True,
-        )
+        self.delete_database(old_db_name)
