@@ -1,4 +1,4 @@
-botocore==0.109.0
+botocore==1.0.0a2
 jmespath==0.7.1
 netaddr==0.7.14
 contextlib2==0.4.0
