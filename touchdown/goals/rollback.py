@@ -47,6 +47,6 @@ class Rollback(Goal):
         restorable = self.collect_as_dict("rollback")
         if target not in restorable:
             raise errors.Error("No such resource '{}'".format(target))
-        restorable[target].restore(from_backup)
+        restorable[target].rollback(from_backup)
 
 register(Rollback)

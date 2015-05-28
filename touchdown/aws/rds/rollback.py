@@ -151,6 +151,7 @@ class Plan(common.SimplePlan, plan.Plan):
         if self.get_database(old_db_name):
             raise errors.Error("Database {} already exists - restore in progress?".format(old_db_name))
 
+        datetime_target = None
         try:
             datetime_target = parse_datetime(target)
             self.check_point_in_time(db, datetime_target)
@@ -179,11 +180,11 @@ class Plan(common.SimplePlan, plan.Plan):
         )
 
         print("Spinning database up from backup")
-        if target:
+        if datetime_target:
             self.client.restore_db_instance_to_point_in_time(
                 SourceDBInstanceIdentifier=old_db_name,
                 TargetDBInstanceIdentifier=db_name,
-                RestoreTime=target,
+                RestoreTime=datetime_target,
                 **kwargs
             )
         else:

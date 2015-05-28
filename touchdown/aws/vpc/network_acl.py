@@ -92,6 +92,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_network_acl"
+    waiter = "network_acl_available"
 
     def _fix_protocol(self, protocol):
         # see https://github.com/aws/aws-cli/pull/532/files
