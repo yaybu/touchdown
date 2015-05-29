@@ -111,17 +111,14 @@ class ReplaceInstances(Action):
         )
 
     def wait_for_healthy_elb(self, elb):
-        self.plan.echo("Waiting for load balancer {} to report healthy")
-        elb = self.plan.session.create_client("elb")
+        self.plan.echo("Waiting for load balancer {} to report healthy".format(elb))
+        obj = self.runner.get_plan(elb)
         while True:
-            result = elb.describe_instance_health(
-                LoadBalancerName=self.plan.runner.get_plan(elb).resource_id,
+            result = obj.client.describe_instance_health(
+                LoadBalancerName=obj.resource_id,
             )
-
-            for instance in result.get("InstanceStates", []):
-                if instance["State"] != "InService":
-                    break
-            else:
+            states = result.get("InstanceStates", [])
+            if len(filter(lambda s: s['State'] != 'InService', states)) == 0:
                 return True
 
             time.sleep(5)
