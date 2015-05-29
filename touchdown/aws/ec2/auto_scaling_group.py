@@ -110,11 +110,26 @@ class ReplaceInstances(Action):
             ShouldDecrementDesiredCapacity=False,
         )
 
+    def wait_for_healthy_elb(self, elb):
+        self.plan.echo("Waiting for load balancer {} to report healthy".format(elb))
+        obj = self.runner.get_plan(elb)
+        while True:
+            result = obj.client.describe_instance_health(
+                LoadBalancerName=obj.resource_id,
+            )
+            states = result.get("InstanceStates", [])
+            if len(filter(lambda s: s['State'] != 'InService', states)) == 0:
+                return True
+
+            time.sleep(5)
+
     def wait_for_healthy_asg(self):
         self.plan.echo("Waiting for scaling group to become healthy")
         while True:
             asg = self.plan.describe_object()
             if self.desired_capacity == len([i for i in asg['Instances'] if i['LifecycleState'] == 'InService']):
+                for elb in self.resource.load_balancers:
+                    self.wait_for_healthy_elb(elb)
                 return True
             time.sleep(5)
 
@@ -210,8 +225,9 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
-        if not self.object and self.resource.min_size and self.resource.min_size > 0:
-            yield WaitForHealthy(self)
+        if self.resource.min_size and self.resource.min_size > 0:
+            if len(self.object.get("Instances", [])) < self.resource.min_size:
+                yield WaitForHealthy(self)
 
         launch_config_name = self.runner.get_plan(self.resource.launch_configuration).resource_id
         instances = []

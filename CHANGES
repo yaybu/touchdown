@@ -4,7 +4,8 @@ Changelog for Touchdown
 0.0.15 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- asg: If an ASG is connected to an ELB, consider the ELB health when
+  scaling/descaling during a deployment.
 
 
 0.0.14 (2015-05-28)
