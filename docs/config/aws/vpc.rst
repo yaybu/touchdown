@@ -288,7 +288,7 @@ Defining rules
     .. attribute: protocol
 
         The network protocol to allow or deny. By default this is ``tcp``. It
-        must be one of ``tcp``, `udp`` or ``icmp``. """
+        must be one of ``tcp``, `udp`` or ``icmp``.
 
     .. attribute: port
 
