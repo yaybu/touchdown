@@ -12,7 +12,7 @@ walkthrough will touch on:
 
  * Using an :class:`~touchdown.aws.ec2.AutoScalingGroup` to start an instance.
 
- * Using load balancing to scale up your service.
+ * Using a :class:`~touchdown.aws.elb.LoadBalancer` to scale up your service.
 
 
 Our application
