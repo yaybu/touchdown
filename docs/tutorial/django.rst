@@ -170,6 +170,90 @@ create a ``/app/etc`` directory to keep settings in::
         user="root",
     )
 
+We'll inject a requirements.txt and install sentry into the virtualenv::
+
+    provisioner.add_file(
+        name='/app/requirements.txt',
+        contents='\n'.join(
+            'sentry==7.5.3',
+        )
+    )
+
+    provisioner.add_execute(
+        command="/app/bin/pip install -r /app/requirements.txt",
+        watches=['/app/requirements.txt'],
+    )
+
+This uses the `watches` syntax. This means we only update the virtualenv if
+requirements.txt has changed and is one mechanism for idempotence when using the
+``Execute`` resource.
+
+We need to actually start sentry. We'll use upstart for this::
+
+    provisioner.add_file(
+        name="/etc/init/kickstart.conf",
+        contents="\n".join([
+           "start on runlevel [2345]",
+           "task",
+           "exec /app/bin/sentry kickstart",
+        ]),
+    )
+
+``kickstart`` is a command we'll create that loads metadata such as the database
+username and password from AWS. It will use ``initctl emit`` to tell upstart
+other tasks it might need to start.
+
+We'll also need upstart configuration for the django app server and for the
+celery processes::
+
+    provisioner.add_file(
+        name="/etc/init/application.conf",
+        contents="\n".join([
+            "start on mode-application",
+            "stop on runlevel [!2345]",
+            "setuid sentry",
+            "setgid sentry",
+            "kill timeout 900",
+            "respawn",
+            " ".join([
+                "exec /app/bin/gunicorn -b 0.0.0.0:8080",
+                "--access-logfile -",
+                "--error-logfile -",
+                "--log-level DEBUG",
+                "-w 8",
+                "-t 120",
+                "--graceful-timeout 120",
+                "sentry.wsgi",
+            ]),
+        ]),
+    )
+
+    provisioner.add_file(
+        name="/etc/init/worker.conf",
+        contents="\n".join([
+            "start on mode-worker",
+            "stop on runlevel [!2345]",
+            "setuid sentry",
+            "setgid sentry",
+            "kill timeout 900",
+            "respawn",
+            "exec /app/bin/django celery worker --concurrency 8",
+        ]),
+    )
+
+    provisioner.add_file(
+        name="/etc/init/beat.conf",
+        contents="\n".join([
+            "start on mode-beat",
+            "stop on runlevel [!2345]",
+            "setuid sentry",
+            "setgid sentry",
+            "kill timeout 900",
+            "respawn",
+            "exec /app/bin/django celery beat --pidfile=",
+        ]),
+    )
+
 To actually provision this as an AMI we use the
 :class:`~touchdown.aws.ec2.Image` resource::
 
