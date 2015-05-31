@@ -192,8 +192,8 @@ put a load balancer in front, which we'll set up first::
         listeners=[
             {"port": 80, "protocol": "http", "instance_port": 8080, "instance_protocol": "http"}
         ],
-        subnets=subnets['delivery'],
-        security_groups=[security_groups['delivery']],
+        subnets=subnets['lb'],
+        security_groups=[security_groups['lb']],
         health_check={
             "interval": 30,
             "healthy_threshold": 3,
