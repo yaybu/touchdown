@@ -35,7 +35,7 @@ The only tier that will have public facing IP's is the lb tier.
 
 ::
 
-    vpc = aws.add_vpc('radpress')
+    vpc = aws.add_vpc('sentry')
 
     subnets = {}
     for subnet in ('lb', 'app', 'db'):
@@ -76,7 +76,7 @@ Then we'll install some standard python packages::
 
 We are going to deploy the app into a virtualenv at ``/app``. We'll do the
 deployment as root, and at runtime the app will use the `sentry` user. We'll
-create a ``/app/etc`` directory to keep settings in.
+create a ``/app/etc`` directory to keep settings in::
 
     provisioner.add_group(name="django")
 
