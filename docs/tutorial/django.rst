@@ -49,11 +49,11 @@ The only tier that will have public facing IP's is the lb tier.
         ),
         'app': vpc.add_subnet(
             name="app",
-            cidr_block='192.168.0.0/24',
+            cidr_block='192.168.0.1/24',
         ),
         'db': vpc.add_subnet(
             name="db",
-            cidr_block='192.168.0.0/24',
+            cidr_block='192.168.0.2/24',
         ),
     }
 
@@ -84,7 +84,7 @@ Adding a database
 -----------------
 
 Rather than manually deploying postgres on an EC2 instance we'll use RDS to
-provision a managed :class:`~touchdown.aws.rds.Database`.
+provision a managed :class:`~touchdown.aws.rds.Database`::
 
     database = aws.add_database(
         name=sentry,
