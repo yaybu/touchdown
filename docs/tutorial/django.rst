@@ -7,32 +7,18 @@ walkthrough will touch on:
  * Creating a :class:`~touchdown.aws.vpc.VPC` with multiple interconnected
    :class:`~touchdown.aws.vpc.Subnet`'s.
 
- * Creating and managing access to an S3 :class:`~touchdown.aws.s3.Bucket`.
-
  * Creating a :class:`~touchdown.aws.rds.Database` and passing its connection
    details to the Django instance.
 
  * Using an :class:`~touchdown.aws.ec2.AutoScalingGroup` to start an instance.
 
- * Using load balancing and CDN's to scale up your service.
-
-
-To keep this first example east to digest we will miss out some steps:
-
- * We aren't going to worry about H/A best practices.
-
-
-However we are going to build our application tier to be completely stateless.
+ * Using load balancing to scale up your service.
 
 
 Our application
 ---------------
 
-For this tutorial we will deploy a simple blog application called radpress.
-
-We have setup a project that has this installed.
-
-FIXME: Publish demo project
+For this tutorial we will deploy a sentry server at AWS.
 
 
 Desiging your network
@@ -59,71 +45,84 @@ The only tier that will have public facing IP's is the lb tier.
         )
 
 
-Configuring S3
---------------
-
-We'll create a bucket called ``radpress``::
-
-    bucket = aws.add_bucket(name='radpress')
-
-This will create a ``public-read``, which is fine for our blog. However our
-EC2 instances need to be able to uploaded media to it. For this we'll use
-an :class:`~touchdown.aws.iam.InstanceProfile` to grant a
-:class:`~touchdown.aws.iam.Role` to the instance.
-
-::
-
-    instance_profile = aws.add_instance_profile(
-        name="radpress-app",
-        roles=[aws.add_role(
-            name="radpress-app",
-            assume_role_policy={
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Principal": {"Service": "ec2.amazonaws.com"},
-                    "Action": "sts:AssumeRole"
-                }],
-            },
-            policies={
-                "app": {
-                    "Version": "2012-10-17",
-                    "Statement": [{
-                        "Resource": "arn:aws:s3:::radpress",
-                        "Effect": "Allow",
-                        "Action": [
-                            "s3:ListBucketVersions",
-                            "s3:ListBucket"
-                        ]
-                    }, {
-                        "Resource": "arn:aws:s3:::radpress/*",
-                        "Effect": "Allow",
-                        "Action": [
-                            "s3:GetObjectVersion",
-                            "s3:DeleteObject",
-                            "s3:DeleteObjectVersion",
-                            "s3:GetObject",
-                            "s3:PutObjectAcl",
-                            "s3:PutObject"
-                        ]
-                    }]
-                }
-            },
-        )],
-    )
-
-The ``assume_role_policy`` restricts who or what can assume a role. We restrict
-it to our EC2 instances.
-
-We then add permissions to inspect the bucket and to put/get/delete its
-contents. With this in place, our ec2 instance will be able to request
-temporary credentials from aws for accessing s3.
-
-
 Adding a database
 -----------------
 
+
 Building your base image
 ------------------------
+
+We'll setup a fuselage bundle to describe what to install on the base ec2
+image::
+
+    provisioner = self.workspace.add_fuselage_bundle()
+
+One unfortunate problem with Ubuntu 14.04 is that you can SSH into it before it
+is ready. ``cloud-init`` is still configuring it, and so if you start deploying
+straight away you will hit race conditions. So we'll wait for ``cloud-init`` to
+finish::
+
+    # Work around some horrid race condition where cloud-init hasn't finished running
+    # https://bugs.launchpad.net/cloud-init/+bug/1258113
+    provisioner.add_execute(
+        command="python -c \"while not __import__('os').path.exists('/run/cloud-init/result.json'): __import__('time').sleep(1)\"",
+    )
+
+Then we'll install some standard python packages::
+
+    provisioner.add_package(name="python-virtualenv")
+    provisioner.add_package(name="python-dev")
+    provisioner.add_package(name="libpq-dev")
+
+We are going to deploy the app into a virtualenv at ``/app``. We'll do the
+deployment as root, and at runtime the app will use the `sentry` user. We'll
+create a ``/app/etc`` directory to keep settings in.
+
+    provisioner.add_group(name="django")
+
+    provisioner.add_user(
+        name="django",
+        group="django",
+        home="/app",
+        shell="/bin/false",
+        system=True,
+    )
+
+    provisioner.add_directory(
+        name='/app',
+        owner='root',
+        group='root',
+    )
+
+    provisioner.add_directory(
+        name='/app/etc',
+        owner='root',
+        group='root',
+    )
+
+    provisioner.add_directory(
+        name='/app/var',
+        owner='root',
+        group='root',
+    )
+
+    provisioner.add_execute(
+        name="virtualenv",
+        command="virtualenv /app",
+        creates="/app/bin/pip",
+        user="root",
+    )
+
+To actually provision this as an AMI we use the
+:class:`~touchdown.aws.ec2.Image` resource::
+
+    image = self.aws.add_image(
+        name="sentry-demo",
+        source_ami='ami-d74437a0',
+        username="ubuntu",
+        provisioner=provisioner,
+    )
+
 
 Deploying an instance
 ---------------------
@@ -131,7 +130,7 @@ Deploying an instance
 We'll deploy the image we just made with an auto scaling group. We are going to
 put a load balancer in front, which we'll set up first::
 
-    aws.add_load_balancer(
+    lb = aws.add_load_balancer(
         name='balancer',
         listeners=[
             {"port": 80, "protocol": "http", "instance_port": 8080, "instance_protocol": "http"}
@@ -157,15 +156,15 @@ any started instances should look like and the
 :class:`~touchdown.aws.ec2.AutoScalingGroup` itself::
 
     app = aws.add_auto_scaling_group(
-        name="radpress-app",
+        name="sentry-app",
         launch_configuration=aws.add_launch_configuration(
-            name="radpress-app-{}".format(int(time.time())),
+            name="sentry-app",
             image=ami,
             instance_type="t1.micro",
             user_data="",
             key_pair=keypair,
             security_groups=security_groups["app"],
-            associate_public_ip_address=True,
+            associate_public_ip_address=False,
             instance_profile=instance_profile,
         ),
         min_size=1,
@@ -173,7 +172,3 @@ any started instances should look like and the
         load_balancers=[lb],
         subnets=subnets["app"],
     )
-
-
-Content delivery networks
--------------------------
