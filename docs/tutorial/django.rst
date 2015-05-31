@@ -1,7 +1,8 @@
 Deploying Django at Amazon
 ==========================
 
-We will deploy a simple Django application at Amazon with Touchdown. This
+We will deploy the sentry service at Amazon with Touchdown. Sentry is a Django
+application so much of this will be applicable to any Django application. This
 walkthrough will touch on:
 
  * Creating a :class:`~touchdown.aws.vpc.vpc.VPC` with multiple interconnected
@@ -15,30 +16,24 @@ walkthrough will touch on:
  * Using a :class:`~touchdown.aws.elb.LoadBalancer` to scale up your service.
 
 
-Our application
----------------
-
-For this tutorial we will deploy a sentry server at AWS.
-
-
 Desiging your network
 ---------------------
 
 We will create a subnet for each type of resource we plan to deploy. For our
 demo this means there will be 3 subnets:
 
- =======   =======           ========
- segment   network           ingress
- =======   =======           ========
- lb        192.168.0.0/24    0.0.0.0/0:80
-                             0.0.0.0/0:443
- app       192.168.0.1/24    lb:80
- db        192.168.0.2/24    app:5432
- =======   =======           ========
+ =======   ===================   ==================
+ segment   network               ingress
+ =======   ===================   ==================
+ lb        ``192.168.0.0/24``    ``0.0.0.0/0:80``
+                                 ``0.0.0.0/0:443``
+ app       ``192.168.1.0/24``    ``lb:80``
+ db        ``192.168.2.0/24``    ``app:5432``
+ =======   ===================   ==================
 
 The only tier that will have public facing IP's is the lb tier.
 
-::
+First we'll create a 3 subnet VPC::
 
     vpc = aws.add_vpc('sentry')
 
@@ -49,35 +44,36 @@ The only tier that will have public facing IP's is the lb tier.
         ),
         'app': vpc.add_subnet(
             name="app",
-            cidr_block='192.168.0.1/24',
+            cidr_block='192.168.1.0/24',
         ),
         'db': vpc.add_subnet(
             name="db",
-            cidr_block='192.168.0.2/24',
+            cidr_block='192.168.2.0/24',
         ),
     }
 
-    security_groups = {
-        'lb': vpc.add_security_group(
-            name="lb",
-            ingress=[
-                {"port": 80, "network": "0.0.0.0/0"},
-                {"port": 443, "network": "0.0.0.0/0"},
-            ],
-        ),
-        'app': vpc.add_security_group(
-            name="app",
-            ingress=[
-                {"port": 80, "security_group": subnets["lb"]},
-            ],
-        ),
-        'db': vpc.add_security_group(
-            name="db",
-            ingress=[
-                {"port": 5432, "security_group": subnets["app"]},
-            ],
-        ),
-    }
+Then we'll create security groups that limit who can access the subnets.
+
+    security_groups = {}
+    security_groups['lb'] = vpc.add_security_group(
+        name="lb",
+        ingress=[
+            {"port": 80, "network": "0.0.0.0/0"},
+            {"port": 443, "network": "0.0.0.0/0"},
+        ],
+    )
+    security_groups['app'] = vpc.add_security_group(
+        name="app",
+        ingress=[
+            {"port": 80, "security_group": security_groups["lb"]},
+        ],
+    )
+    security_groups['db'] = vpc.add_security_group(
+        name="db",
+        ingress=[
+            {"port": 5432, "security_group": security_groups["app"]},
+        ],
+    )
 
 
 Adding a database
