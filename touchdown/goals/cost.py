@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .subnet_group import SubnetGroup
-from .database import Database
-from .point_in_time_restore import PointInTimeRestore
-from .snapshot_restore import SnapshotRestore
-from . import rollback, cost  # noqa
+from touchdown.core.goals import Goal, register
 
 
-__all__ = [
-    'SubnetGroup',
-    'Database',
-    'PointInTimeRestore',
-    'SnapshotRestore',
-]
+class Cost(Goal):
+
+    """ Estimate the cost of running this environment """
+
+    name = "cost"
+
+    def get_plan_class(self, resource):
+        plan_class = resource.meta.get_plan("cost")
+        if not plan_class:
+            plan_class = resource.meta.get_plan("null")
+        return plan_class
+
+    def execute(self):
+        for coster in self.collect_as_iterable("cost"):
+            print coster.resource, coster.cost()
+
+register(Cost)
