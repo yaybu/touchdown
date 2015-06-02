@@ -52,7 +52,8 @@ class DiffSet(object):
             self.build_diffs()
 
     def build_diffs(self):
-        for name, field in self.local.meta.iter_fields_in_order():
+        for field in self.local.meta.iter_fields_in_order():
+            name = field.name
             arg = field.argument
             if not field.present(self.local):
                 continue
