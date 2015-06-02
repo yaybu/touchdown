@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .subnet_group import SubnetGroup
-from .database import Database
-from .point_in_time_restore import PointInTimeRestore
-from .snapshot_restore import SnapshotRestore
-from . import rollback
-
+from . import elb
+from . import rds
 
 __all__ = [
-    'SubnetGroup',
-    'Database',
-    'PointInTimeRestore',
-    'SnapshotRestore',
+    "elb",
+    "rds",
 ]

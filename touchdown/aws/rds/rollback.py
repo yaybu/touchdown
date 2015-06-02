@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This code is not currently exposed publically. It is an example of how to
-# stream from a aws log using the FilterLogEvents API.
-
 import time
 
 import jmespath
