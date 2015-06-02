@@ -59,7 +59,7 @@ Advanced notifications
 
 .. class:: Attachment
 
-    fallback
+    .. attribute:: fallback
 
         The fallback message to show if the advanced notification is not shown
         (for example in mobile notifications or on IRC). This is required.
