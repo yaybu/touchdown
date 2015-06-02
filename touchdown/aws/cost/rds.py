@@ -13,52 +13,50 @@
 # limitations under the License.
 
 from touchdown.core import plan
-from touchdown.aws import common
 from touchdown.aws.rds import Database
 
-from .common import PricingData
+from .common import CostEstimator, PricingData
 
 
-pricing_data = [
-    # MySQL
-    PricingData(
-        "https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-standard-deployments.min.js",
-        engine="mysql",
-        multi_az=False,
-    ),
-    PricingData(
-        "https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-multiAZ-deployments.min.js",
-        engine="mysql",
-        multi_az=True,
-    ),
-    # Postgres
-    PricingData(
-        "https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-standard-deployments.min.js",
-        engine="postgres",
-        multi_az=False,
-    ),
-    PricingData(
-        "https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-multiAZ-deployments.min.js",
-        engine="postgres",
-        multi_az=True,
-    ),
-]
+class DatabasePerHour(PricingData):
+
+    expression = "config.regions[?region=='{region}'].types[].tiers[?name=='{instance_class}'].prices.USD[]"
+    rate = "hourly"
+
+    def format_expression(self, resource):
+        return self.expression.format(
+            region=self.REGIONS[resource.account.region],
+            instance_class=resource.instance_class,
+        )
 
 
-class Plan(common.SimplePlan, plan.Plan):
+class Plan(CostEstimator, plan.Plan):
 
     name = "cost"
     resource = Database
     service_name = "rds"
 
-    def get_pricing_data(self):
-        for data in pricing_data:
-            if data.matches(self.resource):
-                return data
-        raise ValueError("Cannot find pricing file for {}".format(self.resource))
-
-    def cost(self):
-        return self.get_pricing_data().get_instance_type(
-            self.resource.account.region,
-            self.resource.instance_class,
-        )
+    pricing_data = [
+        # MySQL
+        DatabasePerHour(
+            "https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-standard-deployments.min.js",
+            engine="mysql",
+            multi_az=False,
+        ),
+        DatabasePerHour(
+            "https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-multiAZ-deployments.min.js",
+            engine="mysql",
+            multi_az=True,
+        ),
+        # Postgres
+        DatabasePerHour(
+            "https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-standard-deployments.min.js",
+            engine="postgres",
+            multi_az=False,
+        ),
+        DatabasePerHour(
+            "https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-multiAZ-deployments.min.js",
+            engine="postgres",
+            multi_az=True,
+        ),
+    ]

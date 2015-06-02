@@ -13,24 +13,29 @@
 # limitations under the License.
 
 from touchdown.core import plan
-from touchdown.aws import common
 from touchdown.aws.elb import LoadBalancer
 
-from .common import PricingData
+from .common import CostEstimator, PricingData
 
 
-class Plan(common.SimplePlan, plan.Plan):
+class LoadBalancerPerHour(PricingData):
 
-    name = "cost"
+    expression = "config.regions[?region=='{region}'].types[].values[?rate=='perELBHour'].prices.USD[]"
+    rate = "hourly"
+
+    def format_expression(self, resource):
+        return self.expression.format(
+            region=self.REGIONS[resource.account.region],
+        )
+
+
+class Plan(CostEstimator, plan.Plan):
+
     resource = LoadBalancer
     service_name = "elb"
 
-    def get_pricing_data(self):
-        return PricingData(
-            "https://a0.awsstatic.com/pricing/1/ec2/pricing-elb.min.js"
+    pricing_data = [
+        LoadBalancerPerHour(
+            "https://a0.awsstatic.com/pricing/1/ec2/pricing-elb.min.js",
         )
-
-    def cost(self):
-        return self.get_pricing_data().get_region(
-            self.resource.account.region,
-        )
+    ]

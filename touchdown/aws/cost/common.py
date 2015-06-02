@@ -15,6 +15,9 @@
 import requests
 import re
 import demjson
+import jmespath
+
+from touchdown.aws import common
 
 
 class PricingData(object):
@@ -36,32 +39,34 @@ class PricingData(object):
         self.url = url
         self.tags = tags
 
-    def get(self):
+    def format_expression(self, resource):
+        return self.expression
+
+    def get(self, resource):
         data = requests.get(self.url).content
         data = re.sub(re.compile(r'/\*.*\*/\n', re.DOTALL), '', data)
         data = re.sub(r'^callback\(', '', data)
         data = re.sub(r'\);*$', '', data)
-        return demjson.decode(data)
 
-    def get_region(self, region):
-        filtered = filter(
-            lambda r: r['region'] == self.REGIONS[region],
-            self.get()['config']['regions'],
-        )
-        return filtered[0]
-
-    def get_instance_type(self, region, instance_type):
-        r = self.get_region(region)
-        for i in r['types']:
-            for t in i['tiers']:
-                if t['name'] == instance_type:
-                    return {
-                        "currency": "USD",
-                        "cost": t['prices']['USD'],
-                    }
+        expression = self.format_expression(resource)
+        return jmespath.search(expression, demjson.decode(data))
 
     def matches(self, resource):
         for tag, value in self.tags.items():
             if getattr(resource, tag, None) != value:
                 return False
         return True
+
+
+class CostEstimator(common.SimplePlan):
+
+    name = "cost"
+
+    def get_pricing_data(self):
+        for data in self.pricing_data:
+            if data.matches(self.resource):
+                return data
+        raise ValueError("Cannot find pricing file for {}".format(self.resource))
+
+    def cost(self):
+        return self.get_pricing_data().get(self.resource)
