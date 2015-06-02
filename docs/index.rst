@@ -61,6 +61,9 @@ Resources
    :doc:`Deploying scripts <config/provisioner/bash>` |
    :doc:`Deploying fuselage bundles <config/provisioner/fuselage>`
 
+ * **Notifications:**
+   :doc:`Slack notifications <config/notifications/slack>`
+
 
 Getting help
 ============

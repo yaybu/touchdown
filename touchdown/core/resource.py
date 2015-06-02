@@ -168,12 +168,8 @@ class Resource(six.with_metaclass(ResourceType)):
                 setattr(self, field.name, kwargs[field.name])
 
     @property
-    def fields(self):
-        return list((field.name, field) for field in self.meta.iter_fields_in_order())
-
-    @property
     def arguments(self):
-        return list((name, field.argument) for (name, field) in self.fields)
+        return list((name, field.argument) for (name, field) in self.meta.iter_fields_in_order())
 
     @property
     def workspace(self):
