@@ -10,14 +10,14 @@ fuselage==0.0.7
 
 coverage==3.7.1
 coveralls==0.5
-flake8==2.4.0
+flake8==2.4.1
 mccabe==0.3
 mock==1.0.1
 pep8==1.5.7  # rq.filter: <1.6
-py==1.4.27
+py==1.4.28
 pyflakes==0.8.1
-pytest==2.7.0
-vcrpy==1.5.0
+pytest==2.7.1
+vcrpy==1.5.2
 wrapt==1.10.4
 
 -e .
