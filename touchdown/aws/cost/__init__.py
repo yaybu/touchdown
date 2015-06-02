@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from . import asg
 from . import elb
 from . import rds
 
 __all__ = [
+    "asg",
     "elb",
     "rds",
 ]

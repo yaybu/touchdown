@@ -20,8 +20,22 @@ from .common import CostEstimator, PricingData
 
 class DatabasePerHour(PricingData):
 
+    description = "Database instance"
     expression = "config.regions[?region=='{region}'].types[].tiers[?name=='{instance_class}'].prices.USD[]"
     rate = "hourly"
+
+    def format_expression(self, resource):
+        return self.expression.format(
+            region=self.REGIONS[resource.account.region],
+            instance_class=resource.instance_class,
+        )
+
+
+class DatabasePerGb(PricingData):
+
+    description = "Database storage"
+    expression = "config.regions[?region='{region}']"
+    rate = "billing-period"
 
     def format_expression(self, resource):
         return self.expression.format(

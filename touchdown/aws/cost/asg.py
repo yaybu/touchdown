@@ -13,30 +13,32 @@
 # limitations under the License.
 
 from touchdown.core import plan
-from touchdown.aws.elb import LoadBalancer
+from touchdown.aws.ec2 import AutoScalingGroup
 
 from .common import CostEstimator, PricingData
 
 
-class LoadBalancerPerHour(PricingData):
+class Ec2PerHour(PricingData):
 
-    description = "Load Balancer instance"
-    expression = "config.regions[?region=='{region}'].types[].values[?rate=='perELBHour'].prices.USD[]"
+    description = "Elastic Compute instance"
+    expression = "config.regions[?region=='{region}'].instanceTypes[].sizes[?size=='{instance_type}'].valueColumns[0].prices.USD[]"
     rate = "hourly"
 
     def format_expression(self, resource):
         return self.expression.format(
-            region=self.REGIONS[resource.account.region],
+            region=resource.account.region,
+            instance_type=resource.launch_configuration.instance_type,
         )
 
 
 class Plan(CostEstimator, plan.Plan):
 
-    resource = LoadBalancer
-    service_name = "elb"
+    name = "cost"
+    resource = AutoScalingGroup
+    service_name = "ec2"
 
     pricing_data = [
-        LoadBalancerPerHour(
-            "https://a0.awsstatic.com/pricing/1/ec2/pricing-elb.min.js",
+        Ec2PerHour(
+            "https://a0.awsstatic.com/pricing/1/ec2/linux-od.min.js",
         )
     ]

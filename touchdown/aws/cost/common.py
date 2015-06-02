@@ -48,6 +48,9 @@ class PricingData(object):
         data = re.sub(r'^callback\(', '', data)
         data = re.sub(r'\);*$', '', data)
 
+        #import json
+        #print(json.dumps(demjson.decode(data)))
+
         expression = self.format_expression(resource)
         return jmespath.search(expression, demjson.decode(data))
 
