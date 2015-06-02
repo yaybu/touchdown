@@ -17,6 +17,39 @@ import requests
 from touchdown.core import argument, action, errors, plan, resource, serializers, workspace
 
 
+class Field(resource.Resource):
+
+    resource_name = "slack_attachment_field"
+
+    title = argument.String(field="title")
+    value = argument.String(field="value")
+    short = argument.Boolean(field="short")
+
+
+class Attachment(resource.Resource):
+
+    resource_name = "slack_attachment"
+
+    fallback = argument.String(field="fallback")
+    color = argument.String(field="color")
+    pretext = argument.String(field="pretext")
+    author_name = argument.String(field="author_name")
+    author_link = argument.String(field="author_link")
+    author_icon = argument.String(field="author_icon")
+
+    title = argument.String(field="title")
+    title_link = argument.String(field="title_link")
+
+    text = argument.String(field="text")
+
+    fields = argument.ResourceList(Field, field="fields", serializer=serializers.List(serializers.Resource(), skip_empty=True))
+
+    image_url = argument.String(field="image_url")
+    thumb_url = argument.String(field="thumb_url")
+
+    markdown_in = argument.List(field="mrkdwn_in")
+
+
 class SlackNotification(resource.Resource):
 
     resource_name = "slack_notification"
@@ -27,6 +60,7 @@ class SlackNotification(resource.Resource):
     icon_url = argument.String(default="https://avatars3.githubusercontent.com/u/5338681", field="icon_url")
     icon_emoji = argument.String(field="icon_emoji")
     text = argument.String(field="text")
+    attachments = argument.ResourceList(Attachment, field="attachments", serializer=serializers.List(serializers.Resource(), skip_empty=True))
 
     root = argument.Resource(workspace.Workspace)
 

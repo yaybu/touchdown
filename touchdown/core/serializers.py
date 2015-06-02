@@ -317,18 +317,18 @@ class Resource(Dict):
             for name, serializer in getattr(object, "extra_serializers", {}).items():
                 kwargs[name] = serializer
 
-        for argument_name, field in object.fields:
+        for field in object.meta.iter_fields_in_order():
             value = field.get_value(object)
             if self.should_ignore_field(field, value):
                 continue
 
-            if hasattr(object, "serialize_" + argument_name):
-                serializer = Expression(getattr(object, "serialize_" + argument_name))
+            if hasattr(object, "serialize_" + field.name):
+                serializer = Expression(getattr(object, "serialize_" + field.name))
             else:
                 serializer = field.argument.serializer
 
             kwargs[field.argument.field] = Context(
-                Argument(argument_name, field),
+                Argument(field.name, field),
                 serializer,
             )
 
