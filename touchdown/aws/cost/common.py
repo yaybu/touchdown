@@ -16,10 +16,6 @@ import requests
 import re
 import demjson
 
-from touchdown.core import plan
-from touchdown.aws import common
-from touchdown.aws.rds import Database
-
 
 class PricingData(object):
 
