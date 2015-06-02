@@ -29,6 +29,6 @@ class Cost(Goal):
 
     def execute(self):
         for coster in self.collect_as_iterable("cost"):
-            print coster.resource, coster.cost()
+            print (coster.resource, coster.cost())
 
 register(Cost)
