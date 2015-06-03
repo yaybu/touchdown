@@ -14,8 +14,16 @@
 
 import requests
 import re
-import demjson
-import jmespath
+
+try:
+    import demjson
+except ImportError:
+    demjson = None
+
+try:
+    import jmespath
+except ImportError:
+    jmespath = None
 
 from touchdown.aws import common
 
@@ -72,4 +80,8 @@ class CostEstimator(common.SimplePlan):
         raise ValueError("Cannot find pricing file for {}".format(self.resource))
 
     def cost(self):
+        if not demjson:
+            raise errors.Error("Need to install 'demjson' to get pricing data for AWS resources")
+        if not jmespath:
+            raise errors.Error("Need to install 'jmespath' to get pricing data for AWS resource")
         return self.get_pricing_data().get(self.resource)
