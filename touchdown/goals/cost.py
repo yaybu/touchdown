@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,42 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    ec2,
-    cloudfront,
-    cost,
-    elasticache,
-    elastictranscoder,
-    elb,
-    iam,
-    kms,
-    logs,
-    rds,
-    route53,
-    s3,
-    sns,
-    sqs,
-    external_account,
-)
+from touchdown.core.goals import Goal, register
 
-__all__ = [
-    'account',
-    'vpc',
-    'ec2',
-    'cloudfront',
-    'cost',
-    'elasticache',
-    'elastictranscoder',
-    'elb',
-    'iam',
-    'kms',
-    'logs',
-    'rds',
-    'route53',
-    's3',
-    'sns',
-    'sqs',
-    'external_account',
-]
+
+class Cost(Goal):
+
+    """ Estimate the cost of running this environment """
+
+    name = "cost"
+
+    def get_plan_class(self, resource):
+        plan_class = resource.meta.get_plan("cost")
+        if not plan_class:
+            plan_class = resource.meta.get_plan("null")
+        return plan_class
+
+    def execute(self):
+        for coster in self.collect_as_iterable("cost"):
+            print(coster.resource, coster.cost())
+
+register(Cost)

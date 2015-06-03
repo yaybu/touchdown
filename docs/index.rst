@@ -29,6 +29,7 @@ Getting started
    :doc:`Tearing down environments <cli/destroy>` |
    :doc:`Viewing logs <cli/tail>` |
    :doc:`Rolling back data <cli/rollback>` |
+   :doc:`Estimating infrastructure cost <cli/cost>` |
    :doc:`Generating graphs <cli/dot>`
 
  * **Tutorial:**

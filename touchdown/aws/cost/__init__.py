@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,42 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    account,
-    vpc,
-    ec2,
-    cloudfront,
-    cost,
-    elasticache,
-    elastictranscoder,
-    elb,
-    iam,
-    kms,
-    logs,
-    rds,
-    route53,
-    s3,
-    sns,
-    sqs,
-    external_account,
-)
+from . import asg
+from . import elb
+from . import rds
 
 __all__ = [
-    'account',
-    'vpc',
-    'ec2',
-    'cloudfront',
-    'cost',
-    'elasticache',
-    'elastictranscoder',
-    'elb',
-    'iam',
-    'kms',
-    'logs',
-    'rds',
-    'route53',
-    's3',
-    'sns',
-    'sqs',
-    'external_account',
+    "asg",
+    "elb",
+    "rds",
 ]

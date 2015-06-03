@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .apply import Apply
+from .cost import Cost
 from .destroy import Destroy
 from .dot import Dot
 from .rollback import Rollback
@@ -21,6 +22,7 @@ from .tail import Tail
 
 __all__ = [
     "Apply",
+    "Cost",
     "Destroy",
     "Dot",
     "Rollback",
