@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.15 (unreleased)
+0.0.15 (2015-06-03)
 -------------------
 
 - asg: If an ASG is connected to an ELB, consider the ELB health when
