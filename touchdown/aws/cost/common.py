@@ -25,6 +25,7 @@ try:
 except ImportError:
     jmespath = None
 
+from touchdown.core import errors
 from touchdown.aws import common
 
 
@@ -55,9 +56,6 @@ class PricingData(object):
         data = re.sub(re.compile(r'/\*.*\*/\n', re.DOTALL), '', data)
         data = re.sub(r'^callback\(', '', data)
         data = re.sub(r'\);*$', '', data)
-
-        #import json
-        #print(json.dumps(demjson.decode(data)))
 
         expression = self.format_expression(resource)
         return jmespath.search(expression, demjson.decode(data))
