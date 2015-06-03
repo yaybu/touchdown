@@ -93,6 +93,7 @@ There are a bunch of commands you can run against your Touchdown config:
 .. toctree::
 
    apply
+   cost
    destroy
    tail
    rollback
