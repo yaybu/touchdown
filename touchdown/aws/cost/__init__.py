@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from . import asg
+from . import elasticache
 from . import elb
 from . import rds
 
+
 __all__ = [
     "asg",
+    "elasticache",
     "elb",
     "rds",
 ]
