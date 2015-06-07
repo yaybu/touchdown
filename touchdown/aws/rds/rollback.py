@@ -137,38 +137,38 @@ class Plan(common.SimplePlan, plan.Plan):
             )
         )
 
-    def rollback(self, target):
-        db_name = self.resource.name
-        old_db_name = "{}-{:%Y%m%d%H%M%S}".format(db_name, now())
+    def validate(self, target):
+        self.old_db_name = "{}-{:%Y%m%d%H%M%S}".format(self.resource.name, now())
 
-        db = self.get_database(db_name)
-        if not db:
-            raise errors.Error("Database {} not found?".format(db_name))
+        self.db = self.get_database(self.resource.name)
+        if not self.db:
+            raise errors.Error("Database {} not found?".format(self.resource.name))
 
-        if self.get_database(old_db_name):
-            raise errors.Error("Database {} already exists - restore in progress?".format(old_db_name))
+        if self.get_database(self.old_db_name):
+            raise errors.Error("Database {} already exists - restore in progress?".format(self.old_db_name))
 
-        datetime_target = None
+        self.datetime_target = None
         try:
-            datetime_target = parse_datetime(target)
-            self.check_point_in_time(db, datetime_target)
+            self.datetime_target = parse_datetime(target)
+            self.check_point_in_time(self.db, self.datetime_target)
         except ValueError:
-            self.check_snapshot(db, target)
+            self.check_snapshot(self.db, target)
 
-        self.rename_database(db_name, old_db_name)
-        self.wait_for_database(old_db_name)
+    def rollback(self, target):
+        self.rename_database(self.resource.name, self.old_db_name)
+        self.wait_for_database(self.old_db_name)
 
         kwargs = get_from_jmes(
-            db,
+            self.db,
             DBInstanceClass="DBInstanceClass",
             Port="Endpoint.Port",
-            AvailabilityZone=lambda: "AvailabilityZone" if not db.get('MultiAZ', False) else None,
+            AvailabilityZone=lambda: "AvailabilityZone" if not self.db.get('MultiAZ', False) else None,
             DBSubnetGroupName="DBSubnetGroup.DBSubnetGroupName",
             MultiAZ="MultiAZ",
             PubliclyAccessible="PubliclyAccessible",
             AutoMinorVersionUpgrade="AutoMinorVersionUpgrade",
             LicenseModel="LicenseModel",
-            DBName=lambda: "DBName" if db["Engine"] != 'postgres' else None,
+            DBName=lambda: "DBName" if self.db["Engine"] != 'postgres' else None,
             Engine="Engine",
             Iops="Iops",
             OptionGroupName="OptionGroupMemberships[0].OptionGroupName",
@@ -177,23 +177,23 @@ class Plan(common.SimplePlan, plan.Plan):
         )
 
         print("Spinning database up from backup")
-        if datetime_target:
+        if self.datetime_target:
             self.client.restore_db_instance_to_point_in_time(
-                SourceDBInstanceIdentifier=old_db_name,
-                TargetDBInstanceIdentifier=db_name,
-                RestoreTime=datetime_target,
+                SourceDBInstanceIdentifier=self.old_db_name,
+                TargetDBInstanceIdentifier=self.resource.name,
+                RestoreTime=self.datetime_target,
                 **kwargs
             )
         else:
             self.client.restore_db_instance_from_db_snapshot(
-                DBInstanceIdentifier=db_name,
+                DBInstanceIdentifier=self.resource.name,
                 DBSnapshotIdentifier=target,
                 **kwargs
             )
 
-        self.wait_for_database(db_name)
+        self.wait_for_database(self.resource.name)
 
-        self.copy_database_settings(db_name, db)
-        self.wait_for_database(db_name)
+        self.copy_database_settings(self.resource.name, self.db)
+        self.wait_for_database(self.resource.name)
 
-        self.delete_database(old_db_name)
+        self.delete_database(self.old_db_name)

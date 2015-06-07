@@ -43,10 +43,19 @@ class Rollback(Goal):
             help="When or what to rollback to",
         )
 
+    def pre_restore(self):
+        pass
+
+    def post_restore(self):
+        pass
+
     def execute(self, target, from_backup):
         restorable = self.collect_as_dict("rollback")
         if target not in restorable:
             raise errors.Error("No such resource '{}'".format(target))
+        restorable[target].validate(from_backup)
+        self.pre_restore()
         restorable[target].rollback(from_backup)
+        self.post_restore()
 
 register(Rollback)
