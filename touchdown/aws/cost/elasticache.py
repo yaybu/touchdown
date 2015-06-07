@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core import plan
-from touchdown.aws.elasticache import CacheCluster
+from touchdown.aws.elasticache import CacheCluster, ReplicationGroup
 
 from .common import CostEstimator, PricingData
 
@@ -31,9 +31,24 @@ class ElastiCachePerHour(PricingData):
         )
 
 
-class Plan(CostEstimator, plan.Plan):
+class CacheClusterPlan(CostEstimator, plan.Plan):
 
     resource = CacheCluster
+    service_name = "elasticache"
+
+    def get_scale(self, resource):
+        return resource.num_cache_nodes
+
+    pricing_data = [
+        ElastiCachePerHour(
+            "https://a0.awsstatic.com/pricing/1/elasticache/pricing-standard-deployments-elasticache.min.js",
+        )
+    ]
+
+
+class ReplicationGroupPlan(CostEstimator, plan.Plan):
+
+    resource = ReplicationGroup
     service_name = "elasticache"
 
     pricing_data = [

@@ -58,7 +58,17 @@ class PricingData(object):
         data = re.sub(r'\);*$', '', data)
 
         expression = self.format_expression(resource)
-        return jmespath.search(expression, demjson.decode(data))
+
+        return self.reduce(
+            resource,
+            jmespath.search(expression, demjson.decode(data)),
+        )
+
+    def get_scale(self, resource, value):
+        return 1
+
+    def reduce(self, resource, value):
+        return sum(value) * self.get_scale(resource)
 
     def matches(self, resource):
         for tag, value in self.tags.items():
