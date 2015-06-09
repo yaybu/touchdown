@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers, diff
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 from ..sns import Topic
@@ -70,7 +70,7 @@ class Pipeline(Resource):
     # content_config = argument.Dict(field="ContentConfig", default=None)
     # thumbnail_config = argument.Dict(field="ThumbnailConfig", default=None)
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

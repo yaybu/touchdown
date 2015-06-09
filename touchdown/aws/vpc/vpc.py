@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -30,7 +30,7 @@ class VPC(Resource):
 
     tags = argument.Dict()
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

@@ -18,7 +18,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -30,7 +30,7 @@ class Key(Resource):
     usage = argument.String(choices=['ENCRYPT_DECRYPT'], default='ENCRYPT_DECRYPT', field='KeyUsage')
     policy = argument.Dict(field="Policy", serializer=serializers.Json())
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

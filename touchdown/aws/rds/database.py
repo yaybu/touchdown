@@ -17,7 +17,7 @@ from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 from touchdown.core.errors import InvalidParameter
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 from ..kms import Key
@@ -59,7 +59,7 @@ class Database(Resource):
     # option_group = argument.Resource(OptionGroup, field="OptionGroupName")
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
     # tags = argument.Dict()
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
     def clean_storage_encrypted(self, value):
         if not value:

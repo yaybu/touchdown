@@ -15,7 +15,7 @@
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 from touchdown.core.diff import DiffSet
@@ -61,7 +61,7 @@ class Queue(Resource):
         group="attributes"
     )
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

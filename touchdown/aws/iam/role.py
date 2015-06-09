@@ -18,7 +18,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, serializers
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -31,7 +31,7 @@ class Role(Resource):
     assume_role_policy = argument.Dict(field="AssumeRolePolicyDocument", serializer=serializers.Json())
 
     policies = argument.Dict()
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
     def clean_assume_role_policy(self, policy):
         if frozenset(policy.keys()).difference(frozenset(("Version", "Statement"))):

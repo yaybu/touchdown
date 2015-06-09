@@ -18,7 +18,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy, RefreshMetadata
 
 from ..s3 import Bucket
@@ -81,7 +81,7 @@ class StreamingDistribution(Resource):
         field="PriceClass",
     )
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

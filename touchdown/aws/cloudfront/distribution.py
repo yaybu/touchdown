@@ -18,7 +18,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy, RefreshMetadata
 
 from ..iam import ServerCertificate
@@ -214,7 +214,7 @@ class Distribution(Resource):
         group="viewer-certificate",
     )
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

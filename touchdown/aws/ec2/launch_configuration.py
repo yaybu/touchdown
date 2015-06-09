@@ -17,7 +17,7 @@ import base64
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
@@ -78,7 +78,7 @@ class LaunchConfiguration(Resource):
 
     keep_last = argument.Integer(default=5)
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
     def matches(self, runner, remote):
         if "UserData" in remote and remote["UserData"]:

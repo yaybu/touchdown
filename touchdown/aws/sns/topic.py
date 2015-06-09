@@ -15,7 +15,7 @@
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 from touchdown.core.adapters import Adapter
@@ -37,7 +37,7 @@ class Topic(Resource):
     policy = argument.String(field="Policy", group="attributes")
     delivery_policy = argument.String(field="DeliveryPolicy", group="attributes")
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

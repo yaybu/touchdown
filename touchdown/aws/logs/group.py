@@ -15,7 +15,7 @@
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -32,7 +32,7 @@ class LogGroup(Resource):
         ],
     )
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

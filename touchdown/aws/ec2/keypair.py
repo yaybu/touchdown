@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -27,7 +27,7 @@ class KeyPair(Resource):
     name = argument.String(field="KeyName")
     public_key = argument.String(field="PublicKeyMaterial")
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

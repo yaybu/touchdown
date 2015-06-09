@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 from ..vpc import SecurityGroup
@@ -38,7 +38,7 @@ class BaseCacheCluster(Resource):
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
 
     # tags = argument.Dict()
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class CacheCluster(BaseCacheCluster):

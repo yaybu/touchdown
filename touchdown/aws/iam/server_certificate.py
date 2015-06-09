@@ -16,7 +16,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -30,7 +30,7 @@ class ServerCertificate(Resource):
     private_key = argument.String(field="PrivateKey", secret=True)
     certificate_chain = argument.String(field="CertificateChain")
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

@@ -20,7 +20,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.action import Action
 from touchdown.core import errors
 
-from ..account import Account
+from ..account import BaseAccount
 from ..iam import ServerCertificate
 from ..s3 import Bucket
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -115,7 +115,7 @@ class LoadBalancer(Resource):
     health_check = argument.Resource(HealthCheck)
     attributes = argument.Resource(Attributes)
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

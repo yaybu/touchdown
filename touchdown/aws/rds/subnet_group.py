@@ -18,7 +18,7 @@ from touchdown.core import argument
 
 from touchdown.aws.vpc import Subnet
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -31,7 +31,7 @@ class SubnetGroup(Resource):
     subnets = argument.ResourceList(Subnet, field="SubnetIds", update=False)
     # tags = argument.Dict()
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

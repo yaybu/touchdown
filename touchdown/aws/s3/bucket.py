@@ -22,7 +22,7 @@ from touchdown.core.plan import Plan
 from touchdown.core import argument
 from touchdown.core.errors import InvalidParameter
 
-from ..account import Account
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 
@@ -73,7 +73,7 @@ class Bucket(Resource):
 
     policy = argument.String()
 
-    account = argument.Resource(Account)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):

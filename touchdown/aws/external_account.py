@@ -34,7 +34,9 @@ class ExternalRole(BaseAccount):
     mfa_device = argument.String(field="SerialNumber")
     mfa_token = argument.String(field="TokenCode")
 
-    account = argument.Resource(Account)
+    region = argument.String(default=lambda r: r.account.region)
+
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(Plan):
@@ -58,7 +60,7 @@ class Describe(Plan):
                 secret_access_key=c['SecretAccessKey'],
                 session_token=c['SessionToken'],
                 expiration=c['Expiration'],
-                region=self.resource.account.region,
+                region=self.resource.region,
             )
 
         return self._session
