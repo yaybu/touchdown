@@ -47,6 +47,8 @@ class Role(Resource):
                 "Principal": statement["Principal"],
                 "Sid": statement.get("Sid", ""),
             }
+            if "Condition" in statement:
+                s['Condition'] = statement['Condition']
             result['Statement'].append(s)
         return result
 
