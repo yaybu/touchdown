@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from .slack import SlackNotification
+from .newrelic import NewRelicDeploymentNotification
 
 __all__ = [
     "SlackNotification",
+    "NewRelicDeploymentNotification",
 ]
