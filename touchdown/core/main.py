@@ -41,11 +41,11 @@ class ConsoleInterface(object):
             for i, column in enumerate(row):
                 widths[i] = max(len(column), widths.get(i, 0))
 
-        line= "| " + " | ".join(
+        line = "| " + " | ".join(
             "{{:<{}}}".format(widths[i]) for i in range(len(widths))
         ) + " |"
 
-        sep = "+-" + "-+-".join("-" * widths[i] for i in range(len(widths))) +  "-+"
+        sep = "+-" + "-+-".join("-" * widths[i] for i in range(len(widths))) + "-+"
 
         self.echo(sep)
         self.echo(line.format(*data[0]))
