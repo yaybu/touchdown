@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.17 (unreleased)
+0.0.17 (2015-06-10)
 -------------------
 
 - Fix an edge case where using mfa, cross account roles and image_copy.
