@@ -89,6 +89,7 @@ class Null(Plan):
                     session = base_session
 
                 self._session = session
+                self._session.region = self.resource.region
 
         return self._session
 
