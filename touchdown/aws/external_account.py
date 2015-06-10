@@ -43,7 +43,7 @@ class Describe(Plan):
 
     resource = ExternalRole
     default = True
-    name = "describe"
+    name = "null"
     _session = None
     _client = None
 

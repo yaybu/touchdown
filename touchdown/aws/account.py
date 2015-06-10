@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from threading import Lock
+
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
@@ -46,44 +48,47 @@ class Null(Plan):
     name = "null"
     _session = None
 
+    _acquire_session = Lock()
+
     @property
     def session(self):
-        if not self._session:
-            session = None
-            base_session = Session(
-                access_key_id=self.resource.access_key_id or None,
-                secret_access_key=self.resource.secret_access_key or None,
-                session_token=None,
-                expiration=None,
-                region=self.resource.region,
-            )
+        with self._acquire_session:
+            if not self._session:
+                session = None
+                base_session = Session(
+                    access_key_id=self.resource.access_key_id or None,
+                    secret_access_key=self.resource.secret_access_key or None,
+                    session_token=None,
+                    expiration=None,
+                    region=self.resource.region,
+                )
 
-            if self.resource.mfa_serial:
-                cache_key = "_".join((self.resource.access_key_id, self.resource.mfa_serial))
-                if cache_key in self.cache:
-                    session = Session.fromjson(self.cache[cache_key])
+                if self.resource.mfa_serial:
+                    cache_key = "_".join((self.resource.access_key_id, self.resource.mfa_serial))
+                    if cache_key in self.cache:
+                        session = Session.fromjson(self.cache[cache_key])
 
-                if not session or session.expiration <= now():
-                    client = base_session.create_client("sts")
-                    creds = client.get_session_token(
-                        SerialNumber=self.resource.mfa_serial,
-                        TokenCode=self.ui.prompt(
-                            "Please enter a token for MFA device {}".format(self.resource.mfa_serial),
-                            key=self.resource.mfa_serial,
-                        ),
-                    )['Credentials']
-                    session = Session(
-                        access_key_id=creds['AccessKeyId'],
-                        secret_access_key=creds['SecretAccessKey'],
-                        session_token=creds['SessionToken'],
-                        expiration=creds['Expiration'],
-                        region=self.resource.region,
-                    )
-                    self.cache[cache_key] = session.tojson()
-            else:
-                session = base_session
+                    if not session or session.expiration <= now():
+                        client = base_session.create_client("sts")
+                        creds = client.get_session_token(
+                            SerialNumber=self.resource.mfa_serial,
+                            TokenCode=self.ui.prompt(
+                                "Please enter a token for MFA device {}".format(self.resource.mfa_serial),
+                                key=self.resource.mfa_serial,
+                            ),
+                        )['Credentials']
+                        session = Session(
+                            access_key_id=creds['AccessKeyId'],
+                            secret_access_key=creds['SecretAccessKey'],
+                            session_token=creds['SessionToken'],
+                            expiration=creds['Expiration'],
+                            region=self.resource.region,
+                        )
+                        self.cache[cache_key] = session.tojson()
+                else:
+                    session = base_session
 
-            self._session = session
+                self._session = session
 
         return self._session
 
