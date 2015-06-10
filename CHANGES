@@ -4,7 +4,24 @@ Changelog for Touchdown
 0.0.16 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Can now do use MFA and cross-account roles to do deployments in other
+  accounts. If you set up your Touchdownfile with::
+
+      aws = workspace.add_aws(
+          access_key_id="...",
+          secret_access_key="...",
+          mfa_serial="...",
+      )
+
+  Then touchdown will prompt you for an MFA code before starting the
+  deployment. Under the hood this uses the ``GetSessionToken`` API to
+  generate temporary AWS credentials. A bit like sudo, these are cached
+  so each action doesn't require a new MFA token.
+
+- Add a ``pre_restore`` and ``post_restore`` hook to database rollbacks. This
+  allows customizations to be run after initial validation but before the
+  restore starts. This is great for adding application specific policy like
+  emptying an ASG before the rollback.
 
 
 0.0.15 (2015-06-03)
@@ -12,6 +29,10 @@ Changelog for Touchdown
 
 - asg: If an ASG is connected to an ELB, consider the ELB health when
   scaling/descaling during a deployment.
+
+- Add slack notification support.
+
+- Add basic price estimation.
 
 
 0.0.14 (2015-05-28)
