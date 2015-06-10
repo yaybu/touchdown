@@ -15,7 +15,7 @@
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
-from .account import BaseAccount, Account
+from .account import BaseAccount
 
 from .session import Session
 

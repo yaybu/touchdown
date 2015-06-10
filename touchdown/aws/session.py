@@ -14,6 +14,8 @@
 
 import os
 
+from dateutil import parser
+
 from botocore import session
 
 
@@ -43,4 +45,23 @@ class Session(object):
             aws_access_key_id=self.access_key_id,
             aws_secret_access_key=self.secret_access_key,
             aws_session_token=self.session_token,
+        )
+
+    def tojson(self):
+        return {
+            "access_key_id": self.access_key_id,
+            "secret_access_key": self.secret_access_key,
+            "session_token": self.session_token,
+            "expiration": self.expiration.isoformat(),
+            "region": self.region,
+        }
+
+    @classmethod
+    def fromjson(cls, payload):
+        return cls(
+            access_key_id=payload['access_key_id'],
+            secret_access_key=payload['secret_access_key'],
+            session_token=payload['session_token'],
+            expiration=parser.parse(payload['expiration']),
+            region=payload['region'],
         )

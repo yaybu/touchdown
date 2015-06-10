@@ -35,6 +35,12 @@ class ConsoleInterface(object):
         else:
             print("{}".format(text), end='')
 
+    def prompt(self, message, key=None):
+        response = six.moves.input('{}: '.format(message))
+        while not response:
+            response = six.moves.input('{}: '.format(message))
+        return response
+
     def confirm(self, message):
         response = six.moves.input('{} [Y/n] '.format(message))
         while response.lower() not in ('y', 'n', ''):

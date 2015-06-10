@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from __future__ import division
+import os
 
 from . import dependencies, plan, map, errors
+from .cache import JSONFileCache
 
 
 class GoalFactory(object):
@@ -40,8 +42,11 @@ class Goal(object):
 
     execute_in_reverse = False
 
-    def __init__(self, workspace, ui, map=map.ParallelMap):
+    def __init__(self, workspace, ui, map=map.ParallelMap, cache=None):
         self.ui = ui
+        self.cache = cache
+        if not self.cache:
+            self.cache = JSONFileCache(os.path.expanduser('~/.touchdown'))
         self.workspace = workspace
         self.resources = {}
         self.Map = map

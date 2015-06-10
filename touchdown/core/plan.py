@@ -51,6 +51,8 @@ class Plan(six.with_metaclass(PlanType)):
     def __init__(self, runner, resource):
         super(Plan, self).__init__()
         self.runner = runner
+        self.ui = runner.ui
+        self.cache = runner.cache
         self.resource = resource
         if resource.parent:
             self.parent = runner.get_plan(resource.parent)
