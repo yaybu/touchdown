@@ -14,6 +14,7 @@
 
 import requests
 import re
+from decimal import Decimal
 
 try:
     import demjson
@@ -64,11 +65,11 @@ class PricingData(object):
             jmespath.search(expression, demjson.decode(data)),
         )
 
-    def get_scale(self, resource, value):
+    def get_scale(self, resource):
         return 1
 
     def reduce(self, resource, value):
-        return sum(value) * self.get_scale(resource)
+        return sum(Decimal(v) for v in value) * self.get_scale(resource)
 
     def matches(self, resource):
         for tag, value in self.tags.items():

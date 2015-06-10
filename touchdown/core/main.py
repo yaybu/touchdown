@@ -35,6 +35,25 @@ class ConsoleInterface(object):
         else:
             print("{}".format(text), end='')
 
+    def table(self, data):
+        widths = {}
+        for row in data:
+            for i, column in enumerate(row):
+                widths[i] = max(len(column), widths.get(i, 0))
+
+        line= "| " + " | ".join(
+            "{{:<{}}}".format(widths[i]) for i in range(len(widths))
+        ) + " |"
+
+        sep = "+-" + "-+-".join("-" * widths[i] for i in range(len(widths))) +  "-+"
+
+        self.echo(sep)
+        self.echo(line.format(*data[0]))
+        self.echo(sep)
+        for row in data[1:]:
+            self.echo(line.format(*row))
+        self.echo(sep)
+
     def prompt(self, message, key=None):
         response = six.moves.input('{}: '.format(message))
         while not response:

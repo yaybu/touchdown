@@ -28,7 +28,9 @@ class Cost(Goal):
         return plan_class
 
     def execute(self):
+        data = [("Resource", "Cost (per hour)")]
         for coster in self.collect_as_iterable("cost"):
-            print(coster.resource, coster.cost())
+            data.append((str(coster.resource), str(coster.cost())))
+        self.ui.table(data)
 
 register(Cost)

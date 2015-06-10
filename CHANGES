@@ -23,6 +23,8 @@ Changelog for Touchdown
   restore starts. This is great for adding application specific policy like
   emptying an ASG before the rollback.
 
+- Add ASCII table output for price estimation.
+
 
 0.0.15 (2015-06-03)
 -------------------
