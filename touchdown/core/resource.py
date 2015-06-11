@@ -154,7 +154,7 @@ class Resource(six.with_metaclass(ResourceType)):
     dot_ignore = False
     default_plan = None
 
-    policies = argument.List(argument.String())
+    ensure = argument.List(argument.String())
 
     def __init__(self, parent, **kwargs):
         self._values = {}

@@ -23,10 +23,10 @@ class Apply(ActionGoalMixin, Goal):
     name = "apply"
 
     def get_plan_class(self, resource):
-        if "destroy" in resource.policies:
+        if "destroy" in resource.ensure:
             return resource.meta.get_plan("destroy")
 
-        if "never-create" in resource.policies:
+        if "never-create" in resource.ensure:
             return resource.meta.get_plan("describe")
 
         return resource.meta.get_plan("apply") or resource.meta.get_plan("describe") or resource.meta.get_plan("null")

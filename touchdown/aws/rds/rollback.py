@@ -137,7 +137,7 @@ class Plan(common.SimplePlan, plan.Plan):
             )
         )
 
-    def validate(self, target):
+    def check(self, target):
         self.old_db_name = "{}-{:%Y%m%d%H%M%S}".format(self.resource.name, now())
 
         self.db = self.get_database(self.resource.name)

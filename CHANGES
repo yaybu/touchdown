@@ -4,7 +4,26 @@ Changelog for Touchdown
 0.0.18 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix a conflict between IAM policies and Resource policies. Resource policies
+  are now specified using ``ensure``::
+
+      aws.add_role(
+          name="myrole",
+          ensure=["never-destroy"],
+          assume_role_policy={...},
+          policies={
+              "mypolicy": {
+                  "Statement": [{
+                      "Effect": "Allow",
+                      "Action": "*",
+                      "Resource": "*",
+                  }],
+              },
+          },
+      )
+
+- Fix a conflict between ``Plan.validate`` and ``Rollback.validate`` which
+  caused a regression in the ``rollback`` command.
 
 
 0.0.17 (2015-06-10)

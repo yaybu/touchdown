@@ -87,4 +87,5 @@ class JSONFileCache(FileCache):
         try:
             return json.loads(contents)
         except (ValueError,):
+            raise
             raise errors.Error("''%s' cannot be deserialised" % contents)

@@ -24,7 +24,7 @@ class Destroy(ActionGoalMixin, Goal):
     execute_in_reverse = True
 
     def get_plan_class(self, resource):
-        if "never-destroy" not in resource.policies:
+        if "never-destroy" not in resource.ensure:
             return resource.meta.get_plan("destroy") or resource.meta.get_plan("describe") or resource.meta.get_plan("null")
         return resource.meta.get_plan("describe") or resource.meta.get_plan("null")
 
