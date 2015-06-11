@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.18 (unreleased)
+0.0.18 (2015-06-11)
 -------------------
 
 - Fix a conflict between IAM policies and Resource policies. Resource policies
