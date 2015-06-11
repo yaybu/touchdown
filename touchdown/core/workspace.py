@@ -18,6 +18,7 @@ from .resource import Resource
 class Workspace(Resource):
 
     resource_name = "workspace"
+    dot_ignore = True
 
     def __init__(self):
         super(Workspace, self).__init__(None)

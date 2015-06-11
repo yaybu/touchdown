@@ -29,11 +29,13 @@ class Dot(Goal):
         graph = ["digraph ast {"]
 
         for node, deps in self.get_plan_order().items():
-            if not node.dot_ignore:
-                graph.append('{} [label="{}"];'.format(id(node), node))
-                for dep in deps:
-                    if not dep.dot_ignore:
-                        graph.append("{} -> {};".format(id(node), id(dep)))
+            if node.dot_ignore:
+                continue
+            graph.append('{} [label="{}"];'.format(id(node), node))
+            for dep in deps:
+                if dep.dot_ignore:
+                    continue
+                graph.append("{} -> {};".format(id(node), id(dep)))
 
         graph.append("}")
         return "\n".join(graph)
