@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.0.19 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add a 'touchdown get-signin-url' command.
 
 
 0.0.18 (2015-06-11)

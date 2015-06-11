@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import json
+import requests
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, serializers
 
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimplePlan, SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Role(Resource):
@@ -146,3 +147,40 @@ class Destroy(SimpleDestroy, Describe):
 
         for change in super(Destroy, self).destroy_object():
             yield change
+
+
+class Plan(Describe):
+
+    name = "get-signin-url"
+    resource = Role
+    service_name = "iam"
+
+    def get_signin_url(self):
+        role = self.describe_object()
+
+        sts  = self.runner.get_plan(self.resource.account).session.create_client("sts")
+        creds = sts.assume_role(
+            RoleArn=role['Arn'],
+            RoleSessionName="touchdown-get-signin-url",
+        )['Credentials']
+
+        token = requests.get(
+            "https://signin.aws.amazon.com/federation",
+            params={
+                "Action": "getSigninToken",
+                "Session": json.dumps({
+                    "sessionId": creds['AccessKeyId'],
+                    "sessionKey": creds['SecretAccessKey'],
+                    "sessionToken": creds['SessionToken'],
+                }),
+            },
+        ).json()
+
+        p = requests.PreparedRequest()
+        p.prepare_url("https://signin.aws.amazon.com/federation", {
+            "Action": "login",
+            "Issuer": "touchdown",
+            "Destination": "https://console.aws.amazon.com/",
+            "SigninToken": token['SigninToken'],
+        })
+        return p.url
