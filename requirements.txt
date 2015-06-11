@@ -1,4 +1,4 @@
-botocore==1.0.0a2
+botocore==1.0.0b1
 jmespath==0.7.1
 netaddr==0.7.14
 contextlib2==0.4.0
@@ -11,14 +11,14 @@ demjson
 
 coverage==3.7.1
 coveralls==0.5
-flake8==2.4.0
+flake8==2.4.1
 mccabe==0.3
 mock==1.0.1
 pep8==1.5.7  # rq.filter: <1.6
-py==1.4.27
-pyflakes==0.8.1
-pytest==2.7.0
-vcrpy==1.5.0
+py==1.4.28
+pyflakes==0.9.1
+pytest==2.7.1
+vcrpy==1.5.2
 wrapt==1.10.4
 
 -e .
