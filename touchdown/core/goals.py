@@ -59,7 +59,7 @@ class Goal(object):
         return dependencies.DependencyMap(self.workspace, tips_first=False)
 
     def get_plan_class(self, resource):
-        raise NotImplementedError(self.get_planner)
+        raise NotImplementedError(self.get_plan_class)
 
     def get_plan(self, resource):
         if resource not in self.resources:
