@@ -20,7 +20,7 @@ from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, serializers
 
 from ..account import BaseAccount
-from ..common import SimplePlan, SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Role(Resource):
@@ -158,7 +158,7 @@ class Plan(Describe):
     def get_signin_url(self):
         role = self.describe_object()
 
-        sts  = self.runner.get_plan(self.resource.account).session.create_client("sts")
+        sts = self.runner.get_plan(self.resource.account).session.create_client("sts")
         creds = sts.assume_role(
             RoleArn=role['Arn'],
             RoleSessionName="touchdown-get-signin-url",
