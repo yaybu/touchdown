@@ -124,6 +124,7 @@ class SubCommand(object):
 def configure_parser(parser, workspace, console):
     parser.add_argument("--debug", default=False, action="store_true")
     parser.add_argument("--serial", default=False, action="store_true")
+    parser.add_argument("--unattended", default=False, action="store_true")
 
     sub = parser.add_subparsers()
     for name, goal in goals.registered():
@@ -144,6 +145,8 @@ def main():
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
+
+    console.interactive = not args.unattended
 
     args.func(args)
 
