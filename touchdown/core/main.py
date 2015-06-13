@@ -64,7 +64,7 @@ class ConsoleInterface(object):
         response = six.moves.input('{} [Y/n] '.format(message))
         while response.lower() not in ('y', 'n', ''):
             response = six.moves.input('{} [Y/n] '.format(message))
-        return response.lower() == 'y'
+        return response.lower() != 'n'
 
     def render_plan(self, plan):
         for resource, actions in plan:
