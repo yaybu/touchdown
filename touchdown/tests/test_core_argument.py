@@ -68,8 +68,8 @@ class TestArguments(unittest.TestCase):
 
     def test_ip_network(self):
         self.assertEqual(
-            str(argument.IPNetwork().clean(None, "192.168.0.1/25")),
-            "192.168.0.1/25",
+            str(argument.IPNetwork().clean(None, "192.168.0.0/25")),
+            "192.168.0.0/25",
         )
 
     def test_ip_network_exception(self):

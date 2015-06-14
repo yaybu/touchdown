@@ -20,7 +20,7 @@ class TestVpc(aws.RecordedBotoCoreTest):
     def test_create_and_delete_role(self):
         self.aws.add_vpc(
             name='test-vpc',
-            cidr_block='192.168.0.1/25',
+            cidr_block='192.168.0.0/25',
         )
         self.apply()
         self.destroy()
