@@ -32,7 +32,7 @@ Here is an example ``Touchdownfile``::
 
     example = vpc.add_subnet(
         name='application',
-        cidr_block='192.168.0.1/24',
+        cidr_block='192.168.0.0/24',
     )
 
     asg = aws.add_autoscaling_group(

@@ -16,10 +16,10 @@ VPC at Amazon with a subnet your ``Touchdownfile`` would contain::
 
     vpc = aws.add_vpc(
         name='my-vpc,
-        cidr_block='192.168.0.1/24',
+        cidr_block='192.168.0.0/24',
     )
 
-    vpc.add_subnet(name='subnet1', cidr_block='192.168.0.1/25')
+    vpc.add_subnet(name='subnet1', cidr_block='192.168.0.0/25')
 
 
 .. toctree::
