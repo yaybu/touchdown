@@ -138,12 +138,12 @@ class IPNetwork(String):
 
     def clean(self, instance, value):
         try:
-            value = netaddr.IPNetwork(value)
+            network = netaddr.IPNetwork(value)
         except (netaddr.core.AddrFormatError, ValueError):
             raise errors.InvalidParameter("{} is not a valid IP Address")
-        if value != value.cidr:
-            raise errors.InvalidParameter("{} looks wrong - did you mean {}?".format(value, value.cdr))
-        return value
+        if value != str(network.cidr):
+            raise errors.InvalidParameter("{} looks wrong - did you mean {}?".format(value, network.cidr))
+        return network
 
 
 class Dict(Argument):
