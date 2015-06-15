@@ -277,7 +277,7 @@ class Resource(Argument):
         def _(self, **kwargs):
             arguments = {argument_name: self}
             arguments.update(kwargs)
-            arguments['ensure'] = ['never-create']
+            arguments['ensure'] = ['never-create', 'never-destroy']
             resource = cls(self, **arguments)
             self.workspace.add_dependency(resource)
             return resource
