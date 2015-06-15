@@ -30,6 +30,7 @@ from . import (
     sns,
     sqs,
     external_account,
+    password_policy,
 )
 
 __all__ = [
@@ -50,4 +51,5 @@ __all__ = [
     'sns',
     'sqs',
     'external_account',
+    'password_policy',
 ]

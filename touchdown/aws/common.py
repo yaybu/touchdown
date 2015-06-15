@@ -293,7 +293,7 @@ class SimpleDescribe(SimplePlan):
 
     @property
     def resource_id(self):
-        if self.key in self.object:
+        if self.key and self.key in self.object:
             return self.object[self.key]
         return None
 
