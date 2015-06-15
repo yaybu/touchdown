@@ -4,7 +4,17 @@ Changelog for Touchdown
 0.0.19 (unreleased)
 -------------------
 
+- Add AWS password policy management. This lets you enforce password complexity
+  for your IAM users.
+
 - Add a 'touchdown get-signin-url' command.
+
+- Better 'touchdown dot' output.
+
+- Fix ``Y/n`` confirmation so that ``Y`` really is the default.
+
+- #43 - Fix documentation and validation around Subnet ``cidr_block`` -
+  ``192.168.0.1/24`` isn't a valid cidr.
 
 
 0.0.18 (2015-06-11)

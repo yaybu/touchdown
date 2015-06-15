@@ -5,6 +5,40 @@ Identity & Access Management
    :synopsis: Identity & Access Management resources.
 
 
+PasswordPolicy
+--------------
+
+.. class:: PasswordPolicy
+
+    You can set password policy on an Amazon account resource::
+
+        aws.add_password_policy(
+            min_password_length=16,
+        )
+
+    .. attribute:: min_password_length
+
+    .. attribute:: require_symbols
+
+    .. attribute:: require_numbers
+
+    .. attribute:: require_uppercase
+
+    .. attribute:: require_lowercase
+
+    .. attribute:: allow_users_to_change_password
+
+    .. attribute:: expire_passwords
+
+    .. attribute:: max_password_age
+
+    .. attribute:: password_reuse_prevention
+
+        Must be between 1 and 24.
+
+    .. attribute:: hard_expiry
+
+
 InstanceProfile
 ---------------
 
