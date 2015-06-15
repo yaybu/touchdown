@@ -28,9 +28,26 @@ class Cost(Goal):
         return plan_class
 
     def execute(self):
-        data = [("Resource", "Cost (per hour)")]
-        for coster in self.collect_as_iterable("cost"):
-            data.append((str(coster.resource), str(coster.cost())))
-        self.ui.table(data)
+        headers = [("Resource", "Cost (per hour)")]
+        data = []
+
+        def collect_costs(echo, resource):
+            coster = self.get_plan(resource)
+            if coster.name == self.name:
+                data.append((str(coster.resource), str(coster.cost())))
+
+        self.visit(
+            "Collecting costs...",
+            self.get_plan_order(),
+            collect_costs,
+        )
+
+        data.sort()
+
+        if len(data) == 0:
+            self.ui.echo("No costable items")
+            return
+
+        self.ui.table(headers + data)
 
 register(Cost)
