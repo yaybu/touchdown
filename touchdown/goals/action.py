@@ -31,10 +31,11 @@ class ActionGoalMixin(object):
 
     def plan(self):
         self.reset_changes()
-        for progress in self.Map(self.get_plan_order(), lambda e, r: self.get_changes(r), self.ui.echo):
-            self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
-        self.ui.echo("")
-
+        self.visit(
+            "Building plan...",
+            self.get_plan_order(),
+            lambda e, r: self.get_changes(r),
+        )
         for resource in self.get_execution_order().all():
             changes = self.get_changes(resource)
             if changes:

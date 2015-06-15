@@ -72,6 +72,11 @@ class Goal(object):
     def get_execution_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
 
+    def visit(self, message, dep_map, callable):
+        for progress in self.Map(dep_map, callable, self.ui.echo):
+            self.ui.echo("\r[{: >6.2%}] {}".format(progress, message), nl=False)
+        self.ui.echo("")
+
     def collect_as_iterable(self, plan_name):
         collected = []
 
@@ -79,9 +84,7 @@ class Goal(object):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected.append(plan)
-        for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
-            self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
-        self.ui.echo("")
+        self.visit("Building plan...", self.get_plan_order(), _)
         return collected
 
     def collect_as_dict(self, plan_name):
@@ -91,9 +94,7 @@ class Goal(object):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected[plan.resource.name] = plan
-        for progress in self.Map(self.get_plan_order(), _, self.ui.echo):
-            self.ui.echo("\r[{: >6.2%}] Building plan...".format(progress), nl=False)
-        self.ui.echo("")
+        self.visit("Building plan...", self.get_plan_order(), _)
         return collected
 
 
