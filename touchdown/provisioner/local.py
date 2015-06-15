@@ -16,6 +16,7 @@ import errno
 import os
 import tempfile
 import subprocess
+import sys
 
 from touchdown.core import argument
 from touchdown.core import errors
@@ -48,7 +49,7 @@ class Connection(object):
                 fh.write(script.read())
             os.chmod(script_name, 0o755)
 
-            command = []
+            command = [sys.executable]
             if self.resource.user:
                 command = ['sudo', '-u', self.resource.user]
 
