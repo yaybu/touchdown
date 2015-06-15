@@ -52,7 +52,7 @@ First we'll create a 3 subnet VPC::
         ),
     }
 
-Then we'll create security groups that limit who can access the subnets.
+Then we'll create security groups that limit who can access the subnets::
 
     security_groups = {}
     security_groups['lb'] = vpc.add_security_group(
