@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.19 (unreleased)
+0.0.19 (2015-06-15)
 -------------------
 
 - Add AWS password policy management. This lets you enforce password complexity
