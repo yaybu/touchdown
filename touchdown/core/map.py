@@ -124,6 +124,11 @@ class ParallelMap(object):
                 self.done.put(self.ABORT)
                 self.ready.stop()
                 raise
+            except KeyboardInterrupt:
+                self.echo("Exiting...")
+                self.done.put(self.ABORT)
+                self.ready.stop()
+                return
 
     def wait_for_remaining(self):
         # No more dependencies to process - we just need to wait for any
@@ -142,40 +147,47 @@ class ParallelMap(object):
             yield self.current / self.total
 
     def __iter__(self):
-        # Start up as many workers as requested.
-        for i in range(self.workers):
-            t = threading.Thread(target=self.worker, name="worker{}".format(i))
-            t.start()
+        try:
+            # Start up as many workers as requested.
+            for i in range(self.workers):
+                t = threading.Thread(target=self.worker, name="worker{}".format(i))
+                t.start()
 
-        # Seed the workers with the initial batch of work
-        # These are all the tasks that have no dependencies
-        for resource in self.resources.get_ready():
-            self.ready.put(resource)
+            # Seed the workers with the initial batch of work
+            # These are all the tasks that have no dependencies
+            for resource in self.resources.get_ready():
+                self.ready.put(resource)
 
-        # Now we block on the "done" queue. Resources put in the queue are
-        # complete - so we can inform the dep solver and ask for any new work
-        # that this might unblock.
-        while not self.resources.empty():
-            try:
-                resource = self.done.get(timeout=1)
-                if resource == self.ABORT:
-                    break
+            # Now we block on the "done" queue. Resources put in the queue are
+            # complete - so we can inform the dep solver and ask for any new work
+            # that this might unblock.
+            while not self.resources.empty():
+                try:
+                    resource = self.done.get(timeout=1)
+                    if resource == self.ABORT:
+                        break
 
-                self.current += 1
+                    self.current += 1
 
-                self.resources.complete(resource)
-                for resource in self.resources.get_ready():
-                    self.ready.put(resource)
-                self.done.task_done()
-            except queue.Empty:
-                pass
+                    self.resources.complete(resource)
+                    for resource in self.resources.get_ready():
+                        self.ready.put(resource)
+                    self.done.task_done()
+                except queue.Empty:
+                    pass
 
-            yield self.current / self.total
+                yield self.current / self.total
 
-        for progress in self.wait_for_remaining():
-            yield progress
+            for progress in self.wait_for_remaining():
+                yield progress
 
-        self.ready.stop()
+        except KeyboardInterrupt:
+            self.echo("Exiting...")
+            for progress in self.wait_for_remaining():
+                yield progress
+
+        finally:
+            self.ready.stop()
 
     def __call__(self):
         list(iter(self))

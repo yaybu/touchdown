@@ -4,6 +4,8 @@ Changelog for Touchdown
 0.0.20 (unreleased)
 -------------------
 
+- More graceful handling of KeyboardInterrupt.
+
 - Fix cache corruption issue.
 
 - Workaround some potential eventual consitency issues with RouteTable and
