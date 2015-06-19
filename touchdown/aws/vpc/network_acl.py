@@ -93,6 +93,7 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_network_acl"
     waiter = "network_acl_available"
+    waiter_eventual_consistency_threshold = 5
 
     def _fix_protocol(self, protocol):
         # see https://github.com/aws/aws-cli/pull/532/files

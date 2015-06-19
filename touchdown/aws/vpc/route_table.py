@@ -81,6 +81,7 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_route_table"
     waiter = "route_table_available"
+    waiter_eventual_consistency_threshold = 5
 
     def update_vpgw_associations(self):
         remote = set(r['GatewayId'] for r in self.object.get("PropagatingVgws", []))

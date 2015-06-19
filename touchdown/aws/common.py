@@ -36,10 +36,11 @@ class Resource(resource.Resource):
 
 class Waiter(Action):
 
-    def __init__(self, plan, description, waiter):
+    def __init__(self, plan, description, waiter, eventual_consistency_threshold):
         super(Waiter, self).__init__(plan)
         self.description = description
         self.waiter = waiter
+        self.eventual_consistency_threshold = eventual_consistency_threshold
 
     def ready(self):
         waiter = self.plan.get_waiter(self.waiter)
@@ -71,7 +72,8 @@ class Waiter(Action):
         waiter = self.plan.client.get_waiter(self.waiter)
 
         try:
-            waiter.wait(**filters)
+            for i in range(self.eventual_consistency_threshold):
+                waiter.wait(**filters)
         except WaiterError:
             raise errors.Error("Operation took too long to complete")
 
@@ -280,8 +282,8 @@ class SimpleDescribe(SimplePlan):
             **kwargs
         )
 
-    def get_waiter(self, description, waiter):
-        return Waiter(self, description, waiter)
+    def get_waiter(self, description, waiter, eventual_consistency_threshold=1):
+        return Waiter(self, description, waiter, eventual_consistency_threshold)
 
     def get_actions(self):
         self.object = self.describe_object()
@@ -380,6 +382,7 @@ class SimpleApply(SimpleDescribe):
                 waiter = self.get_waiter(
                     ["Waiting for resource to exist"],
                     self.waiter,
+                    getattr(self, "waiter_eventual_consistency_threshold", 1)
                 )
                 if created or not waiter.ready():
                     yield waiter
