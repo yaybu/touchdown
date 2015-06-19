@@ -130,6 +130,30 @@ class ParallelMap(object):
                 self.ready.stop()
                 return
 
+    def pump_once(self):
+        try:
+            resource = self.done.get(timeout=1)
+            if resource == self.ABORT:
+                break
+
+            self.current += 1
+
+            self.resources.complete(resource)
+            for resource in self.resources.get_ready():
+                self.ready.put(resource)
+            self.done.task_done()
+        except queue.Empty:
+            pass
+
+        return self.current / self.total
+
+    def pump(self):
+        # Now we block on the "done" queue. Resources put in the queue are
+        # complete - so we can inform the dep solver and ask for any new work
+        # that this might unblock.
+        while not self.resources.empty():
+            yield self.pump_once()
+
     def wait_for_remaining(self):
         # No more dependencies to process - we just need to wait for any
         # remaining tasks to complete
@@ -158,25 +182,8 @@ class ParallelMap(object):
             for resource in self.resources.get_ready():
                 self.ready.put(resource)
 
-            # Now we block on the "done" queue. Resources put in the queue are
-            # complete - so we can inform the dep solver and ask for any new work
-            # that this might unblock.
-            while not self.resources.empty():
-                try:
-                    resource = self.done.get(timeout=1)
-                    if resource == self.ABORT:
-                        break
-
-                    self.current += 1
-
-                    self.resources.complete(resource)
-                    for resource in self.resources.get_ready():
-                        self.ready.put(resource)
-                    self.done.task_done()
-                except queue.Empty:
-                    pass
-
-                yield self.current / self.total
+            for progress in self.pump():
+                yield progress
 
             for progress in self.wait_for_remaining():
                 yield progress
