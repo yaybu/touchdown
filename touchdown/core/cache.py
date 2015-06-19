@@ -68,7 +68,7 @@ class FileCache(Cache):
 
         self._ensure_cache_directory_exists()
 
-        fd = os.open(path, os.O_WRONLY | os.O_CREAT, 0o600)
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
         with os.fdopen(fd, 'w') as f:
             f.write(contents)
 

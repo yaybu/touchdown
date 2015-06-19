@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.0.20 (unreleased)
 -------------------
 
-- Fix tests on Windows.
+- Fix cache corruption issue.
 
 
 0.0.19 (2015-06-15)
