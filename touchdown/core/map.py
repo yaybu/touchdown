@@ -114,36 +114,25 @@ class ParallelMap(object):
                 finally:
                     self.active.remove(resource)
                 self.done.put(resource)
-            except errors.Error as e:
-                self.echo("ERROR: {}. Stopping.".format(e))
-                self.done.put(self.ABORT)
-                self.ready.stop()
+            except BaseException as e:
+                self.done.put(e)
                 continue
-            except Exception:
-                self.echo("ERROR: Unhandled error - stopping.")
-                self.done.put(self.ABORT)
-                self.ready.stop()
-                raise
-            except KeyboardInterrupt:
-                self.echo("Exiting...")
-                self.done.put(self.ABORT)
-                self.ready.stop()
-                return
 
     def pump_once(self):
         try:
             resource = self.done.get(timeout=1)
-            if resource == self.ABORT:
-                break
-
-            self.current += 1
-
-            self.resources.complete(resource)
-            for resource in self.resources.get_ready():
-                self.ready.put(resource)
-            self.done.task_done()
         except queue.Empty:
-            pass
+            return self.current / self.total
+
+        if isinstance(resource, BaseException):
+            raise resource
+
+        self.current += 1
+
+        self.resources.complete(resource)
+        for resource in self.resources.get_ready():
+            self.ready.put(resource)
+        self.done.task_done()
 
         return self.current / self.total
 
@@ -185,15 +174,20 @@ class ParallelMap(object):
             for progress in self.pump():
                 yield progress
 
-            for progress in self.wait_for_remaining():
-                yield progress
+        except errors.Error as e:
+            self.echo(str(e))
+            self.echo("Exiting...")
 
         except KeyboardInterrupt:
-            self.echo("Exiting...")
-            for progress in self.wait_for_remaining():
-                yield progress
+            self.echo("Interrupted. Pending tasks cancelled.")
+
+        except Exception as e:
+            self.echo("Unhandled error. Cleaning up.")
+            raise
 
         finally:
+            for progress in self.wait_for_remaining():
+                yield progress
             self.ready.stop()
 
     def __call__(self):
