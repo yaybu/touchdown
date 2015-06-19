@@ -12,6 +12,9 @@ Changelog for Touchdown
   NetworkACL. Observed behaviour is that after creating them they arent visible
   to the describe API. Then they are. Then they arent. Then they are.
 
+- Fix the Windows version of the local provider by runnign the bundle under an
+  interpreter.
+
 
 0.0.19 (2015-06-15)
 -------------------
