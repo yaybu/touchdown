@@ -21,6 +21,7 @@ from touchdown.core import serializers
 from touchdown.core.diff import DiffSet
 
 from .. import sns
+from .. import cloudwatch
 
 
 class Queue(Resource):
@@ -128,4 +129,17 @@ class Subscription(sns.Subscription):
                 serializers.Property("QueueArn"),
             ),
             TopicArn=kwargs['TopicArn'],
+        )
+
+
+class AlarmDestination(cloudwatch.AlarmDestination):
+
+    """ Adapts a Queue into an AlarmDestination """
+
+    input = Queue
+
+    def get_serializer(self, runner, **kwargs):
+        return serializers.Context(
+            serializers.Const(self.adapts),
+            serializers.Property("QueueArn"),
         )
