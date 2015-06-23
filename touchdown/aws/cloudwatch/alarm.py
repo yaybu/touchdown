@@ -27,6 +27,8 @@ class AlarmDestination(Adapter):
 
 class Dimension(Resource):
 
+    resource_name = "dimension"
+
     name = argument.String(field="Name", min=1, max=255)
     value = argument.String(field="Value", min=1, max=255)
 
@@ -38,12 +40,17 @@ class Alarm(Resource):
     name = argument.String(field="AlarmName")
     description = argument.String(field="AlarmDescription")
     actions_enabled = argument.Boolean(field="ActionsEnabled")
-    ok_actions = argument.ResourceList(AlarmDestination, field="OKActions")
-    alarm_actions = argument.ResourceList(AlarmDestination, field="AlarmActions")
-    insufficient_data_actions = argument.ResourceList(AlarmDestination, field="InsufficientDataActions")
+    ok_actions = argument.ResourceList(AlarmDestination, field="OKActions", serializer=serializers.List(serializers.Resource()))
+    alarm_actions = argument.ResourceList(AlarmDestination, field="AlarmActions", serializer=serializers.List(serializers.Resource()))
+
+    insufficient_data_actions = argument.ResourceList(
+        AlarmDestination,
+        field="InsufficientDataActions",
+        serializer=serializers.List(serializers.Resource()),
+    )
 
     statistic = argument.String(choice=["SampleCount", "Average", "Sum", "Minimum", "Maximum"], field="Statistic")
-    dimensions = argument.ResourceList(Dimension, max=10, field="Dimensions")
+    dimensions = argument.ResourceList(Dimension, max=10, field="Dimensions", serializer=serializers.List(serializers.Resource()))
     period = argument.Integer(min=60, field="Period")
     unit = argument.String(field="Unit", choices=[
         "Seconds",
@@ -81,9 +88,13 @@ class Alarm(Resource):
         "GreaterThanThreshold",
         "LessThanThreshold",
         "LessThanOrEqualToThreshold",
-    ])
+    ], field="ComparisonOperator")
 
     metric = argument.Resource(Metric, field="MetricName")
+
+    extra_serializers = {
+        "Namespace": serializers.Expression(lambda runner, obj: obj.metric.namespace)
+    }
 
 
 class Describe(SimpleDescribe, Plan):
@@ -92,8 +103,13 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'cloudwatch'
     describe_action = "describe_alarms_for_metric"
     describe_envelope = "MetricAlarms"
-    describe_filters = {}
     key = 'MetricAlarm'
+
+    def get_describe_filters(self):
+        return {
+            "MetricName": self.resource.metric.name,
+            "Namespace": self.resource.metric.namespace,
+        }
 
     def describe_object_matches(self, role):
         return role['AlarmName'] == self.resource.name
@@ -102,11 +118,11 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "put_metric_alarm"
+    create_response = "not-that-useful"
 
     signature = [
         Present("name"),
         Present("metric"),
-        Present("namespace"),
         Present("statistic"),
         Present("period"),
         Present("evaluation_periods"),

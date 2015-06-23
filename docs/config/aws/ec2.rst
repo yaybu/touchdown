@@ -155,3 +155,39 @@ Launch Configuration
     .. attribute:: ebs_optimized
     .. attribute:: associate_public_ip_address
     .. attribute:: placement_tenancy
+
+
+Auto Scaling Policy
+------------------
+
+.. class:: AutoScalingPolicy
+
+    .. attribute:: name
+
+        A name for this policy. This field is required.
+
+    .. attribute:: auto_scaling_group
+
+        The :class:`~touchdown.aws.ec2.AutoScalingGroup` to apply this policy to.
+
+    .. attribute:: adjustment_type
+
+        The adjustment type. Valid values are:
+
+        ``ChangeInCapacity``:
+            Increases or decreases the existing capacity. For example, the current capacity of your Auto Scaling group is set to three instances, and you then create a scaling policy on your Auto Scaling group, specify the type as ``ChangeInCapacity``, and the adjustment as five. When the policy is executed, Auto Scaling adds five more instances to your Auto Scaling group. You then have eight running instances in your Auto Scaling group: current capacity (3) plus ChangeInCapacity (5) equals 8.
+        ``ExactCapacity``:
+            Changes the current capacity to the specified value. For example, if the current capacity is 5 instances and you create a scaling policy on your Auto Scaling group, specify the type as ExactCapacity and the adjustment as 3. When the policy is executed, your Auto Scaling group has three running instances.
+        ``PercentChangeInCapacity``: Increases or decreases the capacity by a percentage. For example, if the current capacity is 10 instances and you create a scaling policy on your Auto Scaling group, specify the type as PercentChangeInCapacity, and the adjustment as 10. When the policy is executed, your Auto Scaling group has eleven running instances because 10 percent of 10 instances is 1 instance, and 10 instances plus 1 instance is 11 instances.
+
+    .. attribute:: min_adjustment_step
+
+        Used with ``adjustment_type`` with the value ``PercentChangeInCapacity``, the scaling policy changes the ``desired_capacity`` of the Auto Scaling group by at least the number of instances specified in the value.
+
+    .. attribute:: scaling_adjustment
+
+        The number by which to scale. ``adjustment_type`` determines the interpretation of this number (for example, as an absolute number or as a percentage of the existing group size). A positive increment adds to the current capacity and a negative value removes from the current capacity.
+
+    .. attribute:: cooldown
+
+        The amount of time, in seconds, after a scaling activity completes and before the next scaling activity can start.

@@ -36,8 +36,13 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'cloudwatch'
     describe_action = "list_metrics"
     describe_envelope = "Metrics"
-    describe_filters = {}
     key = 'MetricName'
+
+    def get_describe_filters(self):
+        return {
+            self.key: self.resource.name,
+            "Namespace": self.resource.namespace,
+        }
 
 
 class Apply(SimpleApply, Describe):

@@ -28,7 +28,7 @@ class Policy(Resource):
     name = argument.String(field="PolicyName")
     auto_scaling_group = argument.Resource(AutoScalingGroup, field="AutoScalingGroupName")
 
-    min_adjustment_step = argument.Integer(default=1, field="MinAdjustmentStep")
+    min_adjustment_step = argument.Integer(field="MinAdjustmentStep")
     adjustment_type = argument.String(
         choices=["ChangeInCapacity", "ExactCapacity", "PercentChangeInCapacity"],
         default="ChangeInCapacity",
@@ -50,14 +50,14 @@ class Describe(SimpleDescribe, Plan):
 
     def get_describe_filters(self):
         return {
-            "AutoScalingGroupName": self.auto_scaling_group.name,
+            "AutoScalingGroupName": self.resource.auto_scaling_group.name,
             "PolicyNames": [self.resource.name]
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_auto_scaling_group"
+    create_action = "put_scaling_policy"
     create_response = "not-that-useful"
 
     signature = (
