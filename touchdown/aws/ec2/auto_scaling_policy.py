@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
-
-from touchdown.core.action import Action
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument, errors, serializers
+from touchdown.core import argument, serializers
 
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from .launch_configuration import LaunchConfiguration
+from .. import cloudwatch
 from .auto_scaling_group import AutoScalingGroup
 
 
@@ -32,7 +29,11 @@ class Policy(Resource):
     auto_scaling_group = argument.Resource(AutoScalingGroup, field="AutoScalingGroupName")
 
     min_adjustment_step = argument.Integer(default=1, field="MinAdjustmentStep")
-    adjustment_type = argument.String(choides=["ChangeInCapacity", "ExactCapacity", "PercentChangeInCapacity"], default="ChangeInCapacity", field="AdjustmentType")
+    adjustment_type = argument.String(
+        choices=["ChangeInCapacity", "ExactCapacity", "PercentChangeInCapacity"],
+        default="ChangeInCapacity",
+        field="AdjustmentType"
+    )
     scaling_adjustment = argument.Integer(default=1, field="ScalingAdjustment")
     cooldown = argument.Integer(default=30, field="Cooldown")
 
@@ -70,7 +71,7 @@ class Destroy(SimpleDestroy, Describe):
     destroy_action = "delete_auto_scaling_group"
 
 
-class AlarmDestination(ssh.AlarmDestination):
+class AlarmDestination(cloudwatch.AlarmDestination):
 
     resource_name = "alarm_destination"
     input = Policy
