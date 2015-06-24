@@ -42,6 +42,7 @@ Resources
 
  * **Amazon:**
    :doc:`Authentication <config/aws/authentication>` |
+   :doc:`Autoscaling <config/aws/autoscaling>` |
    :doc:`CDN <config/aws/cloudfront>` |
    :doc:`Compute <config/aws/ec2>` |
    :doc:`DNS <config/aws/route53>` |
