@@ -42,6 +42,7 @@ Resources
 
  * **Amazon:**
    :doc:`Authentication <config/aws/authentication>` |
+   :doc:`Autoscaling <config/aws/autoscaling>` |
    :doc:`CDN <config/aws/cloudfront>` |
    :doc:`Compute <config/aws/ec2>` |
    :doc:`DNS <config/aws/route53>` |
@@ -49,6 +50,7 @@ Resources
    :doc:`Key Value Stores <config/aws/elasticache>` |
    :doc:`Identity & Access Management <config/aws/iam>` |
    :doc:`Load Balancing <config/aws/elb>` |
+   :doc:`Monitoring <config/aws/cloudwatch>` |
    :doc:`Networking <config/aws/vpc>` |
    :doc:`Relational Databases <config/aws/rds>` |
    :doc:`Simple Notification Service <config/aws/sns>` |

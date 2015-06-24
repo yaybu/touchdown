@@ -26,7 +26,10 @@ class ActionGoalMixin(object):
 
     def get_changes(self, resource):
         if resource not in self.changes:
-            self.changes[resource] = list(self.get_plan(resource).get_actions())
+            try:
+                self.changes[resource] = list(self.get_plan(resource).get_actions())
+            except Exception as e:
+                raise errors.Error("{}: {}".format(resource, e))
         return self.changes[resource]
 
     def plan(self):
