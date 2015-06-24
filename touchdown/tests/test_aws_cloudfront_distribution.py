@@ -20,6 +20,14 @@ from touchdown.core import errors, serializers
 from touchdown.aws.cloudfront import Distribution
 
 from . import aws
+from touchdown.aws.session import session
+
+
+class TestMetadata(unittest.TestCase):
+
+    def test_waiter_waity_enough(self):
+        waiter = session.get_waiter_model("cloudfront")
+        self.assertEqual(waiter.get_waiter("DistributionDeployed").max_attempts, 50)
 
 
 class TestCloudFrontDistributionSerializing(unittest.TestCase):
