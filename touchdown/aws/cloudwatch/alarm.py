@@ -111,8 +111,8 @@ class Describe(SimpleDescribe, Plan):
             "Namespace": self.resource.metric.namespace,
         }
 
-    def describe_object_matches(self, role):
-        return role['AlarmName'] == self.resource.name
+    def describe_object_matches(self, alarm):
+        return alarm['AlarmName'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):

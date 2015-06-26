@@ -4,6 +4,12 @@ Changelog for Touchdown
 0.0.21 (unreleased)
 -------------------
 
+- Add support for CloudTrail.
+
+- Add support for CloudWatch Alarms.
+
+- Add support for auto scaling policies.
+
 - Override waiters for cloudfront. Double the amount of time we will wait for a
   distributiion to be 'Deployed' as 25 is too low in practice.
 
