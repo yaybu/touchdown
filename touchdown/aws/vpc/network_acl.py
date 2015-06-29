@@ -28,15 +28,21 @@ class Rule(Resource):
 
     network = argument.IPNetwork(field="CidrBlock")
     protocol = argument.String(default='tcp', choices=['tcp', 'udp', 'icmp'], field="Protocol")
-    port = argument.Integer(min=-1, max=65535)
+    port = argument.Integer(default=-1, min=-1, max=65535)
     from_port = argument.Integer(default=lambda r: r.port if r.port != -1 else 1, min=-1, max=65535)
     to_port = argument.Integer(default=lambda r: r.port if r.port != -1 else 65535, min=-1, max=65535)
     action = argument.String(default="allow", choices=["allow", "deny"], field="RuleAction")
+    icmp_type = argument.Integer(default=-1)
+    icmp_code = argument.Integer(default=-1)
 
     extra_serializers = {
         "PortRange": serializers.Dict(
             From=serializers.Integer(serializers.Argument("from_port")),
             To=serializers.Integer(serializers.Argument("to_port")),
+        ),
+        "IcmpTypeCode": serializers.Dict(
+            Type=serializers.Integer(serializers.Argument("icmp_type")),
+            Code=serializers.Integer(serializers.Argument("icmp_code")),
         ),
     }
 
@@ -150,10 +156,18 @@ class Apply(SimpleApply, Describe):
 
         for key, rule in local_rules.items():
             if key not in remote_rules or remote_rules[key] != rule:
-                if rule['Egress']:
-                    desc = "Add rule: {0[RuleAction]} egress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
+                protocol = {
+                    '1': 'ICMP',
+                    '6': 'TCP',
+                    '17': 'UDP',
+                }[rule['Protocol']]
+                direction = 'egress' if rule['Egress'] else 'ingress'
+                if protocol == 'ICMP':
+                    desc = "Add rule: {0[RuleAction]} {2} from {0[CidrBlock]}, {1} {0[IcmpTypeCode][Type]}:{0[IcmpTypeCode][Code]}".format(
+                         rule, protocol, direction)
                 else:
-                    desc = "Add rule: {0[RuleAction]} ingress from {0[CidrBlock]}, port {0[PortRange][From]} to {0[PortRange][To]}".format(rule)
+                    desc = "Add rule: {0[RuleAction]} {2} from {0[CidrBlock]}, {1} port {0[PortRange][From]} to {0[PortRange][To]}".format(
+                         rule, protocol, direction)
 
                 yield self.generic_action(
                     desc,
