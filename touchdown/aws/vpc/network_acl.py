@@ -147,7 +147,7 @@ class Apply(SimpleApply, Describe):
         for key, rule in remote_rules.items():
             if key not in local_rules or local_rules[key] != rule:
                 yield self.generic_action(
-                    "Remove rule {} ({})".format(rule['RuleNumber'], 'egrees' if rule['Egress'] else 'ingress'),
+                    "Remove rule {} ({})".format(rule['RuleNumber'], 'egress' if rule['Egress'] else 'ingress'),
                     self.client.delete_network_acl_entry,
                     NetworkAclId=serializers.Identifier(),
                     RuleNumber=rule['RuleNumber'],
