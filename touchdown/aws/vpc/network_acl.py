@@ -35,16 +35,22 @@ class Rule(Resource):
     icmp_type = argument.Integer(default=-1)
     icmp_code = argument.Integer(default=-1)
 
-    extra_serializers = {
-        "PortRange": serializers.Dict(
-            From=serializers.Integer(serializers.Argument("from_port")),
-            To=serializers.Integer(serializers.Argument("to_port")),
-        ),
-        "IcmpTypeCode": serializers.Dict(
-            Type=serializers.Integer(serializers.Argument("icmp_type")),
-            Code=serializers.Integer(serializers.Argument("icmp_code")),
-        ),
-    }
+    def __init__(self, parent, **kwargs):
+        super(Rule, self).__init__(parent, **kwargs)
+        if self.protocol == 'icmp':
+            self.extra_serializers = {
+                "IcmpTypeCode": serializers.Dict(
+                    Type=serializers.Integer(serializers.Argument("icmp_type")),
+                    Code=serializers.Integer(serializers.Argument("icmp_code")),
+                ),
+            }
+        else:
+            self.extra_serializers = {
+                "PortRange": serializers.Dict(
+                    From=serializers.Integer(serializers.Argument("from_port")),
+                    To=serializers.Integer(serializers.Argument("to_port")),
+                )
+            }
 
     def __str__(self):
         name = super(Rule, self).__str__()

@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.0.23 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Stop network ACLs applying every time
 
 
 0.0.22 (2015-06-29)
