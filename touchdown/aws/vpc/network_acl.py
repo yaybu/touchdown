@@ -170,10 +170,12 @@ class Apply(SimpleApply, Describe):
                 direction = 'egress' if rule['Egress'] else 'ingress'
                 if protocol == 'ICMP':
                     desc = "Add rule: {0[RuleAction]} {2} from {0[CidrBlock]}, {1} {0[IcmpTypeCode][Type]}:{0[IcmpTypeCode][Code]}".format(
-                         rule, protocol, direction)
+                        rule, protocol, direction
+                    )
                 else:
                     desc = "Add rule: {0[RuleAction]} {2} from {0[CidrBlock]}, {1} port {0[PortRange][From]} to {0[PortRange][To]}".format(
-                         rule, protocol, direction)
+                        rule, protocol, direction
+                    )
 
                 yield self.generic_action(
                     desc,
