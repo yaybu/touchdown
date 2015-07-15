@@ -21,4 +21,4 @@ class TestMetadata(unittest.TestCase):
 
     def test_waiter_waity_enough(self):
         waiter = session.get_waiter_model("ec2")
-        self.assertEqual(waiter.get_waiter("ImageAvailable").max_attempts, 80)
+        self.assertEqual(waiter.get_waiter("ImageAvailable").max_attempts, 160)
