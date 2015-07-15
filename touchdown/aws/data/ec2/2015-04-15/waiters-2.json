@@ -124,7 +124,7 @@
     },
     "ImageAvailable": {
       "operation": "DescribeImages",
-      "maxAttempts": 80,
+      "maxAttempts": 160,
       "delay": 15,
       "acceptors": [
         {
