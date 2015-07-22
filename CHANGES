@@ -6,6 +6,8 @@ Changelog for Touchdown
 
 - Fix alarm changes not applying and fix finding alarms when dimensions are involved.
 
+- Wait longer to copy AMI's between regions.
+
 
 0.0.23 (2015-07-14)
 -------------------
