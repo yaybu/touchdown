@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.24 (unreleased)
+0.0.24 (2015-07-22)
 -------------------
 
 - Fix alarm changes not applying and fix finding alarms when dimensions are involved.
