@@ -101,23 +101,20 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Alarm
     service_name = 'cloudwatch'
-    describe_action = "describe_alarms_for_metric"
+    describe_action = "describe_alarms"
     describe_envelope = "MetricAlarms"
     key = 'MetricAlarm'
 
     def get_describe_filters(self):
         return {
-            "MetricName": self.resource.metric.name,
-            "Namespace": self.resource.metric.namespace,
+            "AlarmNames": [self.resource.name],
         }
-
-    def describe_object_matches(self, alarm):
-        return alarm['AlarmName'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
 
     create_action = "put_metric_alarm"
+    update_action = "put_metric_alarm"
     create_response = "not-that-useful"
 
     signature = [
