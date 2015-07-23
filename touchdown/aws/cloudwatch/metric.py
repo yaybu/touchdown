@@ -54,7 +54,8 @@ class Apply(SimpleApply, Describe):
             Namespace=serializers.Argument("namespace"),
             MetricData=serializers.ListOfOne(
                 serializers.Dict(
-                    MetricName=serializers.Argument("name")
+                    MetricName=serializers.Argument("name"),
+                    Value=0,
                 )
             )
         )
