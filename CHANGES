@@ -4,7 +4,10 @@ Changelog for Touchdown
 0.0.26 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add CloudWatch Logs MetricFilter resources. This allows metrics to be
+  creating from a log stream.
+
+- Drop the Metric resource.
 
 
 0.0.25 (2015-07-23)
