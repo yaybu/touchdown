@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from .group import LogGroup
+from .filter import Filter
 from . import tail  # noqa
 
 
 __all__ = [
     'LogGroup',
+    'Filter',
 ]

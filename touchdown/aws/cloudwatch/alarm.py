@@ -17,8 +17,8 @@ from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
 from touchdown.core.adapters import Adapter
 
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from .metric import Metric
 
 
 class AlarmDestination(Adapter):
@@ -49,8 +49,11 @@ class Alarm(Resource):
         serializer=serializers.List(serializers.Resource()),
     )
 
-    statistic = argument.String(choice=["SampleCount", "Average", "Sum", "Minimum", "Maximum"], field="Statistic")
+    namespace = argument.String(field="Namespace")
+    metric = argument.String(field="MetricName")
     dimensions = argument.ResourceList(Dimension, max=10, field="Dimensions", serializer=serializers.List(serializers.Resource()))
+
+    statistic = argument.String(choice=["SampleCount", "Average", "Sum", "Minimum", "Maximum"], field="Statistic")
     period = argument.Integer(min=60, field="Period")
     unit = argument.String(field="Unit", choices=[
         "Seconds",
@@ -90,11 +93,7 @@ class Alarm(Resource):
         "LessThanOrEqualToThreshold",
     ], field="ComparisonOperator")
 
-    metric = argument.Resource(Metric, field="MetricName")
-
-    extra_serializers = {
-        "Namespace": serializers.Expression(lambda runner, obj: obj.metric.namespace)
-    }
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):
