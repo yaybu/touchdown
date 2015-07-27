@@ -15,7 +15,6 @@
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
-from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 
 from .group import LogGroup
