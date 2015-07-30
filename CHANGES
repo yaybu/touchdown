@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.0.27 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix tearing down autoscaling policies.
+
+- Fix tearing down log metric filters.
 
 
 0.0.26 (2015-07-27)
