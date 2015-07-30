@@ -50,8 +50,9 @@ class Describe(SimpleDescribe, Plan):
     resource = Filter
     service_name = 'logs'
     describe_action = 'describe_metric_filters'
+    describe_notfound_exception = 'ResourceNotFoundException'
     describe_envelope = "metricFilters"
-    key = "metricName"
+    key = "filterName"
 
     def get_describe_filters(self):
         return {
@@ -70,3 +71,9 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_metric_filter"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            logGroupName=self.resource.log_group.name,
+            filterName=self.resource.name,
+        )

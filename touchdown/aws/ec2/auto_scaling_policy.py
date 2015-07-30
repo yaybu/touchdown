@@ -68,7 +68,13 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_auto_scaling_group"
+    destroy_action = "delete_policy"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            AutoScalingGroupName=self.resource.auto_scaling_group.name,
+            PolicyName=self.resource.name,
+        )
 
 
 class AlarmDestination(cloudwatch.AlarmDestination):
