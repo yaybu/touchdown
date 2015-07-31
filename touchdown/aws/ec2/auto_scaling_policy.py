@@ -49,6 +49,10 @@ class Describe(SimpleDescribe, Plan):
     key = 'PolicyName'
 
     def get_describe_filters(self):
+        asg = self.runner.get_plan(self.resource.auto_scaling_group)
+        if not asg.resource_id:
+            return None
+
         return {
             "AutoScalingGroupName": self.resource.auto_scaling_group.name,
             "PolicyNames": [self.resource.name]

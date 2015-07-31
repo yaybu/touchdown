@@ -4,6 +4,8 @@ Changelog for Touchdown
 0.0.27 (unreleased)
 -------------------
 
+- Fix planning phase of auto scaling policy creation for empty environments.
+
 - Fix tearing down autoscaling policies.
 
 - Fix tearing down log metric filters.
