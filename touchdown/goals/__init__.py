@@ -20,6 +20,7 @@ from .edit import Edit
 from .get import Get
 from .get_signin_url import GetSigninUrl
 from .refresh import Refresh
+from .process_pipeline_jobs import ProcessPipelineJobs
 from .rollback import Rollback
 from .scp import Scp
 from .set import Set
@@ -36,6 +37,7 @@ __all__ = [
     "Edit",
     "Get",
     "GetSigninUrl",
+    "ProcessPipelineJobs",
     "Refresh",
     "Rollback",
     "Set",
