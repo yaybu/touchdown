@@ -15,11 +15,16 @@
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
+from touchdown.core.adapters import Adapter
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from ..iam import Role
 from ..s3 import Bucket
+
+
+class ActionTypeId(Adapter):
+    resource_name = "action_type"
 
 
 class Action(Resource):
@@ -28,8 +33,7 @@ class Action(Resource):
 
     name = argument.String(field="name")
     role = argument.Resource(Role, field="roleArn")
-
-    #  action_type = ...
+    action_type = argument.Resource(ActionTypeId, field="actionTypeId")
 
     inputs = argument.List(
         argument.String(),

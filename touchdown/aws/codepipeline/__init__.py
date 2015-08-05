@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .action_type import ActionType
 from .custom_action_type import CustomActionType
 from .pipeline import Pipeline
 
 
 __all__ = [
+    'ActionType',
     'CustomActionType',
     'Pipeline',
 ]

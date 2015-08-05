@@ -21,6 +21,7 @@ from touchdown.core import argument, serializers
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .. import common
+from . import pipeline
 
 
 class ArtifactDetail(Resource):
@@ -131,6 +132,19 @@ class Destroy(SimpleDestroy, Describe):
             category=self.resource.category,
             provider=self.resource.name,
             version=self.resource.version,
+        )
+
+
+class ActionTypeId(pipeline.ActionTypeId):
+
+    input = CustomActionType
+
+    def get_serializer(self, runner, **kwargs):
+        return serializers.Dict(
+            category=self.resource.category,
+            provider=self.resource.name,
+            version=self.resource.version,
+            owner="Custom"
         )
 
 
