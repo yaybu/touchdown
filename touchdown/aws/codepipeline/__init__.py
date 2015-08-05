@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from .custom_action_type import CustomActionType
+from .pipeline import Pipeline
 
 
 __all__ = [
     'CustomActionType',
+    'Pipeline',
 ]
