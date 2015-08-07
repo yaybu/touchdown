@@ -160,6 +160,7 @@ class ParallelMap(object):
             yield self.current / self.total
 
     def __iter__(self):
+        caught_error = None
         try:
             # Start up as many workers as requested.
             for i in range(self.workers):
@@ -177,18 +178,22 @@ class ParallelMap(object):
         except errors.Error as e:
             self.echo(str(e))
             self.echo("Exiting...")
+            caught_error = e
 
         except KeyboardInterrupt:
             self.echo("Interrupted. Pending tasks cancelled.")
 
         except Exception as e:
             self.echo("Unhandled error. Cleaning up.")
-            raise
+            caught_error = e
 
         finally:
             for progress in self.wait_for_remaining():
                 yield progress
             self.ready.stop()
+
+            if caught_error:
+                raise caught_error
 
     def __call__(self):
         list(iter(self))
