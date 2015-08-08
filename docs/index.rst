@@ -51,6 +51,7 @@ Resources
    :doc:`Building serverless API's <config/aws/apigateway>` |
    :doc:`CDN <config/aws/cloudfront>` |
    :doc:`Compute <config/aws/ec2>` |
+   :doc:`Continuous deployment <config/aws/codepipeline>` |
    :doc:`DNS <config/aws/route53>` |
    :doc:`Encryption Key Management <config/aws/kms>` |
    :doc:`Key Value Stores <config/aws/elasticache>` |
