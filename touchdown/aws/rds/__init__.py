@@ -14,7 +14,7 @@
 
 from .subnet_group import SubnetGroup
 from .database import Database
-from . import rollback  # noqa
+from . import rollback, snapshot  # noqa
 
 
 __all__ = [
