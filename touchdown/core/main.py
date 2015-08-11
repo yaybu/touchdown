@@ -19,9 +19,19 @@ import inspect
 import logging
 import sys
 import six
+import threading
+
+import progressbar
 
 from touchdown.core.workspace import Touchdownfile
 from touchdown.core import errors, goals, map
+
+
+class ProgressBar(progressbar.ProgressBar):
+
+    def finish(self):
+        if not self.finished:
+            super(ProgressBar, self).finish()
 
 
 class ConsoleInterface(object):
@@ -29,11 +39,29 @@ class ConsoleInterface(object):
     def __init__(self, interactive=True):
         self.interactive = interactive
 
+    def failure(self, text):
+        # FIXME: Colorize this?
+        self.echo(text)
+
     def echo(self, text, nl=True, **kwargs):
+        if threading.current_thread().name != "MainThread":
+            text = "[{}] {}".format(threading.current_thread().name, text)
         if nl:
             print("{}\n".format(text), end='')
         else:
             print("{}".format(text), end='')
+
+    def progressbar(self, max_value, **kwargs):
+        return ProgressBar(
+            maxval=max_value,
+            widgets=[
+                progressbar.Percentage(),
+                progressbar.Bar(),
+            ],
+            #redirect_stdout=True,
+            #redirect_stderr=True,
+            **kwargs
+        )
 
     def table(self, data):
         widths = {}

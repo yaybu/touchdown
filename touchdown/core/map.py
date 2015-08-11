@@ -27,28 +27,17 @@ logger = logging.getLogger(__name__)
 
 class SerialMap(object):
 
-    def __init__(self, resources, callable, echo):
+    def __init__(self, ui, resources, callable):
+        self.ui = ui
         self.resources = resources
         self.callable = callable
-        self._echo = echo
         self.total = len(self.resources)
-        self.current = 0
-
-    def echo(self, text, **kwargs):
-        self._echo("[{: >6.2%}] {}".format(
-            self.current / self.total,
-            text,
-        ))
 
     def __iter__(self):
         plan = list(self.resources.all())
-        for resource in plan:
-            self.current += 1
-            self.callable(self.echo, resource)
-            yield self.current / self.total
-
-    def __call__(self):
-        list(iter(self))
+        for current, resource in enumerate(plan):
+            self.callable(resource)
+            yield current
 
 
 class InteruptibleQueue(queue.Queue):
@@ -86,10 +75,10 @@ class ParallelMap(object):
     workers = 8
     ABORT = object()
 
-    def __init__(self, resources, callable, echo):
+    def __init__(self, ui, resources, callable):
+        self.ui = ui
         self.resources = resources
         self.callable = callable
-        self._echo = echo
 
         self.ready = QueueOnce()
         self.done = InteruptibleQueue()
@@ -98,19 +87,12 @@ class ParallelMap(object):
         self.total = len(self.resources)
         self.current = 0
 
-    def echo(self, text, **kwargs):
-        self._echo("[{: >6.2%}] [{}] {}".format(
-            self.current / self.total,
-            getattr(threading.current_thread(), "name", "leader"),
-            text,
-        ))
-
     def worker(self):
         for resource in self.ready:
             try:
                 self.active.add(resource)
                 try:
-                    self.callable(self.echo, resource)
+                    self.callable(resource)
                 finally:
                     self.active.remove(resource)
                 self.done.put(resource)
@@ -122,7 +104,7 @@ class ParallelMap(object):
         try:
             resource = self.done.get(timeout=1)
         except queue.Empty:
-            return self.current / self.total
+            return
 
         if isinstance(resource, BaseException):
             raise resource
@@ -134,14 +116,13 @@ class ParallelMap(object):
             self.ready.put(resource)
         self.done.task_done()
 
-        return self.current / self.total
-
     def pump(self):
         # Now we block on the "done" queue. Resources put in the queue are
         # complete - so we can inform the dep solver and ask for any new work
         # that this might unblock.
         while not self.resources.empty():
-            yield self.pump_once()
+            self.pump_once()
+            yield self.current
 
     def wait_for_remaining(self):
         # No more dependencies to process - we just need to wait for any
@@ -151,13 +132,8 @@ class ParallelMap(object):
             if len(self.active) != remaining:
                 remaining = len(self.active)
                 self.current = self.total - remaining
-
-                if remaining == 1:
-                    self.echo("{} remaining".format(list(self.active)[0]))
-                else:
-                    self.echo("{} tasks remaining".format(remaining))
             time.sleep(1)
-            yield self.current / self.total
+            yield self.current
 
     def __iter__(self):
         caught_error = None
@@ -172,24 +148,24 @@ class ParallelMap(object):
             for resource in self.resources.get_ready():
                 self.ready.put(resource)
 
-            for progress in self.pump():
-                yield progress
+            for current in self.pump():
+                yield current
 
         except errors.Error as e:
-            self.echo(str(e))
-            self.echo("Exiting...")
             caught_error = e
+            self.ui.failure(str(e))
+            self.ui.echo("Exiting...")
 
         except KeyboardInterrupt:
-            self.echo("Interrupted. Pending tasks cancelled.")
+            self.ui.echo("Interrupted. Pending tasks cancelled.")
 
         except Exception as e:
-            self.echo("Unhandled error. Cleaning up.")
             caught_error = e
+            self.ui.echo("Unhandled error. Cleaning up.")
 
         finally:
-            for progress in self.wait_for_remaining():
-                yield progress
+            for current in self.wait_for_remaining():
+                yield current
             self.ready.stop()
 
             if caught_error:

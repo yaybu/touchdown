@@ -37,23 +37,26 @@ class ActionGoalMixin(object):
         self.visit(
             "Building plan...",
             self.get_plan_order(),
-            lambda e, r: self.get_changes(r),
+            self.get_changes,
         )
         for resource in self.get_execution_order().all():
             changes = self.get_changes(resource)
             if changes:
                 yield resource, changes
 
-    def apply_resource(self, echo, resource):
+    def apply_resource(self, resource):
         for change in self.get_changes(resource):
             description = list(change.description)
-            echo("[{}] {}".format(resource, description[0]))
+            self.ui.echo("[{}] {}".format(resource, description[0]))
             for line in description[1:]:
-                echo("[{}]     {}".format(resource, line))
+                self.ui.echo("[{}]     {}".format(resource, line))
             change.run()
 
     def apply_resources(self):
-        self.Map(self.get_execution_order(), self.apply_resource, self.ui.echo)()
+        dep_map = self.get_execution_order()
+        with self.ui.progressbar(max_value=len(dep_map)) as pb:
+            for status in self.Map(self.ui, dep_map, self.apply_resource):
+                pb.update(status)
 
     def is_stale(self):
         return len(self.changes) != 0

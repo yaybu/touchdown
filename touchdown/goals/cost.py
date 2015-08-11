@@ -31,7 +31,7 @@ class Cost(Goal):
         headers = [("Resource", "Cost (per hour)")]
         data = []
 
-        def collect_costs(echo, resource):
+        def collect_costs(resource):
             coster = self.get_plan(resource)
             if coster.name == self.name:
                 data.append((str(coster.resource), str(coster.cost())))
