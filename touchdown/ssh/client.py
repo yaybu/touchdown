@@ -63,27 +63,24 @@ class Client(paramiko.SSHClient):
             # We don't want a stdin
             channel.makefile('wb', -1).close()
 
+            r_stdout = channel.makefile('r')
+            r_stderr = channel.makefile_stderr('r')
+
             # FIXME: It would be better to block with select
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    print(d(channel.recv(1024)), file=stdout, end='')
+                    print(d(r_stdout.readline()), file=stdout, end='')
                 while channel.recv_stderr_ready():
-                    print(d(channel.recv_stderr(1024)), file=stdout, end='')
+                    print(d(r_stderr.readline()), file=stdout, end='')
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
-            buf = d(channel.recv(1024))
-            while buf:
-                print(buf, file=stdout, end='')
-                buf = d(channel.recv(1024))
-            print(d(channel.in_buffer.empty()), file=stdout, end='')
+            for line in r_stdout.readlines():
+                print(line, file=stdout, end='')
 
-            buf = d(channel.recv_stderr(1024))
-            while buf:
-                print(buf, file=stdout, end='')
-                buf = d(channel.recv_stderr(1024))
-            print(d(channel.in_stderr_buffer.empty()), file=stdout, end='')
+            for line in r_stderr.readlines():
+                print(line, file=stdout, end='')
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:

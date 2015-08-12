@@ -12,7 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 import progressbar
+
+
+class StdWrapper(object):
+
+    def __init__(self, pb, inner):
+        self.pb = pb
+        self.inner = inner
+
+    def write(self, text):
+        self.inner.write('\r' + ' ' * self.pb.term_width + '\r')
+        self.inner.write(text)
+        self.inner.write(self.pb._format_line())
+        self.inner.flush()
+
+    def flush(self):
+        self.inner.flush()
 
 
 class ProgressBar(progressbar.ProgressBar):
@@ -21,13 +39,22 @@ class ProgressBar(progressbar.ProgressBar):
         super(ProgressBar, self).__init__(
             maxval=max_value,
             widgets=[
+                "[",
+                progressbar.AdaptiveETA(),
+                "] [",
                 progressbar.Percentage(),
-                progressbar.Bar(),
+                "] ",
+                progressbar.FormatLabel("Processed %(value)s of %(max)s"),
             ],
-            redirect_stdout=True,
-            redirect_stderr=True,
+            redirect_stdout=False,
+            redirect_stderr=False,
         )
+
+    def start(self):
+        sys.stdout = StdWrapper(self, sys.stdout)
+        return super(ProgressBar, self).start()
 
     def finish(self):
         if not self.finished:
             super(ProgressBar, self).finish()
+        sys.stdout = sys.stdout.inner
