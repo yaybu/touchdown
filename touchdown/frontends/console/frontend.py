@@ -12,52 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, print_function
-
 import six
-import threading
 
 from .progress import ProgressBar
+from ..base import BaseFrontend
 
 
-class ConsoleFrontend(object):
+class ConsoleFrontend(BaseFrontend):
 
     def __init__(self, interactive=True):
         self.interactive = interactive
 
-    def failure(self, text):
-        # FIXME: Colorize this?
-        self.echo(text)
-
-    def echo(self, text, nl=True, **kwargs):
-        if threading.current_thread().name != "MainThread":
-            text = "[{}] {}".format(threading.current_thread().name, text)
-        if nl:
-            print("{}\n".format(text), end='')
-        else:
-            print("{}".format(text), end='')
+    def _echo(self, text, nl=True, **kwargs):
+        print(text)
 
     def progressbar(self, **kwargs):
         return ProgressBar(**kwargs)
-
-    def table(self, data):
-        widths = {}
-        for row in data:
-            for i, column in enumerate(row):
-                widths[i] = max(len(column), widths.get(i, 0))
-
-        line = "| " + " | ".join(
-            "{{:<{}}}".format(widths[i]) for i in range(len(widths))
-        ) + " |"
-
-        sep = "+-" + "-+-".join("-" * widths[i] for i in range(len(widths))) + "-+"
-
-        self.echo(sep)
-        self.echo(line.format(*data[0]))
-        self.echo(sep)
-        for row in data[1:]:
-            self.echo(line.format(*row))
-        self.echo(sep)
 
     def prompt(self, message, key=None):
         response = six.moves.input('{}: '.format(message))
@@ -66,28 +36,9 @@ class ConsoleFrontend(object):
         return response
 
     def confirm(self, message):
+        if not self.interactive:
+            return True
         response = six.moves.input('{} [Y/n] '.format(message))
         while response.lower() not in ('y', 'n', ''):
             response = six.moves.input('{} [Y/n] '.format(message))
         return response.lower() != 'n'
-
-    def render_plan(self, plan):
-        for resource, actions in plan:
-            print("%s:" % resource)
-            for action in actions:
-                description = list(action.description)
-                print("  * %s" % description[0])
-                for line in description[1:]:
-                    print("      %s" % line)
-            print("")
-
-    def confirm_plan(self, plan):
-        print("Generated a plan to update infrastructure configuration:")
-        print()
-
-        self.render_plan(plan)
-
-        if not self.interactive:
-            return True
-
-        return self.confirm("Do you want to continue?")

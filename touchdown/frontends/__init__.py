@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .cloudwatch import CloudWatchFrontend
 from .console import ConsoleFrontend
+from .noninteractive import NonInteractiveFrontend
 
 
 __all__ = [
+    "CloudWatchFrontend",
     "ConsoleFrontend",
+    "NonInteractiveFrontend",
 ]
