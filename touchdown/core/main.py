@@ -18,102 +18,10 @@ import argparse
 import inspect
 import logging
 import sys
-import six
-import threading
-
-import progressbar
 
 from touchdown.core.workspace import Touchdownfile
 from touchdown.core import errors, goals, map
-
-
-class ProgressBar(progressbar.ProgressBar):
-
-    def finish(self):
-        if not self.finished:
-            super(ProgressBar, self).finish()
-
-
-class ConsoleInterface(object):
-
-    def __init__(self, interactive=True):
-        self.interactive = interactive
-
-    def failure(self, text):
-        # FIXME: Colorize this?
-        self.echo(text)
-
-    def echo(self, text, nl=True, **kwargs):
-        if threading.current_thread().name != "MainThread":
-            text = "[{}] {}".format(threading.current_thread().name, text)
-        if nl:
-            print("{}\n".format(text), end='')
-        else:
-            print("{}".format(text), end='')
-
-    def progressbar(self, max_value, **kwargs):
-        return ProgressBar(
-            maxval=max_value,
-            widgets=[
-                progressbar.Percentage(),
-                progressbar.Bar(),
-            ],
-            #redirect_stdout=True,
-            #redirect_stderr=True,
-            **kwargs
-        )
-
-    def table(self, data):
-        widths = {}
-        for row in data:
-            for i, column in enumerate(row):
-                widths[i] = max(len(column), widths.get(i, 0))
-
-        line = "| " + " | ".join(
-            "{{:<{}}}".format(widths[i]) for i in range(len(widths))
-        ) + " |"
-
-        sep = "+-" + "-+-".join("-" * widths[i] for i in range(len(widths))) + "-+"
-
-        self.echo(sep)
-        self.echo(line.format(*data[0]))
-        self.echo(sep)
-        for row in data[1:]:
-            self.echo(line.format(*row))
-        self.echo(sep)
-
-    def prompt(self, message, key=None):
-        response = six.moves.input('{}: '.format(message))
-        while not response:
-            response = six.moves.input('{}: '.format(message))
-        return response
-
-    def confirm(self, message):
-        response = six.moves.input('{} [Y/n] '.format(message))
-        while response.lower() not in ('y', 'n', ''):
-            response = six.moves.input('{} [Y/n] '.format(message))
-        return response.lower() != 'n'
-
-    def render_plan(self, plan):
-        for resource, actions in plan:
-            print("%s:" % resource)
-            for action in actions:
-                description = list(action.description)
-                print("  * %s" % description[0])
-                for line in description[1:]:
-                    print("      %s" % line)
-            print("")
-
-    def confirm_plan(self, plan):
-        print("Generated a plan to update infrastructure configuration:")
-        print()
-
-        self.render_plan(plan)
-
-        if not self.interactive:
-            return True
-
-        return self.confirm("Do you want to continue?")
+from touchdown.frontends import ConsoleFrontend
 
 
 class SubCommand(object):
@@ -167,7 +75,7 @@ def configure_parser(parser, workspace, console):
 
 def main():
     parser = argparse.ArgumentParser(description="Manage your infrastructure")
-    console = ConsoleInterface()
+    console = ConsoleFrontend()
     configure_parser(parser, Touchdownfile(), console)
     args = parser.parse_args()
 

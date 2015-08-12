@@ -25,7 +25,7 @@ except ImportError:
 import vcr
 
 from touchdown.core import workspace, errors, goals
-from touchdown.core.main import ConsoleInterface
+from touchdown.frontends import ConsoleFrontend
 from touchdown.core.map import SerialMap
 from touchdown.core.utils import force_bytes
 
@@ -151,7 +151,7 @@ class TestCase(unittest.TestCase):
         self.goal = goals.create(
             "apply",
             self.workspace,
-            ConsoleInterface(interactive=False),
+            ConsoleFrontend(interactive=False),
             map=SerialMap
         )
 
@@ -229,11 +229,11 @@ class RecordedBotoCoreTest(unittest.TestCase):
         self.stack.close()
 
     def apply(self):
-        self.apply_runner = goals.create("apply", self.workspace, ConsoleInterface(interactive=False), map=SerialMap)
+        self.apply_runner = goals.create("apply", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
         self.apply_runner.execute()
         self.assertRaises(errors.NothingChanged, self.apply_runner.execute)
 
     def destroy(self):
-        self.destroy_runner = goals.create("destroy", self.workspace, ConsoleInterface(interactive=False), map=SerialMap)
+        self.destroy_runner = goals.create("destroy", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
         self.destroy_runner.execute()
         self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
