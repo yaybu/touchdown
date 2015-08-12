@@ -26,9 +26,9 @@ class BaseFrontend(object):
         if threading.current_thread().name != "MainThread":
             text = "[{}] {}".format(threading.current_thread().name, text)
         if nl:
-            self._echo("{}\n".format(text), end='')
+            self._echo("{}\n".format(text))
         else:
-            self._echo("{}".format(text), end='')
+            self._echo("{}".format(text))
 
     def table(self, data):
         widths = {}

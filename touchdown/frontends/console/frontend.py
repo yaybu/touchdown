@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import, print_function
+
 import six
 
 from .progress import ProgressBar
@@ -24,7 +26,7 @@ class ConsoleFrontend(BaseFrontend):
         self.interactive = interactive
 
     def _echo(self, text, nl=True, **kwargs):
-        print(text)
+        print(text, end='')
 
     def progressbar(self, **kwargs):
         return ProgressBar(**kwargs)

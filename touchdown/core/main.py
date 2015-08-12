@@ -55,6 +55,8 @@ class SubCommand(object):
         except errors.Error as e:
             self.console.echo(str(e))
             sys.exit(1)
+        finally:
+            self.console.finish()
 
 
 def configure_parser(parser, workspace, console):
