@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 from inspect import isgeneratorfunction
 import logging
+import time
 
-from botocore.exceptions import ClientError, WaiterError
+from botocore.exceptions import ClientError
 
 import jmespath
 
@@ -39,42 +41,56 @@ class Waiter(Action):
     def __init__(self, plan, description, waiter, eventual_consistency_threshold):
         super(Waiter, self).__init__(plan)
         self.description = description
-        self.waiter = waiter
+        self.waiter = self.plan.client.get_waiter(waiter)
         self.eventual_consistency_threshold = eventual_consistency_threshold
 
-    def ready(self):
-        waiter = self.plan.get_waiter(self.waiter)
+    def poll(self):
         filters = self.plan.get_describe_filters()
-        acceptors = list(waiter.config.acceptors)
-        response = waiter._operation_method(**filters)
+        logger.debug("Polling with waiter {} and filters {}".format(self.waiter, filters))
+        return self.waiter._operation_method(**filters)
 
-        current_state = 'waiting'
+    def ready(self):
+        acceptors = list(self.waiter.config.acceptors)
+        for i in range(self.eventual_consistency_threshold):
+            current_state = 'waiting'
+            response = self.poll()
 
-        for acceptor in acceptors:
-            if acceptor.matcher_func(response):
-                current_state = acceptor.state
-                break
-        else:
-            if 'Error' in response:
-                raise errors.Error('Unexpected error encountered.')
+            for acceptor in acceptors:
+                if acceptor.matcher_func(response):
+                    current_state = acceptor.state
+                    break
+            else:
+                if 'Error' in response:
+                    raise errors.Error('Unexpected error encountered.')
 
-        if current_state == 'success':
-            return True
+            if current_state == 'failure':
+                raise errors.Error('Waiter encountered a terminal failure state')
 
-        if current_state == 'failure':
-            raise errors.Error('Waiter encountered a terminal failure state')
+            if current_state != 'success':
+                return False
 
-        return False
+        return True
 
     def run(self):
-        filters = self.plan.get_describe_filters()
-        logger.debug("Waiting with waiter {} and filters {}".format(self.waiter, filters))
-        waiter = self.plan.client.get_waiter(self.waiter)
+        last = datetime.datetime.now()
+        for i in range(self.waiter.config.max_attempts):
+            if self.ready():
+                break
 
-        try:
-            for i in range(self.eventual_consistency_threshold):
-                waiter.wait(**filters)
-        except WaiterError:
+            now = datetime.datetime.now()
+            if (now - last).total_seconds() > 60:
+                attempts_remaining = self.waiter.config.max_attempts - i
+                time_remaining = attempts_remaining * self.waiter.config.delay
+
+                self.plan.ui.echo("Still waiting for {}. {} till timeout occurs.".format(
+                    self.plan.resource,
+                    datetime.timedelta(seconds=time_remaining),
+                ))
+                last = now
+
+            time.sleep(self.waiter.config.delay)
+
+        else:
             raise errors.Error("Operation took too long to complete")
 
         self.plan.object = self.plan.describe_object()
