@@ -60,7 +60,7 @@ class ConnectionPlan(plan.Plan):
         if self._client:
             return self._client
 
-        cli = client.Client()
+        cli = client.Client(self)
 
         kwargs = serializers.Resource().render(self.runner, self.resource)
 
