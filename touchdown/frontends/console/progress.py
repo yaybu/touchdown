@@ -46,6 +46,7 @@ class ProgressBar(progressbar.ProgressBar):
             ],
             redirect_stdout=False,
             redirect_stderr=False,
+            fd=sys.stdout,
         )
 
     def start(self):
