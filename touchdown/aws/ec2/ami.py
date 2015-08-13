@@ -139,7 +139,7 @@ class BuildInstance(Action):
         return reservation["Instances"][0]
 
     def deploy_instance(self, keypair, instance):
-        cli = ssh.Client()
+        cli = ssh.Client(self.plan)
         cli.connect(
             hostname=instance['PublicIpAddress'],
             username=self.resource.username,
