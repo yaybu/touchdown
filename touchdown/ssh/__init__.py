@@ -15,6 +15,9 @@
 from .client import Client, private_key_from_string
 from .connection import Connection, Instance
 
+from . import terminal  # noqa
+
+
 __all__ = [
     "Client",
     "Connection",

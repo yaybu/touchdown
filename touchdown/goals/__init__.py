@@ -19,6 +19,7 @@ from .dot import Dot
 from .get_signin_url import GetSigninUrl
 from .rollback import Rollback
 from .snapshot import Snapshot
+from .ssh import Ssh
 from .tail import Tail
 
 
@@ -30,5 +31,6 @@ __all__ = [
     "GetSigninUrl",
     "Rollback",
     "Snapshot",
+    "Ssh",
     "Tail",
 ]
