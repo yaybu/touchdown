@@ -20,6 +20,7 @@ class Cost(Goal):
     """ Estimate the cost of running this environment """
 
     name = "cost"
+    mutator = False
 
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("cost")

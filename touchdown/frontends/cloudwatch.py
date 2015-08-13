@@ -13,50 +13,83 @@
 # limitations under the License.
 
 import datetime
+import time
+import threading
+from six.moves import queue
+
+from botocore.exceptions import ClientError
 
 from .noninteractive import NonInteractiveFrontend
 
 
-def batch(iterable, n=1):
-    l = len(iterable)
-    for ndx in range(0, l, n):
-        yield iterable[ndx:min(ndx+n, l)]
-
-
 class CloudWatchFrontend(NonInteractiveFrontend):
 
-    def __init__(self, group, stream, batch_size=10000, wait=30):
+    def __init__(self, group, stream):
         self.group = group
         self.stream = stream
-        self.batch_size = min(batch_size, 10000)
-        self.wait = wait
-        self.events = []
-        self.last_echo = self.last_send = datetime.datetime.now()
+        self.finished = False
+        self.queue = queue.Queue()
+        self.thread = threading.Thread(target=self._sender)
+        self.thread.start()
 
     def _echo(self, text, nl=True, **kwargs):
-        self.events.append({
+        self.queue.put({
             "Message": text,
             "Timestamp": datetime.datetime.now(),
         })
-        if self._should_send():
-            self._send()
 
     def finish(self):
-        if self.events:
-            self._send()
+        self.finished = True
 
-    def _should_send(self):
-        if len(self.events) > self.batch_size:
-            return True
-        if (self.last_echo - self.last_send).total_seconds() > self.wait:
-            return True
-        return False
+    def _get_batch(self):
+        batch = []
+        for i in range(10000):
+            try:
+                item = self.queue.get_nowait()
+            except queue.Empty:
+                break
+            batch.append(item)
+        return batch
+
+    def _get_batches(self):
+        while True:
+            batch = self._get_batch()
+            if not batch:
+                return
+            yield batch
 
     def _send(self):
-        events, self.events = self.events, []
-        for events_batch in batch(events, self.batch_size):
-            self.client.put_log_events(
-                events=events_batch,
+        for batch in self._get_batches():
+            kwargs = dict(
+                logEvents=batch,
                 logGroupName=self.group,
                 logStreamName=self.stream,
             )
+            if self.sequence_token:
+                kwargs['sequenceToken'] = self.sequence_token
+            response = self.group.client.put_log_events(**kwargs)
+            self.sequence_token = response['nextSequenceToken']
+
+    def _sender(self):
+        try:
+            self.group.client.create_log_group(
+                logGroupName=self.group,
+            )
+        except ClientError as e:
+            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
+                raise
+
+        try:
+            self.group.client.create_log_stream(
+                logGroupName=self.group,
+                logStreamName=self.stream,
+            )
+        except ClientError as e:
+            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
+                raise
+
+        self.sequence_token = None
+        while not self.finished:
+            self._send()
+            time.sleep(1)
+        self._send()

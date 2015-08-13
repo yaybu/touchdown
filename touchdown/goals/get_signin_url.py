@@ -21,6 +21,7 @@ class GetSigninUrl(Goal):
     """ Generate short-lived access urls """
 
     name = "get-signin-url"
+    mutator = False
 
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("get-signin-url")

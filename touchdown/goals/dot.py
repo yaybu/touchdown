@@ -21,6 +21,7 @@ class Dot(Goal):
     """ Generate a dot graph of all resources and their interconnections """
 
     name = "dot"
+    mutator = False
 
     def get_plan_class(self, resource):
         return plan.NullPlan

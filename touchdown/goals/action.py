@@ -17,6 +17,8 @@ from touchdown.core import errors
 
 class ActionGoalMixin(object):
 
+    mutator = True
+
     def __init__(self, *args, **kwargs):
         super(ActionGoalMixin, self).__init__(*args, **kwargs)
         self.reset_changes()
