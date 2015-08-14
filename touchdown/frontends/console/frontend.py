@@ -31,7 +31,7 @@ class ConsoleFrontend(BaseFrontend):
     def progressbar(self, **kwargs):
         return ProgressBar(**kwargs)
 
-    def prompt(self, message, key=None):
+    def prompt(self, message, key=None, default=None):
         response = six.moves.input('{}: '.format(message))
         while not response:
             response = six.moves.input('{}: '.format(message))

@@ -31,9 +31,10 @@ class CloudWatchFrontend(NonInteractiveFrontend):
         self.queue = queue.Queue()
 
     def _echo(self, text, nl=True, **kwargs):
+        stamp = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds()
         self.queue.put({
-            "Message": text,
-            "Timestamp": datetime.datetime.now(),
+            "message": text,
+            "timestamp": int(stamp),
         })
 
     def start(self, subcommand, goal):
@@ -42,7 +43,7 @@ class CloudWatchFrontend(NonInteractiveFrontend):
 
         try:
             self.client.create_log_group(
-                logGroupName=self.group,
+                logGroupName=self.group.name,
             )
         except ClientError as e:
             if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
@@ -50,7 +51,7 @@ class CloudWatchFrontend(NonInteractiveFrontend):
 
         try:
             self.client.create_log_stream(
-                logGroupName=self.group,
+                logGroupName=self.group.name,
                 logStreamName=self.stream,
             )
         except ClientError as e:
@@ -84,7 +85,7 @@ class CloudWatchFrontend(NonInteractiveFrontend):
         for batch in self._get_batches():
             kwargs = dict(
                 logEvents=batch,
-                logGroupName=self.group,
+                logGroupName=self.group.name,
                 logStreamName=self.stream,
             )
             if self.sequence_token:
