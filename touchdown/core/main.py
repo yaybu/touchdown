@@ -50,6 +50,7 @@ class SubCommand(object):
                 self.console,
                 map.ParallelMap if not args.serial else map.SerialMap
             )
+            self.console.start(self, g)
             args, kwargs = self.get_args_and_kwargs(g.execute, args)
             return g.execute(*args, **kwargs)
         except errors.Error as e:

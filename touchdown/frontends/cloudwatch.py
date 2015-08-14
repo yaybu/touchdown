@@ -29,14 +29,36 @@ class CloudWatchFrontend(NonInteractiveFrontend):
         self.stream = stream
         self.finished = False
         self.queue = queue.Queue()
-        self.thread = threading.Thread(target=self._sender)
-        self.thread.start()
 
     def _echo(self, text, nl=True, **kwargs):
         self.queue.put({
             "Message": text,
             "Timestamp": datetime.datetime.now(),
         })
+
+    def start(self, subcommand, goal):
+        self.plan = goal.get_plan(self.group)
+        self.client = self.plan.client
+
+        try:
+            self.client.create_log_group(
+                logGroupName=self.group,
+            )
+        except ClientError as e:
+            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
+                raise
+
+        try:
+            self.client.create_log_stream(
+                logGroupName=self.group,
+                logStreamName=self.stream,
+            )
+        except ClientError as e:
+            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
+                raise
+
+        self.thread = threading.Thread(target=self._sender)
+        self.thread.start()
 
     def finish(self):
         self.finished = True
@@ -67,27 +89,10 @@ class CloudWatchFrontend(NonInteractiveFrontend):
             )
             if self.sequence_token:
                 kwargs['sequenceToken'] = self.sequence_token
-            response = self.group.client.put_log_events(**kwargs)
+            response = self.client.put_log_events(**kwargs)
             self.sequence_token = response['nextSequenceToken']
 
     def _sender(self):
-        try:
-            self.group.client.create_log_group(
-                logGroupName=self.group,
-            )
-        except ClientError as e:
-            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
-                raise
-
-        try:
-            self.group.client.create_log_stream(
-                logGroupName=self.group,
-                logStreamName=self.stream,
-            )
-        except ClientError as e:
-            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
-                raise
-
         self.sequence_token = None
         while not self.finished:
             self._send()

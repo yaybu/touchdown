@@ -48,6 +48,10 @@ class MultiFrontend(object):
         self.echo("Frontend {} chose {}".format(self.frontends[0], result))
         return result
 
+    def start(self, subcommand, goal):
+        for fe in self.frontends:
+            fe.start(subcommand, goal)
+
     def finish(self):
         for fe in reversed(self.frontends):
             fe.finish()

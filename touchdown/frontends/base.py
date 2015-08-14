@@ -74,5 +74,8 @@ class BaseFrontend(object):
     def confirm(self, message):
         raise NotImplementedError(self.confirm)
 
+    def start(self, subcommand, goal):
+        pass
+
     def finish(self):
         pass
