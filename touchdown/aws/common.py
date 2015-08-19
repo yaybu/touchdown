@@ -123,7 +123,10 @@ class GenericAction(Action):
         params = self.serializer.render(self.runner, self.resource)
         logger.debug("Invoking with params {}".format(params))
 
-        object = self.func(**params)
+        try:
+            object = self.func(**params)
+        except ClientError as e:
+            raise errors.Error("{}: {}".format(self.plan.resource, e))
 
         if self.is_creation_action:
             if self.plan.create_response == "full-description":
