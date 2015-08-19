@@ -48,7 +48,10 @@ class Plan(common.SimplePlan, plan.Plan):
                     seen.add(event['eventId'])
                     if event['eventId'] in previous_events:
                         continue
-                    print(u"[{logStreamName}] {message}".format(**event))
+                    print("[{logStreamName}] {message}".format(**{
+                        "logStreamName": event.get('logStreamName', ''),
+                        "message": event['message'].encode("utf-8", "ignore"),
+                    }))
                     kwargs['startTime'] = event['timestamp']
                 if 'nextToken' not in results:
                     break
