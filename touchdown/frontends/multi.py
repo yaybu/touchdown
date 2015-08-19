@@ -14,8 +14,10 @@
 
 from __future__ import absolute_import, print_function
 
+from .base import BaseFrontend
 
-class MultiFrontend(object):
+
+class MultiFrontend(BaseFrontend):
 
     def __init__(self, frontends):
         self.frontends = frontends
@@ -28,15 +30,6 @@ class MultiFrontend(object):
         for fe in self.frontends:
             fe.echo(text, nl, **kwargs)
 
-    def table(self, data):
-        return self.frontends[0].table(data)
-
-    def render_plan(self, plan):
-        return self.frontends[0].render_plan(plan)
-
-    def confirm_plan(self, plan):
-        return self.frontends[0].confirm_plan(plan)
-
     def progressbar(self, **kwargs):
         return self.frontends[0].progressbar(**kwargs)
 
@@ -45,7 +38,7 @@ class MultiFrontend(object):
 
     def confirm(self, message):
         result = self.frontends[0].confirm(message)
-        self.echo("Frontend {} chose {}".format(self.frontends[0], result))
+        self.echo("Prinmary frontend chose {}".format(result))
         return result
 
     def start(self, subcommand, goal):
