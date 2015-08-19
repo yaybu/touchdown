@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import calendar
 import datetime
 import time
 import threading
@@ -31,10 +32,9 @@ class CloudWatchFrontend(NonInteractiveFrontend):
         self.queue = queue.Queue()
 
     def _echo(self, text, nl=True, **kwargs):
-        stamp = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds()
         self.queue.put({
             "message": text,
-            "timestamp": int(stamp),
+            "timestamp": calendar.timegm(datetime.datetime.utcnow().timetuple()) * 1000,
         })
 
     def start(self, subcommand, goal):
