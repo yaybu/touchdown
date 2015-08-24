@@ -32,10 +32,12 @@ class CloudWatchFrontend(NonInteractiveFrontend):
         self.queue = queue.Queue()
 
     def _echo(self, text, nl=True, **kwargs):
-        self.queue.put({
-            "message": text,
-            "timestamp": calendar.timegm(datetime.datetime.utcnow().timetuple()) * 1000,
-        })
+        text = text.rstrip('\r\n')
+        if text:
+            self.queue.put({
+                "message": text,
+                "timestamp": calendar.timegm(datetime.datetime.utcnow().timetuple()) * 1000,
+            })
 
     def start(self, subcommand, goal):
         self.plan = goal.get_plan(self.group)
