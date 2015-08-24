@@ -73,14 +73,14 @@ class Goal(object):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
 
     def visit(self, message, dep_map, callable):
-        for progress in self.Map(dep_map, callable, self.ui.echo):
-            self.ui.echo("\r[{: >6.2%}] {}".format(progress, message), nl=False)
-        self.ui.echo("")
+        with self.ui.progressbar(max_value=len(dep_map)) as pb:
+            for status in self.Map(self.ui, dep_map, callable):
+                pb.update(status)
 
     def collect_as_iterable(self, plan_name):
         collected = []
 
-        def _(echo, resource):
+        def _(resource):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected.append(plan)
@@ -90,7 +90,7 @@ class Goal(object):
     def collect_as_dict(self, plan_name):
         collected = {}
 
-        def _(echo, resource):
+        def _(resource):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected[plan.resource.name] = plan

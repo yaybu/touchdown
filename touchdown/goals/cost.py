@@ -20,6 +20,7 @@ class Cost(Goal):
     """ Estimate the cost of running this environment """
 
     name = "cost"
+    mutator = False
 
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("cost")
@@ -31,7 +32,7 @@ class Cost(Goal):
         headers = [("Resource", "Cost (per hour)")]
         data = []
 
-        def collect_costs(echo, resource):
+        def collect_costs(resource):
             coster = self.get_plan(resource)
             if coster.name == self.name:
                 data.append((str(coster.resource), str(coster.cost())))

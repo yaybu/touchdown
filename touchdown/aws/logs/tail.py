@@ -59,7 +59,10 @@ class Plan(common.SimplePlan, plan.Plan):
                 results = self.client.filter_log_events(**filters)
             return seen
 
-        seen = pull(kwargs, set())
-        while follow:
-            seen = pull(kwargs, seen)
-            time.sleep(2)
+        try:
+            seen = pull(kwargs, set())
+            while follow:
+                seen = pull(kwargs, seen)
+                time.sleep(2)
+        except KeyboardInterrupt:
+            pass

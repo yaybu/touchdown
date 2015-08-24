@@ -17,7 +17,6 @@ from __future__ import print_function
 import binascii
 import os
 import socket
-import sys
 import time
 
 import six
@@ -42,13 +41,16 @@ class Client(paramiko.SSHClient):
     connection_attempts = 20
     input_encoding = "utf-8"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, plan, *args, **kwargs):
+        self.plan = plan
+        self.ui = plan.ui
+
         super(Client, self).__init__(*args, **kwargs)
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    def _run(self, transport, command, input_encoding=None, stdout=None):
-        if stdout is None:
-            stdout = sys.stdout
+    def _run(self, transport, command, input_encoding=None, echo=None):
+        if echo is None:
+            echo = self.ui.echo
 
         if input_encoding is None:
             input_encoding = self.input_encoding
@@ -63,27 +65,24 @@ class Client(paramiko.SSHClient):
             # We don't want a stdin
             channel.makefile('wb', -1).close()
 
+            r_stdout = channel.makefile('r')
+            r_stderr = channel.makefile_stderr('r')
+
             # FIXME: It would be better to block with select
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    print(d(channel.recv(1024)), file=stdout, end='')
+                    echo(d(r_stdout.readline()), nl=False)
                 while channel.recv_stderr_ready():
-                    print(d(channel.recv_stderr(1024)), file=stdout, end='')
+                    echo(d(r_stderr.readline()), nl=False)
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
-            buf = d(channel.recv(1024))
-            while buf:
-                print(buf, file=stdout, end='')
-                buf = d(channel.recv(1024))
-            print(d(channel.in_buffer.empty()), file=stdout, end='')
+            for line in r_stdout.readlines():
+                echo(line, nl=False)
 
-            buf = d(channel.recv_stderr(1024))
-            while buf:
-                print(buf, file=stdout, end='')
-                buf = d(channel.recv_stderr(1024))
-            print(d(channel.in_stderr_buffer.empty()), file=stdout, end='')
+            for line in r_stderr.readlines():
+                echo(line, nl=False)
 
             exit_code = channel.recv_exit_status()
             if exit_code != 0:
@@ -115,7 +114,11 @@ class Client(paramiko.SSHClient):
 
     def check_output(self, command):
         result_buf = six.StringIO()
-        self._run(self.get_transport(), command, stdout=result_buf)
+
+        def echo(message, nl=False):
+            result_buf.write(message)
+
+        self._run(self.get_transport(), command, echo=echo)
         return 0, result_buf.getvalue(), ""
 
     def verify_transport(self):

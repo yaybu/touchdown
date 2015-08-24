@@ -32,6 +32,7 @@ class Tail(Goal):
     """ Inspect (and stream) your logs """
 
     name = "tail"
+    mutator = False
 
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("tail")

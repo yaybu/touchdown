@@ -17,8 +17,8 @@ import unittest
 import tempfile
 
 from touchdown.core import workspace, errors, serializers, goals
-from touchdown.core.main import ConsoleInterface
 from touchdown.core.map import SerialMap
+from touchdown.frontends import ConsoleFrontend
 
 
 class TestCase(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestCase(unittest.TestCase):
         self.apply_runner = goals.create(
             "apply",
             self.workspace,
-            ConsoleInterface(interactive=False),
+            ConsoleFrontend(interactive=False),
             map=SerialMap
         )
         self.apply_runner.execute()
@@ -39,7 +39,7 @@ class TestCase(unittest.TestCase):
         self.destroy_runner = goals.create(
             "destroy",
             self.workspace,
-            ConsoleInterface(interactive=False),
+            ConsoleFrontend(interactive=False),
             map=SerialMap
         )
         self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
