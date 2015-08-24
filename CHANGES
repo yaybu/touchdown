@@ -4,7 +4,13 @@ Changelog for Touchdown
 0.0.28 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Support streaming log output to CloudWatch logs instead of (or as well as) the console.
+
+- Output information about remaining tasks so that long running tasks don't
+  look like they are hung. This is useful in Travis CI where the silence causes
+  builds/deployments to be terminated.
+
+- Better error handling for parallel cases.
 
 
 0.0.27 (2015-07-31)
