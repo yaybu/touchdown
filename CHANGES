@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.28 (unreleased)
+0.0.28 (2015-08-24)
 -------------------
 
 - Support streaming log output to CloudWatch logs instead of (or as well as) the console.
