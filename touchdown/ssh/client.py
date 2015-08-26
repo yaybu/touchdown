@@ -23,6 +23,7 @@ import six
 import paramiko
 
 from touchdown.core import errors
+from touchdown.core.utils import force_str
 
 
 def private_key_from_string(private_key):
@@ -55,9 +56,6 @@ class Client(paramiko.SSHClient):
         if input_encoding is None:
             input_encoding = self.input_encoding
 
-        def d(data):
-            return data.decode(input_encoding, 'replace')
-
         channel = transport.open_session()
         try:
             channel.exec_command(command)
@@ -72,9 +70,9 @@ class Client(paramiko.SSHClient):
             exit_status_ready = channel.exit_status_ready()
             while not exit_status_ready:
                 while channel.recv_ready():
-                    echo(d(r_stdout.readline()), nl=False)
+                    echo(force_str(r_stdout.readline()), nl=False)
                 while channel.recv_stderr_ready():
-                    echo(d(r_stderr.readline()), nl=False)
+                    echo(force_str(r_stderr.readline()), nl=False)
                 time.sleep(1)
                 exit_status_ready = channel.exit_status_ready()
 
