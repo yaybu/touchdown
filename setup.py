@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.0.29.dev0'
+version = '0.0.30.dev0'
 
 setup(
     name='touchdown',
@@ -31,7 +31,7 @@ setup(
         'six',
         'contextlib2',
         'netaddr',
-        'fuselage>=0.0.6',
+        'fuselage>=0.0.10',
         'botocore>=1.0.0a2',
         'progressbar2',
     ],
