@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.0.29 (unreleased)
+0.0.29 (2015-08-27)
 -------------------
 
 - Now requires at least fuselage 0.0.10 to ensure that we don't hit corner
