@@ -4,7 +4,11 @@ Changelog for Touchdown
 0.0.29 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Now requires at least fuselage 0.0.10 to ensure that we don't hit corner
+  cases in streaming unicode output from execute resources.
+
+- Simplifies string handling in ssh client to avoid yet more unicode handling
+  edge cases.
 
 
 0.0.28 (2015-08-24)

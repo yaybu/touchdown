@@ -31,7 +31,7 @@ setup(
         'six',
         'contextlib2',
         'netaddr',
-        'fuselage>=0.0.6',
+        'fuselage>=0.0.10',
         'botocore>=1.0.0a2',
         'progressbar2',
     ],
