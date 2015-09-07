@@ -41,6 +41,7 @@ class GoalFactory(object):
 class Goal(object):
 
     execute_in_reverse = False
+    mutator = False
 
     def __init__(self, workspace, ui, map=map.ParallelMap, cache=None):
         self.ui = ui

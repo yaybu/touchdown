@@ -18,6 +18,7 @@ from .destroy import Destroy
 from .dot import Dot
 from .get_signin_url import GetSigninUrl
 from .rollback import Rollback
+from .snapshot import Snapshot
 from .tail import Tail
 
 
@@ -28,5 +29,6 @@ __all__ = [
     "Dot",
     "GetSigninUrl",
     "Rollback",
+    "Snapshot",
     "Tail",
 ]

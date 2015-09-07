@@ -28,6 +28,7 @@ Getting started
    :doc:`Applying changes <cli/apply>` |
    :doc:`Tearing down environments <cli/destroy>` |
    :doc:`Viewing logs <cli/tail>` |
+   :doc:`Snapshotting your data <cli/snapshot>` |
    :doc:`Rolling back data <cli/rollback>` |
    :doc:`Estimating infrastructure cost <cli/cost>` |
    :doc:`Generating graphs <cli/dot>`

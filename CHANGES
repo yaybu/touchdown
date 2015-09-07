@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.0.30 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add database snapshot goal and command::
+
+    touchdown snapshot DB_NAME SNAPSHOT_NAME
 
 
 0.0.29 (2015-08-27)
