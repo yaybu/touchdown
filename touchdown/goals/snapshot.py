@@ -20,7 +20,7 @@ class Snapshot(Goal):
 
     """ Snapshot a database """
 
-    name = "snaphot"
+    name = "snapshot"
 
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("snapshot")

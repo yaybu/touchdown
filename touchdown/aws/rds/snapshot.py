@@ -34,25 +34,26 @@ class Plan(common.SimplePlan, plan.Plan):
 
     def snapshot_exists(self, target, snapshot_name):
         try:
-            self.client.describe_db_snapshots(
+            result = self.client.describe_db_snapshots(
                 DBInstanceIdentifier=target,
                 DBSnapshotIdentifier=snapshot_name
             )
-        except ClientError:
+        except ClientError as e:
+            print(e)
             return False
-        return True
+        return len(result['DBSnapshots']) > 0
 
-    def snapshot(self, target, snapshot_name):
-        if not self.db_exists(target):
-            raise errors.Error("Database {} does not exist; Nothing to backup".format(target))
+    def snapshot(self, snapshot_name):
+        if not self.db_exists(self.resource.name):
+            raise errors.Error("Database {} does not exist; Nothing to backup".format(self.resource.name))
 
-        if self.snapshot_exists(target, snapshot_name):
+        if self.snapshot_exists(self.resource.name, snapshot_name):
             raise errors.Error("Snapshot {} already exists".format(snapshot_name))
 
-        self.echo("Starting snapshot of {} as {}".format(target, snapshot_name))
+        self.echo("Starting snapshot of {} as {}".format(self.resource.name, snapshot_name))
         self.client.create_db_snapshot(
             DBSnapshotIdentifier=snapshot_name,
-            DBInstanceIdentifier=target,
+            DBInstanceIdentifier=self.resource.name,
         )
 
         self.echo("Waiting for snapshot to complete")
