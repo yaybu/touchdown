@@ -1,6 +1,6 @@
-botocore==1.1.10
+botocore==1.2.0
 jmespath==0.7.1
-netaddr==0.7.15
+netaddr==0.7.18
 contextlib2==0.4.0
 paramiko==1.15.2
 pycrypto==2.6.1
