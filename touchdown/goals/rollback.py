@@ -21,7 +21,7 @@ class Rollback(Goal):
     """ Rollback a database to a point in time or a backup """
 
     name = "rollback"
-    mutator = True
+    mutator = False
 
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("rollback")

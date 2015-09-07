@@ -151,7 +151,7 @@ class Plan(common.SimplePlan, plan.Plan):
         try:
             self.datetime_target = parse_datetime(target)
             self.check_point_in_time(self.db, self.datetime_target)
-        except ValueError:
+        except errors.Error:
             self.check_snapshot(self.db, target)
 
     def rollback(self, target):
