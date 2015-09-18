@@ -296,11 +296,8 @@ class Instance(ssh.Instance):
     resource_name = "random_asg_instance"
     input = AutoScalingGroup
 
-    def get_serializer(self, runner, **kwargs):
+    def get_instances(self, runner):
         plan = runner.get_plan(self.adapts)
-
-        plan.echo("Scanning for healthy instances to SSH to")
-
         if len(plan.object.get("Instances", [])) == 0:
             raise errors.Error("No instances currently running in group {}".format(self.adapts))
 
@@ -321,11 +318,26 @@ class Instance(ssh.Instance):
         if len(instances) == 0:
             raise errors.Error("No instances available in {}".format(self.adapts))
 
-        if hasattr(self.parent, "proxy") and self.parent.proxy and self.parent.proxy.instance:
-            if self.parent.proxy.instance.adapts.subnets[0].vpc == self.adapts.subnets[0].vpc:
+        return instances
+
+    def get_network_id(self, runner):
+        instances = self.get_instances(runner)
+        ids = set(i.get('VpcId') for i in instances)
+        if len(ids) == 1:
+            return tuple(ids)[0]
+
+    def get_serializer(self, runner, **kwargs):
+        instances = self.get_instances(runner)
+
+        if getattr(self.parent, "proxy", None) and self.parent.proxy.instance:
+            if hasattr(self.parent.proxy.instance, "get_network_id"):
+                network = self.parent.proxy.instance.get_network_id(runner)
                 for instance in instances:
-                    if 'PrivateIpAddress' in instance:
-                        return serializers.Const(instance['PrivateIpAddress'])
+                    if instance['VpcId'] != network:
+                        continue
+                    if 'PrivateIpAddress' not in instance:
+                        continue
+                    return serializers.Const(instance['PrivateIpAddress'])
 
         for instance in instances:
             for k in ('PublicDnsName', 'PublicIpAddress'):
