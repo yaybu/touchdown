@@ -8,6 +8,10 @@ from paramiko.common import asbytes
 from paramiko.py3compat import byte_chr
 
 
+if not hasattr(socketserver, "UnixStreamServer"):
+    raise ImportError(__name__)
+
+
 SSH_AGENT_FAILURE = 5
 SSH_AGENT_SUCCESS = 6
 SSH2_AGENT_IDENTITIES_ANSWER = 12
