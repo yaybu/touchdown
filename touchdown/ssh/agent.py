@@ -1,6 +1,6 @@
 import struct
 import os
-import SocketServer
+from six.moves import socketserver
 import threading
 
 from paramiko.message import Message
@@ -18,7 +18,7 @@ class ConnectionError(Exception):
     pass
 
 
-class AgentRequestHandler(SocketServer.BaseRequestHandler):
+class AgentRequestHandler(socketserver.BaseRequestHandler):
 
     def _read(self, wanted):
         result = ''
@@ -75,10 +75,10 @@ class AgentRequestHandler(SocketServer.BaseRequestHandler):
             self.send_message(handler(msg))
 
 
-class AgentServer(SocketServer.UnixStreamServer):
+class AgentServer(socketserver.UnixStreamServer):
 
     def __init__(self, socket_file):
-        SocketServer.UnixStreamServer.__init__(self, socket_file, AgentRequestHandler)
+        socketserver.UnixStreamServer.__init__(self, socket_file, AgentRequestHandler)
         self.identities = {}
 
     def add(self, pkey, comment):
