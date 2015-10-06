@@ -99,4 +99,5 @@ There are a bunch of commands you can run against your Touchdown config:
    tail
    rollback
    snapshot
+   ssh
    dot
