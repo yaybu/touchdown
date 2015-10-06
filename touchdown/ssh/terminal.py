@@ -36,13 +36,14 @@ class ConnectionPlan(plan.Plan):
         cmd = 'ssh -l {username} -W %h:%p {hostname} {port}'.format(**kwargs)
         return ['-o', 'ProxyCommand={}'.format(cmd)]
 
-    def execute(self):
+    def execute(self, args):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = ['ssh', '-l', kwargs['username']]
         if self.resource.proxy:
             proxy = self.runner.get_plan(self.resource.proxy)
             cmd.extend(proxy.get_proxy_command())
         cmd.extend(["-p", str(kwargs['port']), kwargs['hostname']])
+        cmd.extend(args)
 
         socket_dir = tempfile.mkdtemp(prefix='ssh-')
         socket_file = os.path.join(socket_dir, 'agent.{}'.format(os.getpid()))

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
+
 from touchdown.core import errors
 from touchdown.core.goals import Goal, register
 
@@ -39,11 +41,12 @@ class Ssh(Goal):
             type=str,
             help="The resource to ssh to",
         )
+        parser.add_argument('args', nargs=argparse.REMAINDER)
 
-    def execute(self, box):
+    def execute(self, box, args):
         boxes = self.collect_as_dict("ssh")
         if box not in boxes:
             raise errors.Error("No such host '{}'".format(box))
-        boxes[box].execute()
+        boxes[box].execute(args)
 
 register(Ssh)
