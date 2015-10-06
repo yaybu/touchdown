@@ -18,8 +18,12 @@ import tempfile
 import time
 
 from touchdown.core import plan, serializers
-from .agent import AgentServer
 from .connection import Connection
+
+try:
+    from .agent import AgentServer
+except ImportError:
+    AgentServer = None
 
 
 class ConnectionPlan(plan.Plan):
@@ -47,17 +51,18 @@ class ConnectionPlan(plan.Plan):
         environ['SSH_AUTH_SOCK'] = socket_file
         del environ['SHELL']
 
-        child_pid = os.fork()
-        if child_pid:
-            a = AgentServer(socket_file)
-            a.add(self.resource.private_key, "touchdown.pem")
-            try:
-                a.serve_while_pid(child_pid)
-            finally:
-                shutil.rmtree(socket_dir)
-            return
+        if AgentServer:
+            child_pid = os.fork()
+            if child_pid:
+                a = AgentServer(socket_file)
+                a.add(self.resource.private_key, "touchdown.pem")
+                try:
+                    a.serve_while_pid(child_pid)
+                finally:
+                    shutil.rmtree(socket_dir)
+                    return
 
-        while not os.path.exists(socket_file):
-            time.sleep(0.5)
+            while not os.path.exists(socket_file):
+                time.sleep(0.5)
 
         os.execvpe("/usr/bin/ssh", cmd, environ)
