@@ -31,6 +31,7 @@ Getting started
    :doc:`Snapshotting your data <cli/snapshot>` |
    :doc:`Rolling back data <cli/rollback>` |
    :doc:`SSHing to your infrastructure <cli/ssh>` |
+   :doc:`SCPing to/from your infrastructure <cli/scp>` |
    :doc:`Estimating infrastructure cost <cli/cost>` |
    :doc:`Generating graphs <cli/dot>`
 

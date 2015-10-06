@@ -26,23 +26,34 @@ except ImportError:
     AgentServer = None
 
 
-class ConnectionPlan(plan.Plan):
-
-    name = "ssh"
-    resource = Connection
+class SshMixin(object):
 
     def get_proxy_command(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
-        cmd = 'ssh -l {username} -W %h:%p {hostname} {port}'.format(**kwargs)
-        return ['-o', 'ProxyCommand={}'.format(cmd)]
+        cmd = [
+            '/usr/bin/ssh',
+            '-o', 'User="{username}"'.format(**kwargs),
+            '-o', 'Port="{port}"'.format(**kwargs),
+            '-W', '%h:%p',
+            kwargs['hostname'],
+        ]
+        return ['-o', 'ProxyCommand={}'.format(' '.join(cmd))]
 
-    def execute(self, args):
+    def get_command_and_args(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
-        cmd = ['ssh', '-l', kwargs['username']]
+        cmd = [
+            self.get_command(),
+            '-o', 'User="{username}"'.format(**kwargs),
+            '-o', 'Port={port}'.format(**kwargs),
+            '-o', 'HostName={hostname}'.format(**kwargs),
+        ]
         if self.resource.proxy:
             proxy = self.runner.get_plan(self.resource.proxy)
             cmd.extend(proxy.get_proxy_command())
-        cmd.extend(["-p", str(kwargs['port']), kwargs['hostname']])
+        return cmd
+
+    def execute(self, args):
+        cmd = self.get_command()
         cmd.extend(args)
 
         socket_dir = tempfile.mkdtemp(prefix='ssh-')
@@ -66,4 +77,27 @@ class ConnectionPlan(plan.Plan):
             while not os.path.exists(socket_file):
                 time.sleep(0.5)
 
-        os.execvpe("/usr/bin/ssh", cmd, environ)
+        os.execvpe(cmd[0], cmd, environ)
+
+
+class SshPlan(plan.Plan, SshMixin):
+
+    name = "ssh"
+    resource = Connection
+
+    def get_command(self):
+        return '/usr/bin/ssh'
+
+    def get_command_and_args(self):
+        cmd = super(SshPlan, self).get_command_and_args()
+        cmd.append("remote")
+        return cmd
+
+
+class ScpPlan(plan.Plan, SshMixin):
+
+    name = "scp"
+    resource = Connection
+
+    def get_command(self):
+        return '/usr/bin/scp'
