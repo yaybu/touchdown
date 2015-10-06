@@ -17,8 +17,9 @@ import shutil
 import tempfile
 import time
 
-from touchdown.core import adapters, argument, errors, plan, serializers, workspace
+from touchdown.core import plan, serializers
 from .agent import AgentServer
+from .connection import Connection
 
 
 class ConnectionPlan(plan.Plan):
@@ -28,28 +29,23 @@ class ConnectionPlan(plan.Plan):
 
     def get_proxy_command(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
-        cmd = 'ssh -A -l {username} -W %h:%p {hostname} {port}'.format(kwargs)
+        cmd = 'ssh -l {username} -W %h:%p {hostname} {port}'.format(**kwargs)
         return ['-o', 'ProxyCommand={}'.format(cmd)]
 
-    @classmethod
-    def setup_argparse(cls, parser):
-        parser.add_argument(
-            "box",
-            metavar="BOX",
-            type=str,
-            help="The resource to ssh to",
-        )
-
     def execute(self):
-        cmd = ['ssh', '-A', '-l', self.resource.username]
+        kwargs = serializers.Resource().render(self.runner, self.resource)
+        cmd = ['ssh', '-l', kwargs['username']]
         if self.resource.proxy:
             proxy = self.runner.get_plan(self.resource.proxy)
             cmd.extend(proxy.get_proxy_command())
-        cmd.extend([self.resource.hostname, self.resource.port])
-        print cmd
+        cmd.extend(["-p", str(kwargs['port']), kwargs['hostname']])
 
         socket_dir = tempfile.mkdtemp(prefix='ssh-')
         socket_file = os.path.join(socket_dir, 'agent.{}'.format(os.getpid()))
+
+        environ = os.environ.copy()
+        environ['SSH_AUTH_SOCK'] = socket_file
+        del environ['SHELL']
 
         child_pid = os.fork()
         if child_pid:
@@ -64,4 +60,4 @@ class ConnectionPlan(plan.Plan):
         while not os.path.exists(socket_file):
             time.sleep(0.5)
 
-        os.execvpe("/usr/bin/ssh", cmd, {"SSH_AUTH_SOCK": socket_file})
+        os.execvpe("/usr/bin/ssh", cmd, environ)

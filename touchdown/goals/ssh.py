@@ -26,8 +26,19 @@ class Ssh(Goal):
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("ssh")
         if not plan_class:
+            plan_class = resource.meta.get_plan("describe")
+        if not plan_class:
             plan_class = resource.meta.get_plan("null")
         return plan_class
+
+    @classmethod
+    def setup_argparse(cls, parser):
+        parser.add_argument(
+            "box",
+            metavar="BOX",
+            type=str,
+            help="The resource to ssh to",
+        )
 
     def execute(self, box):
         boxes = self.collect_as_dict("ssh")

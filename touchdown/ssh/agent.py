@@ -3,7 +3,6 @@ import os
 import SocketServer
 import threading
 
-import paramiko
 from paramiko.message import Message
 from paramiko.common import asbytes
 from paramiko.py3compat import byte_chr
@@ -71,7 +70,6 @@ class AgentRequestHandler(SocketServer.BaseRequestHandler):
 
             handler = getattr(self, "handler_{}".format(mtype))
             if not handler:
-                print "{!r} not a supported message type".format(mtype)
                 continue
 
             self.send_message(handler(msg))
