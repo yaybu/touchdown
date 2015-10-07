@@ -22,7 +22,7 @@ Then you could scp files to and from it with::
 
 And in reverse:
 
-    touchdown scp worker remote:foo.txt /tmp/
+    touchdown scp worker:foo.txt /tmp/
 
 
 You can use the following arguments:
