@@ -52,8 +52,8 @@ class SshMixin(object):
             cmd.extend(proxy.get_proxy_command())
         return cmd
 
-    def execute(self, args):
-        cmd = self.get_command()
+    def run(self, args):
+        cmd = self.get_command_and_args()
         cmd.extend(args)
 
         socket_dir = tempfile.mkdtemp(prefix='ssh-')
@@ -93,6 +93,9 @@ class SshPlan(plan.Plan, SshMixin):
         cmd.append("remote")
         return cmd
 
+    def execute(self, args):
+        self.run(args)
+
 
 class ScpPlan(plan.Plan, SshMixin):
 
@@ -101,3 +104,6 @@ class ScpPlan(plan.Plan, SshMixin):
 
     def get_command(self):
         return '/usr/bin/scp'
+
+    def execute(self, source, destination):
+        self.run([source, destination])

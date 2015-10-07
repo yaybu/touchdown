@@ -36,17 +36,30 @@ class Scp(Goal):
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "box",
-            metavar="BOX",
+            "source",
+            metavar="SOURCE",
             type=str,
-            help="The resource to ssh to",
+            help="What to copy",
         )
-        parser.add_argument('args', nargs=argparse.REMAINDER)
+        parser.add_argument(
+            "destination",
+            metavar="DESTINATION",
+            type=str,
+            help="Where to copy it",
+        )
 
-    def execute(self, box, args):
+    def execute(self, source, destination):
+        for path in (source, destination):
+            if ":" in path:
+                server = path.split(":", 1)[0]
+                break
+        else:
+            raise errors.Error("Either source or destination must contain a target server that touchdown knows about")
+
         boxes = self.collect_as_dict("scp")
-        if box not in boxes:
-            raise errors.Error("No such host '{}'".format(box))
-        boxes[box].execute(args)
+        if server not in boxes:
+            raise errors.Error("No such host '{}'".format(server))
+
+        boxes[server].execute(source, destination)
 
 register(Scp)

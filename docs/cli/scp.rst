@@ -18,7 +18,7 @@ If you have defined an explicit ssh connection in your config::
 
 Then you could scp files to and from it with::
 
-    touchdown scp worker foo.txt remote:
+    touchdown scp foo.txt worker:
 
 And in reverse:
 
