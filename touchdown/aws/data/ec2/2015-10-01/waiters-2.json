@@ -1,6 +1,23 @@
 {
   "version": 2,
   "waiters": {
+    "InstanceExists": {
+      "delay": 5,
+      "maxAttempts": 40,
+      "operation": "DescribeInstances",
+      "acceptors": [
+        {
+          "matcher": "status",
+          "expected": 200,
+          "state": "success"
+        },
+        {
+          "matcher": "error",
+          "expected": "InvalidInstanceIDNotFound",
+          "state": "retry"
+        }
+      ]
+    },
     "BundleTaskComplete": {
       "delay": 15,
       "operation": "DescribeBundleTasks",
@@ -17,6 +34,19 @@
           "matcher": "pathAny",
           "state": "failure",
           "argument": "BundleTasks[].State"
+        }
+      ]
+    },
+    "ConsoleOutputAvailable": {
+      "operation": "GetConsoleOutput",
+      "maxAttempts": 40,
+      "delay": 15,
+      "acceptors": [
+        {
+          "state": "success",
+          "matcher": "path",
+          "argument": "length(Output || '') > `0`",
+          "expected": true
         }
       ]
     },
@@ -353,6 +383,11 @@
           "matcher": "pathAll",
           "state": "success",
           "argument": "Volumes[].State"
+        },
+        {
+          "matcher": "error",
+          "expected": "InvalidVolumeNotFound",
+          "state": "success"
         }
       ]
     },
