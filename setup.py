@@ -32,8 +32,8 @@ setup(
         'contextlib2',
         'netaddr',
         'fuselage>=0.0.10',
-        'botocore>=1.0.0a2',
-        'progressbar2<3.0.0',
+        'botocore>=1.2.10',
+        'progressbar2>=3.0.0',
         'requests',
     ],
     entry_points='''

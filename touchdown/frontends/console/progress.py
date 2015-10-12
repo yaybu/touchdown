@@ -35,7 +35,7 @@ class ProgressBar(progressbar.ProgressBar):
 
     def __init__(self, min_value=0, max_value=0, text=None):
         super(ProgressBar, self).__init__(
-            maxval=max_value,
+            max_value=max_value,
             widgets=[
                 "[",
                 progressbar.AdaptiveETA(),
@@ -54,6 +54,6 @@ class ProgressBar(progressbar.ProgressBar):
         return super(ProgressBar, self).start()
 
     def finish(self):
-        if not self.finished:
+        if not self.end_time:
             super(ProgressBar, self).finish()
         sys.stdout = sys.stdout.inner
