@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
+import string
+
 try:
     from contextlib import ExitStack
 except ImportError:
@@ -27,6 +30,10 @@ from touchdown import ssh
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+
+
+def resource_id(prefix='', length=8, chars=string.ascii_lowercase+string.digits):
+    return prefix + ''.join(random.choice(chars) for _ in range(length))
 
 
 class Image(Resource):
@@ -68,7 +75,7 @@ class BuildInstance(Action):
     def create_security_group(self):
         self.plan.echo("Creating temporary security group")
         security_group = self.plan.client.create_security_group(
-            GroupName="temporary-security-group",
+            GroupName=resource_id("temporary-security-group-"),
             Description="Temporary security group",
         )
         self.stack.callback(self.destroy_security_group, security_group)
@@ -93,7 +100,7 @@ class BuildInstance(Action):
     def create_keypair(self):
         self.plan.echo("Creating temporary keypair")
         keypair = self.plan.client.create_key_pair(
-            KeyName="temporary-key-pair",
+            KeyName=resource_id("temporary-key-pair-"),
         )
         self.stack.callback(self.destroy_keypair, keypair)
         return keypair
