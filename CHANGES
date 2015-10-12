@@ -4,8 +4,15 @@ Changelog for Touchdown
 0.0.32 (unreleased)
 -------------------
 
+- Add a new ``touchdown ssh`` and ``touchdown scp`` commands.
+
 - Change how SSH connection to an ASG is achieved (allows private ip addresses
   to be used when on same network, even when using ``.get_auto_scaling_group``.
+
+- The names of resources used when building AMI's are now randomised (which
+  should enable parallelism).
+
+- Now uses ``botocore>=1.2.10`` and ``progressbar2>=3.0``.
 
 
 0.0.31 (2015-09-07)
