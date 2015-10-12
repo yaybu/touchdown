@@ -98,5 +98,7 @@ There are a bunch of commands you can run against your Touchdown config:
    get_signin_url
    tail
    rollback
+   scp
    snapshot
+   ssh
    dot

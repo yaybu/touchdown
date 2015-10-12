@@ -18,7 +18,9 @@ from .destroy import Destroy
 from .dot import Dot
 from .get_signin_url import GetSigninUrl
 from .rollback import Rollback
+from .scp import Scp
 from .snapshot import Snapshot
+from .ssh import Ssh
 from .tail import Tail
 
 
@@ -29,6 +31,8 @@ __all__ = [
     "Dot",
     "GetSigninUrl",
     "Rollback",
+    "Scp",
     "Snapshot",
+    "Ssh",
     "Tail",
 ]

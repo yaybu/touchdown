@@ -33,6 +33,7 @@ class Connection(Target):
 
     resource_name = "ssh_connection"
 
+    name = argument.String()
     username = argument.String(default="root", field="username")
     password = argument.String(field="password")
     private_key = argument.String(field="pkey", serializer=serializers.Identity())

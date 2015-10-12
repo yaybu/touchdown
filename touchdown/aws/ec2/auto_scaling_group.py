@@ -298,7 +298,8 @@ class Instance(ssh.Instance):
 
     def get_instances(self, runner):
         plan = runner.get_plan(self.adapts)
-        if len(plan.object.get("Instances", [])) == 0:
+        obj = plan.describe_object()
+        if len(obj.get("Instances", [])) == 0:
             raise errors.Error("No instances currently running in group {}".format(self.adapts))
 
         # Annoyingly we have to get antother client (different API) to get info
@@ -307,7 +308,7 @@ class Instance(ssh.Instance):
 
         reservations = client.describe_instances(
             InstanceIds=[
-                i["InstanceId"] for i in plan.object.get("Instances", [])
+                i["InstanceId"] for i in obj.get("Instances", [])
             ],
         ).get("Reservations", [])
 
