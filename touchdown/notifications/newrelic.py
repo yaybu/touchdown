@@ -22,7 +22,7 @@ class NewRelicDeploymentNotification(resource.Resource):
     resource_name = "newrelic_deployment_notification"
 
     apikey = argument.String()
-    name = argument.String(field="deployment[app]")
+    name = argument.String(field="deployment[app_name]")
     application_id = argument.String(field="deployment[application_id]")
     description = argument.String(field="deployment[description]")
     changelog = argument.String(field="deployment[changelog]")
@@ -36,15 +36,17 @@ class NotificationAction(action.Action):
 
     @property
     def description(self):
-        yield "Post deployment notification to new relic app {}".format(self.resource.name)
+        yield "Post deployment notification to NewRelic app {}".format(self.resource.name)
 
     def run(self):
+        data = serializers.Resource().render(self.runner, self.resource)
+        headers = {
+            "X-API-Key": self.resource.apikey,
+        }
         response = requests.post(
             "https://api.newrelic.com/deployments.xml",
-            data=serializers.Resource().render(self.runner, self.resource),
-            headers={
-                "X-API-Key": self.resource.apikey,
-            },
+            data=data,
+            headers=headers,
         )
         if response.status_code != 201:
             raise errors.Error("Error submitting notification: {}".format(response.text))
