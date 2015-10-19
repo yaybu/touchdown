@@ -302,14 +302,20 @@ class Instance(ssh.Instance):
         if len(obj.get("Instances", [])) == 0:
             raise errors.Error("No instances currently running in group {}".format(self.adapts))
 
+        asg_inservice = filter(
+            lambda x: x['LifecycleState'] == 'InService',
+            obj.get('Instances', []),
+        )
+
+        if len(asg_inservice) == 0:
+            raise errors.Error("None of the instances in {} are in service".format(self.adapts))
+
         # Annoyingly we have to get antother client (different API) to get info
         # on teh EC2 instances in our asg
         client = plan.session.create_client("ec2")
 
         reservations = client.describe_instances(
-            InstanceIds=[
-                i["InstanceId"] for i in obj.get("Instances", [])
-            ],
+            InstanceIds=[i["InstanceId"] for i in asg_inservice],
         ).get("Reservations", [])
 
         instances = []

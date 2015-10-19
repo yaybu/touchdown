@@ -6,6 +6,8 @@ Changelog for Touchdown
 
 - Support for notifying NewRelic after a deployment.
 
+- Avoid trying to SSH into terminating instances after an ASG rotation.
+
 
 0.2.0 (2015-10-12)
 ------------------
