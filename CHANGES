@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.3.0 (unreleased)
+0.3.0 (2015-10-19)
 ------------------
 
 - Support for notifying NewRelic after a deployment.
