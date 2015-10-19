@@ -80,7 +80,7 @@ class TestNewRelicNotifications(unittest.TestCase):
                 'https://api.newrelic.com/deployments.xml',
                 headers={"X-API-Key": "foo"},
                 data={
-                    'deployment[app]': 'myapp',
+                    'deployment[app_name]': 'myapp',
                     'deployment[revision]': 'myrevision',
                 }
             )
@@ -99,7 +99,7 @@ class TestNewRelicNotifications(unittest.TestCase):
                 'https://api.newrelic.com/deployments.xml',
                 headers={"X-API-Key": "foo"},
                 data={
-                    'deployment[app]': 'myapp',
+                    'deployment[app_name]': 'myapp',
                     'deployment[description]': 'A deployment',
                     'deployment[revision]': 'myrevision',
                 }
@@ -119,7 +119,7 @@ class TestNewRelicNotifications(unittest.TestCase):
                 'https://api.newrelic.com/deployments.xml',
                 headers={"X-API-Key": "foo"},
                 data={
-                    'deployment[app]': 'myapp',
+                    'deployment[app_name]': 'myapp',
                     'deployment[changelog]': 'Something changed',
                     'deployment[revision]': 'myrevision',
                 }
@@ -139,7 +139,7 @@ class TestNewRelicNotifications(unittest.TestCase):
                 'https://api.newrelic.com/deployments.xml',
                 headers={"X-API-Key": "foo"},
                 data={
-                    'deployment[app]': 'myapp',
+                    'deployment[app_name]': 'myapp',
                     'deployment[user]': 'duck',
                     'deployment[revision]': 'myrevision',
                 }
@@ -159,7 +159,7 @@ class TestNewRelicNotifications(unittest.TestCase):
                 'https://api.newrelic.com/deployments.xml',
                 headers={"X-API-Key": "foo"},
                 data={
-                    'deployment[app]': 'myapp',
+                    'deployment[app_name]': 'myapp',
                     'deployment[revision]': 'myrevision',
                     'deployment[application_id]': '1',
                 }
