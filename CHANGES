@@ -8,6 +8,8 @@ Changelog for Touchdown
 
 - Avoid trying to SSH into terminating instances after an ASG rotation.
 
+- Fix progress bar newline glitches introduced by progressbar2 3.0.
+
 
 0.2.0 (2015-10-12)
 ------------------

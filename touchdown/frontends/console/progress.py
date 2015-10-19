@@ -38,8 +38,6 @@ class ProgressBar(progressbar.ProgressBar):
             max_value=max_value,
             widgets=[
                 "[",
-                progressbar.AdaptiveETA(),
-                "] [",
                 progressbar.Percentage(),
                 "] ",
                 progressbar.FormatLabel("Processed %(value)s of %(max)s"),
@@ -56,4 +54,7 @@ class ProgressBar(progressbar.ProgressBar):
     def finish(self):
         if not self.end_time:
             super(ProgressBar, self).finish()
+            sys.stdout.inner.write("\n")
+            sys.stdout.flush()
+
         sys.stdout = sys.stdout.inner
