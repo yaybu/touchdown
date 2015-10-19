@@ -68,7 +68,7 @@ Resources
    :doc:`Deploying fuselage bundles <config/provisioner/fuselage>`
 
  * **Notifications:**
-   :doc:`Slack notifications <config/notifications/slack>`
+   :doc:`Slack notifications <config/notifications/slack>` |
    :doc:`NewRelic deploy notifications <config/notifications/newrelic>`
 
 
