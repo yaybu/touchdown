@@ -19,7 +19,7 @@ from touchdown.core import argument, action, errors, plan, resource, serializers
 
 class NewRelicDeploymentNotification(resource.Resource):
 
-    resource_name = "new_relic_deployment_notification"
+    resource_name = "newrelic_deployment_notification"
 
     apikey = argument.String()
     name = argument.String(field="deployment[app]")

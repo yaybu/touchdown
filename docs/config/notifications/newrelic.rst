@@ -6,7 +6,7 @@ New Relic deployment notifications
 
     You can send a notification from the workspace::
 
-        script = workspace.add_new_relic_deployment_notification(
+        script = workspace.add_newrelic_deployment_notification(
             apikey="XXXXXXXXXXXXXXXXXXXXXXXX",
             app="myapp-staging",
             revision="3.1.0"

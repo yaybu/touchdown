@@ -35,7 +35,7 @@ class TestNewRelicNotifications(unittest.TestCase):
         self.apply_runner.execute()
 
     def test_validation_apikey(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             name="foo",
             revision="foo",
         )
@@ -46,7 +46,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_validation_name(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             revision="foo",
         )
@@ -57,7 +57,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_validation_revision(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             name="foo",
         )
@@ -68,7 +68,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_apikey_and_name_and_revision(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             name="myapp",
             revision="myrevision",
@@ -86,7 +86,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_description(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             name="myapp",
             revision="myrevision",
@@ -106,7 +106,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_changelog(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             name="myapp",
             revision="myrevision",
@@ -126,7 +126,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_user(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             name="myapp",
             revision="myrevision",
@@ -146,7 +146,7 @@ class TestNewRelicNotifications(unittest.TestCase):
             )
 
     def test_application_id(self):
-        self.workspace.add_new_relic_deployment_notification(
+        self.workspace.add_newrelic_deployment_notification(
             apikey="foo",
             name="myapp",
             revision="myrevision",
