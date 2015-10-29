@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Unicode handling fixes in output handlers.
 
 
 0.3.0 (2015-10-19)

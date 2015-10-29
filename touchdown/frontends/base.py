@@ -16,6 +16,8 @@ from __future__ import absolute_import, print_function
 
 import threading
 
+from touchdown.core.utils import force_str
+
 
 class BaseFrontend(object):
 
@@ -23,12 +25,13 @@ class BaseFrontend(object):
         self.echo(text)
 
     def echo(self, text, nl=True, **kwargs):
+        text = force_str(text)
         if threading.current_thread().name != "MainThread":
             text = "[{}] {}".format(threading.current_thread().name, text)
         if nl:
             self._echo("{}\n".format(text))
         else:
-            self._echo("{}".format(text))
+            self._echo(text)
 
     def table(self, data):
         widths = {}
