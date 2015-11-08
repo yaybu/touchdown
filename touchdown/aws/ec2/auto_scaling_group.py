@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import time
 
 from touchdown.core.action import Action
@@ -339,16 +340,23 @@ class Instance(ssh.Instance):
         if getattr(self.parent, "proxy", None) and self.parent.proxy.instance:
             if hasattr(self.parent.proxy.instance, "get_network_id"):
                 network = self.parent.proxy.instance.get_network_id(runner)
+                possible = []
                 for instance in instances:
                     if instance['VpcId'] != network:
                         continue
                     if 'PrivateIpAddress' not in instance:
                         continue
-                    return serializers.Const(instance['PrivateIpAddress'])
+                    possible.append(instance['PrivateIpAddress'])
+                if possible:
+                    return serializers.Const(random.choice(possible))
 
         for instance in instances:
+            possible = []
             for k in ('PublicDnsName', 'PublicIpAddress'):
                 if k in instance and instance[k]:
-                    return serializers.Const(instance[k])
+                    possible.append(instance[k])
+                    break
+            if possible:
+                return serializers.Const(random.choice(possible))
 
         raise errors.Error("No instances available in {} with ip address".format(self.adapts))
