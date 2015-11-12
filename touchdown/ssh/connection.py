@@ -78,7 +78,7 @@ class ConnectionPlan(plan.Plan):
                         ('', 0)
                     )
                     break
-                except ssh_exception.ChannelException:
+                except (EOFError, ssh_exception.ChannelException):
                     time.sleep(i)
                     continue
 
@@ -96,7 +96,16 @@ class ConnectionPlan(plan.Plan):
             args.append("port={}".format(kwargs['port']))
 
         self.echo("Establishing ssh connection ({})".format(", ".join(args)))
-        cli.connect(**kwargs)
+        for i in range(20):
+            try:
+                cli.connect(**kwargs)
+                break
+            except (EOFError, ssh_exception.SSHException):
+                self.echo("Connection timeout. Retrying in 1s.")
+                time.sleep(1)
+                continue
+        else:
+            raise errors.Error("Error setting up connection to {} after 20 tries".format(kwargs['hostname']))
 
         self.echo("Got connection")
 
