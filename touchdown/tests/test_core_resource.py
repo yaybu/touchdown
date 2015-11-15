@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import unittest
-import mock
 
 from touchdown.aws.vpc import SecurityGroup
 from touchdown.core import serializers

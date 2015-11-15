@@ -57,6 +57,25 @@ class ConnectionPlan(plan.Plan):
     resource = Connection
     _client = None
 
+    def get_proxy(self, **kwargs):
+        self.echo("Setting up connection proxy via {}".format(self.resource.proxy))
+        proxy = self.runner.get_plan(self.resource.proxy)
+        transport = proxy.get_client().get_transport()
+        self.echo("Setting up proxy channel to {}".format(kwargs['hostname']))
+
+        for i in range(20):
+            try:
+                return transport.open_channel(
+                    'direct-tcpip',
+                    (kwargs['hostname'], kwargs['port']),
+                    ('', 0)
+                )
+            except (EOFError, ssh_exception.ChannelException):
+                time.sleep(i)
+                continue
+
+        raise errors.Error("Error setting up proxy channel to {} after 20 tries".format(kwargs['hostname']))
+
     def get_client(self):
         if self._client:
             return self._client
@@ -66,25 +85,7 @@ class ConnectionPlan(plan.Plan):
         kwargs = serializers.Resource().render(self.runner, self.resource)
 
         if self.resource.proxy:
-            self.echo("Setting up connection proxy via {}".format(self.resource.proxy))
-            proxy = self.runner.get_plan(self.resource.proxy)
-            transport = proxy.get_client().get_transport()
-            self.echo("Setting up proxy channel to {}".format(kwargs['hostname']))
-            for i in range(20):
-                try:
-                    kwargs['sock'] = transport.open_channel(
-                        'direct-tcpip',
-                        (kwargs['hostname'], kwargs['port']),
-                        ('', 0)
-                    )
-                    break
-                except (EOFError, ssh_exception.ChannelException):
-                    time.sleep(i)
-                    continue
-
-            if 'sock' not in kwargs:
-                raise errors.Error("Error setting up proxy channel to {} after 20 tries".format(kwargs['hostname']))
-
+            kwargs['sock'] = self.get_proxy(**kwargs)
             self.echo("Proxy setup")
 
         if not self.resource.password and not self.resource.private_key:
