@@ -15,7 +15,7 @@
 import logging
 import six
 
-from . import argument, errors
+from . import argument, errors, serializers
 
 logger = logging.getLogger(__name__)
 marker = object()
@@ -51,7 +51,6 @@ class Field(object):
         return value
 
     def __set__(self, instance, value):
-        from . import serializers
         if value is None:
             self.delete_value(instance)
             return
@@ -166,6 +165,24 @@ class Resource(six.with_metaclass(ResourceType)):
         for field in self.meta.iter_fields_in_order():
             if field.name in kwargs:
                 setattr(self, field.name, kwargs[field.name])
+
+    def identifier(self):
+        """ Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' """
+        return serializers.Identifier(serializers.Const(self))
+
+    def property(self, property_name):
+        """ Returns a serializer that renders a property fetched by describing a remote resource """
+        return serializers.Property(
+            serializers.Const(self),
+            property_name,
+        )
+
+    def format(self, format_string):
+        """ Returns a serializer that renders a format string using values from a remote resource """
+        return serializers.Format(
+            format_string,
+            serializers.Const(self),
+        )
 
     @property
     def arguments(self):
