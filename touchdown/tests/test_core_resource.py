@@ -25,19 +25,19 @@ class TestResource(unittest.TestCase):
         self.resource = SecurityGroup(None, name="test")
 
     def test_identifier(self):
-        self.assertTrue(
-            isinstance(self.resource.identifier(),
+        self.assertTrue(isinstance(
+            self.resource.identifier(),
             serializers.Identifier,
-        )
+        ))
 
     def test_properties(self):
-        self.assertTrue(
-            isinstance(self.resource.property("Foo"),
+        self.assertTrue(isinstance(
+            self.resource.property("Foo"),
             serializers.Property,
-        )
+        ))
 
     def test_format_string(self):
-        self.assertTrue(
-            isinstance(self.resource.format_string("Foo"),
+        self.assertTrue(isinstance(
+            self.resource.format_string("Foo"),
             serializers.Format,
-        )
+        ))
