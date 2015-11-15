@@ -177,13 +177,6 @@ class Resource(six.with_metaclass(ResourceType)):
             property_name,
         )
 
-    def format(self, format_string):
-        """ Returns a serializer that renders a format string using values from a remote resource """
-        return serializers.Format(
-            format_string,
-            serializers.Const(self),
-        )
-
     @property
     def arguments(self):
         return list((name, field.argument) for (name, field) in self.meta.iter_fields_in_order())
