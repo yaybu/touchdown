@@ -32,12 +32,12 @@ class TestResource(unittest.TestCase):
 
     def test_properties(self):
         self.assertTrue(isinstance(
-            self.resource.property("Foo"),
+            self.resource.get_property("Foo"),
             serializers.Property,
         ))
 
     def test_format_string(self):
         self.assertTrue(isinstance(
-            self.resource.format_string("Foo"),
+            self.resource.format("Foo"),
             serializers.Format,
         ))
