@@ -19,7 +19,7 @@ import six
 
 from .progress import ProgressBar
 from ..base import BaseFrontend
-from ..noninteractive import PrgressBar as NonInteractiveProgressBar
+from ..noninteractive import ProgressBar as NonInteractiveProgressBar
 
 
 class ConsoleFrontend(BaseFrontend):
