@@ -8,7 +8,7 @@ ecdsa==0.13
 six==1.10.0
 fuselage==0.0.11
 demjson
-progressbar2==3.4.1
+progressbar2==3.5.0
 
 coverage==4.0.2
 coveralls==1.1
