@@ -85,7 +85,7 @@ class DefaultCacheBehavior(Resource):
     allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
     cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
 
-    default_ttl = argument.Integer(default=86400l, field="DefaultTTL")
+    default_ttl = argument.Integer(default=86400, field="DefaultTTL")
     min_ttl = argument.Integer(default=0, field="MinTTL")
     max_ttl = argument.Integer(default=31536000, field="MaxTTL")
     viewer_protocol_policy = argument.String(
