@@ -65,6 +65,7 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
                 'MinimumProtocolVersion': 'TLSv1',
                 'SSLSupportMethod': 'sni-only'
             },
+            'WebACLId': '',
         })
 
     def test_simple_distribution_with_aliases(self):
@@ -91,6 +92,7 @@ class TestCloudFrontDistributionSerializing(unittest.TestCase):
                 'MinimumProtocolVersion': 'TLSv1',
                 'SSLSupportMethod': 'sni-only'
             },
+            'WebACLId': '',
         })
 
 
