@@ -33,7 +33,7 @@ class ConsoleFrontend(BaseFrontend):
     def progressbar(self, **kwargs):
         if hasattr(signal, "SIGWINCH"):
             return ProgressBar(**kwargs)
-        return NonInteractiveProgressBar(**kwargs)
+        return NonInteractiveProgressBar(self, **kwargs)
 
     def prompt(self, message, key=None, default=None):
         response = six.moves.input('{}: '.format(message))
