@@ -85,7 +85,9 @@ class DefaultCacheBehavior(Resource):
     allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
     cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
 
+    default_ttl = argument.Integer(default=86400l, field="DefaultTTL")
     min_ttl = argument.Integer(default=0, field="MinTTL")
+    max_ttl = argument.Integer(default=31536000, field="MaxTTL")
     viewer_protocol_policy = argument.String(
         choices=['allow-all', 'https-only', 'redirect-to-https'],
         default='allow-all',
@@ -152,7 +154,8 @@ class Distribution(Resource):
         "ViewerCertificate": serializers.Resource(
             group="viewer-certificate",
             CloudFrontDefaultCertificate=serializers.Expression(lambda r, o: False if o.ssl_certificate else True),
-        )
+        ),
+        "WebACLId": serializers.Const(""),
     }
 
     name = argument.String()
