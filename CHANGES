@@ -4,7 +4,23 @@ Changelog for Touchdown
 0.3.2 (unreleased)
 ------------------
 
-- Fix ASG SSH behavior.
+- Fix CloudFront for new versions of botocore. In the process we now support
+  setting the `default_ttl` and `max_ttl`.
+
+- SSH connections will retry more, to give instances time to fully boot.
+
+- Fix ASG SSH behavior. It was supposed to choose a random instance, but was
+  actually always picking the first instance.
+
+- Improve Windows support: Avoid using `progressbar2` on Windows. It blows up
+  if `signals.SIGWINCH` is not available.
+
+- Add some helpers to resources to help with serializer common cases. For example::
+
+      foo = aws.add_distribution(....)
+      bar = foo.identifier()
+
+  Now `bar` is `serializers.Identifier` that is bound to `foo`.
 
 
 0.3.1 (2015-10-29)
