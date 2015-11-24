@@ -288,6 +288,21 @@ put a load balancer in front, which we'll set up first::
     )
 
 
+We are going to set some user data in the AutoScaling setup so that Django knows which database to connect to.
+
+    user_data = serializers.Json(serializers.Dict({
+        "DATABASES": serializers.Dict(
+            ENGINE='django.db.backends.postgresql_psycopg2',
+            NAME=database.db_name,
+            HOST=serializers.Format("{0[Address]}", database.get_property("Endpoint")),
+            USER=database.master_username,
+            PASSWORD=database.master_password,
+            PORT=5432,
+            ),
+
+    }))
+
+
 Then we need a :class:`~touchdown.aws.ec2.LaunchConfiguration` that says what
 any started instances should look like and the
 :class:`~touchdown.aws.ec2.AutoScalingGroup` itself::
@@ -298,7 +313,7 @@ any started instances should look like and the
             name="sentry-app",
             image=ami,
             instance_type="t1.micro",
-            user_data="",
+            user_data=user_data,
             key_pair=keypair,
             security_groups=security_groups["app"],
             associate_public_ip_address=False,
