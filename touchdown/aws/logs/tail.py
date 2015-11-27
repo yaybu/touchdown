@@ -16,6 +16,7 @@
 # stream from a aws log using the FilterLogEvents API.
 
 import time
+import datetime
 
 from touchdown.core import plan
 from touchdown.core.datetime import as_seconds
@@ -48,9 +49,10 @@ class Plan(common.SimplePlan, plan.Plan):
                     seen.add(event['eventId'])
                     if event['eventId'] in previous_events:
                         continue
-                    print("[{logStreamName}] {message}".format(**{
+                    print("[{timestamp}] [{logStreamName}] {message}".format(**{
                         "logStreamName": event.get('logStreamName', ''),
                         "message": event['message'].encode("utf-8", "ignore"),
+                        "timestamp": datetime.datetime.utcfromtimestamp(int(event['timestamp']) / 1000.0),
                     }))
                     kwargs['startTime'] = event['timestamp']
                 if 'nextToken' not in results:
