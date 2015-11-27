@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.3.3 (unreleased)
+0.3.3 (2015-11-27)
 ------------------
 
 - Add a timestamp to `touchdown tail foo.log`.
