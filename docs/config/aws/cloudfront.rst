@@ -249,9 +249,13 @@ serves CSS. This helps to improve cacheability.
         redirected to the https version of the url. ``allow-all`` passes on
         traffic to the origin using the same protocol as the client used.
 
+    .. attribute:: default_ttl
+
     .. attribute:: min_ttl
 
         The minimum amount of time to cache content for.
+
+    .. attribute:: max_ttl
 
     .. attribute:: allowed_methods
 
