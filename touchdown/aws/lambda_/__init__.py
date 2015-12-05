@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .bucket import Bucket
-from .file import File
-from .folder import Folder
-from .notification_configuration import NotificationConfiguration
+from .function import Function
+from .permission import Permission
+from .s3 import S3LambdaNotification
 
 
 __all__ = [
-    'Bucket',
-    'File',
-    'Folder',
-    'NotificationConfiguration',
+    'Function',
+    'Permission',
+    'S3LambdaNotification',
 ]

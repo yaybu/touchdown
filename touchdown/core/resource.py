@@ -157,8 +157,8 @@ class Resource(six.with_metaclass(ResourceType)):
 
     def __init__(self, parent, **kwargs):
         self._values = {}
-        self.parent = parent
         self.dependencies = set()
+        self.parent = parent
         for key in kwargs.keys():
             if key not in self.meta.fields:
                 raise errors.InvalidParameter("'%s' is not a valid option" % (key, ))

@@ -30,6 +30,8 @@ class Topic(Resource):
 
     resource_name = "topic"
 
+    arn = argument.Output("TopicArn")
+
     name = argument.String(field="Name", min=1, max=256, regex='[A-Za-z0-9-_]*')
     notify = argument.ResourceList(Subscription)
 
@@ -76,10 +78,7 @@ class Apply(SimpleApply, Describe):
                     serializers.Context(
                         local,
                         serializers.Resource(
-                            TopicArn=serializers.Context(
-                                self.resource,
-                                serializers.Property("TopicArn"),
-                            ),
+                            TopicArn=self.resource.arn,
                         )
                     )
                 )

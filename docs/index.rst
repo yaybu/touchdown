@@ -52,6 +52,7 @@ Resources
    :doc:`Encryption Key Management <config/aws/kms>` |
    :doc:`Key Value Stores <config/aws/elasticache>` |
    :doc:`Identity & Access Management <config/aws/iam>` |
+   :doc:`Lambda zero-admin compute <config/aws/lambda>` |
    :doc:`Load Balancing <config/aws/elb>` |
    :doc:`Monitoring <config/aws/cloudwatch>` |
    :doc:`Networking <config/aws/vpc>` |
