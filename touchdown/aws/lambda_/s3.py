@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
-from touchdown.core import argument
-
+from touchdown.core import argument, serializers
 from touchdown.aws.s3 import NotificationConfiguration
 from .function import Function
 
 
-class S3LambdaNotification(Resource, NotificationConfiguration):
+class S3LambdaNotification(NotificationConfiguration):
 
     function = argument.Resource(
         Function,
         field="LambdaFunctionArn",
+        serializer=serializers.Property("FunctionArn"),
     )
 
     def __init__(self, parent, **kwargs):
         super(S3LambdaNotification, self).__init__(parent, **kwargs)
         self.function.add_permission(
             name="s3-{}-lambda-{}".format(parent.name, self.function.name),
-            action="lambda:Invoke",
+            action="lambda:InvokeFunction",
             principal="s3.amazonaws.com",
             source_arn=parent.arn,
         )

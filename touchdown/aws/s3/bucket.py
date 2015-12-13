@@ -80,7 +80,7 @@ class Bucket(Resource):
     notify_lambda = argument.ResourceList(
         'touchdown.aws.lambda_.s3.S3LambdaNotification',
         field="LambdaFunctionConfigurations",
-        serializer=serializers.List(serializers.Resource(group="notifications")),
+        serializer=serializers.List(serializers.Resource()),
         group="notifications",
     )
 
@@ -159,7 +159,7 @@ class Apply(SimpleApply, Describe):
             update_notifications = True
         elif self.object:
             remote = self.get_remote_notification_config()
-            d = DiffSet(self.runner, self.resource, remote, group="attributes")
+            d = DiffSet(self.runner, self.resource, remote, group="notifications")
             update_notifications = not d.matches()
 
         if update_notifications:

@@ -28,10 +28,13 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 class FunctionSerializer(serializers.Formatter):
 
-    MAIN_PY = zipfile.ZipInfo(
-        'main.py',
-        date_time=(2004, 7, 6, 0, 0, 0),
-    )
+    def mkinfo(self, name):
+        info = zipfile.ZipInfo(
+            name,
+            date_time=(2004, 7, 6, 0, 0, 0),
+        )
+        info.external_attr = 0o644 << 16L
+        return info
 
     def render(self, runner, func):
         buf = StringIO()
@@ -40,7 +43,7 @@ class FunctionSerializer(serializers.Formatter):
             mode='w',
             compression=zipfile.ZIP_DEFLATED
         )
-        zf.writestr(self.MAIN_PY, inspect.getsource(func))
+        zf.writestr(self.mkinfo("main.py"), inspect.getsource(func))
         zf.close()
         return buf.getvalue()
 
@@ -48,6 +51,8 @@ class FunctionSerializer(serializers.Formatter):
 class Function(Resource):
 
     resource_name = "lambda_function"
+
+    arn = argument.Output("FunctionArn")
 
     name = argument.String(field="FunctionName", min=1, max=140)
     description = argument.String(name="Description")

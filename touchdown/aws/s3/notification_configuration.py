@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument
+from touchdown.core import argument, resource
 
 
-class NotificationConfiguration(object):
+class NotificationConfiguration(resource.Resource):
 
-    resource_name = "cors_rule"
+    resource_name = "notification_configuration"
+
     name = argument.String(field="Id")
     events = argument.List(argument.String(
         choices=[
