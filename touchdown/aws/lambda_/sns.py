@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core import serializers
+from touchdown.aws import sns
 from .function import Function
-from .permission import Permission
-from .s3 import S3LambdaNotification
-from .sns import Subscription
 
 
-__all__ = [
-    'Function',
-    'Permission',
-    'S3LambdaNotification',
-    'Subscription',
-]
+class Subscription(sns.Subscription):
+
+    """ Adapts a Lambda Function into a Subscription """
+
+    input = Function
+
+    def get_serializer(self, runner, **kwargs):
+        return serializers.Dict(
+            Protocol=serializers.Const("lambda"),
+            Endpoint=self.adapts.arn,
+            TopicArn=kwargs['TopicArn'],
+        )
