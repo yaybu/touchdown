@@ -37,7 +37,8 @@ Getting started
 
  * **Tutorial:**
    :doc:`Hello world <tutorial/hello_world>` |
-   :doc:`Django <tutorial/django>`
+   :doc:`Django <tutorial/django>` |
+   :doc:`Handling S3 Events with Lambda <tutorial/s3_events_with_lambda>`
 
 
 Resources
@@ -46,6 +47,7 @@ Resources
  * **Amazon:**
    :doc:`Authentication <config/aws/authentication>` |
    :doc:`Autoscaling <config/aws/autoscaling>` |
+   :doc:`Building serverless API's <config/aws/apigateway>` |
    :doc:`CDN <config/aws/cloudfront>` |
    :doc:`Compute <config/aws/ec2>` |
    :doc:`DNS <config/aws/route53>` |

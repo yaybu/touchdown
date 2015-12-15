@@ -19,16 +19,15 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .rest_api import RestApi
 
 
-class Resource(resource.Resource):
+class Model(resource.Resource):
 
-    resource_name = "resource"
+    resource_name = "model"
 
-    name = argument.String(field="pathPart")
+    name = argument.String(field="name")
+    description = argument.String(field="description")
+    schema = argument.String(field="schema")
+    content_type = argument.String(field="contentType", default='application/json')
 
-    parent_resource = argument.Resource(
-        "touchdown.aws.apigateway.rsource.Resource",
-        field="parentId",
-    )
     api = argument.Resource(
         RestApi,
         field="restApiId"
@@ -37,9 +36,9 @@ class Resource(resource.Resource):
 
 class Describe(SimpleDescribe, Plan):
 
-    resource = Resource
+    resource = Model
     service_name = 'apigateway'
-    describe_action = "get_resources"
+    describe_action = "get_models"
     describe_envelope = "items"
     key = 'id'
 
@@ -54,16 +53,16 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_resource"
+    create_action = "create_model"
     create_envelope = "@"
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_resource"
+    destroy_action = "delete_model"
 
     def get_destroy_serializer(self):
         return serializers.Dict(
             restApiId=self.resource.rest_api.identifier(),
-            resourceId=self.resource.identifier(),
+            modelName=self.resource.name,
         )
