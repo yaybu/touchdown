@@ -19,16 +19,19 @@ from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .rest_api import RestApi
 
 
-class Resource(resource.Resource):
+class Deployment(resource.Resource):
 
-    resource_name = "resource"
+    resource_name = "deployment"
 
-    name = argument.String(field="pathPart")
+    name = argument.String(field="description")
+    stage_name = argument.String(field="stageName")
+    stage_description = argument.String(field="stageDescription")
 
-    parent_resource = argument.Resource(
-        "touchdown.aws.apigateway.rsource.Resource",
-        field="parentId",
-    )
+    cache_cluster_enabled = argument.Boolean(field="cacheClusterEnabled")
+    cache_cluster_size = argument.String(field="cacheClusterSize")
+
+    variables = argument.Dict(field="variables")
+
     api = argument.Resource(
         RestApi,
         field="restApiId"
@@ -37,9 +40,9 @@ class Resource(resource.Resource):
 
 class Describe(SimpleDescribe, Plan):
 
-    resource = Resource
+    resource = Deployment
     service_name = 'apigateway'
-    describe_action = "get_resources"
+    describe_action = "get_deployments"
     describe_envelope = "items"
     key = 'id'
 
@@ -52,21 +55,21 @@ class Describe(SimpleDescribe, Plan):
         )
 
     def describe_object_matches(self, obj):
-        return self.resource.name == d.get('pathPart', '')
+        return self.resource.name == d.get('description', '')
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_resource"
+    create_action = "create_deployment"
     create_envelope = "@"
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_resource"
+    destroy_action = "delete_deployment"
 
     def get_destroy_serializer(self):
         return serializers.Dict(
             restApiId=self.resource.rest_api.identifier(),
-            resourceId=self.resource.identifier(),
+            deploymentId=self.resource.identifier(),
         )

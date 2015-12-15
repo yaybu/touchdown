@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .deployment import Deployment
+from .model import Model
 from .resource import Resource
 from .rest_api import RestApi
 

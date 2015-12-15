@@ -50,6 +50,9 @@ class Describe(SimpleDescribe, Plan):
             restApiId=api.identifier(),
         )
 
+    def describe_object_matches(self, obj):
+        return self.resource.name == d.get('name', '')
+
 
 class Apply(SimpleApply, Describe):
 

@@ -81,3 +81,28 @@ Defining models
     .. attribute:: schema
 
     .. attribute:: content_type
+
+
+Defining deployments
+--------------------
+
+.. class:: Deployment
+
+    ::
+
+        rest_api.add_deployment(
+            name='api-deployment',
+            stage='production',
+        )
+
+    .. attribute:: name
+
+    .. attribute:: stage
+
+    .. attribute:: stage_description
+
+    .. attribute:: cache_cluster_enabled
+
+    .. attribute:: cache_cluster_size
+
+    .. attribute:: variables
