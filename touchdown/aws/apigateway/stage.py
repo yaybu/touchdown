@@ -16,7 +16,7 @@ from touchdown.core.plan import Plan
 from touchdown.core import resource, argument, serializers
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
-from .rest_api import RestApi
+from .deployment import Deployment
 
 
 class Stage(resource.Resource):
@@ -55,7 +55,7 @@ class Describe(SimpleDescribe, Plan):
         )
 
     def describe_object_matches(self, obj):
-        return self.resource.name == d.get('stageName', '')
+        return self.resource.name == obj.get('stageName', '')
 
 
 class Apply(SimpleApply, Describe):

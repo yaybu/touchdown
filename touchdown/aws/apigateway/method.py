@@ -16,7 +16,6 @@ from touchdown.core.plan import Plan
 from touchdown.core import resource, argument, serializers
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
-from .rest_api import RestApi
 from .resource import Resource
 
 
@@ -35,7 +34,6 @@ class Method(resource.Resource):
         Resource,
         field="resourceId",
     )
-
 
 
 class Describe(SimpleDescribe, Plan):

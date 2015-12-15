@@ -55,7 +55,7 @@ class Describe(SimpleDescribe, Plan):
         )
 
     def describe_object_matches(self, obj):
-        return self.resource.name == d.get('description', '')
+        return self.resource.name == obj.get('description', '')
 
 
 class Apply(SimpleApply, Describe):

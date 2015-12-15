@@ -38,7 +38,7 @@ class Describe(SimpleDescribe, Plan):
     key = 'id'
 
     def describe_object_matches(self, obj):
-        return self.resource.name == d.get('name', '')
+        return self.resource.name == obj.get('name', '')
 
 
 class Apply(SimpleApply, Describe):

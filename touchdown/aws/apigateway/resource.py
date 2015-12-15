@@ -52,7 +52,7 @@ class Describe(SimpleDescribe, Plan):
         )
 
     def describe_object_matches(self, obj):
-        return self.resource.name == d.get('pathPart', '')
+        return self.resource.name == obj.get('pathPart', '')
 
 
 class Apply(SimpleApply, Describe):
