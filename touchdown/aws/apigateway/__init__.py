@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .deployment import Deployment
+from .method import Method
 from .model import Model
 from .resource import Resource
 from .rest_api import RestApi
@@ -21,6 +22,7 @@ from .stage import Stage
 
 __all__ = [
     "Deployment",
+    "Method",
     "Model",
     "Resource",
     "RestApi",

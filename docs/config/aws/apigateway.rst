@@ -111,6 +111,8 @@ Defining deployments
 Adding stages
 -------------
 
+A stage defines the path through which an API deployment is accessible. With deployment stages, you can have multiple releases for each API, such as alpha, beta, and production. Using stage variables you can configure an API deployment stage to interact with different backend endpoints.
+
 .. class:: Stage
 
     ::
@@ -128,3 +130,15 @@ Adding stages
     .. attribute:: cache_cluster_size
 
     .. attribute:: variables
+
+
+Attaching methods
+-----------------
+
+.. class:: Method
+
+    ::
+
+        my_method = resource.add_method(
+            method = "GET",
+        )
