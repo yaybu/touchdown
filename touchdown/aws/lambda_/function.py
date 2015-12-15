@@ -33,7 +33,7 @@ class FunctionSerializer(serializers.Formatter):
             name,
             date_time=(2004, 7, 6, 0, 0, 0),
         )
-        info.external_attr = 0o644 << 16L
+        info.external_attr = 0o644 << 16
         return info
 
     def render(self, runner, func):
