@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .resource import Resource
 from .rest_api import RestApi
 
+
 __all__ = [
+    "Resource",
     "RestApi",
 ]
