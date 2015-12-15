@@ -16,9 +16,13 @@ from .deployment import Deployment
 from .model import Model
 from .resource import Resource
 from .rest_api import RestApi
+from .stage import Stage
 
 
 __all__ = [
+    "Deployment",
+    "Model",
     "Resource",
     "RestApi",
+    "Stage",
 ]

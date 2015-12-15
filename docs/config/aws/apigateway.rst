@@ -106,3 +106,25 @@ Defining deployments
     .. attribute:: cache_cluster_size
 
     .. attribute:: variables
+
+
+Adding stages
+-------------
+
+.. class:: Stage
+
+    ::
+
+        my_stage = deployment.add_stage(
+            name='staging',
+        )
+
+    .. attribute:: name
+
+    .. attribute:: description
+
+    .. attribute:: cache_cluster_enabled
+
+    .. attribute:: cache_cluster_size
+
+    .. attribute:: variables
