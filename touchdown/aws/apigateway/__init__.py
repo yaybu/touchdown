@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from .deployment import Deployment
+from .integration import Integration
+from .integration_response import IntegrationResponse
 from .method import Method
+from .methd_response import MethodResponse
 from .model import Model
 from .resource import Resource
 from .rest_api import RestApi
@@ -22,7 +25,10 @@ from .stage import Stage
 
 __all__ = [
     "Deployment",
+    "Integration",
+    "IntegrationResponse",
     "Method",
+    "MethodResponse",
     "Model",
     "Resource",
     "RestApi",
