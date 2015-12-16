@@ -50,18 +50,22 @@ class Describe(SimpleDescribe, Plan):
     resource = Integration
     service_name = 'apigateway'
     describe_action = "get_integration"
+    describe_notfound_exception = "NotFoundException"
     describe_envelope = "@"
     key = 'httpMethod'
 
     def get_describe_filters(self):
+        api = self.runner.get_plan(self.resource.resource.api)
+        if not api.resource_id:
+            return None
         resource = self.runner.get_plan(self.resource.resource)
         if not resource.resource_id:
             return None
-        return serializers.Dict(
-            restApiId=resource.api.identifier(),
-            resourceId=resource.identifier(),
-            httpMethod=self.resource.method,
-        )
+        return {
+            "restApiId": api.resource_id,
+            "resourceId": resource.resource_id,
+            "httpMethod": self.resource.name,
+        }
 
 
 class Apply(SimpleApply, Describe):
@@ -81,6 +85,6 @@ class Destroy(SimpleDestroy, Describe):
 
     def get_destroy_serializer(self):
         return serializers.Dict(
-            restApiId=self.resource.rest_api.identifier(),
+            restApiId=self.resource.resource.api.identifier(),
             resourceId=self.resource.identifier(),
         )

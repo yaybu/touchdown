@@ -38,7 +38,6 @@ As it's an AWS example we need to setup an AWS workspace::
         method="GET",
         authorization_type = "NONE",
         api_key_required=False,
-        # request_parameters={},
     )
 
     root.add_method_response(

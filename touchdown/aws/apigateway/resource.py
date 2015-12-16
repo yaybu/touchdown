@@ -47,12 +47,12 @@ class Describe(SimpleDescribe, Plan):
         api = self.runner.get_plan(self.resource.api)
         if not api.resource_id:
             return None
-        return serializers.Dict(
-            restApiId=api.identifier(),
-        )
+        return {
+            "restApiId": api.resource_id,
+        }
 
     def describe_object_matches(self, obj):
-        return self.resource.name == obj.get('pathPart', '')
+        return self.resource.name == obj.get('path', '')
 
 
 class Apply(SimpleApply, Describe):
@@ -67,6 +67,9 @@ class Destroy(SimpleDestroy, Describe):
 
     def get_destroy_serializer(self):
         return serializers.Dict(
-            restApiId=self.resource.rest_api.identifier(),
+            restApiId=self.resource.api.identifier(),
             resourceId=self.resource.identifier(),
         )
+
+    def can_delete(self):
+        return self.resource.name != '/'

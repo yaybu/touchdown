@@ -70,6 +70,6 @@ class Destroy(SimpleDestroy, Describe):
 
     def get_destroy_serializer(self):
         return serializers.Dict(
-            restApiId=self.resource.rest_api.identifier(),
+            restApiId=self.resource.api.identifier(),
             deploymentId=self.resource.identifier(),
         )

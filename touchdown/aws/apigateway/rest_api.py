@@ -37,6 +37,9 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = "items"
     key = 'id'
 
+    def get_describe_filters(self):
+        return {}
+
     def describe_object_matches(self, obj):
         return self.resource.name == obj.get('name', '')
 
