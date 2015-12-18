@@ -14,6 +14,7 @@
 
 from .customer_gateway import CustomerGateway
 from .internet_gateway import InternetGateway
+from .nat_gateway import NatGateway
 from .network_acl import NetworkACL
 from .route_table import RouteTable
 from .subnet import Subnet
@@ -27,6 +28,7 @@ __all__ = [
     'VPC',
     'CustomerGateway',
     'InternetGateway',
+    'NatGateway',
     'NetworkACL',
     'RouteTable',
     'Subnet',

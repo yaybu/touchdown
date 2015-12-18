@@ -386,6 +386,10 @@ Defining routes
 
         A :py:class:`InternetGateway` resource.
 
+    .. attribute:: nat_gateway
+
+        A :py:class:`NatGateway` resource.
+
 
 Internet Gateway
 ----------------
@@ -414,3 +418,29 @@ Internet Gateway
         A dictionary of tags to associate with this VPC. A common use of tags
         is to group components by environment (e.g. "dev1", "staging", etc) or
         to map components to cost centres for billing purposes.
+
+
+NAT Gateway
+-----------
+
+.. currentmodule:: touchdown.aws.vpc.nat_gateway
+
+.. class:: NatGateway
+
+    An internet gateway is the AWS component that allows you connect a private VPC to the internet.
+
+    You can create a NAT gateway in any subnet::
+
+        nat_gateway = subnet.add_nat_gateway(
+            name='my-nat-gateway',
+        )
+
+    .. attribute:: name
+
+        The name of the gateway. This field is required.
+
+    .. attribute:: tags
+
+        A dictionary of tags to associate with this gateway. A common use of tags is to group components by environment (e.g. "dev1", "staging", etc) or to map components to cost centres for billing purposes.
+
+    .. attribute:: elastic_ip

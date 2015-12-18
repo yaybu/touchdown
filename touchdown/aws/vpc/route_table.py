@@ -17,6 +17,7 @@ from touchdown.core import argument, serializers
 
 from .vpc import VPC
 from .internet_gateway import InternetGateway
+from .nat_gateway import NatGateway
 from .vpn_gateway import VpnGateway
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 
@@ -27,6 +28,7 @@ class Route(Resource):
 
     destination_cidr = argument.IPNetwork(field="DestinationCidrBlock")
     internet_gateway = argument.Resource(InternetGateway, field="GatewayId")
+    nat_gateway = argument.Resource(NatGateway, field="NatGatewayId")
     ignore = argument.Boolean(default=False)
 
     # instance = argument.Resource(Instance, field="InstanceId")
