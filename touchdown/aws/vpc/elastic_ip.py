@@ -16,56 +16,49 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 
-from .subnet import Subnet
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
-from .elastic_ip import ElasticIp
 
+class ElasticIp(Resource):
 
-class NatGateway(Resource):
+    resource_name = "elastic_ip"
 
-    resource_name = "nat_gateway"
-
-    name = argument.Callable(lambda r: r.subnet.name)
-
-    elastic_ip = argument.Resource(
-        ElasticIp,
-        field="AllocationId",
-        serializer=serializers.Property("AllocationId"),
-    )
-
-    subnet = argument.Resource(
-        Subnet,
-        field="SubnetId",
-        serializer=serializers.Identifier(),
-    )
+    public_ip = argument.String(field="PublicIp")
 
 
 class Describe(SimpleDescribe, Plan):
 
-    resource = NatGateway
+    resource = ElasticIp
     service_name = 'ec2'
-    describe_action = "describe_nat_gateways"
-    describe_envelope = "NatGateways"
-    key = "NatGatewayId"
+    describe_action = "describe_addresses"
+    describe_envelope = "Addresses"
+    key = "AllocationId"
 
     def get_describe_filters(self):
-        subnet = self.runner.get_plan(self.resource.subnet)
-        if not subnet.resource_id:
+        if not self.resource.public_ip:
             return None
-
         return {
             "Filters": [
-                {"Name": "subnet-id", "Values": subnet.resource_id},
+                {"Name": "public-ip", "Values": self.resource.public_ip},
             ]
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_nat_gateway"
+    create_action = "allocate_address"
+
+    def get_create_serializer(self):
+        return serializers.Dict(
+            Domain='vpc',
+        )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_nat_gateway"
+    destroy_action = "release_address"
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            AllocationId=serializers.Property("AllocationId"),
+        )
