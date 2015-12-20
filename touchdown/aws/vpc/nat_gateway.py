@@ -24,8 +24,7 @@ class NatGateway(Resource):
 
     resource_name = "nat_gateway"
 
-    name = argument.String()
-    tags = argument.Dict()
+    name = argument.Callable(lambda r: r.subnet.name)
 
     elastic_ip = argument.Resource(
         ElasticIp,
@@ -53,17 +52,10 @@ class Describe(SimpleDescribe, Plan):
         if not subnet.resource_id:
             return None
 
-        if self.key in self.object:
-            return {
-                "Filters": [
-                    {'Name': 'nat-gateway-id', 'Values': [self.object[self.key]]}
-                ]
-            }
-
         return {
             "Filters": [
-                {'Name': 'tag:Name', 'Values': [self.resource.name]},
-            ],
+                {"Name": "subnet-id", "Values": subnet.resource_id},
+            ]
         }
 
 

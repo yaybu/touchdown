@@ -432,15 +432,11 @@ NAT Gateway
     You can create a NAT gateway in any subnet::
 
         nat_gateway = subnet.add_nat_gateway(
-            name='my-nat-gateway',
+            elastic_ip=....,
         )
 
     .. attribute:: name
 
-        The name of the gateway. This field is required.
-
-    .. attribute:: tags
-
-        A dictionary of tags to associate with this gateway. A common use of tags is to group components by environment (e.g. "dev1", "staging", etc) or to map components to cost centres for billing purposes.
+        You cannot assign a name to a NAT Gateway - it automatically inherits the name of the subnet it is placed in (i.e. its `Name` tag).
 
     .. attribute:: elastic_ip
