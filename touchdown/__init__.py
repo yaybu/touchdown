@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import touchdown.aws  # noqa
+import touchdown.config  # noqa
 import touchdown.local  # noqa
 import touchdown.provisioner  # noqa
 import touchdown.ssh  # noqa

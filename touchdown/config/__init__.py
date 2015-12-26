@@ -12,29 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .apply import Apply
-from .cost import Cost
-from .destroy import Destroy
-from .dot import Dot
-from .get_signin_url import GetSigninUrl
-from .rollback import Rollback
-from .scp import Scp
-from .set import Set
-from .snapshot import Snapshot
-from .ssh import Ssh
-from .tail import Tail
+from .ini import IniFile
+from .string import String
 
 
 __all__ = [
-    "Apply",
-    "Cost",
-    "Destroy",
-    "Dot",
-    "GetSigninUrl",
-    "Rollback",
-    "Set",
-    "Scp",
-    "Snapshot",
-    "Ssh",
-    "Tail",
+    "IniFile",
+    "String",
 ]

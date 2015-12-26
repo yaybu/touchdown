@@ -18,5 +18,5 @@ from .folder import LocalFolder
 
 __all__ = [
     "LocalFile",
-    "Folder",
+    "LocalFolder",
 ]
