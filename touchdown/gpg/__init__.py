@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import touchdown.aws  # noqa
-import touchdown.config  # noqa
-import touchdown.gpg  # noqa
-import touchdown.local  # noqa
-import touchdown.provisioner  # noqa
-import touchdown.ssh  # noqa
-import touchdown.goals  # noqa
-import touchdown.notifications  # noqa
+from .gpg import Gpg
+from .wrapper import Wrapper
 
-from touchdown.core import Workspace
 
 __all__ = [
-    "Workspace",
+    "Gpg",
+    "Wrapper",
 ]

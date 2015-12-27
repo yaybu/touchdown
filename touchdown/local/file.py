@@ -14,14 +14,14 @@
 
 import os
 
-from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors
+from touchdown.interfaces import File
 
 from .folder import LocalFolder
 
 
-class LocalFile(Resource):
+class LocalFile(File):
 
     resource_name = "file"
 

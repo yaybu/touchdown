@@ -30,8 +30,7 @@ from six.moves import configparser
 
 from touchdown.core.plan import Plan
 from touchdown.core import argument, resource
-
-from touchdown.local import LocalFile
+from touchdown.interfaces import File
 
 
 class IniFile(resource.Resource):
@@ -39,7 +38,7 @@ class IniFile(resource.Resource):
     resource_name = "ini_file"
 
     name = argument.String()
-    file = argument.Resource(LocalFile)
+    file = argument.Resource(File)
 
 
 class Describe(Plan):
