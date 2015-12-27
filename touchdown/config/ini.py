@@ -56,7 +56,7 @@ class Describe(Plan):
     def read(self):
         fp = self.runner.get_plan(self.resource.file)
         config = configparser.ConfigParser()
-        config.read(six.StringIO(fp.read()))
+        config.readfp(fp.read())
         return config
 
     def get_actions(self):

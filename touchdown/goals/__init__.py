@@ -16,6 +16,7 @@ from .apply import Apply
 from .cost import Cost
 from .destroy import Destroy
 from .dot import Dot
+from .get import Get
 from .get_signin_url import GetSigninUrl
 from .rollback import Rollback
 from .scp import Scp
@@ -30,6 +31,7 @@ __all__ = [
     "Cost",
     "Destroy",
     "Dot",
+    "Get",
     "GetSigninUrl",
     "Rollback",
     "Set",

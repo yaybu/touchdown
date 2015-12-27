@@ -25,6 +25,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from six.moves import configparser
+
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, resource
 
@@ -70,3 +72,22 @@ class Set(Plan):
             c.add_section(section)
         c.set(section, name, value)
         conf.write(c)
+
+
+class Get(Plan):
+
+    resource = String
+    name = "get"
+
+    def execute(self):
+        conf = self.runner.get_plan(self.resource.config)
+        if "." not in self.resource.name:
+            raise errors.Error("You didn't specify a section")
+        section, name = self.resource.name.rsplit(".", 1)
+        c = conf.read()
+        try:
+            return c.get(section, name)
+        except configparser.NoSectionError:
+            return self.resource.default
+        except configparser.NoOptionError:
+            return self.resource.default
