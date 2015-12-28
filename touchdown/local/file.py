@@ -16,7 +16,7 @@ import os
 
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors
-from touchdown.interfaces import File
+from touchdown.interfaces import File, FileNotFound
 
 from .folder import LocalFolder
 
@@ -41,7 +41,10 @@ class Describe(Plan):
         return []
 
     def read(self):
-        return open(self.resource.name, 'r')
+        try:
+            return open(self.resource.name, 'r')
+        except IOError:
+            raise FileNotFound(self.resource.name)
 
     def write(self, contents):
         with open(self.resource.name, 'w') as fp:

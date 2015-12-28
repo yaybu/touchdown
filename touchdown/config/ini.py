@@ -30,7 +30,7 @@ from six.moves import configparser
 
 from touchdown.core.plan import Plan
 from touchdown.core import argument, resource
-from touchdown.interfaces import File
+from touchdown.interfaces import File, FileNotFound
 
 
 class IniFile(resource.Resource):
@@ -55,7 +55,10 @@ class Describe(Plan):
     def read(self):
         fp = self.runner.get_plan(self.resource.file)
         config = configparser.ConfigParser()
-        config.readfp(fp.read())
+        try:
+            config.readfp(fp.read())
+        except FileNotFound:
+            pass
         return config
 
     def get_actions(self):

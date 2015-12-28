@@ -13,6 +13,11 @@
 # limitations under the License.
 
 from touchdown.core.resource import Resource
+from touchdown.core import errors
+
+
+class FileNotFound(errors.Error):
+    pass
 
 
 class File(Resource):
