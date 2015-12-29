@@ -14,9 +14,11 @@
 
 from .key import Key
 from .alias import Alias
+from .wrapper import Wrapper
 
 
 __all__ = [
     'Key',
     'Alias',
+    'Wrapper',
 ]

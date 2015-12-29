@@ -16,7 +16,7 @@ from botocore.exceptions import ClientError
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers
+from touchdown.core import argument, errors, serializers
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -41,6 +41,24 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = "Keys"
     describe_filters = {}
     key = 'KeyId'
+
+    def create_data_key(self, context=None):
+        response = self.client.generate_data_key(
+            KeyId=self.object['KeyId'],
+            KeySpec='AES_256',
+            EncryptionContext=context or {},
+        )
+        return response['Plaintext'], response['CipherBlob']
+
+    def decrypt_data_key(self, ciphertext_blob, context=None):
+        try:
+            response = self.client.decrypt(
+                CiphertextBlob=ciphertext_blob,
+                EncryptionContext=context or {},
+            )
+        except Exception as e:
+            raise errors.Error("Key decryption failed: {}".format(e))
+        return response['Plaintext']
 
     def describe_object_matches(self, key):
         try:
