@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import tarfile
 from six import StringIO
 
@@ -41,29 +42,32 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'kms'
     name = "describe"
 
+    signature = []
+
     def get_actions(self):
         return []
 
     def read(self):
         kms = self.runner.get_plan(self.resource.key)
         tar = tarfile.open(
-            self.runner.get_plan(self.resource.file).read(),
-            "r",
+            name='ffff',
+            fileobj=self.runner.get_plan(self.resource.file).read(),
+            mode="r",
         )
-        f = Fernet(kms.decrypt_data_key(tar.extractfile("key").read()))
+        f = Fernet(base64.urlsafe_b64encode(kms.decrypt_data_key(tar.extractfile("key").read())))
         return StringIO(f.decrypt(tar.extractfile("blob").read()))
 
     def write(self, c):
         kms = self.runner.get_plan(self.resource.key)
-        aes_key, aes_key_protected = kms.generate_data_key()
+        aes_key, aes_key_protected = kms.create_data_key()
         io = StringIO()
-        tar = tarfile.open(io, 'w')
+        tar = tarfile.open(name='xxxx', fileobj=io, mode='w')
 
         ti = tarfile.TarInfo('key')
         ti.size = len(aes_key_protected)
         tar.addfile(ti, StringIO(aes_key_protected))
 
-        f = Fernet(aes_key)
+        f = Fernet(base64.urlsafe_b64encode(aes_key))
         encrypted = f.encrypt(c)
 
         ti = tarfile.TarInfo('blob')

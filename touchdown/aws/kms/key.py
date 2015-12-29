@@ -43,12 +43,13 @@ class Describe(SimpleDescribe, Plan):
     key = 'KeyId'
 
     def create_data_key(self, context=None):
+        self.object = self.describe_object()
         response = self.client.generate_data_key(
             KeyId=self.object['KeyId'],
             KeySpec='AES_256',
             EncryptionContext=context or {},
         )
-        return response['Plaintext'], response['CipherBlob']
+        return response['Plaintext'], response['CiphertextBlob']
 
     def decrypt_data_key(self, ciphertext_blob, context=None):
         try:
