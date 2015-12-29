@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .key import Key
 from .alias import Alias
+from .grant import Grant
+from .key import Key
 from .wrapper import Wrapper
 
 
 __all__ = [
-    'Key',
     'Alias',
+    'Grant',
+    'Key',
     'Wrapper',
 ]

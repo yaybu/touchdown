@@ -26,7 +26,7 @@ class Key(Resource):
 
     resource_name = "key"
 
-    description = argument.String(max=8192, field="Description")
+    name = argument.String(max=8192, field="Description")
     usage = argument.String(choices=['ENCRYPT_DECRYPT'], default='ENCRYPT_DECRYPT', field='KeyUsage')
     policy = argument.Dict(field="Policy", serializer=serializers.Json())
 
@@ -67,7 +67,7 @@ class Describe(SimpleDescribe, Plan):
             if e.response['Error']['Code'] == 'AccessDeniedException':
                 return False
             raise
-        return metadata['Description'] == self.resource.description
+        return metadata['Description'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
