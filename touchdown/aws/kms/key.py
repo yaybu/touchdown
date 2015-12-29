@@ -67,14 +67,17 @@ class Describe(SimpleDescribe, Plan):
             if e.response['Error']['Code'] == 'AccessDeniedException':
                 return False
             raise
-        return metadata['Description'] == self.resource.name
+
+        if not metadata['KeyMetadata']['Enabled']:
+            return False
+
+        return metadata['KeyMetadata']['Description'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
 
     create_action = "create_key"
-
-    signature = []
+    create_envelope = "KeyMetadata"
 
     def update_object(self):
         for change in super(Apply, self).update_object():
