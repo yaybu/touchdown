@@ -26,16 +26,16 @@ restrict encryption and decryption by IAM policy.
 
     A key in the Amazon KMS service.
 
-    ..warning:: A key cannot be directly named.
-
-        Without a name there would be no way for touchdown to remember which
-        key it created previously (without out-of-band state). In order to
-        idempotently manage a key we effectively use the description
-        field as a name field.
-
-    .. attribute:: description
+    .. attribute:: name
 
         The description of the key. Must be at most 8192 characters.
+
+        ..warning:: A key cannot be directly named.
+
+            Without a name there would be no way for touchdown to remember which
+            key it created previously (without out-of-band state). In order to
+            idempotently manage a key we effectively use the description
+            field as a name field.
 
     .. attribute:: usage
 
@@ -58,3 +58,33 @@ restrict encryption and decryption by IAM policy.
     .. attribute:: key
 
         A :class:`Key` to point this alias at.
+
+
+.. class:: Grant
+
+    Grant access to a KMS key by AWS principal.
+
+    .. attribute:: name
+
+    .. attribute:: grantee_principal
+
+    .. attribute:: retiring_principal
+
+    .. attribute:: operations
+
+        Must be one or more of:
+
+            * ``Decrypt``
+            * ``Encrypt``
+            * ``GenerateDataKey``
+            * ``GenerateDataKeyWithoutPlaintext``
+            * ``ReEncryptFrom``
+            * ``ReEncryptTo``
+            * ``CreateGrant``
+            * ``RetireGrant``
+
+    .. attribute:: encryption_context
+
+    .. attribute:: encryption_context_subset
+
+    .. attribute:: grant_tokens
