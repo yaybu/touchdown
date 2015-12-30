@@ -105,17 +105,7 @@ class Goal(object):
         return collected
 
 
-class Describe(Goal):
-
-    name = "describe"
-
-    def get_plan_class(self, resource):
-        return resource.meta.plans.get("describe", plan.NullPlan)
-
-
 goals = GoalFactory()
 register = goals.register
 registered = goals.registered
 create = goals.create
-
-register(Describe)
