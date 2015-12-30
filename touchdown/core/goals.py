@@ -63,12 +63,18 @@ class Goal(object):
         raise NotImplementedError(self.get_plan_class)
 
     def get_plan(self, resource):
-        if resource not in self.resources:
-            klass = self.get_plan_class(resource)
-            plan = klass(self, resource)
-            plan.validate()
-            self.resources[resource] = plan
-        return self.resources[resource]
+        # FIXME: Deprecated
+        klass = self.get_plan_class(resource)
+        return self.get_service(resource, klass.name)
+
+    def get_service(self, resource, service):
+        service_key = (resource, service)
+        if service_key not in self.resources:
+            klass = resource.meta.get_plan(service)
+            service = klass(self, resource)
+            service.validate()
+            self.resources[service_key] = service
+        return self.resources[service_key]
 
     def get_execution_order(self):
         return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)

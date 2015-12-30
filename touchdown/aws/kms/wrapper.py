@@ -51,7 +51,7 @@ class Describe(SimpleDescribe, Plan):
         kms = self.runner.get_plan(self.resource.key)
         tar = tarfile.open(
             name='ffff',
-            fileobj=self.runner.get_plan(self.resource.file).read(),
+            fileobj=self.runner.get_service(self.resource.file, "describe").read(),
             mode="r",
         )
         f = Fernet(base64.urlsafe_b64encode(kms.decrypt_data_key(tar.extractfile("key").read())))
@@ -76,5 +76,5 @@ class Describe(SimpleDescribe, Plan):
 
         tar.close()
 
-        fp = self.runner.get_plan(self.resource.file)
+        fp = self.runner.get_service(self.resource.file, "describe")
         fp.write(io.getvalue())
