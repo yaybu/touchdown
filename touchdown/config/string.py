@@ -44,6 +44,10 @@ class String(resource.Resource):
 
     config = argument.Resource(IniFile)
 
+    @property
+    def value(self):
+        return self.property("Value")
+
 
 class Describe(Plan):
 
@@ -52,7 +56,7 @@ class Describe(Plan):
 
     def get_actions(self):
         self.object = {
-            "Value": "0",
+            "Value": self.runner.get_service(self, "get").execute(),
         }
         return []
 
@@ -91,3 +95,6 @@ class Get(Plan):
             return self.resource.default
         except configparser.NoOptionError:
             return self.resource.default
+
+
+argument.String.register_adapter(String, lambda r: r.value)

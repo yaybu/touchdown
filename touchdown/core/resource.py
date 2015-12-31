@@ -42,6 +42,7 @@ class Field(object):
             del instance._values[self.name]
 
     def clean_value(self, instance, value):
+        value = self.argument.adapt(value)
         try:
             value = self.argument.clean(instance, value)
             if hasattr(instance, "clean_{}".format(self.name)):

@@ -26,6 +26,7 @@ class Argument(object):
 
     default = None
     serializer = serializers.Identity()
+    adapters = {}
 
     def __init__(self, default=None, help=None, **kwargs):
         self.__doc__ = help
@@ -41,6 +42,19 @@ class Argument(object):
 
     def contribute_to_class(self, cls):
         pass
+
+    @classmethod
+    def register_adapter(cls, klass, callable):
+        cls.adapters.setdefault(cls, []).append(
+            (klass, callable),
+        )
+
+    @classmethod
+    def adapt(cls, value):
+        for klass, callable in cls.adapters.get(cls, []):
+            if isinstance(value, klass):
+                return callable(value)
+        return value
 
 
 class ReadOnly(Argument):
