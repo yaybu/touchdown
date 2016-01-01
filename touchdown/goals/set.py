@@ -50,6 +50,6 @@ class Set(Goal):
         settings = self.collect_as_dict("set")
         if name not in settings:
             raise errors.Error("No such setting '{}'".format(name))
-        settings[name].execute(value)
+        settings[name].execute(settings[name].from_string(value))
 
 register(Set)

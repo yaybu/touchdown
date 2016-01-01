@@ -1,4 +1,4 @@
-# Copyright 2015 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,33 @@ from touchdown.core import argument
 from . import variable
 
 
-class String(variable.Variable):
+class List(variable.Variable):
 
-    resource_name = "string"
+    resource_name = "list"
 
-    default = argument.String()
+    default = argument.List()
     min = argument.Integer()
     max = argument.Integer()
 
 
 class Set(variable.Set):
-    resource = String
+    resource = List
+
+    def from_string(self, value):
+        return value.split(",")
+
+    def to_lines(self, value):
+        return value
 
 
 class Get(variable.Get):
-    resource = String
+    resource = List
+
+    def to_string(self, value):
+        return ",".join(value)
+
+    def from_lines(self, value):
+        return value
 
 
-argument.String.register_adapter(String, lambda r: r.value)
+argument.List.register_adapter(List, lambda r: r.value)

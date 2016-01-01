@@ -44,6 +44,6 @@ class Get(Goal):
         settings = self.collect_as_dict("get")
         if name not in settings:
             raise errors.Error("No such setting '{}'".format(name))
-        print settings[name].execute()
+        print settings[name].to_string(settings[name].execute())
 
 register(Get)

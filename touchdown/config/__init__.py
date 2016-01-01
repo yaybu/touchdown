@@ -14,6 +14,7 @@
 
 from .ini import IniFile
 from .integer import Integer
+from .list import List
 from .string import String
 from .variable import Variable
 
@@ -21,6 +22,7 @@ from .variable import Variable
 __all__ = [
     "IniFile",
     "Integer",
+    "List",
     "String",
     "Variable",
 ]

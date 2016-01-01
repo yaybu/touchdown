@@ -20,24 +20,23 @@ class Integer(variable.Variable):
 
     resource_name = "integer"
 
-    name = argument.String()
-    default = argument.String()
-    min = argument.String()
-    max = argument.String()
+    default = argument.Integer()
+    min = argument.Integer()
+    max = argument.Integer()
 
 
-class Set(variable.Plan):
+class Set(variable.Set):
     resource = Integer
 
-    def to_string(self, value):
-        return str(value)
+    def to_lines(self, value):
+        return [str(value)]
 
 
-class Get(variable.Plan):
+class Get(variable.Get):
     resource = Integer
 
-    def from_string(self, value):
-        return int(value)
+    def from_lines(self, value):
+        return int(value[0])
 
 
 argument.Integer.register_adapter(Integer, lambda r: r.value)

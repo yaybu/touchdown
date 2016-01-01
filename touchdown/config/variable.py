@@ -25,10 +25,6 @@ class Variable(resource.Resource):
     resource_name = "variable"
 
     name = argument.String()
-    default = argument.String()
-    min = argument.String()
-    max = argument.String()
-
     config = argument.Resource(IniFile)
 
     @property
@@ -53,8 +49,8 @@ class Set(Plan):
     resource = Variable
     name = "set"
 
-    def to_string(self, value):
-        return value
+    def to_lines(self, value):
+        return [value]
 
     def execute(self, value):
         conf = self.runner.get_plan(self.resource.config)
@@ -64,7 +60,7 @@ class Set(Plan):
         c = conf.read()
         if not c.has_section(section):
             c.add_section(section)
-        c.set(section, name, self.to_string(value))
+        c.set(section, name, "\n".join(self.to_lines(value)))
         conf.write(c)
 
 
@@ -73,8 +69,9 @@ class Get(Plan):
     resource = Variable
     name = "get"
 
-    def from_string(self, value):
-        return value
+    def from_lines(self, value):
+        assert len(value) == 1
+        return value[0]
 
     def execute(self):
         conf = self.runner.get_plan(self.resource.config)
@@ -83,7 +80,7 @@ class Get(Plan):
         section, name = self.resource.name.rsplit(".", 1)
         c = conf.read()
         try:
-            return self.from_string(c.get(section, name))
+            return self.from_lines(c.get(section, name).splitlines())
         except configparser.NoSectionError:
             return self.resource.default
         except configparser.NoOptionError:

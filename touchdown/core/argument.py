@@ -116,7 +116,7 @@ class String(Argument):
             return value
 
         if not isinstance(value, (six.binary_type, six.text_type)):
-            raise errors.InvalidParameter("Value is not a string")
+            raise errors.InvalidParameter("Value {!r} is not a string".format(value))
 
         # Cast to native string type for this python version
         value = force_str(value)
@@ -222,7 +222,7 @@ class List(Argument):
 
     def clean(self, instance, value):
         if not isinstance(value, list):
-            raise errors.InvalidParameter("{} is not a list")
+            raise errors.InvalidParameter("{} is not a list".format(value))
         if not self.list_of:
             return value
         result = []
