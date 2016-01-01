@@ -42,7 +42,6 @@ class Field(object):
             del instance._values[self.name]
 
     def clean_value(self, instance, value):
-        value = self.argument.adapt(value)
         try:
             value = self.argument.clean(instance, value)
             if hasattr(instance, "clean_{}".format(self.name)):
@@ -56,6 +55,7 @@ class Field(object):
             self.delete_value(instance)
             return
 
+        value = self.argument.adapt(value)
         if isinstance(value, serializers.Serializer):
             for dep in value.dependencies(instance):
                 if dep != instance:
@@ -208,8 +208,8 @@ class Resource(six.with_metaclass(ResourceType)):
     def get_property(self, property_name):
         """ Returns a serializer that renders a property fetched by describing a remote resource """
         return serializers.Property(
-            serializers.Const(self),
             property_name,
+            serializers.Const(self),
         )
 
     def serializer_with_args(self, **kwargs):

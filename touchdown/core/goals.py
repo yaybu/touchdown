@@ -15,7 +15,7 @@
 from __future__ import division
 import os
 
-from . import dependencies, plan, map, errors
+from . import dependencies, map, errors
 from .cache import JSONFileCache
 
 

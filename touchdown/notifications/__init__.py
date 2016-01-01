@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .echo import EchoNotification
 from .slack import SlackNotification
 from .newrelic import NewRelicDeploymentNotification
 
 __all__ = [
+    "EchoNotification",
     "SlackNotification",
     "NewRelicDeploymentNotification",
 ]

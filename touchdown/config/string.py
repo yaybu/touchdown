@@ -46,7 +46,7 @@ class String(resource.Resource):
 
     @property
     def value(self):
-        return self.property("Value")
+        return self.get_property("Value")
 
 
 class Describe(Plan):
@@ -56,7 +56,7 @@ class Describe(Plan):
 
     def get_actions(self):
         self.object = {
-            "Value": self.runner.get_service(self, "get").execute(),
+            "Value": self.runner.get_service(self.resource, "get").execute(),
         }
         return []
 
