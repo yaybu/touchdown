@@ -85,3 +85,13 @@ class Get(Plan):
             return self.resource.default
         except configparser.NoOptionError:
             return self.resource.default
+
+
+class Refresh(Plan):
+
+    resource = Variable
+    name = "refresh"
+
+    def execute(self):
+        setter = self.runner.get_service(self.resource, "set")
+        setter.execute(self.resource.default)
