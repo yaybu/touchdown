@@ -14,6 +14,7 @@
 
 from six.moves import configparser
 
+from touchdown.core.action import Action
 from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, resource
 
@@ -25,6 +26,7 @@ class Variable(resource.Resource):
     resource_name = "variable"
 
     name = argument.String()
+    retain_default = argument.Boolean(default=False)
     config = argument.Resource(IniFile)
 
     @property
@@ -38,10 +40,35 @@ class Describe(Plan):
     name = "describe"
 
     def get_actions(self):
+        val, user_set = self.runner.get_service(self.resource, "get").execute()
         self.object = {
-            "Value": self.runner.get_service(self.resource, "get").execute(),
+            "Value": val,
+            "UserSet": user_set,
         }
         return []
+
+
+class ApplyAction(Action):
+
+    @property
+    def description(self):
+        yield "Generate and store setting {!r}".format(self.resource.name)
+
+    def run(self):
+        self.runner.get_service(self.resource, "set").execute(
+            self.resource.default,
+        )
+
+
+class Apply(Plan):
+
+    resource = Variable
+    name = "apply"
+
+    def get_actions(self):
+        val, user_set = self.runner.get_service(self.resource, "get").execute()
+        if not user_set and self.resource.retain_default:
+            yield ApplyAction(self)
 
 
 class Set(Plan):
@@ -80,11 +107,11 @@ class Get(Plan):
         section, name = self.resource.name.rsplit(".", 1)
         c = conf.read()
         try:
-            return self.from_lines(c.get(section, name).splitlines())
+            return self.from_lines(c.get(section, name).splitlines()), True
         except configparser.NoSectionError:
-            return self.resource.default
+            return self.resource.default, False
         except configparser.NoOptionError:
-            return self.resource.default
+            return self.resource.default, False
 
 
 class Refresh(Plan):

@@ -44,6 +44,11 @@ class Get(Goal):
         settings = self.collect_as_dict("get")
         if name not in settings:
             raise errors.Error("No such setting '{}'".format(name))
-        print settings[name].to_string(settings[name].execute())
+        val, user_set = settings[name].to_string(settings[name].execute())
+
+        if user_set:
+            print "{} (overriden by user)".format(val)
+        else:
+            print "{} (default value)".format(val)
 
 register(Get)

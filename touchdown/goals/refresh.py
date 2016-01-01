@@ -47,4 +47,4 @@ class Refresh(Goal):
         settings[name].execute()
 
 
-register(Get)
+register(Refresh)

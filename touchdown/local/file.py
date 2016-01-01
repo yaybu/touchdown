@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 from touchdown.core.plan import Plan
-from touchdown.core import argument, errors
+from touchdown.core import argument
 from touchdown.interfaces import File, FileNotFound
 
 from .folder import LocalFolder
@@ -36,8 +34,6 @@ class Describe(Plan):
     name = "describe"
 
     def get_actions(self):
-        if not os.path.isfile(os.path.join(self.resource.folder.name, self.resource.name)):
-            raise errors.NotFound("'{}' could not be found, or is not a file".format(self.resource))
         return []
 
     def read(self):
