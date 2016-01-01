@@ -1,4 +1,4 @@
-# Copyright 2015 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@ from touchdown.core import argument
 from . import variable
 
 
-class String(variable.Variable):
+class Integer(variable.Variable):
 
-    resource_name = "string"
+    resource_name = "integer"
 
     name = argument.String()
     default = argument.String()
@@ -27,11 +27,17 @@ class String(variable.Variable):
 
 
 class Set(variable.Plan):
-    resource = String
+    resource = Integer
+
+    def to_string(self, value):
+        return str(value)
 
 
 class Get(variable.Plan):
-    resource = String
+    resource = Integer
+
+    def from_string(self, value):
+        return int(value)
 
 
-argument.String.register_adapter(String, lambda r: r.value)
+argument.Integer.register_adapter(Integer, lambda r: r.value)

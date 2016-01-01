@@ -43,8 +43,8 @@ class SubCommand(object):
         return args, kwargs
 
     def __call__(self, args):
-        self.workspace.load()
         try:
+            self.workspace.load()
             g = self.goal(
                 self.workspace,
                 self.console,

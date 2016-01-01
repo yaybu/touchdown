@@ -115,9 +115,8 @@ class String(Argument):
         if value is None:
             return value
 
-        # Automatically cast integers, etc to string
         if not isinstance(value, (six.binary_type, six.text_type)):
-            value = str(value)
+            raise errors.InvalidParameter("Value is not a string")
 
         # Cast to native string type for this python version
         value = force_str(value)
