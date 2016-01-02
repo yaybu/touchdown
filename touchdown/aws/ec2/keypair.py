@@ -12,12 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+
 from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present
-from touchdown.core import argument
+from touchdown.core.plan import Plan, Present, XOR
+from touchdown.core import argument, serializers
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+
+
+class PublicKeyFromPrivateKey(serializers.Formatter):
+
+    def render(self, runner, value):
+        private_key = serialization.load_pem_private_key(
+            value,
+            password=None,
+            backend=default_backend(),
+        )
+        return private_key.public_key().public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
 
 
 class KeyPair(Resource):
@@ -25,7 +42,12 @@ class KeyPair(Resource):
     resource_name = "keypair"
 
     name = argument.String(field="KeyName")
+
     public_key = argument.String(field="PublicKeyMaterial")
+    private_key = argument.String(
+        field="PublicKeyMaterial",
+        serializer=PublicKeyFromPrivateKey(),
+    )
 
     account = argument.Resource(BaseAccount)
 
@@ -50,7 +72,10 @@ class Apply(SimpleApply, Describe):
 
     signature = (
         Present("name"),
-        Present("public_key"),
+        XOR(
+            Present("public_key"),
+            Present("private_key"),
+        ),
     )
 
 
