@@ -354,3 +354,6 @@ class ResourceList(List):
                 return
             self.list_of.resource_class = ResourceType.__all_resources__[resource_class]
         super(ResourceList, self).contribute_to_class(cls)
+
+
+String.register_adapter(int, str)
