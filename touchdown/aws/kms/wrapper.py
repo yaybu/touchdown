@@ -21,7 +21,6 @@ from cryptography.fernet import Fernet
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 from touchdown.interfaces import File
-from ..common import SimpleDescribe
 
 from .key import Key
 
@@ -36,7 +35,7 @@ class Wrapper(File):
     key = argument.Resource(Key)
 
 
-class Describe(SimpleDescribe, Plan):
+class Describe(Plan):
 
     resource = Wrapper
     service_name = 'kms'
