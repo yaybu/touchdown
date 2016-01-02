@@ -18,7 +18,7 @@ import tempfile
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import errors
+from touchdown.core import argument, errors, serializers
 
 
 class FileNotFound(errors.Error):
@@ -88,3 +88,48 @@ class Edit(Plan):
         contents, changed = self.edit(f.read().read())
         if changed:
             f.write(contents)
+
+
+class Set(Plan):
+
+    resource = File
+    name = "set"
+
+    def execute(self, value):
+        f = self.runner.get_service(self.resource, "describe")
+        f.write(value)
+
+
+class Get(Plan):
+
+    resource = File
+    name = "get"
+
+    def execute(self):
+        f = self.runner.get_service(self.resource, "describe")
+        return f.read().read()
+
+
+#class Refresh(Plan):
+#
+#    resource = File
+#    name = "refresh"
+#
+#    def execute(self):
+#        setter = self.runner.get_service(self.resource, "set")
+#        setter.execute(self.resource.default)
+
+
+class FileAsString(serializers.Serializer):
+
+    def __init__(self, resource):
+        self.resource = resource
+
+    def render(self, runner, object):
+        return runner.get_service(self.resource, "get").execute()
+
+    def dependencies(self, object):
+        return frozenset((self.resource, ))
+
+
+argument.String.register_adapter(File, lambda r: FileAsString(r))
