@@ -4,7 +4,61 @@ Changelog for Touchdown
 0.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for read and write operations against local files::
+
+    folder = workspace.add_local_folder(name=os.getcwd())
+    local_file = folder.add_file(name='production.cfg')
+
+- The contents of any file can be assigned to any string argument. For
+  example::
+
+      aws.add_keypair(
+          name='my-keypair',
+          public_key=folder.add_file(name='production.pub'),
+      )
+
+- Add support for GPG encryption. This layers upon the local file system
+  abstraction::
+
+    gpg = workspace.add_gpg()
+    local_file = gpg.add_cipher(file=local_file)
+
+- Add integration between Amazon KMS and the local file system abstraction::
+
+    kms = aws.add_key(name='my-deployment-key')
+    local_file = kms.add_cipher(file=local_file)
+
+- Add support for Amazon KMS Grants.
+
+- Add a ``touchdown edit`` command that can transparently decrypt, fire up
+  ``$EDITOR`` and then re-encrypt a file wrapped in GPG or KMS encryption.
+
+- Add a mechanism for ConfParser backed configuration that is mapped to
+  touchdowns resource system::
+
+    conf = local_file.add_config()
+    asg_min = conf.add_string(
+        name='scaling.web.min',
+        default=1,
+        min=0,
+        max=1,
+    )
+
+    web_asg = aws.add_auto_scaling_group(
+        name='web',
+        min=asg_min,
+    )
+
+- Add new commands for managing tunable configuration values:
+
+    * ``touchdown get`` - see the current state of a variable
+    * ``touchdown set`` - set a new value for a variable
+    * ``touchdown refresh`` - reset a variable to its default (can be used to rotate a secret key)
+
+- EC2 KeyPair's can be created from a `private_key` or a `public_key` (in the
+  case where a private key is provided touchdown will generate a new public key
+  and use that directly). This is to make it easier for the key to be generated
+  and rotated by touchdown.
 
 
 0.4.0 (2016-01-08)
