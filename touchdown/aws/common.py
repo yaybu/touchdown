@@ -441,11 +441,18 @@ class SimpleDestroy(SimpleDescribe):
                 self.waiter,
             )
 
+    def can_delete(self):
+        return True
+
     def get_actions(self):
         self.object = self.describe_object()
 
         if not self.object:
             logger.debug("Resource '{}' not found - assuming already destroyed".format(self.resource))
+            return
+
+        if not self.can_delete():
+            logger.debug("Resource '{}' cannot be deleted".format(self.resource))
             return
 
         for action in self.destroy_object():

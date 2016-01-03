@@ -10,6 +10,7 @@ It can push notifications to:
 
  * HTTP endpoints
  * Amazon SQS :class:`~touchdown.aws.sqs.Queue`'s
+ * Amazon Lambda :class:`~touchdown.aws.lambda_.Function`'s
  * SMS text messages
  * E-mail
  * Apple, Android, Fire OS and Window devices
@@ -46,6 +47,7 @@ Messages published to SNS are stored redundantly to prevent messages being lost.
         of:
 
             * :class:`~touchdown.aws.sqs.Queue`
+            * :class:`~touchdown.aws.lambda_.Function`
 
     .. attribute:: display_name
 

@@ -43,6 +43,33 @@ class Argument(object):
         pass
 
 
+class ReadOnly(Argument):
+
+    def clean(self, value):
+        raise errors.InvalidParameter("This argument is read-only")
+
+
+class Callable(ReadOnly):
+
+    def __init__(self, func):
+        self.func = func
+
+    def get_default(self, instance):
+        return self.func(instance)
+
+
+class Output(ReadOnly):
+
+    def __init__(self, propname):
+        self.propname = propname
+
+    def get_default(self, instance):
+        return serializers.Context(
+            instance,
+            serializers.Property(self.propname),
+        )
+
+
 class Boolean(Argument):
 
     """ Represents a boolean. "1", "yes", "on" and "true" are all considered
@@ -144,6 +171,16 @@ class IPNetwork(String):
         if value != str(network.cidr):
             raise errors.InvalidParameter("{} looks wrong - did you mean {}?".format(value, network.cidr))
         return network
+
+
+class Function(Argument):
+
+    serializer = None
+
+    def clean(self, instance, value):
+        if not callable(value):
+            raise errors.InvalidParameter("{} is not callable".format(value))
+        return value
 
 
 class Dict(Argument):
@@ -296,8 +333,8 @@ class ResourceList(List):
         resource_class = self.list_of.resource_class
         if isinstance(resource_class, six.string_types):
             from .resource import ResourceType
-            if self.resource_class not in ResourceType.__all_resources__:
+            if resource_class not in ResourceType.__all_resources__:
                 ResourceType.add_callback(resource_class, self.contribute_to_class, cls)
                 return
-            self.list_of.resource_class = ResourceType.__all_resources__[self.resource_class]
+            self.list_of.resource_class = ResourceType.__all_resources__[resource_class]
         super(ResourceList, self).contribute_to_class(cls)

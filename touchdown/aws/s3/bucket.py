@@ -21,6 +21,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 from touchdown.core.errors import InvalidParameter
+from touchdown.core.diff import DiffSet
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -41,6 +42,10 @@ class CorsRule(Resource):
 class Bucket(Resource):
 
     resource_name = "bucket"
+
+    arn = argument.Callable(
+        lambda instance: "arn:aws:s3:::{}".format(instance.name),
+    )
 
     name = argument.String(field="Bucket")
 
@@ -70,8 +75,14 @@ class Bucket(Resource):
     )
 
     rules = argument.ResourceList(CorsRule)
-
     policy = argument.String()
+
+    notify_lambda = argument.ResourceList(
+        'touchdown.aws.lambda_.s3.S3LambdaNotification',
+        field="LambdaFunctionConfigurations",
+        serializer=serializers.List(serializers.Resource()),
+        group="notifications",
+    )
 
     account = argument.Resource(BaseAccount)
 
@@ -128,6 +139,37 @@ class Apply(SimpleApply, Describe):
             return {}
         return json.loads(remote)
 
+    def get_remote_notification_config(self):
+        return self.client.get_bucket_notification_configuration(
+            Bucket=self.resource.name,
+        )
+
+    def update_notification_config(self):
+        local_s = serializers.Default(
+            serializers.Resource(group="notifications"),
+            serializers.Const({}),
+        )
+        local = local_s.render(
+            self.runner,
+            self.resource,
+        )
+
+        update_notifications = False
+        if local and not self.object:
+            update_notifications = True
+        elif self.object:
+            remote = self.get_remote_notification_config()
+            d = DiffSet(self.runner, self.resource, remote, group="notifications")
+            update_notifications = not d.matches()
+
+        if update_notifications:
+            yield self.generic_action(
+                "Update notification configuration",
+                self.client.put_bucket_notification_configuration,
+                Bucket=self.resource.name,
+                NotificationConfiguration=local_s,
+            )
+
     def update_object(self):
         update_cors = False
         if not self.object and self.resource.rules:
@@ -161,6 +203,9 @@ class Apply(SimpleApply, Describe):
                 Bucket=self.resource.name,
                 Policy=self.resource.policy,
             )
+
+        for action in self.update_notification_config():
+            yield action
 
 
 class Destroy(SimpleDestroy, Describe):

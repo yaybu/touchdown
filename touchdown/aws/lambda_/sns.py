@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .bucket import Bucket
-from .file import File
-from .folder import Folder
-from .notification_configuration import NotificationConfiguration
+from touchdown.core import serializers
+from touchdown.aws import sns
+from .function import Function
 
 
-__all__ = [
-    'Bucket',
-    'File',
-    'Folder',
-    'NotificationConfiguration',
-]
+class Subscription(sns.Subscription):
+
+    """ Adapts a Lambda Function into a Subscription """
+
+    input = Function
+
+    def get_serializer(self, runner, **kwargs):
+        return serializers.Dict(
+            Protocol=serializers.Const("lambda"),
+            Endpoint=self.adapts.arn,
+            TopicArn=kwargs['TopicArn'],
+        )

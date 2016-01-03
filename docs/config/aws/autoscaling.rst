@@ -115,8 +115,8 @@ Defining what to launch
     .. attribute:: placement_tenancy
 
 
-Dynamcing scaling based on CloudWatch
--------------------------------------
+Dynamic scaling based on CloudWatch
+-----------------------------------
 
 In this example we use a metric that will be populated by our application. It
 contains the length of a task queue::

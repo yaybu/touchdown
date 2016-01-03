@@ -15,6 +15,7 @@
 from . import (
     account,
     vpc,
+    apigateway,
     ec2,
     cloudfront,
     cloudwatch,
@@ -25,6 +26,7 @@ from . import (
     elb,
     iam,
     kms,
+    lambda_,
     logs,
     rds,
     route53,
@@ -38,6 +40,7 @@ from . import (
 __all__ = [
     'account',
     'vpc',
+    'apigateway',
     'ec2',
     'cloudfront',
     'cloudwatch',
@@ -48,6 +51,7 @@ __all__ = [
     'elb',
     'iam',
     'kms',
+    'lambda_',
     'logs',
     'rds',
     'route53',

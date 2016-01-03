@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2015 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .bucket import Bucket
-from .file import File
-from .folder import Folder
-from .notification_configuration import NotificationConfiguration
+from .deployment import Deployment
+from .integration import Integration
+from .integration_response import IntegrationResponse
+from .method import Method
+from .method_response import MethodResponse
+from .model import Model
+from .resource import Resource
+from .rest_api import RestApi
+from .stage import Stage
 
 
 __all__ = [
-    'Bucket',
-    'File',
-    'Folder',
-    'NotificationConfiguration',
+    "Deployment",
+    "Integration",
+    "IntegrationResponse",
+    "Method",
+    "MethodResponse",
+    "Model",
+    "Resource",
+    "RestApi",
+    "Stage",
 ]

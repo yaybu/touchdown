@@ -27,6 +27,8 @@ class Role(Resource):
 
     resource_name = "role"
 
+    arn = argument.Output("Arn")
+
     name = argument.String(field="RoleName")
     path = argument.String(field='Path')
     assume_role_policy = argument.Dict(field="AssumeRolePolicyDocument", serializer=serializers.Json())

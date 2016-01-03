@@ -37,7 +37,8 @@ Getting started
 
  * **Tutorial:**
    :doc:`Hello world <tutorial/hello_world>` |
-   :doc:`Django <tutorial/django>`
+   :doc:`Django <tutorial/django>` |
+   :doc:`Handling S3 Events with Lambda <tutorial/s3_events_with_lambda>`
 
 
 Resources
@@ -46,12 +47,14 @@ Resources
  * **Amazon:**
    :doc:`Authentication <config/aws/authentication>` |
    :doc:`Autoscaling <config/aws/autoscaling>` |
+   :doc:`Building serverless API's <config/aws/apigateway>` |
    :doc:`CDN <config/aws/cloudfront>` |
    :doc:`Compute <config/aws/ec2>` |
    :doc:`DNS <config/aws/route53>` |
    :doc:`Encryption Key Management <config/aws/kms>` |
    :doc:`Key Value Stores <config/aws/elasticache>` |
    :doc:`Identity & Access Management <config/aws/iam>` |
+   :doc:`Lambda zero-admin compute <config/aws/lambda>` |
    :doc:`Load Balancing <config/aws/elb>` |
    :doc:`Monitoring <config/aws/cloudwatch>` |
    :doc:`Networking <config/aws/vpc>` |
