@@ -35,29 +35,26 @@ class Wrapper(File):
     key = argument.Resource(Key)
 
 
-class Describe(Plan):
+class FileIo(Plan):
 
     resource = Wrapper
     service_name = 'kms'
-    name = "describe"
+    name = "fileio"
 
     signature = []
 
-    def get_actions(self):
-        return []
-
     def read(self):
-        kms = self.runner.get_plan(self.resource.key)
+        kms = self.runner.get_service(self.resource.key, "describe")
         tar = tarfile.open(
             name='ffff',
-            fileobj=self.runner.get_service(self.resource.file, "describe").read(),
+            fileobj=self.runner.get_service(self.resource.file, "fileio").read(),
             mode="r",
         )
         f = Fernet(base64.urlsafe_b64encode(kms.decrypt_data_key(tar.extractfile("key").read())))
         return StringIO(f.decrypt(tar.extractfile("blob").read()))
 
     def write(self, c):
-        kms = self.runner.get_plan(self.resource.key)
+        kms = self.runner.get_service(self.resource.key, "describe")
         aes_key, aes_key_protected = kms.create_data_key()
         io = StringIO()
         tar = tarfile.open(name='xxxx', fileobj=io, mode='w')
@@ -75,5 +72,5 @@ class Describe(Plan):
 
         tar.close()
 
-        fp = self.runner.get_service(self.resource.file, "describe")
+        fp = self.runner.get_service(self.resource.file, "fileio")
         fp.write(io.getvalue())

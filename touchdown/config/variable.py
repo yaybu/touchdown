@@ -16,7 +16,7 @@ from six.moves import configparser
 
 from touchdown.core.action import Action
 from touchdown.core.plan import Plan
-from touchdown.core import argument, errors, resource
+from touchdown.core import argument, errors, resource, serializers
 
 from . import IniFile
 
@@ -28,10 +28,6 @@ class Variable(resource.Resource):
     name = argument.String()
     retain_default = argument.Boolean(default=False)
     config = argument.Resource(IniFile)
-
-    @property
-    def value(self):
-        return self.get_property("Value")
 
 
 class Describe(Plan):
@@ -76,11 +72,14 @@ class Set(Plan):
     resource = Variable
     name = "set"
 
+    def from_string(self, value):
+        return value
+
     def to_lines(self, value):
         return [value]
 
     def execute(self, value):
-        conf = self.runner.get_plan(self.resource.config)
+        conf = self.runner.get_service(self.resource.config, "describe")
         if "." not in self.resource.name:
             raise errors.Error("You didn't specify a section")
         section, name = self.resource.name.rsplit(".", 1)
@@ -96,12 +95,15 @@ class Get(Plan):
     resource = Variable
     name = "get"
 
+    def to_string(self, value):
+        return str(value)
+
     def from_lines(self, value):
         assert len(value) == 1
         return value[0]
 
     def execute(self):
-        conf = self.runner.get_plan(self.resource.config)
+        conf = self.runner.get_service(self.resource.config, "describe")
         if "." not in self.resource.name:
             raise errors.Error("You didn't specify a section")
         section, name = self.resource.name.rsplit(".", 1)
@@ -122,3 +124,15 @@ class Refresh(Plan):
     def execute(self):
         setter = self.runner.get_service(self.resource, "set")
         setter.execute(self.resource.default)
+
+
+class VariableAsString(serializers.Serializer):
+
+    def __init__(self, resource):
+        self.resource = resource
+
+    def render(self, runner, object):
+        return runner.get_service(self.resource, "get").execute()
+
+    def dependencies(self, object):
+        return frozenset((self.resource, ))

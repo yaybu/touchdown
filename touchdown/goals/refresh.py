@@ -20,7 +20,7 @@ class Refresh(Goal):
 
     """ Replace a configuration variable with its default setting """
 
-    name = "get"
+    name = "refresh"
     mutator = False
 
     def get_plan_class(self, resource):

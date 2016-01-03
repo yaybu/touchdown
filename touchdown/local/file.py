@@ -28,13 +28,10 @@ class LocalFile(File):
     folder = argument.Resource(LocalFolder)
 
 
-class Describe(Plan):
+class FileIo(Plan):
 
     resource = LocalFile
-    name = "describe"
-
-    def get_actions(self):
-        return []
+    name = "fileio"
 
     def read(self):
         try:

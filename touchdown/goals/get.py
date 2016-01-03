@@ -26,8 +26,6 @@ class Get(Goal):
     def get_plan_class(self, resource):
         plan_class = resource.meta.get_plan("get")
         if not plan_class:
-            plan_class = resource.meta.get_plan("describe")
-        if not plan_class:
             plan_class = resource.meta.get_plan("null")
         return plan_class
 
@@ -44,11 +42,12 @@ class Get(Goal):
         settings = self.collect_as_dict("get")
         if name not in settings:
             raise errors.Error("No such setting '{}'".format(name))
-        val, user_set = settings[name].to_string(settings[name].execute())
+        val, user_set = settings[name].execute()
+        val = settings[name].to_string(val)
 
         if user_set:
-            print "{} (overriden by user)".format(val)
+            print("{} (overriden by user)".format(val))
         else:
-            print "{} (default value)".format(val)
+            print("{} (default value)".format(val))
 
 register(Get)

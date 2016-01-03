@@ -39,4 +39,4 @@ class Get(variable.Get):
         return int(value[0])
 
 
-argument.Integer.register_adapter(Integer, lambda r: r.value)
+argument.Integer.register_adapter(Integer, variable.VariableAsString)

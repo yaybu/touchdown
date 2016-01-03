@@ -34,13 +34,13 @@ class Describe(Plan):
     name = "describe"
 
     def write(self, c):
-        fp = self.runner.get_plan(self.resource.file)
+        fp = self.runner.get_service(self.resource.file, "fileio")
         s = six.StringIO()
         c.write(s)
         fp.write(s.getvalue())
 
     def read(self):
-        fp = self.runner.get_plan(self.resource.file)
+        fp = self.runner.get_service(self.resource.file, "fileio")
         config = configparser.ConfigParser()
         try:
             config.readfp(fp.read())

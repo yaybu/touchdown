@@ -33,4 +33,4 @@ class Get(variable.Get):
     resource = String
 
 
-argument.String.register_adapter(String, lambda r: r.value)
+argument.String.register_adapter(String, variable.VariableAsString)

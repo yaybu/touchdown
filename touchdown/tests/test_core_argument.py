@@ -33,7 +33,7 @@ class TestArguments(unittest.TestCase):
         self.assertEqual(argument.Boolean().clean(None, "false"), False)
 
     def test_string(self):
-        self.assertEqual(argument.String().clean(None, 0), "0")
+        self.assertEqual(argument.String().clean(None, "0"), "0")
 
     def test_string_none(self):
         self.assertEqual(argument.String().clean(None, None), None)

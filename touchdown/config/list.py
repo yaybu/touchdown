@@ -45,4 +45,4 @@ class Get(variable.Get):
         return value
 
 
-argument.List.register_adapter(List, lambda r: r.value)
+argument.List.register_adapter(List, variable.VariableAsString)

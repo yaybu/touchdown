@@ -31,25 +31,22 @@ class Wrapper(File):
     gpg = argument.Resource(Gpg)
 
 
-class Describe(Plan):
+class FileIo(Plan):
 
     resource = Wrapper
-    name = "describe"
-
-    def get_actions(self):
-        return []
+    name = "fileio"
 
     def read(self):
-        fp = self.runner.get_plan(self.resource.file)
-        gpg = self.runner.get_plan(self.resource.gpg).get_gnupg()
+        fp = self.runner.get_service(self.resource.file, "fileio")
+        gpg = self.runner.get_service(self.resource.gpg, "describe").get_gnupg()
         return StringIO(gpg.decrypt_file(
             fp.read(),
             passphrase=self.resource.gpg.passphrase,
         ))
 
     def write(self, c):
-        fp = self.runner.get_plan(self.resource.file)
-        gpg = self.runner.get_plan(self.resource.gpg).get_gnupg()
+        fp = self.runner.get_service(self.resource.file, "fileio")
+        gpg = self.runner.get_service(self.resource.gpg, "describe").get_gnupg()
         fp.write(str(gpg.encrypt(
             c,
             recipients=self.resource.gpg.recipients,

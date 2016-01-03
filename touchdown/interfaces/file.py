@@ -84,7 +84,7 @@ class Edit(Plan):
             os.unlink(name)
 
     def execute(self):
-        f = self.runner.get_service(self.resource, "describe")
+        f = self.runner.get_service(self.resource, "fileio")
         contents, changed = self.edit(f.read().read())
         if changed:
             f.write(contents)
@@ -96,7 +96,7 @@ class Set(Plan):
     name = "set"
 
     def execute(self, value):
-        f = self.runner.get_service(self.resource, "describe")
+        f = self.runner.get_service(self.resource, "fileio")
         f.write(value)
 
 
@@ -106,11 +106,11 @@ class Get(Plan):
     name = "get"
 
     def execute(self):
-        f = self.runner.get_service(self.resource, "describe")
+        f = self.runner.get_service(self.resource, "fileio")
         return f.read().read()
 
 
-#class Refresh(Plan):
+# class Refresh(Plan):
 #
 #    resource = File
 #    name = "refresh"
@@ -126,7 +126,7 @@ class FileAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, "get").execute()
+        return runner.get_service(self.resource, "fileio").read()
 
     def dependencies(self, object):
         return frozenset((self.resource, ))
