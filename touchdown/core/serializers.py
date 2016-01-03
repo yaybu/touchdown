@@ -405,3 +405,9 @@ class Context(Serializer):
 
     def dependencies(self, object):
         return self.inner.dependencies(object).union(self.serializer.dependencies(object))
+
+
+def maybe(val):
+    if not isinstance(value, Serializer):
+        return Const(value)
+    return val

@@ -51,9 +51,10 @@ class ApplyAction(Action):
         yield "Generate and store setting {!r}".format(self.resource.name)
 
     def run(self):
-        self.runner.get_service(self.resource, "set").execute(
-            self.resource.default,
+        default = serialize.maybe(self.resource.default).render(
+            self.runner, self.resource
         )
+        self.runner.get_service(self.resource, "set").execute(default)
 
 
 class Apply(Plan):
@@ -108,12 +109,15 @@ class Get(Plan):
             raise errors.Error("You didn't specify a section")
         section, name = self.resource.name.rsplit(".", 1)
         c = conf.read()
+
         try:
             return self.from_lines(c.get(section, name).splitlines()), True
-        except configparser.NoSectionError:
-            return self.resource.default, False
-        except configparser.NoOptionError:
-            return self.resource.default, False
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            default = serializers.maybe(self.resource.default).render(
+                self.runner,
+                self.resource,
+            )
+            return default, False
 
 
 class Refresh(Plan):
