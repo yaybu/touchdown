@@ -17,6 +17,7 @@ from six import StringIO
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 from touchdown.interfaces import File
+from touchdown.core.utils import force_bytes
 
 from .gpg import Gpg
 
@@ -39,16 +40,17 @@ class FileIo(Plan):
     def read(self):
         fp = self.runner.get_service(self.resource.file, "fileio")
         gpg = self.runner.get_service(self.resource.gpg, "describe").get_gnupg()
-        return StringIO(gpg.decrypt_file(
-            fp.read(),
+        result = str(gpg.decrypt(
+            force_bytes(fp.read().read()),
             passphrase=self.resource.gpg.passphrase,
         ))
+        return StringIO(result)
 
     def write(self, c):
         fp = self.runner.get_service(self.resource.file, "fileio")
         gpg = self.runner.get_service(self.resource.gpg, "describe").get_gnupg()
         fp.write(str(gpg.encrypt(
-            c,
+            force_bytes(c),
             recipients=self.resource.gpg.recipients,
             symmetric=self.resource.gpg.symmetric,
             passphrase=self.resource.gpg.passphrase,

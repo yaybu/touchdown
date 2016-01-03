@@ -51,7 +51,7 @@ class ApplyAction(Action):
         yield "Generate and store setting {!r}".format(self.resource.name)
 
     def run(self):
-        default = serialize.maybe(self.resource.default).render(
+        default = serializers.maybe(self.resource.default).render(
             self.runner, self.resource
         )
         self.runner.get_service(self.resource, "set").execute(default)

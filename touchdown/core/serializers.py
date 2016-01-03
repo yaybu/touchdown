@@ -408,6 +408,6 @@ class Context(Serializer):
 
 
 def maybe(val):
-    if not isinstance(value, Serializer):
-        return Const(value)
+    if not isinstance(val, Serializer):
+        return Const(val)
     return val

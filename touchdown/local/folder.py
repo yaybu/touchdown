@@ -27,6 +27,9 @@ class LocalFolder(Resource):
     name = argument.String()
     root = argument.Resource(Workspace)
 
+    def clean_name(self, name):
+        return os.path.abspath(os.path.expanduser(name))
+
 
 class Describe(Plan):
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 from touchdown.interfaces import File, FileNotFound
@@ -24,7 +26,7 @@ class LocalFile(File):
     resource_name = "file"
 
     name = argument.String()
-    # path = argument.Computed(lambda r: os.path.join(r.folder.name, r.name))
+    path = argument.Callable(lambda r: os.path.join(r.folder.name, r.name))
     folder = argument.Resource(LocalFolder)
 
 
@@ -35,10 +37,10 @@ class FileIo(Plan):
 
     def read(self):
         try:
-            return open(self.resource.name, 'r')
+            return open(self.resource.path, 'r')
         except IOError:
-            raise FileNotFound(self.resource.name)
+            raise FileNotFound(self.resource.path)
 
     def write(self, contents):
-        with open(self.resource.name, 'w') as fp:
+        with open(self.resource.path, 'w') as fp:
             fp.write(contents)
