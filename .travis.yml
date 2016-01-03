@@ -3,7 +3,10 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
-  - "pypy"
+  - "3.5"
+
+# The version of pypy on Travis is too old for cryptography
+#  - "pypy"
 
 sudo: false
 
