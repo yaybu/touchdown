@@ -42,7 +42,7 @@ class Describe(SimpleDescribe, Plan):
     resource = Stage
     service_name = 'apigateway'
     describe_action = "get_stages"
-    describe_envelope = "items"
+    describe_envelope = "item"  # This is not a typo
     key = 'id'
 
     def get_describe_filters(self):
