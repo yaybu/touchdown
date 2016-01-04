@@ -136,7 +136,7 @@ class VariableAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, "get").execute()
+        return runner.get_service(self.resource, "get").execute()[0]
 
     def dependencies(self, object):
         return frozenset((self.resource, ))

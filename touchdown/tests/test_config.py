@@ -35,15 +35,15 @@ class _Mixins(object):
         self.config = file.add_ini_file(
             file=file,
         )
-        self.strings_value1 = self.config.add_string(
+        self.strings_variable1 = self.config.add_string(
             name='strings.variable1',
             default='value1',
         )
-        self.integer_value1 = self.config.add_integer(
+        self.integer_variable11 = self.config.add_integer(
             name='integers.variable1',
             default=1,
         )
-        self.list_value1 = self.config.add_list(
+        self.list_variable1 = self.config.add_list(
             name='lists.variable1',
             default=['foo', 'bar', 'baz'],
         )
@@ -88,6 +88,12 @@ class _Mixins(object):
     def test_set_list(self):
         self.call("set", "lists.variable1", "foo,bar")
         self.call("get", "lists.variable1")
+
+    def test_echo_string(self):
+        self.workspace.add_echo(
+            text=self.strings_variable1,
+        )
+        self.call("apply")
 
 
 class LocalFileTestCase(_Mixins, unittest.TestCase):
