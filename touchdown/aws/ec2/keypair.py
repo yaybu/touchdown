@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+import struct
+
+from paramiko.util import deflate_long
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan, Present, XOR
 from touchdown.core import argument, serializers
+from touchdown.core.utils import force_bytes, force_str
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -27,14 +32,17 @@ class PublicKeyFromPrivateKey(serializers.Formatter):
 
     def render(self, runner, value):
         private_key = serialization.load_pem_private_key(
-            value,
+            force_bytes(value),
             password=None,
             backend=default_backend(),
         )
-        return private_key.public_key().public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
+        numbers = private_key.public_key().public_numbers()
+
+        output = b''
+        parts = [b'ssh-rsa', deflate_long(numbers.e), deflate_long(numbers.n)]
+        for part in parts:
+            output += struct.pack('>I', len(part)) + part
+        return force_str(b'ssh-rsa ' + base64.b64encode(output) + b'\n')
 
 
 class KeyPair(Resource):
