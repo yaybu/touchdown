@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import unittest
 import tempfile
 import shutil
 
-from touchdown.core import workspace, errors, goals
+from touchdown.core import workspace, errors, goals, serializers
 from touchdown.core.map import SerialMap
 from touchdown.frontends import ConsoleFrontend
 
@@ -48,13 +49,19 @@ class _Mixins(object):
             default=['foo', 'bar', 'baz'],
         )
 
-    def call(self, command, *args, **kwargs):
+    def get_goal(self, goal):
         return goals.create(
-            command,
+            goal,
             self.workspace,
             ConsoleFrontend(interactive=False),
             map=SerialMap
-        ).execute(*args, **kwargs)
+        )
+
+    def call(self, command, *args, **kwargs):
+        return self.get_goal(command).execute(*args, **kwargs)
+
+    def get(self, name):
+        return self.get_goal("get").collect_as_dict("get")[name].execute()
 
     def test_apply(self):
         self.assertRaises(
@@ -88,6 +95,17 @@ class _Mixins(object):
     def test_set_list(self):
         self.call("set", "lists.variable1", "foo,bar")
         self.call("get", "lists.variable1")
+
+    def test_retain_list(self):
+        self.config.add_list(
+            name='lists.variable2',
+            default=serializers.Expression(lambda ctx, value: [str(datetime.datetime.now())]),
+            retain_default=True,
+        )
+        assert self.get("lists.variable2") != self.get("lists.variable2")
+        self.call("apply")
+        self.assertRaises(errors.NothingChanged, self.call, "apply")
+        assert self.get("lists.variable2") == self.get("lists.variable2")
 
     def test_echo_string(self):
         self.workspace.add_echo(
