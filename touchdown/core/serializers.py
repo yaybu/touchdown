@@ -16,6 +16,7 @@ import itertools
 import json
 
 from touchdown.core.utils import force_str
+from touchdown.core import diff
 
 
 class FieldNotPresent(Exception):
@@ -32,13 +33,8 @@ class Serializer(object):
         raise NotImplementedError(self.render)
 
     def diff(self, runner, object, value):
-        try:
-            rendered = self.render (runner, object)
-        except FieldNotPresent:
-            return
-
-        if value != rendered:
-            yield "", value, rendered
+        rendered = self.render(runner, object)
+        return diff.ValueDiff(value, rendered)
 
     def dependencies(self, object):
         return frozenset()
@@ -344,6 +340,7 @@ class Resource(Dict):
         return self._render(kwargs, runner, object)
 
     def diff(self, runner, obj, value):
+        d = diff.AttributeDiff()
         for field in obj.meta.iter_fields_in_order():
             name = field.name
             arg = field.argument
@@ -359,20 +356,15 @@ class Resource(Dict):
                 continue
 
             if arg.field not in value:
-                yield (name, "", "Set to initial value")
+                d.add(field, "", "INITIAL_VALUE")
                 continue
 
-            for child_name, orig, to in arg.serializer.diff(runner, getattr(obj, name), value[arg.field]):
-                yield "{}.{}".format(name, child_name), orig, to
+            try:
+                d.add(field, arg.serializer.diff(runner, getattr(obj, name), value[arg.field]))
+            except FieldNotPresent:
+                continue
 
-            #try:
-            #    # We kind of serialize twice here. First to serialize any
-            #    # serializers, second to ensure we have the right kind of thing.
-            #    # XXX: Consider rolling this into the Argument serializer.
-            #    rendered = arg.serializer.render(
-            #        self.runner, serializers.Argument(name).render(self.runner, self.local))
-            #except serializers.FieldNotPresent:
-            #    continue
+        return d
 
     def dependencies(self, object):
         raise NotImplementedError(self.dependencies, object)

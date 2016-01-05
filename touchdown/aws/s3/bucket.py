@@ -19,13 +19,11 @@ from botocore.exceptions import ClientError
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 from touchdown.core.errors import InvalidParameter
-from touchdown.core.diff import DiffSet
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from touchdown.core import serializers
 
 
 class CorsRule(Resource):
@@ -159,7 +157,7 @@ class Apply(SimpleApply, Describe):
             update_notifications = True
         elif self.object:
             remote = self.get_remote_notification_config()
-            d = DiffSet(self.runner, self.resource, remote, group="notifications")
+            d = serializers.Resource(group="notifications").diff(self.runner, self.resource, remote)
             update_notifications = not d.matches()
 
         if update_notifications:

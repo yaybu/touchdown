@@ -14,7 +14,7 @@
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers, diff
+from touchdown.core import argument, serializers
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
@@ -91,10 +91,14 @@ class Apply(SimpleApply, Describe):
     create_action = "create_pipeline"
 
     def update_object(self):
-        d = diff.DiffSet(self.runner, self.resource, self.object.get('Notifications', {}), group="notifications")
+        d = serializers.Resource(group="notifications").diff(
+            self.runner,
+            self.resource,
+            self.object.get('Notifications', {})
+        )
         if not d.matches():
             yield self.generic_action(
-                ["Update pipline notification topics"] + list(d.get_descriptions()),
+                ["Update pipline notification topics"] + list(d.lines()),
                 self.client.update_pipeline_notifications,
                 Id=serializers.Identifier(),
                 Notifications=serializers.Resource(group="notifications"),

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import itertools
+from six.moves import zip_longest
 
 from touchdown.core.plan import Plan
 from touchdown.core import argument
@@ -50,10 +50,10 @@ class Rule(Resource):
     icmp = argument.Resource(IcmpTypeCode, field="IcmpTypeCode", serializer=serializers.Resource())
     action = argument.String(default="allow", choices=["allow", "deny"], field="RuleAction")
 
-    #def clean_port(self, value):
-    #    if isinstance(value, (int, str)):
-    #        return PortRange(None, from_port=value, to_port=value)
-    #    return value
+    # def clean_port(self, value):
+    #     if isinstance(value, (int, str)):
+    #         return PortRange(None, from_port=value, to_port=value)
+    #     return value
 
     def clean_protocol(self, protocol):
         # see https://github.com/aws/aws-cli/pull/532/files
@@ -68,10 +68,10 @@ class Rule(Resource):
 
     def __str__(self):
         name = super(Rule, self).__str__()
-        #if self.from_port == self.to_port:
-        #    ports = "port {}".format(self.from_port)
-        #else:
-        #    ports = "ports {} to {}".format(self.from_port, self.to_port)
+        # if self.from_port == self.to_port:
+        #     ports = "port {}".format(self.from_port)
+        # else:
+        #     ports = "ports {} to {}".format(self.from_port, self.to_port)
         ports = ""
         return "{}: {} {} from {}".format(name, self.protocol, ports, self.network)
 
@@ -117,11 +117,11 @@ class Describe(SimpleDescribe, Plan):
         }
 
     def _check_rules(self, local, remote, egress):
-        rules = itertools.izip_longest(
+        rules = zip_longest(
             local,
             filter(
-                 lambda r: r['Egress'] == egress and r['RuleNumber'] <= 32766,
-                 remote['Entries'],
+                lambda r: r['Egress'] == egress and r['RuleNumber'] <= 32766,
+                remote['Entries'],
             ),
         )
         for i, (left, right) in enumerate(rules, start=1):
@@ -201,9 +201,9 @@ class Apply(SimpleApply, Describe):
             for action in self.insert_network_rules():
                 yield action
 
-        #vpc = self.runner.get_plan(self.resource.vpc)
-        #if not vpc.resource_id:
-        #    return
+        vpc = self.runner.get_plan(self.resource.vpc)
+        if not vpc.resource_id:
+            return
 
         # FIXME: Delete all unused network acls
 

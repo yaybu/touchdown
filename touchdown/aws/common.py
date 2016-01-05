@@ -24,7 +24,6 @@ import jmespath
 from touchdown.core import errors, serializers, resource
 from touchdown.core.action import Action
 from touchdown.core.plan import Present
-from touchdown.core.diff import DiffSet
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ logger = logging.getLogger(__name__)
 class Resource(resource.Resource):
 
     def matches(self, runner, remote):
-        d = DiffSet(runner, self, remote)
+        d = serializers.Resource().diff(runner, self, remote)
         return d.matches()
 
 
@@ -374,11 +373,11 @@ class SimpleApply(SimpleDescribe):
         if self.update_action and self.object:
             logger.debug("Checking resource {} for changes".format(self.resource))
 
-            ds = DiffSet(self.runner, self.resource, self.object)
+            ds = serializers.Resource().diff(self.runner, self.resource, self.object)
             if not ds.matches():
                 logger.debug("Resource has {} differences".format(len(ds)))
                 yield self.generic_action(
-                    ["Updating {}".format(self.resource)] + list(ds.get_descriptions()),
+                    ["Updating {}".format(self.resource)] + list(ds.lines()),
                     getattr(self.client, self.update_action),
                     self.get_update_serializer(),
                 )
