@@ -197,7 +197,32 @@ class Apply(SimpleApply, Describe):
         if not vpc.resource_id:
             return
 
-        # FIXME: Delete all unused network acls
+        prefix = "{}.".format(self.resource.name)
+
+        result = self.client.describe_network_acls(
+            Filters=[
+                {"Name": 'vpc-id', "Values": [vpc.resource_id]},
+            ]
+        )
+
+        for network_acl in result.get('NetworkAcls', []):
+            tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
+            name = tags.get('Name', '')
+            # Only ignore ACL's for the current resource
+            if name != self.resource.name and not name.startswith(prefix):
+                continue
+            # Don't delete the default ACL
+            if network_acl['IsDefault']:
+                continue
+            # Don't try and delete ACL's that are in use
+            if len(network_acl['Associations']) != 0:
+                continue
+
+            yield self.generic_action(
+                "Delete stale network acl: {} ({})".format(name, network_acl['NetworkAclId']),
+                self.client.delete_network_acl,
+                NetworkAclId=network_acl['NetworkAclId'],
+            )
 
 
 class Destroy(SimpleDestroy, Describe):
