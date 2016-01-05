@@ -356,7 +356,7 @@ class Resource(Dict):
                 continue
 
             if arg.field not in value:
-                d.add(field, "", "INITIAL_VALUE")
+                d.add(field, diff.ValueDiff(value, "INITIAL_VALUE"))
                 continue
 
             try:
