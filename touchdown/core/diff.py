@@ -26,16 +26,8 @@ class Diff(object):
         self.remote_value = remote_value
         self.local_value = local_value
 
-    @property
-    def local_name(self):
-        return self.field.name
-
-    @property
-    def remote_name(self):
-        return self.field.field
-
     def __str__(self):
-        return "{0.local_name} ({0.remote_value} => {0.local_value})".format(self)
+        return "{0.field} ({0.remote_value} => {0.local_value})".format(self)
 
 
 class DiffSet(object):
@@ -52,33 +44,8 @@ class DiffSet(object):
             self.build_diffs()
 
     def build_diffs(self):
-        for field in self.local.meta.iter_fields_in_order():
-            name = field.name
-            arg = field.argument
-            if not field.present(self.local):
-                continue
-            if not getattr(arg, "field", ""):
-                continue
-            if not getattr(arg, "update", True):
-                continue
-            if getattr(arg, "group", "") != self.group:
-                continue
-            if not getattr(self.local, name) and arg.field not in self.remote:
-                continue
-
-            try:
-                # We kind of serialize twice here. First to serialize any
-                # serializers, second to ensure we have the right kind of thing.
-                # XXX: Consider rolling this into the Argument serializer.
-                rendered = arg.serializer.render(
-                    self.runner, serializers.Argument(name).render(self.runner, self.local))
-            except serializers.FieldNotPresent:
-                continue
-
-            if arg.field not in self.remote:
-                self.diffs.append(Diff(arg, "", rendered))
-            elif rendered != self.remote[arg.field]:
-                self.diffs.append(Diff(arg, self.remote[arg.field], rendered))
+        for name, orig, to in serializers.Resource().diff(self.runner, self.local, self.remote):
+            self.diffs.append(Diff(name, orig, to))
 
     def get_descriptions(self):
         for diff in self.diffs:

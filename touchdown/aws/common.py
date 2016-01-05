@@ -33,7 +33,8 @@ logger = logging.getLogger(__name__)
 class Resource(resource.Resource):
 
     def matches(self, runner, remote):
-        return DiffSet(runner, self, remote).matches()
+        d = DiffSet(runner, self, remote)
+        return d.matches()
 
 
 class Waiter(Action):

@@ -31,6 +31,15 @@ class Serializer(object):
     def render(self, runner, object):
         raise NotImplementedError(self.render)
 
+    def diff(self, runner, object, value):
+        try:
+            rendered = self.render (runner, object)
+        except FieldNotPresent:
+            return
+
+        if value != rendered:
+            yield "", value, rendered
+
     def dependencies(self, object):
         return frozenset()
 
@@ -333,6 +342,37 @@ class Resource(Dict):
             )
 
         return self._render(kwargs, runner, object)
+
+    def diff(self, runner, obj, value):
+        for field in obj.meta.iter_fields_in_order():
+            name = field.name
+            arg = field.argument
+            if not field.present(obj):
+                continue
+            if not getattr(arg, "field", ""):
+                continue
+            if not getattr(arg, "update", True):
+                continue
+            if getattr(arg, "group", "") != self.group:
+                continue
+            if not getattr(obj, name) and arg.field not in value:
+                continue
+
+            if arg.field not in value:
+                yield (name, "", "Set to initial value")
+                continue
+
+            for child_name, orig, to in arg.serializer.diff(runner, getattr(obj, name), value[arg.field]):
+                yield "{}.{}".format(name, child_name), orig, to
+
+            #try:
+            #    # We kind of serialize twice here. First to serialize any
+            #    # serializers, second to ensure we have the right kind of thing.
+            #    # XXX: Consider rolling this into the Argument serializer.
+            #    rendered = arg.serializer.render(
+            #        self.runner, serializers.Argument(name).render(self.runner, self.local))
+            #except serializers.FieldNotPresent:
+            #    continue
 
     def dependencies(self, object):
         raise NotImplementedError(self.dependencies, object)
