@@ -177,6 +177,12 @@ class Resource(six.with_metaclass(ResourceType)):
             property_name,
         )
 
+    def serializer_with_args(self, **kwargs):
+        return serializers.Context(
+            serializers.Const(self),
+            serializers.Resource(**kwargs),
+        )
+
     @property
     def arguments(self):
         return list((name, field.argument) for (name, field) in self.meta.iter_fields_in_order())

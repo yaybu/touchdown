@@ -125,6 +125,8 @@ class Describe(SimpleDescribe, Plan):
             ),
         )
         for i, (left, right) in enumerate(rules, start=1):
+            if not left or not right:
+                return False
             if i != right['RuleNumber']:
                 return False
             if not left.matches(self.runner, right):
@@ -163,35 +165,25 @@ class Apply(SimpleApply, Describe):
     waiter = "network_acl_available"
     waiter_eventual_consistency_threshold = 5
 
-    def _insert_rule(self, rule):
-        protocol = {
-            '1': 'ICMP',
-            '6': 'TCP',
-            '17': 'UDP',
-        }[rule['Protocol']]
-        direction = 'egress' if rule['Egress'] else 'ingress'
-        if protocol == 'ICMP':
-            desc = "Add rule: {0[RuleAction]} {2} from {0[CidrBlock]}, {1} {0[IcmpTypeCode][Type]}:{0[IcmpTypeCode][Code]}".format(
-                rule, protocol, direction
-            )
-        else:
-            desc = "Add rule: {0[RuleAction]} {2} from {0[CidrBlock]}, {1} port {0[PortRange][From]} to {0[PortRange][To]}".format(
-                rule, protocol, direction
-            )
-
+    def _insert_rule(self, rule, rule_number, egress):
         return self.generic_action(
-            desc,
+            "Add {direction} rule: {rule}".format(
+                rule=rule,
+                direction='egress' if egress else 'ingress',
+            ),
             self.client.create_network_acl_entry,
-            NetworkAclId=serializers.Identifier(),
-            **rule
+            rule.serializer_with_args(
+                NetworkAclId=self.resource.identifier(),
+                Egress=egress,
+                RuleNumber=rule_number,
+            )
         )
 
     def insert_network_rules(self):
-        return
-        for rule in self.resource.inbound:
-            yield self._insert_rule(rule)
-        for rule in self.resource.outbound:
-            yield self._insert_rule(rule)
+        for i, rule in enumerate(self.resource.inbound, start=1):
+            yield self._insert_rule(rule, rule_number=i, egress=False)
+        for i, rule in enumerate(self.resource.outbound, start=1):
+            yield self._insert_rule(rule, rule_number=i, egress=True)
 
     def update_object(self):
         for action in super(Apply, self).update_object():
