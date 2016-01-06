@@ -353,7 +353,7 @@ class SimpleApply(SimpleDescribe):
         if "name" not in self.resource.meta.fields:
             return
         argument = self.resource.meta.fields["name"].argument
-        if argument.group == "tags":
+        if getattr(argument, "group", "") == "tags":
             yield self.generic_action(
                 ["Name newly created resource (via tags)"],
                 self.client.create_tags,
