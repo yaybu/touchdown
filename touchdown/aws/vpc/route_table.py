@@ -43,7 +43,7 @@ class RouteTable(Resource):
 
     resource_name = "route_table"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     routes = argument.ResourceList(Route)
     propagating_vpn_gateways = argument.ResourceList(VpnGateway)
     tags = argument.Dict()

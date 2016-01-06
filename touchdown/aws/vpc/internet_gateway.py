@@ -24,7 +24,7 @@ class InternetGateway(Resource):
 
     resource_name = "internet_gateway"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     tags = argument.Dict()
     vpc = argument.Resource(VPC)
 

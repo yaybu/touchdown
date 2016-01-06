@@ -349,13 +349,27 @@ class SimpleApply(SimpleDescribe):
         g.is_creation_action = True
         return g
 
+    def name_object(self):
+        if "name" not in self.resource.meta.fields:
+            return
+        argument = self.resource.meta.fields["name"].argument
+        if argument.group == "tags":
+            yield self.generic_action(
+                ["Name newly created resource (via tags)"],
+                self.client.create_tags,
+                Resources=serializers.ListOfOne(serializers.Identifier()),
+                Tags=serializers.ListOfOne(serializers.Dict(
+                    Key=argument.field,
+                    Value=self.resource.name,
+                ))
+            )
+
     def update_tags(self):
         if getattr(self.resource, "immutable_tags", False) and self.object:
             return
 
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)
-            local_tags['Name'] = self.resource.name
             remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
 
             tags = {}
@@ -394,6 +408,8 @@ class SimpleApply(SimpleDescribe):
             logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resource))
             self.object = {}
             yield self.create_object()
+            for action in self.name_object():
+                yield action
             created = True
 
         if created:

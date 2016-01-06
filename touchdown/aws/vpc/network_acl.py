@@ -80,7 +80,7 @@ class NetworkACL(Resource):
 
     resource_name = "network_acl"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     inbound = argument.ResourceList(Rule)
     outbound = argument.ResourceList(Rule)
 

@@ -26,7 +26,7 @@ class VpnConnection(Resource):
 
     resource_name = "vpn_connection"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     customer_gateway = argument.Resource(CustomerGateway, field="CustomerGatewayId")
     vpn_gateway = argument.Resource(VpnGateway, field="VpnGatewayId")
     type = argument.String(default="ipsec.1", choices=["ipsec.1"], field="Type")

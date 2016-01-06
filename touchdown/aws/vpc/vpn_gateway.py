@@ -55,7 +55,7 @@ class VpnGateway(Resource):
 
     resource_name = "vpn_gateway"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     type = argument.String(default="ipsec.1", choices=["ipsec.1"], field="Type")
     availability_zone = argument.String(field="AvailabilityZone")
     tags = argument.Dict()
