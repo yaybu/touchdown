@@ -248,7 +248,7 @@ class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_network_acl"
 
-    def destroy_object(self):
+    def get_actions(self):
         for network_acl in self.get_possible_objects():
             tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
             name = tags.get('Name', '')
