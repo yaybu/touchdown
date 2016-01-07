@@ -1,0 +1,614 @@
+interactions:
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2015-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\">\n\
+        \    <requestId>b65794b2-bd02-44b3-aeba-9229fa1b86c4</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-c189afa4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:02 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=vpc-c189afa4&Version=2015-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['96']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>91db4162-3f70-4ffc-a0d2-fb4e57f1ae54</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-79afab1c</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet/>\n        </item>\n    </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:02 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=vpc-c189afa4&Version=2015-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['96']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>2e7bbf99-f691-4bf4-9243-099fc1c816e8</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-79afab1c</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>true</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet/>\n        </item>\n    </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:03 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateNetworkAcl&VpcId=vpc-c189afa4&Version=2015-10-01
+    headers:
+      Content-Length: ['61']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateNetworkAclResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>3fc54164-daa7-4805-8006-daa2d70bca90</requestId>\n    <networkAcl>\n\
+        \        <networkAclId>acl-31afab54</networkAclId>\n        <vpcId>vpc-c189afa4</vpcId>\n\
+        \        <default>false</default>\n        <entrySet>\n            <item>\n\
+        \                <ruleNumber>32767</ruleNumber>\n                <protocol>-1</protocol>\n\
+        \                <ruleAction>deny</ruleAction>\n                <egress>true</egress>\n\
+        \                <cidrBlock>0.0.0.0/0</cidrBlock>\n            </item>\n \
+        \           <item>\n                <ruleNumber>32767</ruleNumber>\n     \
+        \           <protocol>-1</protocol>\n                <ruleAction>deny</ruleAction>\n\
+        \                <egress>false</egress>\n                <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \            </item>\n        </entrySet>\n        <associationSet/>\n   \
+        \     <tagSet/>\n    </networkAcl>\n</CreateNetworkAclResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:03 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=CreateTags&ResourceId.1=acl-31afab54&Version=2015-10-01&Tag.1.Value=test-network-acl.1&Tag.1.Key=Name
+    headers:
+      Content-Length: ['108']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateTagsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\">\n\
+        \    <requestId>d2e5a56f-7a14-47c4-a7f6-b516d8719028</requestId>\n    <return>true</return>\n\
+        </CreateTagsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:03 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>1bf550aa-8336-4eb2-98f8-110a50d4bc45</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:03 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>412499f3-4a30-4693-9b67-d56aa13765a1</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:04 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>bf70cfef-a575-4640-8ffa-b816fc3cd179</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:04 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>8db48fad-e4fc-407c-a0aa-fc366f7e8120</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:04 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>27dc5cfa-09f9-4049-abc1-29da6e4b8b75</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:04 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>8102dfca-0d90-4235-a401-c67f3b9929a8</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:04 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: NetworkAclId=acl-31afab54&RuleNumber=1&Protocol=17&Egress=false&Version=2015-10-01&RuleAction=allow&PortRange.From=25&Action=CreateNetworkAclEntry&PortRange.To=25&CidrBlock=10.0.0.0%2F20
+    headers:
+      Content-Length: ['186']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateNetworkAclEntryResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>b8abc900-c44a-47fe-8997-b4712cdc6e4e</requestId>\n    <return>true</return>\n\
+        </CreateNetworkAclEntryResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:05 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: NetworkAclId=acl-31afab54&RuleNumber=2&Protocol=6&Egress=false&Version=2015-10-01&RuleAction=allow&PortRange.From=8080&Action=CreateNetworkAclEntry&PortRange.To=8090&CidrBlock=10.0.0.0%2F20
+    headers:
+      Content-Length: ['189']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <CreateNetworkAclEntryResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>8beaae47-fc84-451d-afb3-4ccd047ca836</requestId>\n    <return>true</return>\n\
+        </CreateNetworkAclEntryResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:04 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-c189afa4&Version=2015-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\">\n\
+        \    <requestId>9fbeac63-5892-4a07-94d5-da3b57c76094</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-c189afa4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:05 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=acl-31afab54&Version=2015-10-01&Filter.1.Name=network-acl-id
+    headers:
+      Content-Length: ['104']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>6c0e4afc-26e2-4b72-a5fa-907f53fbee66</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>1</ruleNumber>\n\
+        \                    <protocol>17</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>10.0.0.0/20</cidrBlock>\n\
+        \                    <portRange>\n                        <from>25</from>\n\
+        \                        <to>25</to>\n                    </portRange>\n \
+        \               </item>\n                <item>\n                    <ruleNumber>2</ruleNumber>\n\
+        \                    <protocol>6</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>10.0.0.0/20</cidrBlock>\n\
+        \                    <portRange>\n                        <from>8080</from>\n\
+        \                        <to>8090</to>\n                    </portRange>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n    </networkAclSet>\n\
+        </DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:05 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=vpc-c189afa4&Version=2015-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['96']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>8d5457bb-0a88-4f4b-ad40-afbcbac01288</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>1</ruleNumber>\n\
+        \                    <protocol>17</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>10.0.0.0/20</cidrBlock>\n\
+        \                    <portRange>\n                        <from>25</from>\n\
+        \                        <to>25</to>\n                    </portRange>\n \
+        \               </item>\n                <item>\n                    <ruleNumber>2</ruleNumber>\n\
+        \                    <protocol>6</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>10.0.0.0/20</cidrBlock>\n\
+        \                    <portRange>\n                        <from>8080</from>\n\
+        \                        <to>8090</to>\n                    </portRange>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n       \
+        \ <item>\n            <networkAclId>acl-79afab1c</networkAclId>\n        \
+        \    <vpcId>vpc-c189afa4</vpcId>\n            <default>true</default>\n  \
+        \          <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet/>\n        </item>\n    </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:05 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=test-vpc&Version=2015-10-01&Filter.1.Name=tag%3AName
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\">\n\
+        \    <requestId>b4df94f3-0319-478f-9f99-1933ecf9cd2f</requestId>\n    <vpcSet>\n\
+        \        <item>\n            <vpcId>vpc-c189afa4</vpcId>\n            <state>available</state>\n\
+        \            <cidrBlock>192.168.0.0/25</cidrBlock>\n            <dhcpOptionsId>dopt-ec5b4b8e</dhcpOptionsId>\n\
+        \            <tagSet>\n                <item>\n                    <key>Name</key>\n\
+        \                    <value>test-vpc</value>\n                </item>\n  \
+        \          </tagSet>\n            <instanceTenancy>default</instanceTenancy>\n\
+        \            <isDefault>false</isDefault>\n        </item>\n    </vpcSet>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:06 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeNetworkAcls&Filter.1.Value.1=vpc-c189afa4&Version=2015-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['96']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeNetworkAclsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>c45ea357-ae17-47fc-925c-a8c64e45b546</requestId>\n    <networkAclSet>\n\
+        \        <item>\n            <networkAclId>acl-31afab54</networkAclId>\n \
+        \           <vpcId>vpc-c189afa4</vpcId>\n            <default>false</default>\n\
+        \            <entrySet>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>1</ruleNumber>\n\
+        \                    <protocol>17</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>10.0.0.0/20</cidrBlock>\n\
+        \                    <portRange>\n                        <from>25</from>\n\
+        \                        <to>25</to>\n                    </portRange>\n \
+        \               </item>\n                <item>\n                    <ruleNumber>2</ruleNumber>\n\
+        \                    <protocol>6</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>10.0.0.0/20</cidrBlock>\n\
+        \                    <portRange>\n                        <from>8080</from>\n\
+        \                        <to>8090</to>\n                    </portRange>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet>\n                <item>\n                    <resourceId>acl-31afab54</resourceId>\n\
+        \                    <resourceType>network-acl</resourceType>\n          \
+        \          <key>Name</key>\n                    <value>test-network-acl.1</value>\n\
+        \                </item>\n            </tagSet>\n        </item>\n       \
+        \ <item>\n            <networkAclId>acl-79afab1c</networkAclId>\n        \
+        \    <vpcId>vpc-c189afa4</vpcId>\n            <default>true</default>\n  \
+        \          <entrySet>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>true</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>100</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>allow</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n                <item>\n                    <ruleNumber>32767</ruleNumber>\n\
+        \                    <protocol>-1</protocol>\n                    <ruleAction>deny</ruleAction>\n\
+        \                    <egress>false</egress>\n                    <cidrBlock>0.0.0.0/0</cidrBlock>\n\
+        \                </item>\n            </entrySet>\n            <associationSet/>\n\
+        \            <tagSet/>\n        </item>\n    </networkAclSet>\n</DescribeNetworkAclsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:06 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteNetworkAcl&NetworkAclId=acl-31afab54&Version=2015-10-01
+    headers:
+      Content-Length: ['68']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteNetworkAclResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\"\
+        >\n    <requestId>af1fb3e0-7a29-438f-aba1-19c1e4134c5b</requestId>\n    <return>true</return>\n\
+        </DeleteNetworkAclResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:06 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteVpc&VpcId=vpc-c189afa4&Version=2015-10-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DeleteVpcResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\">\n \
+        \   <requestId>f783251f-5cba-4a38-b1fe-084b4dd9e7b4</requestId>\n    <return>true</return>\n\
+        </DeleteVpcResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:06 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeVpcs&Filter.1.Value.1=vpc-c189afa4&Version=2015-10-01&Filter.1.Name=vpc-id
+    headers:
+      Content-Length: ['89']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://ec2.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+        <DescribeVpcsResponse xmlns=\"http://ec2.amazonaws.com/doc/2015-10-01/\">\n\
+        \    <requestId>04765d47-7712-4e1e-aefc-9b6e5cc84869</requestId>\n    <vpcSet/>\n\
+        </DescribeVpcsResponse>"}
+    headers:
+      content-type: [text/xml;charset=UTF-8]
+      date: ['Thu, 07 Jan 2016 22:19:07 GMT']
+      server: [AmazonEC2]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+version: 1

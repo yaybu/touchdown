@@ -16,6 +16,64 @@ import unittest
 
 from touchdown.core.workspace import Workspace
 from touchdown.core import errors
+from . import aws
+
+
+class TestNetworkAcl(aws.RecordedBotoCoreTest):
+
+    def test_create_and_delete_network_acl(self):
+        vpc = self.aws.add_vpc(
+            name='test-vpc',
+            cidr_block='192.168.0.0/25',
+        )
+        vpc.add_network_acl(
+            name='test-network-acl',
+            inbound=[{
+                "network": '10.0.0.0/20',
+                "protocol": "udp",
+                "port": 25,
+                "action": "allow",
+            }, {
+                "network": '10.0.0.0/20',
+                "protocol": "tcp",
+                "port__start": 8080,
+                "port__end": 8090,
+            }],
+        )
+        self.apply()
+        self.destroy()
+
+    def test_create_and_update_and_delete_network_acl(self):
+        vpc = self.aws.add_vpc(
+            name='test-vpc',
+            cidr_block='192.168.0.0/25',
+        )
+        network_acl = vpc.add_network_acl(
+            name='test-network-acl',
+            inbound=[{
+                "network": '10.0.0.0/20',
+                "protocol": "udp",
+                "port": 25,
+                "action": "allow",
+            }, {
+                "network": '10.0.0.0/20',
+                "protocol": "tcp",
+                "port__start": 8080,
+                "port__end": 8090,
+            }],
+        )
+        self.apply()
+
+        network_acl.outbound = [{
+            "network": '10.0.0.0/20',
+            "protocol": "icmp",
+            "icmp__type": 3,
+            "icmp__code": 4,
+            "action": "allow",
+        }]
+        self.apply(assert_idempotent=False)
+
+        self.destroy()
 
 
 class TestNetworkAclRules(unittest.TestCase):

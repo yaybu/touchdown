@@ -220,6 +220,9 @@ class Apply(SimpleApply, Describe):
 
     def prepare_to_create(self):
         for network_acl in self.get_possible_objects():
+            # Don't try and delete the matching network acl
+            if network_acl['NetworkAclId'] == self.resource_id:
+                continue
             # Don't try and delete ACL's that are in use
             if len(network_acl['Associations']) != 0:
                 continue

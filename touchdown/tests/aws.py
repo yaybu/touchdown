@@ -244,10 +244,11 @@ class RecordedBotoCoreTest(unittest.TestCase):
     def tearDown(self):
         self.stack.close()
 
-    def apply(self):
+    def apply(self, assert_idempotent=True):
         self.apply_runner = goals.create("apply", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
         self.apply_runner.execute()
-        self.assertRaises(errors.NothingChanged, self.apply_runner.execute)
+        if assert_idempotent:
+            self.assertRaises(errors.NothingChanged, self.apply_runner.execute)
 
     def destroy(self):
         self.destroy_runner = goals.create("destroy", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
