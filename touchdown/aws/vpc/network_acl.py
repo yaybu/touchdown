@@ -30,6 +30,12 @@ class PortRange(Resource):
     start = argument.Integer(default=1, min=-1, max=65535, field="From")
     end = argument.Integer(default=65535, min=-1, max=65535, field="To")
 
+    @classmethod
+    def clean(cls, value):
+        if isinstance(value, int):
+            return super(PortRange, cls).clean({"start": value, "end": value})
+        return super(PortRange, cls).clean(value)
+
 
 class IcmpTypeCode(Resource):
 

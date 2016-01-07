@@ -261,19 +261,22 @@ class Resource(Argument):
         Every time you assign a value to a Resource argument we validate it is
         the correct type. We also mark self as depending on the resource.
         """
-        if isinstance(value, dict):
-            for resource_class in self.get_resource_class():
-                try:
-                    value = resource_class(instance, **value)
-                    break
-                except errors.InvalidParameter:
-                    continue
-            else:
-                raise errors.InvalidParameter("Parameter must be one of {}".format(str(self.get_resource_class())))
-        elif hasattr(self.resource_class, "wrap"):
+        if hasattr(self.resource_class, "wrap"):
             value = self.resource_class.wrap(instance, value)
         elif not isinstance(value, self.get_resource_class()):
-            raise errors.InvalidParameter("Parameter must be a {}".format(self.resource_class))
+            error_msg = []
+            for resource_class in self.get_resource_class():
+                try:
+                    value = resource_class(instance, **resource_class.clean(value))
+                    break
+                except errors.InvalidParameter as e:
+                    error_msg.append(" * {}: {}".format(
+                        resource_class.resource_name,
+                        str(e),
+                    ))
+            else:
+                error_msg.insert(0, "Parameter is not the right type and could not be converted into the right type:")
+                raise errors.InvalidParameter("\n".join(error_msg))
         instance.add_dependency(value)
         return value
 

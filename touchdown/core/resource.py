@@ -159,12 +159,27 @@ class Resource(six.with_metaclass(ResourceType)):
         self._values = {}
         self.dependencies = set()
         self.parent = parent
-        for key in kwargs.keys():
-            if key not in self.meta.fields:
-                raise errors.InvalidParameter("'%s' is not a valid option" % (key, ))
+
+        params = self.clean(kwargs)
         for field in self.meta.iter_fields_in_order():
-            if field.name in kwargs:
-                setattr(self, field.name, kwargs[field.name])
+            if field.name in params:
+                setattr(self, field.name, params[field.name])
+
+    @classmethod
+    def clean(cls, value):
+        if not isinstance(value, dict):
+            raise errors.InvalidParameter(
+                "{!r} cannot be adapted into a {}".format(value, cls.resource_name)
+            )
+
+        params = {}
+        for key in value.keys():
+            if key not in cls.meta.fields:
+                raise errors.InvalidParameter(
+                    "{!r} is not a valid option for a {}".format(key, cls.resource_name)
+                )
+            params[key] = value[key]
+        return params
 
     def identifier(self):
         """ Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' """
