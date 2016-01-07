@@ -207,14 +207,30 @@ class RecordedBotoCoreTest(unittest.TestCase):
             (cpool.HTTPSConnectionPool, 'ConnectionCls', VCRRequestsHTTPSConnection),
         )
 
+    def _before_record_request(self, request):
+        return request
+
+    def _before_record_response(self, response):
+        return response
+
     def setUp(self):
         self.stack = ExitStack()
 
-        self.stack.enter_context(vcr.use_cassette(
+        self.vcr = vcr.VCR(
+            before_record=self._before_record_request,
+            before_record_response=self._before_record_response,
+        )
+
+        self.stack.enter_context(self.vcr.use_cassette(
             os.path.join(os.path.dirname(__file__), 'cassettes/{}.yml'.format(self.id())),
             serializers='json',
             custom_patches=self.patches(),
-            filter_headers=['authorization'],
+            filter_headers=[
+                'authorization',
+                'date',
+                "User-Agent",
+                "X-Amz-Date",
+            ],
         ))
 
         is_conn_dropped = self.stack.enter_context(mock.patch(
