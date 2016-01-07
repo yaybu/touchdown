@@ -187,7 +187,7 @@ class Resource(six.with_metaclass(ResourceType)):
                     "Cannot set '{}' and '{}__{}'".format(
                         key,
                         key,
-                        val.keys()[0],
+                        next(iter(val.keys())),
                     )
                 )
             params[key] = val
