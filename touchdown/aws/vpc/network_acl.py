@@ -56,11 +56,6 @@ class Rule(Resource):
     icmp = argument.Resource(IcmpTypeCode, field="IcmpTypeCode", serializer=serializers.Resource())
     action = argument.String(default="allow", choices=["allow", "deny"], field="RuleAction")
 
-    # def clean_port(self, value):
-    #     if isinstance(value, (int, str)):
-    #         return PortRange(None, from_port=value, to_port=value)
-    #     return value
-
     def clean_protocol(self, protocol):
         # see https://github.com/aws/aws-cli/pull/532/files
         if protocol == 'tcp':
@@ -73,12 +68,38 @@ class Rule(Resource):
             return '-1'
 
     def __str__(self):
-        # if self.from_port == self.to_port:
-        #     ports = "port {}".format(self.from_port)
-        # else:
-        #     ports = "ports {} to {}".format(self.from_port, self.to_port)
-        ports = ""
-        return "{} {} from {}".format(self.protocol, ports, self.network)
+        rule = []
+
+        if self.network:
+            rule.append("network={}".format(str(self.network)))
+
+        if self.protocol:
+            rule.append("protocol={}".format({
+                '6': 'tcp',
+                '17': 'udp',
+                '1': 'icmp',
+                '-1': 'all',
+            }.get(self.protocol, self.protocol)))
+
+        if self.port:
+            if self.port.start == self.port.end:
+                rule.append("port={}".format(self.port.start))
+            else:
+                if self.port.start:
+                    rule.append("port__start={}".format(self.port.start))
+                if self.port.end:
+                    rule.append("port__end={}".format(self.port.end))
+
+        if self.icmp:
+            if self.icmp.type:
+                rule.append("icmp__type={}".format(self.icmp.type))
+            if self.icmp.code:
+                rule.append("icmp__code={}".format(self.icmp.code))
+
+        if self.action:
+            rule.append("action={}".format(self.action))
+
+        return "rule({})".format(", ".join(rule))
 
 
 class NetworkACL(Resource):
