@@ -173,12 +173,31 @@ class Resource(six.with_metaclass(ResourceType)):
             )
 
         params = {}
-        for key in value.keys():
+        compound_params = {}
+        for key, subvalue in value.items():
+            if "__" in key:
+                key, subkey = key.split("__", 1)
+                compound_params.setdefault(key, {})[subkey] = subvalue
+                continue
+            params[key] = subvalue
+
+        for key, val in compound_params.items():
+            if key in params:
+                raise errors.InvalidParameter(
+                    "Cannot set '{}' and '{}__{}'".format(
+                        key,
+                        key,
+                        val.keys()[0],
+                    )
+                )
+            params[key] = val
+
+        for key in params.keys():
             if key not in cls.meta.fields:
                 raise errors.InvalidParameter(
                     "{!r} is not a valid option for a {}".format(key, cls.resource_name)
                 )
-            params[key] = value[key]
+
         return params
 
     def identifier(self):
