@@ -14,7 +14,7 @@
 
 from six.moves import zip_longest
 
-from touchdown.core.plan import Plan, Present
+from touchdown.core.plan import Plan
 from touchdown.core import argument
 
 from .vpc import VPC
@@ -184,12 +184,6 @@ class Describe(SimpleDescribe, Plan):
 
             yield network_acl
 
-    def get_next_available_name(self):
-        return "{}.{}".format(
-            self.resource.name,
-            self.biggest_serial + 1,
-        )
-
 
 class Apply(SimpleApply, Describe):
 
@@ -208,6 +202,12 @@ class Apply(SimpleApply, Describe):
                 self.client.delete_network_acl,
                 NetworkAclId=network_acl['NetworkAclId'],
             )
+
+    def get_create_name(self):
+        return "{}.{}".format(
+            self.resource.name,
+            self.biggest_serial + 1,
+        )
 
     def _insert_rule(self, rule, rule_number, egress):
         return self.generic_action(
@@ -243,15 +243,12 @@ class Destroy(SimpleDestroy, Describe):
     destroy_action = "delete_network_acl"
 
     def destroy_object(self):
-        for action in super(Destroy, self).destroy_object():
-            yield action
-
         for network_acl in self.get_possible_objects():
-            if network_acl['NetworkAclId'] == self.resource_id:
-                continue
+            tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
+            name = tags.get('Name', '')
 
             yield self.generic_action(
-                "Destroy stale network acl: {}".format(network_acl['NetworkAclId']),
+                "Destroy network acl: {} ({})".format(name, network_acl['NetworkAclId']),
                 self.client.delete_network_acl,
                 NetworkAclId=network_acl['NetworkAclId'],
             )

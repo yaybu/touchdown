@@ -332,6 +332,9 @@ class SimpleApply(SimpleDescribe):
     def get_create_serializer(self):
         return serializers.Resource()
 
+    def get_create_name(self):
+        return self.resource.name
+
     def get_update_serializer(self):
         return serializers.Resource(mode="update")
 
@@ -352,15 +355,16 @@ class SimpleApply(SimpleDescribe):
     def name_object(self):
         if "name" not in self.resource.meta.fields:
             return
+        name = self.get_create_name()
         argument = self.resource.meta.fields["name"].argument
         if getattr(argument, "group", "") == "tags":
             yield self.generic_action(
-                ["Name newly created resource (via tags)"],
+                ["Name newly created resource {} (via tags)".format(name)],
                 self.client.create_tags,
                 Resources=serializers.ListOfOne(serializers.Identifier()),
                 Tags=serializers.ListOfOne(serializers.Dict(
                     Key=argument.field,
-                    Value=self.resource.name,
+                    Value=name,
                 ))
             )
 

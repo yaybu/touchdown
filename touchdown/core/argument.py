@@ -70,18 +70,6 @@ class Output(ReadOnly):
         )
 
 
-class NextAvailableName(ReadOnly):
-
-    def get_default(self, instance):
-        return serializers.Context(
-            instance,
-            serializers.Expression(
-                #lambda r, o: r.get_service("describe", o).get_next_available_name(),
-                lambda r, o: r.get_plan(o).get_next_available_name(),
-            )
-        )
-
-
 class Boolean(Argument):
 
     """ Represents a boolean. "1", "yes", "on" and "true" are all considered
