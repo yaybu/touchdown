@@ -57,6 +57,19 @@ Simple storage service
                 }),
             )
 
+      .. attribute:: notify_lambda
+
+          A list of lambda functions to call when a notification event occurs. For example::
+
+              mybucket = aws.add_bucket(
+                  name='my-bucket',
+                  notify_lambda=[{
+                      "name": "process-new-objects",
+                      "function": myfunction,
+                      "events": ["s3:ObjectCreated:*"]
+                  }]
+              )
+
 
 Adding files to buckets
 -----------------------
