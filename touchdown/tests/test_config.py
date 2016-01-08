@@ -77,24 +77,30 @@ class _Mixins(object):
 
     def test_get_string(self):
         self.call("get", "strings.variable1")
+        self.assertEqual(self.get("strings.variable1"), ("value1", False))
 
     def test_set_string(self):
         self.call("set", "strings.variable1", "value2")
         self.call("get", "strings.variable1")
+        self.assertEqual(self.get("strings.variable1"), ("value2", True))
 
     def test_get_integer(self):
         self.call("get", "integers.variable1")
+        self.assertEqual(self.get("integers.variable1"), (1, False))
 
     def test_set_integer(self):
         self.call("set", "integers.variable1", 2)
         self.call("get", "integers.variable1")
+        self.assertEqual(self.get("integers.variable1"), (2, True))
 
     def test_get_list(self):
         self.call("get", "lists.variable1")
+        self.assertEqual(self.get("lists.variable1"), (["foo", "bar", "baz"], False))
 
     def test_set_list(self):
         self.call("set", "lists.variable1", "foo,bar")
         self.call("get", "lists.variable1")
+        self.assertEqual(self.get("lists.variable1"), (["foo", "bar"], True))
 
     def test_retain_list(self):
         self.config.add_list(
