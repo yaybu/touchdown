@@ -38,7 +38,8 @@ Getting started
  * **Tutorial:**
    :doc:`Hello world <tutorial/hello_world>` |
    :doc:`Django <tutorial/django>` |
-   :doc:`Handling S3 Events with Lambda <tutorial/s3_events_with_lambda>`
+   :doc:`Handling S3 Events with Lambda <tutorial/s3_events_with_lambda>` |
+   :doc:`A serverless redirect service <tutorial/redirects_with_apigateway>`
 
 
 Resources
