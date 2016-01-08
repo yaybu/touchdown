@@ -241,6 +241,11 @@ Network ACL's
             )],
         )
 
+    Network ACL's are updated by replacement. This means each time a change is
+    detected an entirely new one will be created and subnets using the old one
+    (that are managed by touchdown) will be pointed at the new one. This avoids
+    having to re-number rules in an existing ACL and makes rolling back easier.
+
     .. attribute:: name
 
         The name of the network acl. This field is required.
