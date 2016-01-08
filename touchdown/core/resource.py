@@ -159,12 +159,46 @@ class Resource(six.with_metaclass(ResourceType)):
         self._values = {}
         self.dependencies = set()
         self.parent = parent
-        for key in kwargs.keys():
-            if key not in self.meta.fields:
-                raise errors.InvalidParameter("'%s' is not a valid option" % (key, ))
+
+        params = self.clean(kwargs)
         for field in self.meta.iter_fields_in_order():
-            if field.name in kwargs:
-                setattr(self, field.name, kwargs[field.name])
+            if field.name in params:
+                setattr(self, field.name, params[field.name])
+
+    @classmethod
+    def clean(cls, value):
+        if not isinstance(value, dict):
+            raise errors.InvalidParameter(
+                "{!r} cannot be adapted into a {}".format(value, cls.resource_name)
+            )
+
+        params = {}
+        compound_params = {}
+        for key, subvalue in value.items():
+            if "__" in key:
+                key, subkey = key.split("__", 1)
+                compound_params.setdefault(key, {})[subkey] = subvalue
+                continue
+            params[key] = subvalue
+
+        for key, val in compound_params.items():
+            if key in params:
+                raise errors.InvalidParameter(
+                    "Cannot set '{}' and '{}__{}'".format(
+                        key,
+                        key,
+                        next(iter(val.keys())),
+                    )
+                )
+            params[key] = val
+
+        for key in params.keys():
+            if key not in cls.meta.fields:
+                raise errors.InvalidParameter(
+                    "{!r} is not a valid option for a {}".format(key, cls.resource_name)
+                )
+
+        return params
 
     def identifier(self):
         """ Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' """
@@ -175,6 +209,12 @@ class Resource(six.with_metaclass(ResourceType)):
         return serializers.Property(
             serializers.Const(self),
             property_name,
+        )
+
+    def serializer_with_args(self, **kwargs):
+        return serializers.Context(
+            serializers.Const(self),
+            serializers.Resource(**kwargs),
         )
 
     @property

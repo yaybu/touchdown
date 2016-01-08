@@ -15,7 +15,7 @@
 from . import aws
 
 
-class TestVpc(aws.RecordedBotoCoreTest):
+class TestSubnet(aws.RecordedBotoCoreTest):
 
     def test_create_and_delete_subnet(self):
         vpc = self.aws.add_vpc(

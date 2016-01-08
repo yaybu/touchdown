@@ -67,3 +67,42 @@ class TestSerializing(unittest.TestCase):
         serializer = serializers.List(serializers.Dict(Name=serializers.Argument("name")))
         result = serializer.render(self.runner, [self.resource])
         self.assertEqual(result, [{"Name": "test"}, ])
+
+
+class TestDiffing(unittest.TestCase):
+
+    def setUp(self):
+        self.resource = SecurityGroup(None, name="test")
+        self.runner = mock.Mock()
+
+    def test_matches_false(self):
+        d = serializers.Resource().diff(self.runner, self.resource, {})
+        assert d.matches() is False
+
+    def test_diffs(self):
+        d = serializers.Resource().diff(self.runner, self.resource, {})
+        assert list(d.lines()) == ['name: ', '    {} => INITIAL_VALUE']
+
+    def test_matches_true(self):
+        d = serializers.Resource().diff(self.runner, self.resource, {
+            "GroupName": "test",
+        })
+        assert d.matches() is True
+
+    def test_diffs_desc_set(self):
+        self.resource.description = "description"
+        d = serializers.Resource().diff(self.runner, self.resource, {
+            "GroupName": "test",
+            "Description": "",
+        })
+        assert d.matches() is False
+        assert list(d.lines()) == ['description: ', '     => description']
+
+    def test_diffs_desc_unset(self):
+        self.resource.description = ""
+        d = serializers.Resource().diff(self.runner, self.resource, {
+            "GroupName": "test",
+            "Description": "description",
+        })
+        assert d.matches() is False
+        assert list(d.lines()) == ['description: ', '    description => ']

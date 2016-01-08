@@ -24,7 +24,7 @@ class CustomerGateway(Resource):
 
     resource_name = "customer_gateway"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     type = argument.String(default="ipsec.1", choices=["ipsec.1"], field="Type")
     public_ip = argument.IPAddress(field="PublicIp")
     bgp_asn = argument.Integer(default=65000, field="BgpAsn")

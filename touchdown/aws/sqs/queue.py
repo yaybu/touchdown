@@ -18,7 +18,6 @@ from touchdown.core import argument
 from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
-from touchdown.core.diff import DiffSet
 
 from .. import sns
 from .. import cloudwatch
@@ -94,10 +93,10 @@ class Apply(SimpleApply, Describe):
     # waiter = "bucket_exists"
 
     def update_object(self):
-        d = DiffSet(self.runner, self.resource, self.object, group="attributes")
+        d = serializers.Resource(group="attributes").diff(self.runner, self.resource, self.object)
         if not d.matches():
             yield self.generic_action(
-                ["Updating queue attributes"] + list(d.get_descriptions()),
+                ["Updating queue attributes"] + list(d.lines()),
                 self.client.set_queue_attributes,
                 QueueUrl=serializers.Identifier(),
                 Attributes=serializers.Resource(group="attributes")

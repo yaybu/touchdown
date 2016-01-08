@@ -24,7 +24,6 @@ import jmespath
 from touchdown.core import errors, serializers, resource
 from touchdown.core.action import Action
 from touchdown.core.plan import Present
-from touchdown.core.diff import DiffSet
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,8 @@ logger = logging.getLogger(__name__)
 class Resource(resource.Resource):
 
     def matches(self, runner, remote):
-        return DiffSet(runner, self, remote).matches()
+        d = serializers.Resource().diff(runner, self, remote)
+        return d.matches()
 
 
 class Waiter(Action):
@@ -332,6 +332,9 @@ class SimpleApply(SimpleDescribe):
     def get_create_serializer(self):
         return serializers.Resource()
 
+    def get_create_name(self):
+        return self.resource.name
+
     def get_update_serializer(self):
         return serializers.Resource(mode="update")
 
@@ -349,13 +352,28 @@ class SimpleApply(SimpleDescribe):
         g.is_creation_action = True
         return g
 
+    def name_object(self):
+        if "name" not in self.resource.meta.fields:
+            return
+        name = self.get_create_name()
+        argument = self.resource.meta.fields["name"].argument
+        if getattr(argument, "group", "") == "tags":
+            yield self.generic_action(
+                ["Name newly created resource {} (via tags)".format(name)],
+                self.client.create_tags,
+                Resources=serializers.ListOfOne(serializers.Identifier()),
+                Tags=serializers.ListOfOne(serializers.Dict(
+                    Key=argument.field,
+                    Value=name,
+                ))
+            )
+
     def update_tags(self):
         if getattr(self.resource, "immutable_tags", False) and self.object:
             return
 
         if hasattr(self.resource, "tags"):
             local_tags = dict(self.resource.tags)
-            local_tags['Name'] = self.resource.name
             remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
 
             tags = {}
@@ -373,11 +391,11 @@ class SimpleApply(SimpleDescribe):
         if self.update_action and self.object:
             logger.debug("Checking resource {} for changes".format(self.resource))
 
-            ds = DiffSet(self.runner, self.resource, self.object)
+            ds = serializers.Resource().diff(self.runner, self.resource, self.object)
             if not ds.matches():
                 logger.debug("Resource has {} differences".format(len(ds)))
                 yield self.generic_action(
-                    ["Updating {}".format(self.resource)] + list(ds.get_descriptions()),
+                    ["Updating {}".format(self.resource)] + list(ds.lines()),
                     getattr(self.client, self.update_action),
                     self.get_update_serializer(),
                 )
@@ -394,6 +412,8 @@ class SimpleApply(SimpleDescribe):
             logger.debug("Cannot find AWS object for resource {} - creating one".format(self.resource))
             self.object = {}
             yield self.create_object()
+            for action in self.name_object():
+                yield action
             created = True
 
         if created:

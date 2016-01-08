@@ -16,6 +16,7 @@ import itertools
 import json
 
 from touchdown.core.utils import force_str
+from touchdown.core import diff
 
 
 class FieldNotPresent(Exception):
@@ -30,6 +31,10 @@ class Serializer(object):
 
     def render(self, runner, object):
         raise NotImplementedError(self.render)
+
+    def diff(self, runner, object, value):
+        rendered = self.render(runner, object)
+        return diff.ValueDiff(value, rendered)
 
     def dependencies(self, object):
         return frozenset()
@@ -333,6 +338,33 @@ class Resource(Dict):
             )
 
         return self._render(kwargs, runner, object)
+
+    def diff(self, runner, obj, value):
+        d = diff.AttributeDiff()
+        for field in obj.meta.iter_fields_in_order():
+            name = field.name
+            arg = field.argument
+            if not field.present(obj):
+                continue
+            if not getattr(arg, "field", ""):
+                continue
+            if not getattr(arg, "update", True):
+                continue
+            if getattr(arg, "group", "") != self.group:
+                continue
+            if not getattr(obj, name) and arg.field not in value:
+                continue
+
+            if arg.field not in value:
+                d.add(field, diff.ValueDiff(value, "INITIAL_VALUE"))
+                continue
+
+            try:
+                d.add(field, arg.serializer.diff(runner, getattr(obj, name), value[arg.field]))
+            except FieldNotPresent:
+                continue
+
+        return d
 
     def dependencies(self, object):
         raise NotImplementedError(self.dependencies, object)

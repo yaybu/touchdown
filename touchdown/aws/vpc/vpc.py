@@ -24,7 +24,7 @@ class VPC(Resource):
 
     resource_name = "vpc"
 
-    name = argument.String()
+    name = argument.String(field="Name", group="tags")
     cidr_block = argument.IPNetwork(field='CidrBlock')
     tenancy = argument.String(default="default", choices=["default", "dedicated"], field="InstanceTenancy")
 

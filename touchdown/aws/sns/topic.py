@@ -19,7 +19,6 @@ from ..account import BaseAccount
 from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
 from touchdown.core.adapters import Adapter
-from touchdown.core.diff import DiffSet
 
 
 class Subscription(Adapter):
@@ -69,7 +68,7 @@ class Apply(SimpleApply, Describe):
 
         for local in self.resource.notify:
             for remote in remote_subscriptions:
-                if DiffSet(self.runner, local, remote).matches():
+                if serializers.Resource().diff(self.runner, local, remote).matches():
                     break
             else:
                 yield self.generic_action(
@@ -85,7 +84,7 @@ class Apply(SimpleApply, Describe):
 
         for remote in remote_subscriptions:
             for local in self.resource.notify:
-                if DiffSet(self.runner, local, remote).matches():
+                if serializers.Resource().diff(self.runner, local, remote).matches():
                     break
             else:
                 yield self.generic_action(
@@ -100,13 +99,13 @@ class Apply(SimpleApply, Describe):
                 TopicArn=self.resource_id,
             )['Attributes']
 
-        d = DiffSet(self.runner, self.resource, attributes, group="attributes")
-        for diff in d.get_changes():
+        d = serializers.Resource(group="attributes").diff(self.runner, self.resource, attributes)
+        for field, diff in d.diffs:
             yield self.generic_action(
                 "Update {}".format(diff),
                 self.client.set_topic_attributes,
                 TopicArn=serializers.Identifier(),
-                AttributeName=diff.remote_name,
+                AttributeName=field.field,
                 AttributeValue=diff.local_value,
             )
 

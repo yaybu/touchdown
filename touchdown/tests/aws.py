@@ -207,14 +207,30 @@ class RecordedBotoCoreTest(unittest.TestCase):
             (cpool.HTTPSConnectionPool, 'ConnectionCls', VCRRequestsHTTPSConnection),
         )
 
+    def _before_record_request(self, request):
+        return request
+
+    def _before_record_response(self, response):
+        return response
+
     def setUp(self):
         self.stack = ExitStack()
 
-        self.stack.enter_context(vcr.use_cassette(
+        self.vcr = vcr.VCR(
+            before_record=self._before_record_request,
+            before_record_response=self._before_record_response,
+        )
+
+        self.stack.enter_context(self.vcr.use_cassette(
             os.path.join(os.path.dirname(__file__), 'cassettes/{}.yml'.format(self.id())),
             serializers='json',
             custom_patches=self.patches(),
-            filter_headers=['authorization'],
+            filter_headers=[
+                'authorization',
+                'date',
+                "User-Agent",
+                "X-Amz-Date",
+            ],
         ))
 
         is_conn_dropped = self.stack.enter_context(mock.patch(
@@ -228,10 +244,11 @@ class RecordedBotoCoreTest(unittest.TestCase):
     def tearDown(self):
         self.stack.close()
 
-    def apply(self):
+    def apply(self, assert_idempotent=True):
         self.apply_runner = goals.create("apply", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
         self.apply_runner.execute()
-        self.assertRaises(errors.NothingChanged, self.apply_runner.execute)
+        if assert_idempotent:
+            self.assertRaises(errors.NothingChanged, self.apply_runner.execute)
 
     def destroy(self):
         self.destroy_runner = goals.create("destroy", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
