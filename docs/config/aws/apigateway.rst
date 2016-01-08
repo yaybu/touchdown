@@ -46,13 +46,13 @@ Defining resources
                 name='/animal',
             )
 
-    .. attribute:: parent
+    .. attribute:: parent_resource
 
         The resource this resource is attached to::
 
             dog = rest_api.add_resource(
                 name='/animal/dog',
-                parent=animal,
+                parent_resource=animal,
             )
 
         This is optional if you attach a resource directly::
@@ -81,6 +81,8 @@ Defining models
     .. attribute:: schema
 
     .. attribute:: content_type
+
+        This defaults to ``application/json``.
 
 
 Defining deployments
@@ -115,7 +117,7 @@ A stage defines the path through which an API deployment is accessible. With dep
 
 .. class:: Stage
 
-    ::
+    You attach new stages to a deployment::
 
         my_stage = deployment.add_stage(
             name='staging',
@@ -137,8 +139,96 @@ Attaching methods
 
 .. class:: Method
 
-    ::
+    You attach an method to a resource::
 
         my_method = resource.add_method(
             method = "GET",
         )
+
+    .. attribute:: name
+
+    .. attribute:: authorization_type
+
+    .. attribute:: api_key_required
+
+    .. attribute:: request_parameters
+
+    .. attribute:: request_models
+
+
+Attaching method responses
+--------------------------
+
+.. class:: MethodResponse
+
+    You attach an method response to a resource::
+
+        my_method_response = resource.add_method_response(
+            name = "GET",
+        )
+
+    .. attribute:: name
+
+    .. attribute:: status_code
+
+    .. attribute:: response_parameters
+
+    .. attribute:: response_models
+
+
+Attaching integrations
+----------------------
+
+.. class:: Integration
+
+    You attach an integration to a resource::
+
+        my_integration = resource.add_integration(
+            name = "GET",
+        )
+
+    .. attribute:: name
+
+        E.g. ``GET``
+
+    .. attribute:: integration_type
+
+        Can be `HTTP`, `AWS` or `MOCK`.
+
+    .. attribute:: integration_http_method
+
+    .. attribute:: request_parameters
+
+    .. attribute:: request_templates
+
+    .. attribute:: uri
+
+    .. attribute:: credentials
+
+    .. attribute:: cache_namespace
+
+    .. attribute:: cache_key_parameters
+
+
+Attaching integration responses
+-------------------------------
+
+.. class:: IntegrationResponse
+
+    You attach an integration response to a resource::
+
+        my_integration_response = resource.add_integration_response(
+            name = "GET",
+        )
+
+    .. attribute:: name
+
+        E.g. ``GET``
+
+    .. attribute:: status_code
+
+    .. attribute:: selection_pattern
+
+    .. attribute:: response_parameters
+
+    .. attribute:: response_templates
