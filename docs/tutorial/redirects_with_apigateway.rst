@@ -69,6 +69,7 @@ Deploying the API
 ----------------
 
 ::
+
     deployment = api.add_deployment(
         name=base_domain,
         stage_name=stage_name,
@@ -81,6 +82,7 @@ Linking to a domain name
 ========================
 
 ::
+
     stage.add_domain(aws.add_apigateway_domain(
         domain=base_domain,
         certificate_name=certificate_name,
