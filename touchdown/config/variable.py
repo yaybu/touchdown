@@ -127,7 +127,10 @@ class Refresh(Plan):
 
     def execute(self):
         setter = self.runner.get_service(self.resource, "set")
-        setter.execute(self.resource.default)
+        setter.execute(serializers.maybe(self.resource.default).render(
+            self.runner,
+            self.resource,
+        ))
 
 
 class VariableAsString(serializers.Serializer):
