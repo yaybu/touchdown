@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
+import itertools
 import unittest
 import tempfile
 import shutil
@@ -25,6 +25,8 @@ from touchdown.frontends import ConsoleFrontend
 class _Mixins(object):
 
     def setUp(self):
+        self.counter = iter(itertools.count())
+
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
@@ -105,7 +107,7 @@ class _Mixins(object):
     def test_retain_list(self):
         self.config.add_list(
             name='lists.variable2',
-            default=serializers.Expression(lambda ctx, value: [str(datetime.datetime.now())]),
+            default=serializers.Expression(lambda ctx, value: [str(next(self.counter))]),
             retain_default=True,
         )
         assert self.get("lists.variable2") != self.get("lists.variable2")
