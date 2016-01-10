@@ -23,6 +23,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.fernet import Fernet
 
 from touchdown.core import serializers
+from touchdown.core.utils import force_str
 
 
 DJANGO_SECRET_KEY_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -49,9 +50,9 @@ def pwgen(length=28, lower=True, upper=True, numeric=True, symbols=False):
     system_random = random.SystemRandom()
     sym = []
     if lower:
-        sym.extend(string.lowercase)
+        sym.extend(string.ascii_lowercase)
     if upper:
-        sym.extend(string.uppercase)
+        sym.extend(string.ascii_uppercase)
     if numeric:
         sym.extend(string.digits)
     if symbols:
@@ -81,19 +82,19 @@ def rsa_private_key():
         key_size=4096,
         backend=default_backend()
     )
-    return private_key.private_bytes(
+    return force_str(private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption(),
-    )
+    ))
 
 
 @expression
 def dsa_private_key():
-    private_key = dsa.generate_private_key(
+    private_key = force_str(dsa.generate_private_key(
         key_size=1024,
         backend=default_backend()
-    )
+    ))
     return private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
