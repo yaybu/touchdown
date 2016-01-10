@@ -64,8 +64,10 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_nat_gateway"
+    waiter = "nat_gateway_available"
 
 
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_nat_gateway"
+    waiter = "nat_gateway_deleted"
