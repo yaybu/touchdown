@@ -27,6 +27,7 @@ class Route(Resource):
 
     destination_cidr = argument.IPNetwork(field="DestinationCidrBlock")
     internet_gateway = argument.Resource(InternetGateway, field="GatewayId")
+    nat_gateway = argument.Resource("touchdown.aws.vpc.nat_gateway.NatGateway", field="NatGatewayId")
     ignore = argument.Boolean(default=False)
 
     # instance = argument.Resource(Instance, field="InstanceId")

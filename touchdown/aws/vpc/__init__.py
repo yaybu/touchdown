@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from .customer_gateway import CustomerGateway
+from .elastic_ip import ElasticIp
 from .internet_gateway import InternetGateway
+from .nat_gateway import NatGateway
 from .network_acl import NetworkACL
 from .route_table import RouteTable
 from .subnet import Subnet
@@ -26,7 +28,9 @@ from .vpn_gateway import VpnGateway
 __all__ = [
     'VPC',
     'CustomerGateway',
+    'ElasticIp',
     'InternetGateway',
+    'NatGateway',
     'NetworkACL',
     'RouteTable',
     'Subnet',

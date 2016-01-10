@@ -4,6 +4,8 @@ Changelog for Touchdown
 0.4.1 (unreleased)
 ------------------
 
+- Add support for AWS NAT Gateway.
+
 - Add support for read and write operations against local files::
 
     folder = workspace.add_local_folder(name=os.getcwd())
