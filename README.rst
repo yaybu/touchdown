@@ -2,17 +2,17 @@
 Touchdown
 =========
 
-.. image:: https://travis-ci.org/yaybu/touchdown.png?branch=master
+.. image:: https://img.shields.io/travis/yaybu/touchdown/master.svg
    :target: https://travis-ci.org/#!/yaybu/touchdown
 
-.. image:: https://ci.appveyor.com/api/projects/status/1uscoxn229nq78tl?svg=true
+.. image:: https://img.shields.io/appveyor/ci/yaybu/touchdown/master.svg
    :target: https://ci.appveyor.com/project/yaybu/touchdown
 
-.. image:: https://coveralls.io/repos/yaybu/touchdown/badge.png?branch=master
-    :target: https://coveralls.io/r/yaybu/touchdown
+.. image:: https://img.shields.io/coveralls/yaybu/touchdown/master.svg
+   :target: https://coveralls.io/r/yaybu/touchdown
 
-.. image:: https://pypip.in/version/touchdown/badge.png
-    :target: https://pypi.python.org/pypi/touchdown/
+.. image:: https://img.shields.io/pypi/v/touchdown.svg
+   :target: https://pypi.python.org/pypi/touchdown/
 
 
 Touchdown is a service orchestration framework for python. It provides a python
