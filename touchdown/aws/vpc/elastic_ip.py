@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core.action import Action
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
+from touchdown.config import String
 
+from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
@@ -23,7 +26,10 @@ class ElasticIp(Resource):
 
     resource_name = "elastic_ip"
 
-    public_ip = argument.String(field="PublicIp")
+    name = argument.String()
+    public_ip = argument.Resource(String)
+
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):
@@ -32,26 +38,45 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'ec2'
     describe_action = "describe_addresses"
     describe_envelope = "Addresses"
-    key = "AllocationId"
+    key = "PublicIp"
 
     def get_describe_filters(self):
-        if not self.resource.public_ip:
-            return None
+        public_ip, _ = self.runner.get_service(self.resource.public_ip, "get").execute()
+        if not public_ip:
+            return
+
         return {
             "Filters": [
-                {"Name": "public-ip", "Values": self.resource.public_ip},
+                {"Name": "public-ip", "Values": [public_ip]},
             ]
         }
+
+
+class NameAction(Action):
+
+    @property
+    def description(self):
+        yield "Store setting elastic ip as setting {!r}".format(self.resource.public_ip.name)
+
+    def run(self):
+        self.runner.get_service(self.resource.public_ip, "set").execute(
+            self.plan.object['PublicIp']
+        )
 
 
 class Apply(SimpleApply, Describe):
 
     create_action = "allocate_address"
+    create_envelope = "@"
+    create_response = "full-description"
 
     def get_create_serializer(self):
         return serializers.Dict(
             Domain='vpc',
         )
+
+    def name_object(self):
+        yield NameAction(self)
 
 
 class Destroy(SimpleDestroy, Describe):
