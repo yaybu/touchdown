@@ -265,6 +265,44 @@
         }
       ]
     },
+    "NatGatewayAvailable": {
+      "delay": 15,
+      "operation": "DescribeNatGateways",
+      "maxAttempts": 40,
+      "acceptors": [
+        {
+          "expected": "available",
+          "matcher": "pathAll",
+          "state": "success",
+          "argument": "NatGateways[].State"
+        },
+        {
+          "expected": "deleted",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "NatGateways[].State"
+        },
+        {
+          "expected": "deleting",
+          "matcher": "pathAny",
+          "state": "failure",
+          "argument": "NatGateways[].State"
+        }
+      ]
+    },
+    "NatGatewayDeleted": {
+      "delay": 15,
+      "operation": "DescribeNatGateways",
+      "maxAttempts": 40,
+      "acceptors": [
+        {
+          "expected": "deleted",
+          "matcher": "pathAll",
+          "state": "success",
+          "argument": "NatGateways[].State"
+        }
+      ]
+    },
     "PasswordDataAvailable": {
       "operation": "GetPasswordData",
       "maxAttempts": 40,

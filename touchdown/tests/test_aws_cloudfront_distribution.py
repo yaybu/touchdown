@@ -113,10 +113,10 @@ class TestCloudFront(aws.TestBasicUsage):
 
     # FIXME: Refactor tests so matching can be done in a generic way
     def test_no_change(self):
-        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-07-27/distribution", self.fixture_found, expires=1)
+        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-09-17/distribution", self.fixture_found, expires=1)
         self.responses.add_fixture(
             "GET",
-            "https://cloudfront.amazonaws.com/2015-07-27/distribution/EDFDVBD6EXAMPLE",
+            "https://cloudfront.amazonaws.com/2015-09-17/distribution/EDFDVBD6EXAMPLE",
             "aws_distribution_get",
             expires=1
         )
@@ -125,9 +125,9 @@ class TestCloudFront(aws.TestBasicUsage):
 
     # FIXME: Refactor tests so matching can be done in a generic way
     def test_create(self):
-        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-07-27/distribution", self.fixture_404, expires=1)
+        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-09-17/distribution", self.fixture_404, expires=1)
         self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
-        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-07-27/distribution", self.fixture_found)
-        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-07-27/distribution/EDFDVBD6EXAMPLE", "aws_distribution_get")
+        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-09-17/distribution", self.fixture_found)
+        self.responses.add_fixture("GET", "https://cloudfront.amazonaws.com/2015-09-17/distribution/EDFDVBD6EXAMPLE", "aws_distribution_get")
         self.goal.execute()
         self.assertEqual(self.plan.resource_id, self.expected_resource_id)
