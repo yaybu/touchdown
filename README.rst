@@ -14,6 +14,9 @@ Touchdown
 .. image:: https://img.shields.io/pypi/v/touchdown.svg
    :target: https://pypi.python.org/pypi/touchdown/
 
+.. image:: https://img.shields.io/badge/docs-latest-green.svg
+   :target: http://docs.yaybu.com/projects/touchdown/en/latest/
+
 
 Touchdown is a service orchestration framework for python. It provides a python
 "DSL" for declaring complicated cloud infrastructures and provisioning those
