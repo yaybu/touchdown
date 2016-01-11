@@ -75,6 +75,9 @@ Resources
    :doc:`Slack notifications <config/notifications/slack>` |
    :doc:`NewRelic deploy notifications <config/notifications/newrelic>`
 
+ * **Tunables:**
+   :doc:`Configuration <config/config>`
+
 
 Getting help
 ============

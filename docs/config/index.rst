@@ -27,3 +27,4 @@ VPC at Amazon with a subnet your ``Touchdownfile`` would contain::
    aws/index
    provisioner/index
    notifications/index
+   config
