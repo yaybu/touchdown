@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from botocore.client import ClientError
+
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
@@ -19,9 +21,10 @@ from touchdown.core import argument
 from .bucket import Bucket
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from touchdown.core import serializers
+from touchdown.interfaces import File, FileNotFound
 
 
-class File(Resource):
+class File(File):
 
     resource_name = "file"
 
@@ -64,6 +67,11 @@ class Apply(SimpleApply, Describe):
     create_action = "put_object"
     create_response = "not-that-useful"
 
+    def get_actions(self):
+        if self.resource.contents:
+            return super(Apply, self).get_actions()
+        return []
+
 
 class Destroy(SimpleDestroy, Describe):
 
@@ -73,4 +81,39 @@ class Destroy(SimpleDestroy, Describe):
         return serializers.Dict(
             Bucket=self.resource.bucket.name,
             Key=self.resource.name,
+        )
+
+
+class FileIo(Plan):
+
+    resource = File
+    name = "fileio"
+
+    def read(self):
+        bucket = self.runner.get_service(self.resource.bucket, "describe")
+        if not bucket.describe_object():
+            raise FileNotFound("s3://{}/".format(self.resource.bucket.name))
+
+        describe = self.runner.get_service(self.resource, "describe")
+        try:
+            obj = describe.client.get_object(
+                Bucket=self.resource.bucket.name,
+                Key=self.resource.name,
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchKey':
+                raise FileNotFound("s3://{}/{}".format(
+                    self.resource.bucket.name,
+                    self.resource.name,
+                ))
+            raise
+
+        return obj['Body']
+
+    def write(self, contents):
+        describe = self.runner.get_service(self.resource, "describe")
+        describe.client.put_object(
+            Bucket=self.resource.bucket.name,
+            Key=self.resource.name,
+            Body=contents,
         )

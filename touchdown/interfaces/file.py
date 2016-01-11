@@ -85,7 +85,14 @@ class Edit(Plan):
 
     def execute(self):
         f = self.runner.get_service(self.resource, "fileio")
-        contents, changed = self.edit(f.read().read())
+
+        try:
+            contents = f.read().read()
+        except FileNotFound:
+            contents = ''
+
+        contents, changed = self.edit(contents)
+
         if changed:
             f.write(contents)
 
