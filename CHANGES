@@ -51,6 +51,11 @@ Changelog for Touchdown
         min=asg_min,
     )
 
+- You can use S3 files anywhere you would use local files::
+
+    bucket = aws.add_bucket(name='mybucket')
+    conf = aws.add_config(file=bucket.add_file(name='test.cfg'))
+
 - Add new commands for managing tunable configuration values:
 
     * ``touchdown get`` - see the current state of a variable
