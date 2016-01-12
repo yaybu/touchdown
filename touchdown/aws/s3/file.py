@@ -14,7 +14,6 @@
 
 from botocore.client import ClientError
 
-from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
 from touchdown.core import argument
 
