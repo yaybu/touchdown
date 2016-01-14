@@ -42,7 +42,7 @@ class AttributeDiff(object):
 
     def lines(self):
         for field, diff in self.diffs:
-            yield "{}: ".format(field.name)
+            yield "{}: ".format(field)
             for line in diff.lines():
                 yield "    {}".format(line)
 

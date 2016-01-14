@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import six
+
 from touchdown.core import errors
 
 
@@ -31,7 +33,7 @@ class ActionGoalMixin(object):
             try:
                 self.changes[resource] = list(self.get_plan(resource).get_actions())
             except Exception as e:
-                raise errors.Error("{}: {}".format(resource, e))
+                six.raise_from(errors.Error("{}: {}".format(resource, e)), e)
         return self.changes[resource]
 
     def plan(self):

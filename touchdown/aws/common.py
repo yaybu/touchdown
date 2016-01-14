@@ -262,8 +262,8 @@ class SimpleDescribe(SimplePlan):
             return [results]
         return results
 
-    def describe_object(self):
-        logger.debug("Trying to find AWS object for resource {} using {}".format(self.resource, self.describe_action))
+    def get_possible_objects(self):
+        logger.debug("Trying to find AWS objects for resource {} using {}".format(self.resource, self.describe_action))
 
         if self.describe_filters is not None:
             filters = self.describe_filters
@@ -281,7 +281,10 @@ class SimpleDescribe(SimplePlan):
         else:
             results = self._get_unpaginated_matches(filters)
 
-        objects = list(filter(self.describe_object_matches, results or []))
+        return results or []
+
+    def describe_object(self):
+        objects = list(filter(self.describe_object_matches, self.get_possible_objects()))
 
         if len(objects) > 1:
             raise errors.Error("Expecting to find one {}, but found {}".format(self.resource, len(objects)))
@@ -291,6 +294,12 @@ class SimpleDescribe(SimplePlan):
             return objects[0]
 
         return {}
+
+    def lookup_version(self, name):
+        for obj in self.get_possible_objects():
+            if obj.get(self.key, '') == name:
+                return obj
+        return obj
 
     def generic_action(self, description, callable, serializer=None, **kwargs):
         return GenericAction(

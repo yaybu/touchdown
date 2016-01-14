@@ -107,6 +107,20 @@ class Identifier(Serializer):
             return "pending ({})".format(object)
         return result
 
+    def diff(self, runner, object, value):
+        rendered = self.render(runner, object)
+        resource = self.inner.render(runner, object)
+        if not value or value == rendered:
+            return diff.ValueDiff(value, rendered)
+        describe = runner.get_plan(resource)
+        d = Resource().diff(
+            runner,
+            resource,
+            describe.lookup_version(value),
+        )
+        d.diffs.insert(0, ("name", diff.ValueDiff(value, rendered)))
+        return d
+
     def dependencies(self, object):
         return self.inner.dependencies(object)
 
@@ -356,11 +370,11 @@ class Resource(Dict):
                 continue
 
             if arg.field not in value:
-                d.add(field, diff.ValueDiff(value, "INITIAL_VALUE"))
+                d.add(field.name, diff.ValueDiff(value, "INITIAL_VALUE"))
                 continue
 
             try:
-                d.add(field, arg.serializer.diff(runner, getattr(obj, name), value[arg.field]))
+                d.add(field.name, arg.serializer.diff(runner, getattr(obj, name), value[arg.field]))
             except FieldNotPresent:
                 continue
 

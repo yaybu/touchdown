@@ -129,13 +129,6 @@ class Describe(SimpleDescribe, Plan):
         if not vpc.resource_id:
             return None
 
-        if self.key in self.object:
-            return {
-                "Filters": [
-                    {'Name': 'network-acl-id', 'Values': [self.object[self.key]]}
-                ]
-            }
-
         return {
             "Filters": [
                 {'Name': 'vpc-id', 'Values': [vpc.resource_id]}
@@ -185,24 +178,12 @@ class Describe(SimpleDescribe, Plan):
         return self._compare_rules(network_acl)
 
     def get_possible_objects(self):
-        vpc = self.runner.get_plan(self.resource.vpc)
-        if not vpc.resource_id:
-            return
-
-        prefix = "{}.".format(self.resource.name)
-
-        result = self.client.describe_network_acls(
-            Filters=[
-                {"Name": 'vpc-id', "Values": [vpc.resource_id]},
-            ]
-        )
-
-        for network_acl in result.get('NetworkAcls', []):
+        for network_acl in super(Describe, self).get_possible_objects():
             tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
             name = tags.get('Name', '')
 
             # Only ignore ACL's for the current resource
-            if name != self.resource.name and not name.startswith(prefix):
+            if name != self.resource.name and not name.startswith(self.resource.name + "."):
                 continue
 
             # Don't delete the default ACL

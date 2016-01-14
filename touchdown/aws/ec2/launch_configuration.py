@@ -130,19 +130,15 @@ class Apply(SimpleApply, Describe):
         )
 
     def prepare_to_create(self):
-        prefix = "{}.".format(self.resource.name)
         configs = []
-        for page in self.client.get_paginator("describe_launch_configurations").paginate():
-            for config in page.get('LaunchConfigurations', []):
-                if not config['LaunchConfigurationName'].startswith(prefix):
-                    continue
-                if self.object and config['LaunchConfigurationName'] == self.object['LaunchConfigurationName']:
-                    # Make sure we don't delete the launch config that matches self.resource!!!
-                    continue
-                configs.append({
-                    "LaunchConfigurationName": config["LaunchConfigurationName"],
-                    "CreatedTime": config["CreatedTime"],
-                })
+        for config in self.get_possible_objects():
+            if self.object and config['LaunchConfigurationName'] == self.object['LaunchConfigurationName']:
+                # Make sure we don't delete the launch config that matches self.resource!!!
+                continue
+            configs.append({
+                "LaunchConfigurationName": config["LaunchConfigurationName"],
+                "CreatedTime": config["CreatedTime"],
+            })
 
         configs.sort(key=lambda config: config["CreatedTime"])
 
