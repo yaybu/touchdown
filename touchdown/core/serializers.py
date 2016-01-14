@@ -158,6 +158,9 @@ class Argument(Serializer):
             result = result.render(runner, object)
             if self.field:
                 result = self.field.clean_value(object, result)
+        else:
+            result = object.meta.fields[self.attribute].argument.serializer.render(runner, object)
+
         return result
 
 
@@ -256,6 +259,9 @@ class Json(Formatter):
     def render(self, runner, object):
         return json.dumps(self.inner.render(runner, object), sort_keys=True)
 
+    def diff(self, runner, object):
+        return self.inner.diff(runner, object, json.loads(value))
+
 
 class Format(Formatter):
     def __init__(self, format_string, inner=Identity()):
@@ -295,6 +301,20 @@ class Dict(Serializer):
 
     def render(self, runner, object):
         return self._render(self.kwargs, runner, object)
+
+    def diff(self, runner, object, value):
+        d = diff.AttributeDiff()
+        rendered = self.render(runner, object)
+
+        for k, v in rendered.items():
+            if k not in value:
+                d.add(k, diff.ValueDiff(v, ""))
+
+        for k, v in value.items():
+            if k not in rendered:
+                d.add(k, diff.ValueDiff("", v))
+
+        return d
 
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))
@@ -341,14 +361,9 @@ class Resource(Dict):
             if self.should_ignore_field(field, value):
                 continue
 
-            if hasattr(object, "serialize_" + field.name):
-                serializer = Expression(getattr(object, "serialize_" + field.name))
-            else:
-                serializer = field.argument.serializer
-
             kwargs[field.argument.field] = Context(
                 Argument(field.name, field),
-                serializer,
+                field.argument.serializer,
             )
 
         return self._render(kwargs, runner, object)
@@ -374,7 +389,11 @@ class Resource(Dict):
                 continue
 
             try:
-                d.add(field.name, arg.serializer.diff(runner, getattr(obj, name), value[arg.field]))
+                serializer = Context(
+                    Argument(field.name, field),
+                    arg.serializer,
+                )
+                d.add(field.name, serializer.diff(runner, obj, value[arg.field]))
             except FieldNotPresent:
                 continue
 
@@ -416,6 +435,10 @@ class Context(Serializer):
     def render(self, runner, object):
         object = self.serializer.render(runner, object)
         return self.inner.render(runner, object)
+
+    def diff(self, runner, object, value):
+        object = self.serializer.render(runner, object)
+        return self.inner.diff(runner, object, value)
 
     def dependencies(self, object):
         return self.inner.dependencies(object).union(self.serializer.dependencies(object))

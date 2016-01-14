@@ -80,11 +80,6 @@ class LaunchConfiguration(Resource):
 
     account = argument.Resource(BaseAccount)
 
-    def matches(self, runner, remote):
-        if "UserData" in remote and remote["UserData"]:
-            remote["UserData"] = force_str(base64.b64decode(remote["UserData"]))
-        return super(LaunchConfiguration, self).matches(runner, remote)
-
 
 class Describe(SimpleDescribe, Plan):
 
@@ -97,10 +92,15 @@ class Describe(SimpleDescribe, Plan):
 
     biggest_serial = 0
 
-    def describe_object_matches(self, lc):
-        if not lc["LaunchConfigurationName"].startswith(self.resource.name + "."):
-            return False
+    def get_possible_objects(self):
+        for obj in super(Describe, self).get_possible_objects():
+            if not obj["LaunchConfigurationName"].startswith(self.resource.name + "."):
+                continue
+            if "UserData" in obj and obj["UserData"]:
+                obj["UserData"] = force_str(base64.b64decode(obj["UserData"]))
+            yield obj
 
+    def describe_object_matches(self, lc):
         try:
             serial = lc["LaunchConfigurationName"].rsplit(".", 1)[1]
             self.biggest_serial = max(int(serial), self.biggest_serial)
