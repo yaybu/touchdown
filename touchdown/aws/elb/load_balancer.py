@@ -112,8 +112,8 @@ class LoadBalancer(Resource):
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
     # tags = argument.Dict()
 
-    health_check = argument.Resource(HealthCheck)
-    attributes = argument.Resource(Attributes)
+    health_check = argument.Resource(HealthCheck, serializer=serializers.Resource())
+    attributes = argument.Resource(Attributes, serializer=serializers.Resource())
 
     account = argument.Resource(BaseAccount)
 
@@ -169,10 +169,7 @@ class Apply(SimpleApply, Describe):
                 "Configure attributes",
                 self.client.modify_load_balancer_attributes,
                 LoadBalancerName=serializers.Identifier(),
-                LoadBalancerAttributes=serializers.Context(
-                    serializers.Const(a),
-                    serializers.Resource()
-                ),
+                LoadBalancerAttributes=serializers.Argument("attributes"),
             )
 
     def update_health_check(self):
@@ -181,10 +178,7 @@ class Apply(SimpleApply, Describe):
                 "Configure health check",
                 self.client.configure_health_check,
                 LoadBalancerName=self.resource.name,
-                HealthCheck=serializers.Context(
-                    serializers.Const(self.resource.health_check),
-                    serializers.Resource(),
-                ),
+                HealthCheck=serializers.Argument("health_check"),
             )
 
     def update_object(self):

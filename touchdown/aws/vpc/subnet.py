@@ -123,14 +123,14 @@ class Apply(SimpleApply, Describe):
                     "Associate route table",
                     self.client.associate_route_table,
                     SubnetId=serializers.Identifier(),
-                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifier()),
+                    RouteTableId=self.resource.route_table.identifier(),
                 )
             elif self.object['RouteTableId'] != self.runner.get_plan(self.resource.route_table).resource_id:
                 yield self.generic_action(
                     "Replace route table association",
                     self.client.replace_route_table_association,
                     AssociationId=self.object["RouteTableAssociationId"],
-                    RouteTableId=serializers.Context(serializers.Argument("route_table"), serializers.Identifier()),
+                    RouteTableId=self.resource.route_table.identifier(),
                 )
         elif self.object.get("RouteTableAssociationId", None):
             yield self.generic_action(
@@ -154,7 +154,7 @@ class Apply(SimpleApply, Describe):
                 "Replace Network ACL association",
                 self.client.replace_network_acl_association,
                 AssociationId=serializers.Property('NetworkAclAssociationId'),
-                NetworkAclId=serializers.Context(serializers.Argument("network_acl"), serializers.Identifier()),
+                NetworkAclId=self.resource.network_acl.identifier(),
             )
 
 

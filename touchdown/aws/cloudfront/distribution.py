@@ -60,8 +60,8 @@ class DefaultCacheBehavior(Resource):
             "Quantity": 0,
         }),
         "AllowedMethods": CloudFrontList(
-            inner=serializers.Context(serializers.Argument("allowed_methods"), serializers.List()),
-            CachedMethods=serializers.Context(serializers.Argument("cached_methods"), CloudFrontList()),
+            inner=serializers.Argument("allowed_methods"),
+            CachedMethods=serializers.Argument("cached_methods"),
         ),
         "ForwardedValues": serializers.Resource(
             group="forwarded-values",
@@ -83,7 +83,7 @@ class DefaultCacheBehavior(Resource):
     )
 
     allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
-    cached_methods = argument.List(default=lambda x: ["GET", "HEAD"])
+    cached_methods = argument.List(default=lambda x: ["GET", "HEAD"], serializer=CloudFrontList())
 
     default_ttl = argument.Integer(default=86400, field="DefaultTTL")
     min_ttl = argument.Integer(default=0, field="MinTTL")
@@ -140,8 +140,8 @@ class Distribution(Resource):
             lambda runner, object: runner.get_plan(object).object.get('CallerReference', str(uuid.uuid4()))
         ),
         "Aliases": CloudFrontList(serializers.Chain(
-            serializers.Context(serializers.Argument("cname"), serializers.ListOfOne(maybe_empty=True)),
-            serializers.Context(serializers.Argument("aliases"), serializers.List()),
+            serializers.Argument("cname"),
+            serializers.Argument("aliases"),
         )),
         # We don't support GeoRestrictions yet - so include a stubbed default
         # when serializing
@@ -159,7 +159,7 @@ class Distribution(Resource):
     }
 
     name = argument.String()
-    cname = argument.String(default=lambda instance: instance.name)
+    cname = argument.String(default=lambda instance: instance.name, serializer=serializers.ListOfOne(maybe_empty=True))
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
     aliases = argument.List()
     root_object = argument.String(default='/', field="DefaultRootObject")

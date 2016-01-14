@@ -46,8 +46,8 @@ class StreamingDistribution(Resource):
             lambda runner, object: runner.get_plan(object).object.get('StreamingDistributionConfig', {}).get('CallerReference', str(uuid.uuid4()))
         ),
         "Aliases": CloudFrontList(serializers.Chain(
-            serializers.Context(serializers.Argument("cname"), serializers.ListOfOne(maybe_empty=True)),
-            serializers.Context(serializers.Argument("aliases"), serializers.List()),
+            serializers.Argument("cname"),
+            serializers.Argument("aliases"),
         )),
         "TrustedSigners": serializers.Const({
             "Enabled": False,
@@ -57,7 +57,7 @@ class StreamingDistribution(Resource):
     }
 
     name = argument.String()
-    cname = argument.String(default=lambda instance: instance.name)
+    cname = argument.String(default=lambda instance: instance.name, serializer=serializers.Argument("cname"))
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
     aliases = argument.List()
     enabled = argument.Boolean(default=True, field="Enabled")

@@ -145,7 +145,7 @@ class Argument(Serializer):
         self.attribute = attribute
         self.field = field
 
-    def render(self, runner, object):
+    def get_inner(self, runner, object):
         try:
             result = getattr(object, self.attribute)
         except AttributeError:
@@ -154,14 +154,24 @@ class Argument(Serializer):
             if result is None:
                 raise FieldNotPresent(self.attribute)
             pass
+        return result
+
+    def render(self, runner, object):
+        result = self.get_inner(runner, object)
         if isinstance(result, Serializer):
             result = result.render(runner, object)
             if self.field:
                 result = self.field.clean_value(object, result)
         else:
-            result = object.meta.fields[self.attribute].argument.serializer.render(runner, object)
+            result = object.meta.fields[self.attribute].argument.serializer.render(runner, result)
 
         return result
+
+    def diff(self, runner, object, value):
+        result = self.get_inner(runner, object)
+        if isinstance(result, Serializer):
+            return result.diff(runner, result, value)
+        return object.meta.fields[self.attribute].argument.serializer.diff(runner, result, value)
 
 
 class Expression(Serializer):
@@ -259,7 +269,7 @@ class Json(Formatter):
     def render(self, runner, object):
         return json.dumps(self.inner.render(runner, object), sort_keys=True)
 
-    def diff(self, runner, object):
+    def diff(self, runner, object, value):
         return self.inner.diff(runner, object, json.loads(value))
 
 
@@ -361,10 +371,7 @@ class Resource(Dict):
             if self.should_ignore_field(field, value):
                 continue
 
-            kwargs[field.argument.field] = Context(
-                Argument(field.name, field),
-                field.argument.serializer,
-            )
+            kwargs[field.argument.field] = Argument(field.name, field)
 
         return self._render(kwargs, runner, object)
 
@@ -389,11 +396,7 @@ class Resource(Dict):
                 continue
 
             try:
-                serializer = Context(
-                    Argument(field.name, field),
-                    arg.serializer,
-                )
-                d.add(field.name, serializer.diff(runner, obj, value[arg.field]))
+                d.add(field.name, Argument(field.name, field).diff(runner, obj, value[arg.field]))
             except FieldNotPresent:
                 continue
 

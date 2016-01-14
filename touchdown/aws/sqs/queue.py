@@ -123,10 +123,7 @@ class Subscription(sns.Subscription):
     def get_serializer(self, runner, **kwargs):
         return serializers.Dict(
             Protocol=serializers.Const("sqs"),
-            Endpoint=serializers.Context(
-                serializers.Const(self.adapts),
-                serializers.Property("QueueArn"),
-            ),
+            Endpoint=self.adapts.get_property("QueueArn"),
             TopicArn=kwargs['TopicArn'],
         )
 
@@ -138,7 +135,4 @@ class AlarmDestination(cloudwatch.AlarmDestination):
     input = Queue
 
     def get_serializer(self, runner, **kwargs):
-        return serializers.Context(
-            serializers.Const(self.adapts),
-            serializers.Property("QueueArn"),
-        )
+        return self.adapts.get_property("QueueArn")
