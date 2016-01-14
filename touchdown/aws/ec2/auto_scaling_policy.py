@@ -87,7 +87,4 @@ class AlarmDestination(cloudwatch.AlarmDestination):
     input = Policy
 
     def get_serializer(self, runner, **kwargs):
-        return serializers.Context(
-            serializers.Const(self.adapts),
-            serializers.Property("PolicyARN"),
-        )
+        return self.adapts.get_property("PolicyARN")

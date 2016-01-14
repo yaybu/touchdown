@@ -76,8 +76,8 @@ class Apply(SimpleApply, Describe):
         yield self.generic_action(
             "Attach to vpc {}".format(self.resource.vpc),
             self.client.attach_internet_gateway,
-            InternetGatewayId=serializers.Identifier(),
-            VpcId=serializers.Context(serializers.Argument("vpc"), serializers.Identifier()),
+            InternetGatewayId=self.resource.identifier(),
+            VpcId=self.resource.vpc.identifier(),
         )
 
 

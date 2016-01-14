@@ -26,7 +26,7 @@ class TestResource(unittest.TestCase):
     def test_identifier(self):
         self.assertTrue(isinstance(
             self.resource.identifier(),
-            serializers.Identifier,
+            serializers.Context,
         ))
 
     def test_properties(self):

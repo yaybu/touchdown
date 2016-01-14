@@ -144,9 +144,9 @@ class Apply(SimpleApply, Describe):
                     yield self.generic_action(
                         "Adding route for {}".format(local.destination_cidr),
                         self.client.create_route,
-                        serializers.Context(serializers.Const(local), serializers.Resource(
-                            RouteTableId=serializers.Identifier(serializers.Const(self.resource)),
-                        ))
+                        local.serializer_with_kwargs(
+                            RouteTableId=self.resource.identifier(),
+                        ),
                     )
 
     def update_object(self):

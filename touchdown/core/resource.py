@@ -203,7 +203,10 @@ class Resource(six.with_metaclass(ResourceType)):
 
     def identifier(self):
         """ Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' """
-        return serializers.Identifier(serializers.Const(self))
+        return serializers.Context(
+            serializers.Const(self),
+            serializers.Identifier(),
+        )
 
     def get_property(self, property_name):
         """ Returns a serializer that renders a property fetched by describing a remote resource """
@@ -212,7 +215,7 @@ class Resource(six.with_metaclass(ResourceType)):
             serializers.Const(self),
         )
 
-    def serializer_with_args(self, **kwargs):
+    def serializer_with_kwargs(self, **kwargs):
         return serializers.Context(
             serializers.Const(self),
             serializers.Resource(**kwargs),

@@ -227,7 +227,7 @@ class Apply(SimpleApply, Describe):
                 direction='egress' if egress else 'ingress',
             ),
             self.client.create_network_acl_entry,
-            rule.serializer_with_args(
+            rule.serializer_with_kwargs(
                 NetworkAclId=self.resource.identifier(),
                 Egress=egress,
                 RuleNumber=rule_number,

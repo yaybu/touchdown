@@ -74,12 +74,9 @@ class Apply(SimpleApply, Describe):
                 yield self.generic_action(
                     "Subscribe to {}".format(local),
                     self.client.subscribe,
-                    serializers.Context(
-                        local,
-                        serializers.Resource(
-                            TopicArn=self.resource.arn,
-                        )
-                    )
+                    local.serializer_with_kwargs(
+                        TopicArn=self.resource.arn,
+                    ),
                 )
 
         for remote in remote_subscriptions:

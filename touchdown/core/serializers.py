@@ -99,10 +99,9 @@ class Identifier(Serializer):
         self.inner = inner
 
     def render(self, runner, object):
-        resource = self.inner.render(runner, object)
-        if not resource:
+        if not object:
             raise FieldNotPresent()
-        result = runner.get_plan(resource).resource_id
+        result = runner.get_plan(object).resource_id
         if not result:
             return "pending ({})".format(object)
         return result

@@ -138,7 +138,7 @@ class Apply(SimpleApply, Describe):
             else:
                 changes.append(serializers.Dict(
                     Action="UPSERT",
-                    ResourceRecordSet=serializers.Context(serializers.Const(local), serializers.Resource()),
+                    ResourceRecordSet=local.serializer_with_kwargs(),
                 ))
                 description.append("Name => {}, Type={}, Action=UPSERT".format(local.name, local.type))
 

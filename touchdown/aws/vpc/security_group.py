@@ -161,7 +161,7 @@ class Apply(SimpleApply, Describe):
                     "Authorize ingress {}".format(local_rule),
                     self.client.authorize_security_group_ingress,
                     GroupId=serializers.Identifier(),
-                    IpPermissions=serializers.ListOfOne(serializers.Context(serializers.Const(local_rule), serializers.Resource())),
+                    IpPermissions=serializers.ListOfOne(local_rule.serializer_with_kwargs()),
                 )
 
         return
@@ -175,7 +175,7 @@ class Apply(SimpleApply, Describe):
                     "Authorize egress {}".format(local_rule),
                     self.client.authorize_security_group_egress,
                     GroupId=serializers.Identifier(),
-                    IpPermissions=serializers.ListOfOne(serializers.Context(serializers.Const(local_rule), serializers.Resource())),
+                    IpPermissions=serializers.ListOfOne(local_rule.serializer_with_kwargs()),
                 )
 
 

@@ -78,10 +78,7 @@ class Output(ReadOnly):
         self.propname = propname
 
     def get_default(self, instance):
-        return serializers.Context(
-            instance,
-            serializers.Property(self.propname),
-        )
+        return instance.get_property(self.propname)
 
 
 class Boolean(Argument):
