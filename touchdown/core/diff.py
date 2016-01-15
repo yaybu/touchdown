@@ -22,7 +22,7 @@ class ValueDiff(object):
         return self.remote_value == self.local_value
 
     def lines(self):
-        return ["{0.remote_value} => {0.local_value}".format(self)]
+        return ["{0.remote_value!r} => {0.local_value!r}".format(self)]
 
     def __str__(self):
         return '\n'.join(self.lines())

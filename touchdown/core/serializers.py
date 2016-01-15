@@ -317,11 +317,16 @@ class Dict(Serializer):
 
         for k, v in rendered.items():
             if k not in value:
-                d.add(k, diff.ValueDiff(v, ""))
+                d.add(k, diff.ValueDiff("", v))
+                continue
+            if isinstance(v, dict) and isinstance(value[k], dict):
+                d.add(k, Dict(**v).diff(runner, object, value[k]))
+                continue
+            d.add(k, diff.ValueDiff(v, value[k]))
 
         for k, v in value.items():
             if k not in rendered:
-                d.add(k, diff.ValueDiff("", v))
+                d.add(k, diff.ValueDiff(v, ""))
 
         return d
 
