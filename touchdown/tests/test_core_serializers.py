@@ -81,7 +81,7 @@ class TestDiffing(unittest.TestCase):
 
     def test_diffs(self):
         d = serializers.Resource().diff(self.runner, self.resource, {})
-        assert list(d.lines()) == ['name: ', '    {} => INITIAL_VALUE']
+        assert list(d.lines()) == ['name: ', "    {} => 'INITIAL_VALUE'"]
 
     def test_matches_true(self):
         d = serializers.Resource().diff(self.runner, self.resource, {
@@ -96,7 +96,7 @@ class TestDiffing(unittest.TestCase):
             "Description": "",
         })
         assert d.matches() is False
-        assert list(d.lines()) == ['description: ', '     => description']
+        assert list(d.lines()) == ['description: ', "    '' => 'description'"]
 
     def test_diffs_desc_unset(self):
         self.resource.description = ""
@@ -105,4 +105,4 @@ class TestDiffing(unittest.TestCase):
             "Description": "description",
         })
         assert d.matches() is False
-        assert list(d.lines()) == ['description: ', '    description => ']
+        assert list(d.lines()) == ['description: ', "    'description' => ''"]
