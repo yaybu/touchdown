@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.5.0 (unreleased)
+0.5.0 (2016-01-15)
 ------------------
 
 - Add support for AWS NAT Gateway.
