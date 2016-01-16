@@ -217,7 +217,7 @@ class RecordedBotoCoreTest(unittest.TestCase):
     def _before_record_response(self, response):
         response['body']['string'] = response['body']['string'].replace(
             force_bytes(self.config["OWNER"]),
-            b"111111111111",
+            b"x0x0x0x0x0x0",
         )
         return response
 
@@ -225,7 +225,7 @@ class RecordedBotoCoreTest(unittest.TestCase):
         self.stack = ExitStack()
 
         self.config = {
-            "OWNER": "111111111111",
+            "OWNER": "x0x0x0x0x0x0",
             "ACCESS_KEY_ID": "AKIAI634JOB5PNTJNTZOOBA",
             "SECRET_ACCESS_KEY": "1234567890abcedfghijklmnopqrstuvwxyz!",
         }
