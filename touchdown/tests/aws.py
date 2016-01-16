@@ -16,6 +16,7 @@ import os
 import unittest
 import mock
 import six
+import json
 
 try:
     from contextlib import ExitStack
@@ -36,6 +37,9 @@ try:
 except ImportError:
     from urllib3.response import HTTPResponse
 from botocore.endpoint import Endpoint as OldEndpoint
+
+
+PROJECT_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 
 
 class Buffer(object):
@@ -211,10 +215,24 @@ class RecordedBotoCoreTest(unittest.TestCase):
         return request
 
     def _before_record_response(self, response):
+        response['body']['string'] = response['body']['string'].replace(
+            force_bytes(self.config["OWNER"]),
+            b"111111111111",
+        )
         return response
 
     def setUp(self):
         self.stack = ExitStack()
+
+        self.config = {
+            "OWNER": "111111111111",
+            "ACCESS_KEY_ID": "AKIAI634JOB5PNTJNTZOOBA",
+            "SECRET_ACCESS_KEY": "1234567890abcedfghijklmnopqrstuvwxyz!",
+        }
+        aws_json = os.path.join(PROJECT_ROOT, "aws.json")
+        if os.path.exists(aws_json):
+            with open(aws_json, "r") as fp:
+                self.config.update(json.load(fp))
 
         self.vcr = vcr.VCR(
             before_record=self._before_record_request,
@@ -223,7 +241,7 @@ class RecordedBotoCoreTest(unittest.TestCase):
 
         self.stack.enter_context(self.vcr.use_cassette(
             os.path.join(os.path.dirname(__file__), 'cassettes/{}.yml'.format(self.id())),
-            serializers='json',
+            # serializer='json',
             custom_patches=self.patches(),
             filter_headers=[
                 'authorization',
@@ -239,7 +257,11 @@ class RecordedBotoCoreTest(unittest.TestCase):
         is_conn_dropped.return_value = True
 
         self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(region='eu-west-1')
+        self.aws = self.workspace.add_aws(
+            region='eu-west-1',
+            access_key_id=self.config['ACCESS_KEY_ID'],
+            secret_access_key=self.config['SECRET_ACCESS_KEY'],
+        )
 
     def tearDown(self):
         self.stack.close()

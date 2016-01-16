@@ -19,7 +19,7 @@ install:
   - pip install --no-index --find-links=$HOME/wheelhouse -r requirements.txt
 
 script:
-  - AWS_ACCESS_KEY_ID=AKIASDSDSDSDSDSD AWS_SECRET_ACCESS_KEY=dummykey coverage run $(which py.test) touchdown
+  - coverage run $(which py.test) touchdown
   - flake8 touchdown
 
 after_success:
