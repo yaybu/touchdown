@@ -15,14 +15,26 @@
 class ValueDiff(object):
 
     def __init__(self, remote_value, local_value):
-        self.remote_value = remote_value
-        self.local_value = local_value
+        self._remote_value = remote_value
+        self._local_value = local_value
+
+    @property
+    def local_value(self):
+        if self._local_value is None:
+            return "(unset)"
+        return repr(self._local_value)
+
+    @property
+    def remote_value(self):
+        if self._remote_value is None:
+            return "(unset)"
+        return repr(self._remote_value)
 
     def matches(self):
         return self.remote_value == self.local_value
 
     def lines(self):
-        return ["{0.remote_value!r} => {0.local_value!r}".format(self)]
+        return ["{0.remote_value} => {0.local_value}".format(self)]
 
     def __str__(self):
         return '\n'.join(self.lines())
