@@ -8,8 +8,8 @@ Touchdown
 .. image:: https://img.shields.io/appveyor/ci/yaybu/touchdown/master.svg
    :target: https://ci.appveyor.com/project/yaybu/touchdown
 
-.. image:: https://img.shields.io/coveralls/yaybu/touchdown/master.svg
-   :target: https://coveralls.io/r/yaybu/touchdown
+.. image:: https://img.shields.io/codecov/c/github/yaybu/touchdown/master.svg
+   :target: https://codecov.io/github/yaybu/touchdown?ref=master
 
 .. image:: https://img.shields.io/pypi/v/touchdown.svg
    :target: https://pypi.python.org/pypi/touchdown/
