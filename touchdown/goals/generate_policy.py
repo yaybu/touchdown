@@ -146,7 +146,7 @@ class GeneratePolicy(Goal):
             serialize_map,
         ))
 
-        print json.dumps(policy, indent=4, separators=(',', ': '))
+        print (json.dumps(policy, indent=4, separators=(',', ': ')))
 
 
 register(GeneratePolicy)
