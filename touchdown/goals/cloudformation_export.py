@@ -108,21 +108,21 @@ class Export(Goal):
         props.set_bool("AutomaticFailoverEnabled", replication_group.automatic_failover)
         props.set_bool("AutoMinorVersionUpgrade", replication_group.auto_minor_version_upgrade)
         props.set("CacheNodeType", replication_group.instance_class)
-        #props.set_ref("CacheParameterGroupName", replication_group.parameter_group)
-        #props.set("CacheSecurityGroupNames" : [ String, ... ],
+        # props.set_ref("CacheParameterGroupName", replication_group.parameter_group)
+        # props.set("CacheSecurityGroupNames" : [ String, ... ],
         props.set_ref("CacheSubnetGroupName", replication_group.subnet_group)
         props.set("Engine", replication_group.engine)
         props.set("EngineVersion", replication_group.engine_version)
-        #props.set("NotificationTopicArn" : String,
+        # props.set("NotificationTopicArn" : String,
         props.set("NumCacheClusters", replication_group.num_cache_clusters)
         props.set("Port", replication_group.port)
         props.set("PreferredCacheClusterAZs", replication_group.availability_zone)
-        #props.set("PreferredMaintenanceWindow" : String,
+        # props.set("PreferredMaintenanceWindow" : String,
         props.set("ReplicationGroupDescription", replication_group.description)
         props.set_ref_list("SecurityGroupIds", replication_group.security_groups)
-        #props.set("SnapshotArns" : [ String, ... ],
-        #props.set("SnapshotRetentionLimit" : Integer,
-        #props.set("SnapshotWindow" : String
+        # props.set("SnapshotArns" : [ String, ... ],
+        # props.set("SnapshotRetentionLimit" : Integer,
+        # props.set("SnapshotWindow" : String
 
     def serialize_database(self, props, db):
         props.set("AllocatedStorage", db.allocated_storage)
@@ -131,7 +131,7 @@ class Export(Goal):
         props.set("AvailabilityZone", db.availability_zone)
         props.set("BackupRetentionPeriod", db.backup_retention_period)
         props.set("CharacterSetName", db.character_set_name)
-        #props.set("DBClusterIdentifier" : String,
+        # props.set("DBClusterIdentifier" : String,
         props.set("DBInstanceClass", db.instance_class)
         props.set("DBInstanceIdentifier", db.name)
         props.set("DBName", db.db_name)
@@ -184,8 +184,8 @@ class Export(Goal):
         props.set("Tags", tags)
 
         props.set_ip("CidrBlock", vpc.cidr_block)
-        #props.set("EnableDnsSupport", vpc.enable_dns_support)
-        #props.set("EnableDnsHostnames", vpc.enable_dns_hostnames)
+        # props.set("EnableDnsSupport", vpc.enable_dns_support)
+        # props.set("EnableDnsHostnames", vpc.enable_dns_hostnames)
         props.set("InstanceTenancy", vpc.tenancy)
 
     def serialize_internet_gateway(self, props, internet_gateway):
@@ -206,7 +206,6 @@ class Export(Goal):
         tags['Name'] = security_group.name
         props.set("Tags", tags)
 
-
     def serialize_subnet(self, props, subnet):
         props.set("AvailabilityZone", subnet.availability_zone)
         props.set_ip("CidrBlock", subnet.cidr_block)
@@ -226,7 +225,6 @@ class Export(Goal):
         tags['Name'] = route_table.name
         props.set("Tags", tags)
 
-
     def serialize_network_acl(self, props, network_acl):
         tags = {}
         tags.update(network_acl.tags)
@@ -237,16 +235,16 @@ class Export(Goal):
         # FIXME: Need to be able to unpickle interfaces
         # FIXME: Need to be able to map a dimension to a dict
         props.set_bool("ActionsEnabled", alarm.actions_enabled)
-        #props.set_ref_list("AlarmActions", alarm.alarm_actions)
+        # props.set_ref_list("AlarmActions", alarm.alarm_actions)
         props.set("AlarmDescription", alarm.description)
         props.set("AlarmName", alarm.name)
         props.set("ComparisonOperator", alarm.comparison_operator)
-        #props.set("Dimensions", alarm.dimensions)
+        # props.set("Dimensions", alarm.dimensions)
         props.set("EvaluationPeriods", alarm.evaluation_periods)
-        #props.set_ref_list("InsufficientDataActions", alarm.insufficient_data_actions)
+        # props.set_ref_list("InsufficientDataActions", alarm.insufficient_data_actions)
         props.set("MetricName", alarm.metric)
         props.set("Namespace", alarm.namespace)
-        #props.set_ref_list("OKActions", alarm.ok_actions)
+        # props.set_ref_list("OKActions", alarm.ok_actions)
         props.set("Period", alarm.period)
         props.set("Statistic", alarm.statistic)
         props.set("Threshold", alarm.threshold)
