@@ -31,7 +31,7 @@ class ValueDiff(object):
         return repr(self._remote_value)
 
     def matches(self):
-        return self.remote_value == self.local_value
+        return self._remote_value == self._local_value
 
     def lines(self):
         return ["{0.remote_value} => {0.local_value}".format(self)]
