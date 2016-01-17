@@ -14,6 +14,7 @@
 
 import itertools
 import json
+from six.moves import zip_longest
 
 from touchdown.core.utils import force_str
 from touchdown.core import diff
@@ -431,7 +432,7 @@ class List(Serializer):
         return list(result)
 
     def diff(self, runner, object, value):
-        for renderable, value in itertools.izip_longest(object, value):
+        for renderable, value in zip_longest(object, value):
             if not renderable:
                 return diff.ValueDiff("", "ITEM REMOVED")
             elif not value:
