@@ -120,11 +120,10 @@ class Apply(SimpleApply, Describe):
 
         # Retrieve all DNS records associated with this hosted zone
         # Ignore SOA and NS records for the top level domain
-        if self.resource_id:
-            for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
-                if record['Type'] in ('SOA', 'NS') and record['Name'] == self.resource.name:
-                    continue
-                yield record
+        for record in self.client.list_resource_record_sets(HostedZoneId=self.resource_id)['ResourceRecordSets']:
+            if record['Type'] in ('SOA', 'NS') and record['Name'] == self.resource.name:
+                continue
+            yield record
 
     def update_object(self):
         changes = []

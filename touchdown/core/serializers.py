@@ -430,6 +430,17 @@ class List(Serializer):
             raise FieldNotPresent()
         return list(result)
 
+    def diff(self, runner, object, value):
+        for renderable, value in itertools.izip_longest(object, value):
+            if not renderable:
+                return diff.ValueDiff("", "ITEM REMOVED")
+            elif not value:
+                return diff.ValueDiff("ITEM ADDED", "")
+            d = self.child.diff(runner, renderable, value)
+            if not d.matches():
+                return d
+        return diff.ValueDiff("", "")
+
     def dependencies(self, object):
         return frozenset(self.child.dependencies(object))
 
