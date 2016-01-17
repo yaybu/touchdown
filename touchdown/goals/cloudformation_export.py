@@ -135,27 +135,27 @@ class Export(Goal):
         props.set("DBInstanceClass", db.instance_class)
         props.set("DBInstanceIdentifier", db.name)
         props.set("DBName", db.db_name)
-        #"DBParameterGroupName" : String,
-        #"DBSecurityGroups" : [ String, ... ],
-        #"DBSnapshotIdentifier" : String
-        #"DBSubnetGroupName" : String,
+        # "DBParameterGroupName" : String,
+        # "DBSecurityGroups" : [ String, ... ],
+        # "DBSnapshotIdentifier" : String
+        # "DBSubnetGroupName" : String,
         props.set("Engine", db.engine)
         props.set("EngineVersion", db.engine_version)
         props.set("Iops", db.iops)
         props.set_ref("KmsKeyId", db.key)
-        #"LicenseModel" : String,
+        # "LicenseModel" : String,
         props.set("MasterUsername", db.master_username)
         props.set("MasterUserPassword", db.master_password)
         props.set_bool("MultiAZ", db.multi_az)
-        #"OptionGroupName" : String,
+        # "OptionGroupName" : String,
         props.set("Port", db.port)
         props.set("PreferredBackupWindow", db.preferred_backup_window)
         props.set("PreferredMaintenanceWindow", db.preferred_maintenance_window)
         props.set("PubliclyAccessible", db.publically_accessible)
-        #"SourceDBInstanceIdentifier" : String,
+        # "SourceDBInstanceIdentifier" : String,
         props.set_bool("StorageEncrypted", db.storage_encrypted)
         props.set("StorageType", db.storage_type)
-        #"Tags" : [ Resource Tag, ..., ],
+        # "Tags" : [ Resource Tag, ..., ],
         props.set_ref_list("VPCSecurityGroups", db.security_groups)
 
     def serialize_trail(self, props, trail):
@@ -164,18 +164,18 @@ class Export(Goal):
         props.set_ref("S3BucketName", trail.bucket)
         props.set("S3KeyPrefix", trail.bucket_prefix)
         props.set_ref("SnsTopicName", trail.topic)
-        #FIXME: CloudWatch logs integration?
+        # FIXME: CloudWatch logs integration?
 
     def serialize_bucket(self, props, bucket):
-        #"AccessControl" : String,
+        # "AccessControl" : String,
         props.set("BucketName", bucket.name)
-        #"CorsConfiguration" : CORS Configuration,
-        #"LifecycleConfiguration" : Lifecycle Configuration,
-        #"LoggingConfiguration" : Logging Configuration,
-        #"NotificationConfiguration" : Notification Configuration,
-        #"Tags" : [ Resource Tag, ... ],
-        #"VersioningConfiguration" : Versioning Configuration,
-        #"WebsiteConfiguration" : Website Configuration Type
+        # "CorsConfiguration" : CORS Configuration,
+        # "LifecycleConfiguration" : Lifecycle Configuration,
+        # "LoggingConfiguration" : Logging Configuration,
+        # "NotificationConfiguration" : Notification Configuration,
+        # "Tags" : [ Resource Tag, ... ],
+        # "VersioningConfiguration" : Versioning Configuration,
+        # "WebsiteConfiguration" : Website Configuration Type
 
     def serialize_vpc(self, props, vpc):
         tags = {}
@@ -274,13 +274,13 @@ class Export(Goal):
 
     def serialize_launch_configuration(self, props, resource):
         props.set_bool("AssociatePulicIpAddress", resource.associate_public_ip_address)
-        #"BlockDeviceMappings" : [ BlockDeviceMapping, ... ],
-        #"ClassicLinkVPCId" : String,
-        #"ClassicLinkVPCSecurityGroups" : [ String, ... ],
+        # "BlockDeviceMappings" : [ BlockDeviceMapping, ... ],
+        # "ClassicLinkVPCId" : String,
+        # "ClassicLinkVPCSecurityGroups" : [ String, ... ],
         props.set_bool("EbsOptimized", resource.ebs_optimized)
         props.set_ref("IamInstanceProfile", resource.instance_profile)
         props.set("ImageId", resource.image)
-        #"InstanceId" : String,
+        # "InstanceId" : String,
         props.set("InstanceMonitoring", resource.instance_monitoring)
         props.set("InstanceType", resource.instance_type)
         props.set("KernelId", resource.kernel)
@@ -301,11 +301,11 @@ class Export(Goal):
         props.set_ref_list('LoadBalancerNames', resource.load_balancers)
         props.set("MaxSize", resource.max_size)
         props.set("MinSize", resource.min_size)
-        #"MetricsCollection" : [ MetricsCollection, ... ]
-        #"NotificationConfigurations" : [ NotificationConfigurations, ... ],
-        #"PlacementGroup" : String,
-        #"Tags" : [ Auto Scaling Tag, ..., ],
-        #"TerminationPolicies" : [ String, ..., ],
+        # "MetricsCollection" : [ MetricsCollection, ... ]
+        # "NotificationConfigurations" : [ NotificationConfigurations, ... ],
+        # "PlacementGroup" : String,
+        # "Tags" : [ Auto Scaling Tag, ..., ],
+        # "TerminationPolicies" : [ String, ..., ],
         props.set_ref_list("VPCZoneIdentifier", resource.subnets)
 
     def serialize_resource(self, resource):
@@ -349,7 +349,7 @@ class Export(Goal):
         output['Resources'] = resources
         output['Outputs'] = {}
 
-        print json.dumps(output, indent=4, separators=(',', ': '))
+        print(json.dumps(output, indent=4, separators=(',', ': ')))
 
 
 register(Export)
