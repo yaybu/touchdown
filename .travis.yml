@@ -23,7 +23,7 @@ script:
   - flake8 touchdown
 
 after_success:
-  - coveralls
+  - codecov
 
 notifications:
     irc:
