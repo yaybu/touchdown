@@ -7,6 +7,8 @@ Changelog for Touchdown
 - Touchdown now reports resource changes better, especially when attributes
   transition from unset to set states.
 
+- Various diffing bug fixes.
+
 
 0.5.0 (2016-01-15)
 ------------------
