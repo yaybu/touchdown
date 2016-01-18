@@ -31,7 +31,7 @@ class Role(Resource):
 
     name = argument.String(field="RoleName")
     path = argument.String(field='Path')
-    assume_role_policy = argument.Dict(field="AssumeRolePolicyDocument", serializer=serializers.Json())
+    assume_role_policy = argument.Dict(field="AssumeRolePolicyDocument", serializer=serializers.Json(serializers.Map()))
 
     policies = argument.Dict()
     account = argument.Resource(BaseAccount)
@@ -79,13 +79,14 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
-        remote_policy = self.object.get('AssumeRolePolicyDocument', None)
-        if remote_policy and remote_policy != self.resource.assume_role_policy:
+        pd = serializers.Argument("assume_role_policy")
+        diff = pd.diff(self.runner, self.resource, json.dumps(self.object.get('AssumeRolePolicyDocument', {})))
+        if not diff.matches():
             yield self.generic_action(
                 "Update 'Assume Role Policy' document",
                 self.client.update_assume_role_policy,
                 RoleName=serializers.Identifier(),
-                PolicyDocument=serializers.Argument("assume_role_policy"),
+                PolicyDocument=pd,
             )
 
         # If the object exists then we can look at the roles it has

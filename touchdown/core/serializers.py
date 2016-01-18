@@ -314,7 +314,7 @@ class Dict(Serializer):
 
     def diff(self, runner, object, value):
         d = diff.AttributeDiff()
-        rendered = self.render(runner, object)
+        rendered = self._render(self.kwargs, runner, object)
 
         for k, v in rendered.items():
             if k not in value:
@@ -333,6 +333,38 @@ class Dict(Serializer):
 
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))
+
+
+class Map(Dict):
+
+    def render(self, runner, object):
+        result = dict()
+        for key, value in object.items():
+            try:
+                result[key] = maybe(value).render(runner, object)
+            except FieldNotPresent:
+                continue
+        if not len(result):
+            raise FieldNotPresent()
+        return result
+
+    def diff(self, runner, object, value):
+        d = diff.AttributeDiff()
+
+        for k, v in object.items():
+            if isinstance(v, dict) and isinstance(value.get(k, None), dict):
+                d.add(k, Dict(**v).diff(runner, object, value[k]))
+                continue
+            d.add(k, maybe(v).diff(runner, v, value.get(k, None)))
+
+        for k, v in value.items():
+            if k not in object:
+                d.add(k, diff.ValueDiff(v, None))
+
+        return d
+
+    def dependencies(self, object):
+        return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in object.values())))
 
 
 class Resource(Dict):

@@ -8,6 +8,8 @@ Changelog for Touchdown
 
 - Fix issue updating an Assume Role Policy.
 
+- Fix some issues diffing dicts.
+
 
 0.5.1 (2016-01-17)
 ------------------
