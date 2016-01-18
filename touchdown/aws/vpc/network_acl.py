@@ -27,11 +27,13 @@ class PortRange(Resource):
 
     resource_name = "port_range"
 
-    start = argument.Integer(default=1, min=-1, max=65535, field="From")
-    end = argument.Integer(default=65535, min=-1, max=65535, field="To")
+    start = argument.Integer(default=1, min=1, max=65535, field="From")
+    end = argument.Integer(default=65535, min=1, max=65535, field="To")
 
     @classmethod
     def clean(cls, value):
+        if value == "*":
+            return super(PortRange, cls).clean({"start": 1, "end": 65535})
         if isinstance(value, int):
             return super(PortRange, cls).clean({"start": value, "end": value})
         return super(PortRange, cls).clean(value)

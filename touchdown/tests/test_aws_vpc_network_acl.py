@@ -83,6 +83,18 @@ class TestNetworkAclRules(unittest.TestCase):
         self.aws = self.workspace.add_aws(region='eu-west-1')
         self.vpc = self.aws.add_vpc(name='test-vpc')
 
+    def test_simple_rule_with_all_ports(self):
+        acl = self.vpc.add_network_acl(
+            name='test-acl',
+            inbound=[dict(
+                network='10.0.0.0/20',
+                protocol='tcp',
+                port='*',
+            )]
+        )
+        assert acl.inbound[0].port.start == 1
+        assert acl.inbound[0].port.end == 65535
+
     def test_simple_rule_with_single_port(self):
         acl = self.vpc.add_network_acl(
             name='test-acl',
