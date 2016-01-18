@@ -85,7 +85,7 @@ class Apply(SimpleApply, Describe):
                 "Update 'Assume Role Policy' document",
                 self.client.update_assume_role_policy,
                 RoleName=serializers.Identifier(),
-                PolicyDocument=serializers.Json(serializers.Argument("assume_role_policy")),
+                PolicyDocument=serializers.Argument("assume_role_policy"),
             )
 
         # If the object exists then we can look at the roles it has
