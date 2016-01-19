@@ -37,6 +37,7 @@ class CustomOrigin(Resource):
             HTTPPort=serializers.Argument("http_port"),
             HTTPSPort=serializers.Argument("https_port"),
             OriginProtocolPolicy=serializers.Argument("protocol"),
+            OriginSslProtocols=serializers.Argument("ssl_policy"),
         )
     }
 
@@ -46,6 +47,11 @@ class CustomOrigin(Resource):
     http_port = argument.Integer(default=80)
     https_port = argument.Integer(default=443)
     protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
+    ssl_policy = argument.List(
+        choices=['SSLv3', 'TLSv1', 'TLSv1.1','TLSv1.2'],
+        default=['SSLv3', 'TLSv1'],
+        serializer=CloudFrontList(serializers.List()),
+    )
 
 
 class DefaultCacheBehavior(Resource):

@@ -207,6 +207,10 @@ content from ``backend.example.com`` on port 8080 abd 8443::
         ``http-only`` which can be used to send even secure and confidential
         traffic in the clear to your backend.
 
+    .. attribute:: ssl_policy
+
+        Specifies the permitted backend ssl versions. Defaults to SSLv3 and TLSv1.
+
 
 Cache behaviours
 ~~~~~~~~~~~~~~~
