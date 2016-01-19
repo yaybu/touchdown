@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.5.3 (unreleased)
+0.5.3 (2016-01-19)
 ------------------
 
 - Allow setting `ssl_policy` on custom origins.
