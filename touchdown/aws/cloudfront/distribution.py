@@ -48,7 +48,7 @@ class CustomOrigin(Resource):
     https_port = argument.Integer(default=443)
     protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
     ssl_policy = argument.List(
-        choices=['SSLv3', 'TLSv1', 'TLSv1.1','TLSv1.2'],
+        choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
         default=['SSLv3', 'TLSv1'],
         serializer=CloudFrontList(serializers.List()),
     )
