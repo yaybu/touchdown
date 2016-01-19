@@ -79,15 +79,16 @@ class Apply(SimpleApply, Describe):
         for change in super(Apply, self).update_object():
             yield change
 
-        pd = serializers.Argument("assume_role_policy")
-        diff = pd.diff(self.runner, self.resource, json.dumps(self.object.get('AssumeRolePolicyDocument', {})))
-        if not diff.matches():
-            yield self.generic_action(
-                "Update 'Assume Role Policy' document",
-                self.client.update_assume_role_policy,
-                RoleName=serializers.Identifier(),
-                PolicyDocument=pd,
-            )
+        if self.object:
+            pd = serializers.Argument("assume_role_policy")
+            diff = pd.diff(self.runner, self.resource, json.dumps(self.object.get('AssumeRolePolicyDocument', {})))
+            if not diff.matches():
+                yield self.generic_action(
+                    "Update 'Assume Role Policy' document",
+                    self.client.update_assume_role_policy,
+                    RoleName=serializers.Identifier(),
+                    PolicyDocument=pd,
+                )
 
         # If the object exists then we can look at the roles it has
         # Otherwise we assume its a new role and it will have no policies
