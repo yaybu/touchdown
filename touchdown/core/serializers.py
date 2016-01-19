@@ -430,7 +430,7 @@ class Resource(Dict):
 
             # If a field is present in the remote, then diff against that
             # If a field is not present in the remote, diff against the default
-            if arg.field in value:
+            if value and arg.field in value:
                 remote_val = value[arg.field]
             else:
                 remote_val = arg.get_default(obj)

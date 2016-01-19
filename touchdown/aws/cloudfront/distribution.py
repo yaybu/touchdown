@@ -38,7 +38,11 @@ class CustomOrigin(Resource):
             HTTPSPort=serializers.Argument("https_port"),
             OriginProtocolPolicy=serializers.Argument("protocol"),
             OriginSslProtocols=serializers.Argument("ssl_policy"),
-        )
+        ),
+        "CustomHeaders": serializers.Dict(
+            Quantity=0,
+            Items=[],
+        ),
     }
 
     name = argument.String(field='Id')
@@ -94,6 +98,8 @@ class DefaultCacheBehavior(Resource):
     default_ttl = argument.Integer(default=86400, field="DefaultTTL")
     min_ttl = argument.Integer(default=0, field="MinTTL")
     max_ttl = argument.Integer(default=31536000, field="MaxTTL")
+    compress = argument.Boolean(default=False, field="Compress")
+
     viewer_protocol_policy = argument.String(
         choices=['allow-all', 'https-only', 'redirect-to-https'],
         default='allow-all',

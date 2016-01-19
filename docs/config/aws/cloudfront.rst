@@ -261,6 +261,8 @@ serves CSS. This helps to improve cacheability.
 
     .. attribute:: max_ttl
 
+    .. attribute:: compress
+
     .. attribute:: allowed_methods
 
         The HTTP methods that are passed to the backend.

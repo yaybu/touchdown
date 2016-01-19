@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.5.3 (unreleased)
 ------------------
 
-- Allow setting 'ssl_policy' on custom origins.
+- Allow setting `ssl_policy` on custom origins.
+
+- Allow setting `compress` True/False on a behaviour.
 
 
 0.5.2 (2016-01-19)

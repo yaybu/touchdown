@@ -299,7 +299,6 @@ class SimpleDescribe(SimplePlan):
         for obj in self.get_possible_objects():
             if obj.get(self.key, '') == name:
                 return obj
-        return obj
 
     def generic_action(self, description, callable, serializer=None, **kwargs):
         return GenericAction(

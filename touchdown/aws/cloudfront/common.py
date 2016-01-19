@@ -39,6 +39,10 @@ class S3Origin(Resource):
         "S3OriginConfig": serializers.Dict(
             OriginAccessIdentity=serializers.Argument("origin_access_identity"),
         ),
+        "CustomHeaders": serializers.Dict(
+            Quantity=0,
+            Items=[],
+        ),
     }
 
     name = argument.String(field='Id')
