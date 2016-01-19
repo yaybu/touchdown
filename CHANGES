@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.5.2 (unreleased)
+0.5.2 (2016-01-19)
 ------------------
 
 - Fix network acl entry port validation and allow 'port' to be set to '*'.
