@@ -63,3 +63,28 @@ class AttributeDiff(object):
 
     def __str__(self):
         return '\n'.join(self.lines())
+
+
+class ListDiff(object):
+
+    def __init__(self):
+        self.diffs = []
+
+    def add(self, index, diff):
+        if not diff.matches():
+            self.diffs.append((index, diff))
+
+    def matches(self):
+        return len(self) == 0
+
+    def lines(self):
+        for index, diff in self.diffs:
+            yield "[{}]: ".format(index)
+            for line in diff.lines():
+                yield "    {}".format(line)
+
+    def __len__(self):
+        return len(self.diffs)
+
+    def __str__(self):
+        return '\n'.join(self.lines())

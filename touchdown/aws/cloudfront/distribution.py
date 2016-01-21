@@ -32,13 +32,8 @@ class CustomOrigin(Resource):
 
     resource_name = "custom_origin"
     dot_ignore = True
+
     extra_serializers = {
-        "CustomOriginConfig": serializers.Dict(
-            HTTPPort=serializers.Argument("http_port"),
-            HTTPSPort=serializers.Argument("https_port"),
-            OriginProtocolPolicy=serializers.Argument("protocol"),
-            OriginSslProtocols=serializers.Argument("ssl_policy"),
-        ),
         "CustomHeaders": serializers.Dict(
             Quantity=0,
             Items=[],
@@ -48,13 +43,26 @@ class CustomOrigin(Resource):
     name = argument.String(field='Id')
     domain_name = argument.String(field='DomainName')
     origin_path = argument.String(default='', field='OriginPath')
-    http_port = argument.Integer(default=80)
-    https_port = argument.Integer(default=443)
-    protocol = argument.String(choices=['http-only', 'match-viewer'], default='match-viewer')
+
+    http_port = argument.Integer(default=80, field='HTTPPort', group='custom-origin-config')
+    https_port = argument.Integer(default=443, field='HTTPSPort', group='custom-origin-config')
+    protocol = argument.String(
+        choices=['http-only', 'match-viewer'],
+        default='match-viewer',
+        field='OriginProtocolPolicy',
+        group='custom-origin-config',
+    )
     ssl_policy = argument.List(
         choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
         default=['SSLv3', 'TLSv1'],
+        field="OriginSslProtocols",
+        group="custom-origin-config",
         serializer=CloudFrontList(serializers.List()),
+    )
+
+    _custom_origin_config = argument.Serializer(
+        serializer=serializers.Resource(group="custom-origin-config"),
+        field="CustomOriginConfig",
     )
 
 
@@ -163,10 +171,6 @@ class Distribution(Resource):
                 "Quantity": 0,
             },
         }),
-        "ViewerCertificate": serializers.Resource(
-            group="viewer-certificate",
-            CloudFrontDefaultCertificate=serializers.Expression(lambda r, o: False if o.ssl_certificate else True),
-        ),
         "WebACLId": serializers.Const(""),
     }
 
@@ -210,9 +214,9 @@ class Distribution(Resource):
 
     ssl_certificate = argument.Resource(
         ServerCertificate,
-        field="IAMCertificateId",
-        serializer=serializers.Property("ServerCertificateId"),
+        field="Certificate",
         group="viewer-certificate",
+        serializer=serializers.Property("ServerCertificateId"),
     )
 
     ssl_support_method = argument.String(
@@ -227,6 +231,14 @@ class Distribution(Resource):
         choices=["TLSv1", "SSLv3"],
         field="MinimumProtocolVersion",
         group="viewer-certificate",
+    )
+
+    viewer_certificate = argument.Serializer(
+        field="ViewerCertificate",
+        serializer=serializers.Resource(
+            group="viewer-certificate",
+            CertificateSource=serializers.Expression(lambda r, o: "iam" if o.ssl_certificate else "cloudfront"),
+        ),
     )
 
     account = argument.Resource(BaseAccount)
@@ -264,7 +276,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_distribution"
-    # update_action = "update_distribution"
+    update_action = "update_distribution"
     create_response = "not-that-useful"
     waiter = "distribution_deployed"
 

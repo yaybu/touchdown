@@ -32,6 +32,10 @@ from .launch_configuration import LaunchConfiguration
 class AutoScalingGroup(Resource):
 
     resource_name = "auto_scaling_group"
+    field_order = [
+        "subnets",
+        "availability_zones",
+    ]
 
     name = argument.String(field="AutoScalingGroupName")
     launch_configuration = argument.Resource(LaunchConfiguration, field="LaunchConfigurationName")
@@ -39,12 +43,20 @@ class AutoScalingGroup(Resource):
     max_size = argument.Integer(field="MaxSize")
     desired_capacity = argument.Integer(field="DesiredCapacity")
     default_cooldown = argument.Integer(default=300, field="DefaultCooldown")
-    availability_zones = argument.List(field="AvailabilityZones", serializer=serializers.List(skip_empty=True))
+
     subnets = argument.ResourceList(
         Subnet,
         field="VPCZoneIdentifier",
         serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier(), skip_empty=True)),
     )
+
+    availability_zones = argument.List(
+        argument.String(),
+        default=lambda i: [s.get_property('AvailabilityZone') for s in i.subnets if s.availability_zone],
+        field="AvailabilityZones",
+        serializer=serializers.List(skip_empty=True),
+    )
+
     load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", update=False)
     health_check_type = argument.String(
         max=32,
