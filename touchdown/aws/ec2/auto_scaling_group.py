@@ -50,13 +50,6 @@ class AutoScalingGroup(Resource):
         serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier(), skip_empty=True)),
     )
 
-    availability_zones = argument.List(
-        argument.String(),
-        default=lambda i: [s.get_property('AvailabilityZone') for s in i.subnets if s.availability_zone],
-        field="AvailabilityZones",
-        serializer=serializers.List(skip_empty=True),
-    )
-
     load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", update=False)
     health_check_type = argument.String(
         max=32,
