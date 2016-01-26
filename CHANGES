@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.6.0 (unreleased)
+0.6.0 (2016-01-26)
 ------------------
 
 - SSL certificate chains are now validated. This is not yet complete
