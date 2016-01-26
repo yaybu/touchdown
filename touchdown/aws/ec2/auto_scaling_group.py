@@ -32,10 +32,6 @@ from .launch_configuration import LaunchConfiguration
 class AutoScalingGroup(Resource):
 
     resource_name = "auto_scaling_group"
-    field_order = [
-        "subnets",
-        "availability_zones",
-    ]
 
     name = argument.String(field="AutoScalingGroupName")
     launch_configuration = argument.Resource(LaunchConfiguration, field="LaunchConfigurationName")
