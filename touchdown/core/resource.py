@@ -29,7 +29,7 @@ class Field(object):
         self.__doc__ = self.argument.__doc__
 
     def present(self, instance):
-        return self.name in instance._values
+        return self.argument.present(instance)
 
     def get_value(self, instance):
         retval = instance._values.get(self.name, marker)

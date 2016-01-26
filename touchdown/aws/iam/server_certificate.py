@@ -12,17 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cryptography.x509 import load_pem_x509_certificate
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import asymmetric
+
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument
+from touchdown.core import argument, errors
 
 from ..account import BaseAccount
 from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
+def split_cert_chain(chain):
+    lines = []
+    for line in chain.split("\n"):
+        if not line:
+            continue
+        lines.append(line)
+        if line == "-----END CERTIFICATE-----":
+            yield "\n".join(lines).encode("utf-8")
+            lines = []
+    if lines:
+        yield "\n".join(lines).encode("utf-8")
+
+
 class ServerCertificate(Resource):
 
     resource_name = "server_certificate"
+    field_order = [
+        "certificate_body",
+        "certificate_chain",
+    ]
 
     name = argument.String(field="ServerCertificateName")
     path = argument.String(field='Path')
@@ -31,6 +52,36 @@ class ServerCertificate(Resource):
     certificate_chain = argument.String(field="CertificateChain")
 
     account = argument.Resource(BaseAccount)
+
+    def clean_certificate_chain(self, value):
+        # Perform a basic validation of the SSL chain.
+        # This isn't a complete and secure validation. It's just to try and
+        # catch problems before doing a deployment.
+        backend = default_backend()
+
+        certs = [load_pem_x509_certificate(self.certificate_body, backend)]
+        for cert in split_cert_chain(value):
+            certs.append(load_pem_x509_certificate(cert, backend))
+
+        for i, (cert, issuer) in enumerate(zip(certs, certs[1:])):
+            verifier = issuer.public_key().verifier(
+                cert.signature,
+                asymmetric.padding.PKCS1v15(),
+                cert.signature_hash_algorithm,
+            )
+            verifier.update(cert.tbs_certificate_bytes)
+            try:
+                verifier.verify()
+            except:
+                raise errors.Error(
+                    "Invalid chain: {} (issued by {}) -> {}. At position {}.".format(
+                        cert.subject,
+                        cert.issuer,
+                        issuer.subject,
+                        i
+                    ))
+
+        return value
 
 
 class Describe(SimpleDescribe, Plan):

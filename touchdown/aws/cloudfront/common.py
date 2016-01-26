@@ -27,6 +27,12 @@ class CloudFrontList(serializers.Dict):
             lambda runner, object: len(self.kwargs["Items"].render(runner, object)),
         )
 
+    def diff(self, runner, obj, value):
+        if len(self.kwargs) == 2:
+            items = value["Items"] if value else []
+            return self.kwargs["Items"].diff(runner, obj, items)
+        return super(CloudFrontList, self).diff(runner, obj, value)
+
 
 def CloudFrontResourceList():
     return CloudFrontList(serializers.List(serializers.Resource()))

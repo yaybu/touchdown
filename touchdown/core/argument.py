@@ -35,6 +35,9 @@ class Argument(object):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    def present(self, instance):
+        return self.name in instance._values
+
     def get_default(self, instance):
         if callable(self.default):
             return self.default(instance)
@@ -59,7 +62,7 @@ class Argument(object):
 
 class ReadOnly(Argument):
 
-    def clean(self, value):
+    def clean(self, instance, value):
         raise errors.InvalidParameter("This argument is read-only")
 
 
@@ -79,6 +82,17 @@ class Output(ReadOnly):
 
     def get_default(self, instance):
         return instance.get_property(self.propname)
+
+
+class Serializer(ReadOnly):
+
+    def present(self, instance):
+        # Serializers contribute to Update or Create actions *always*
+        # So mark them as present, either though they aren't 'set'
+        return True
+
+    def get_default(self, instance):
+        return instance
 
 
 class Boolean(Argument):

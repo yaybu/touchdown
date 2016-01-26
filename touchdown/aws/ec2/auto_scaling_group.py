@@ -39,12 +39,13 @@ class AutoScalingGroup(Resource):
     max_size = argument.Integer(field="MaxSize")
     desired_capacity = argument.Integer(field="DesiredCapacity")
     default_cooldown = argument.Integer(default=300, field="DefaultCooldown")
-    availability_zones = argument.List(field="AvailabilityZones", serializer=serializers.List(skip_empty=True))
+
     subnets = argument.ResourceList(
         Subnet,
         field="VPCZoneIdentifier",
         serializer=serializers.CommaSeperatedList(serializers.List(serializers.Identifier(), skip_empty=True)),
     )
+
     load_balancers = argument.ResourceList(LoadBalancer, field="LoadBalancerNames", update=False)
     health_check_type = argument.String(
         max=32,

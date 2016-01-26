@@ -17,7 +17,7 @@ import json
 from six.moves import zip_longest
 
 from touchdown.core.utils import force_str
-from touchdown.core import diff
+from touchdown.core import diff, errors
 
 
 class FieldNotPresent(Exception):
@@ -26,6 +26,24 @@ class FieldNotPresent(Exception):
 
 class RequiredFieldNotPresent(Exception):
     pass
+
+
+class Pending(object):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        return False
+
+    def __nonzero__(self):
+        return True
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return "(pending {})".format(self.value)
 
 
 class Serializer(object):
@@ -104,7 +122,7 @@ class Identifier(Serializer):
             raise FieldNotPresent()
         result = runner.get_plan(object).resource_id
         if not result:
-            return "pending ({})".format(object)
+            return Pending(object)
         return result
 
     def diff(self, runner, object, value):
@@ -132,8 +150,13 @@ class Property(Serializer):
         self.inner = inner
 
     def render(self, runner, object):
-        obj = runner.get_plan(self.inner.render(runner, object)).object
-        return obj.get(self.property, "dummy")
+        target = self.inner.render(runner, object)
+        target_plan = runner.get_plan(target)
+        if not target_plan.resource_id:
+            return Pending(target)
+        if self.property not in target_plan.object:
+            raise errors.Error("{} not available".format(self.property))
+        return target_plan.object[self.property]
 
     def dependencies(self, object):
         return self.inner.dependencies(object)
@@ -238,6 +261,9 @@ class String(Formatter):
         except ValueError:
             return str(self.inner.render(runner, object))
 
+    def diff(self, runner, object, value):
+        return super(String, self).diff(runner, object, None if value is None else str(value))
+
 
 class Integer(Formatter):
     def render(self, runner, object):
@@ -259,10 +285,17 @@ class ListOfOne(Formatter):
                 raise FieldNotPresent()
         return [value]
 
+    def diff(self, runner, object, value):
+        return self.inner.diff(runner, object, value[0])
+
 
 class CommaSeperatedList(Formatter):
     def render(self, runner, object):
         return ",".join(self.inner.render(runner, object))
+
+    def diff(self, runner, object, value):
+        v = value.split(",") if value else []
+        return self.inner.diff(runner, object, v)
 
 
 class Json(Formatter):
@@ -415,7 +448,6 @@ class Resource(Dict):
     def diff(self, runner, obj, value):
         d = diff.AttributeDiff()
         for field in obj.meta.iter_fields_in_order():
-            name = field.name
             arg = field.argument
             if not field.present(obj):
                 continue
@@ -425,15 +457,13 @@ class Resource(Dict):
                 continue
             if getattr(arg, "group", "") != self.group:
                 continue
-            if not getattr(obj, name) and arg.field not in value:
-                continue
 
             # If a field is present in the remote, then diff against that
             # If a field is not present in the remote, diff against the default
             if value and arg.field in value:
                 remote_val = value[arg.field]
             else:
-                remote_val = arg.get_default(obj)
+                remote_val = None
 
             try:
                 d.add(field.name, Argument(field.name, field).diff(runner, obj, remote_val))
@@ -463,16 +493,74 @@ class List(Serializer):
             raise FieldNotPresent()
         return list(result)
 
+    def _find_intersections(self, runner, old, new):
+        matches = {}
+        # FIXME: This is incredibly inefficient, which is why we only take this
+        # code path for small values of `value` or `object`
+        for i, o in enumerate(old):
+            for j, n in enumerate(new):
+                if self.child.diff(runner, n, o).matches():
+                    matches.setdefault(i, []).append(i)
+        return matches
+
+    def _find_longest_intersection(self, old, new, intersections):
+        longest_intersections = {}
+        length = start_new = start_old = 0
+        for i, v in enumerate(new):
+            _longest_intersections = {}
+            for j in intersections.get(i, []):
+                _longest_intersections[j] = (j and longest_intersections.get(j - 1, 0)) + 1
+                if _longest_intersections[j] > length:
+                    length = _longest_intersections[j]
+                    start_old = j - length + 1
+                    start_new = i - length + 1
+            longest_intersections = _longest_intersections
+        return length, start_new, start_old
+
+    def _walk_intersections(self, runner, old, new):
+        length, start_old, start_new = self._find_longest_intersection(
+            old,
+            new,
+            self._find_intersections(runner, old, new),
+        )
+
+        if length == 0:
+            # No intersections between begin and end...
+            return itertools.chain(
+                [('-', old)] if old else [],
+                [('+', new)] if new else [],
+            )
+        else:
+            return itertools.chain(
+                self._walk_intersections(runner, old[:start_old], new[:start_new]),
+                [('=', new[start_new:start_new+length])],
+                self._walk_intersections(runner, old[start_old + length:], new[start_new + length:]),
+            )
+
+    def diff_slow(self, runner, object, value):
+        diffs = diff.ListDiff()
+        idx = 0
+        pending = []
+        for op, vals in self._walk_intersections(runner, value, object):
+            if op == "-":
+                pending = vals
+            elif op == "+":
+                for i, (old, new) in enumerate(zip_longest(pending, vals), idx):
+                    diffs.add(i, self.child.diff(runner, new, old))
+                pending = []
+            idx += len(vals)
+        return diffs
+
+    def diff_stupid(self, runner, object, value):
+        diffs = diff.ListDiff()
+        for i, (renderable, v) in enumerate(zip_longest(object, value)):
+            diffs.add(i, self.child.diff(runner, renderable, v))
+        return diffs
+
     def diff(self, runner, object, value):
-        for renderable, value in zip_longest(object, value):
-            if not renderable:
-                return diff.ValueDiff("", "ITEM REMOVED")
-            elif not value:
-                return diff.ValueDiff("ITEM ADDED", "")
-            d = self.child.diff(runner, renderable, value)
-            if not d.matches():
-                return d
-        return diff.ValueDiff("", "")
+        if len(object) < 50 and len(value) < 50:
+            return self.diff_slow(runner, object, value)
+        return self.diff_stupid(self, runner, object, value)
 
     def dependencies(self, object):
         return frozenset(self.child.dependencies(object))

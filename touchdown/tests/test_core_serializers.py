@@ -104,5 +104,34 @@ class TestDiffing(unittest.TestCase):
             "GroupName": "test",
             "Description": "description",
         })
-        assert d.matches() is False
         assert list(d.lines()) == ['description: ', "    'description' => ''"]
+        assert d.matches() is False
+
+
+class TestListOfStringsDiff(unittest.TestCase):
+
+    def setUp(self):
+        self.serializer = serializers.List(
+            serializers.String(),
+        )
+
+    def diff(self, a, b):
+        return self.serializer.diff(None, a, b)
+
+    def test_match_1(self):
+        self.assertEqual(True, self.diff([], []).matches())
+
+    def test_match_2(self):
+        self.assertEqual(True, self.diff(["a", "b"], ["a", "b"]).matches())
+
+    def test_all_inserts(self):
+        d = self.diff(["a", "b", "c"], [])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 3)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "(unset)")
+        self.assertEqual(d.diffs[0][1].local_value, "'a'")
+        self.assertEqual(d.diffs[1][1].remote_value, "(unset)")
+        self.assertEqual(d.diffs[1][1].local_value, "'b'")
+        self.assertEqual(d.diffs[2][1].remote_value, "(unset)")
+        self.assertEqual(d.diffs[2][1].local_value, "'c'")
