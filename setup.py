@@ -36,6 +36,7 @@ setup(
         'botocore>=1.3.20',
         'progressbar2>=3.0.0',
         'requests',
+        'python-gnupg',
     ],
     entry_points='''
         [console_scripts]
