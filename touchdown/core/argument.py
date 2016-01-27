@@ -56,7 +56,10 @@ class Argument(object):
     def adapt(cls, value):
         for klass, callable in cls.adapters.get(cls, []):
             if isinstance(value, klass):
-                return callable(value)
+                try:
+                    return callable(value)
+                except Exception:
+                    continue
         return value
 
 
@@ -367,4 +370,5 @@ class ResourceList(List):
         super(ResourceList, self).contribute_to_class(cls)
 
 
+Integer.register_adapter(str, int)
 String.register_adapter(int, str)

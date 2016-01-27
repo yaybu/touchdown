@@ -4,7 +4,8 @@ Changelog for Touchdown
 0.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Automatically cast strings to integers when assigning to an
+  `argument.Integer`.
 
 
 0.6.0 (2016-01-26)
