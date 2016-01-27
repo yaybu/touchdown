@@ -4,7 +4,10 @@ Changelog for Touchdown
 0.6.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Support 'update by replacement' for IAM Server Certificates.
+
+- Validates that an IAM Server Certificate `private_key` belongs to its
+  `certificate_body`.
 
 
 0.6.1 (2016-01-27)

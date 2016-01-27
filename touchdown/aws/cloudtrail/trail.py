@@ -46,7 +46,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'cloudtrail'
     describe_action = "describe_trails"
     describe_envelope = "trailList"
-    key = 'Trail'
+    key = 'Name'
 
     def get_describe_filters(self):
         return {

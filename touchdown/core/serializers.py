@@ -134,7 +134,7 @@ class Identifier(Serializer):
         d = Resource().diff(
             runner,
             resource,
-            describe.lookup_version(value),
+            describe.get_object_by_id(value),
         )
         d.diffs.insert(0, ("name", diff.ValueDiff(value, rendered)))
         return d
