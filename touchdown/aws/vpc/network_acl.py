@@ -34,6 +34,11 @@ class PortRange(Resource):
     def clean(cls, value):
         if value == "*":
             return super(PortRange, cls).clean({"start": 1, "end": 65535})
+        if isinstance(value, str):
+            try:
+                value = int(value)
+            except ValueError:
+                pass
         if isinstance(value, int):
             return super(PortRange, cls).clean({"start": value, "end": value})
         return super(PortRange, cls).clean(value)
