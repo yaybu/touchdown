@@ -14,8 +14,7 @@ install:
 - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
 - python --version
 - python -m pip install --upgrade setuptools pip wheel
-- appveyor\\run.cmd python -m pip wheel --find-links=C:\wheelhouse -r requirements.txt --wheel-dir=C:\wheelhouse
-- appveyor\\run.cmd python -m pip install --find-links=C:\wheelhouse -r requirements.txt
+- appveyor\\run.cmd python -m pip install --cache-dir=C:\wheelhouse -r requirements.txt
 - appveyor\\run.cmd python -m easy_install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz
 cache: C:\wheelhouse
 build: off
