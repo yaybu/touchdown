@@ -55,47 +55,6 @@ class HealthCheck(Resource):
     timeout = argument.Integer(field="Timeout")
 
 
-class Attributes(Resource):
-
-    resource_name = "attributes"
-    dot_ignore = True
-
-    idle_timeout = argument.Integer(
-        default=30,
-        field="ConnectionSettings",
-        serializer=serializers.Dict(
-            IdleTimeout=serializers.Identity(),
-        ),
-    )
-
-    connection_draining = argument.Integer(
-        default=0,
-        field="ConnectionDraining",
-        serializer=serializers.Dict(
-            Enabled=serializers.Expression(lambda runner, object: object > 0),
-            Timeout=serializers.Identity(),
-        )
-    )
-
-    cross_zone_load_balancing = argument.Boolean(
-        default=True,
-        field="CrossZoneLoadBalancing",
-        serializer=serializers.Dict(
-            Enabled=serializers.Identity(),
-        )
-    )
-
-    access_log = argument.Resource(
-        Bucket,
-        field="AccessLog",
-        serializer=serializers.Dict(
-            Enabled=serializers.Expression(lambda runner, object: object is not None),
-            S3BucketName=serializers.Identifier(),
-        )
-    )
-    # FIXME Support EmitInterval and S3BucketPrefix
-
-
 class LoadBalancer(Resource):
 
     resource_name = "load_balancer"
@@ -113,7 +72,45 @@ class LoadBalancer(Resource):
     # tags = argument.Dict()
 
     health_check = argument.Resource(HealthCheck, serializer=serializers.Resource())
-    attributes = argument.Resource(Attributes, serializer=serializers.Resource())
+
+    idle_timeout = argument.Integer(
+        default=30,
+        field="ConnectionSettings",
+        group="attributes",
+        serializer=serializers.Dict(
+            IdleTimeout=serializers.Identity(),
+        ),
+    )
+
+    connection_draining = argument.Integer(
+        default=0,
+        field="ConnectionDraining",
+        group="attributes",
+        serializer=serializers.Dict(
+            Enabled=serializers.Expression(lambda runner, object: object > 0),
+            Timeout=serializers.Identity(),
+        )
+    )
+
+    cross_zone_load_balancing = argument.Boolean(
+        default=True,
+        field="CrossZoneLoadBalancing",
+        group="attributes",
+        serializer=serializers.Dict(
+            Enabled=serializers.Identity(),
+        )
+    )
+
+    access_log = argument.Resource(
+        Bucket,
+        field="AccessLog",
+        group="attributes",
+        serializer=serializers.Dict(
+            Enabled=serializers.Expression(lambda runner, object: object is not None),
+            S3BucketName=serializers.Identifier(),
+        )
+    )
+    # FIXME Support EmitInterval and S3BucketPrefix
 
     account = argument.Resource(BaseAccount)
 
@@ -130,6 +127,12 @@ class Describe(SimpleDescribe, Plan):
     def get_describe_filters(self):
         return {"LoadBalancerNames": [self.resource.name]}
 
+    def annotate_object(self, obj):
+        obj['LoadBalancerAttributes'] = self.client.describe_load_balancer_attributes(
+            LoadBalancerName=obj['LoadBalancerName'],
+        )['LoadBalancerAttributes']
+        return obj
+
 
 class Apply(SimpleApply, Describe):
 
@@ -142,34 +145,17 @@ class Apply(SimpleApply, Describe):
     ]
 
     def update_attributes(self):
-        if not self.resource.attributes:
-            return
-
-        a = self.resource.attributes
-
-        changed = False
-        if not self.object:
-            changed = True
-        else:
-            attributes = self.client.describe_load_balancer_attributes(
-                LoadBalancerName=self.resource_id
-            )['LoadBalancerAttributes']
-
-            if attributes['ConnectionSettings']['IdleTimeout'] != a.idle_timeout:
-                changed = True
-            if attributes['ConnectionDraining']['Timeout'] != a.connection_draining:
-                changed = True
-            if attributes['CrossZoneLoadBalancing']['Enabled'] != a.cross_zone_load_balancing:
-                changed = True
-            if attributes['AccessLog'].get('S3BucketName', None) != a.access_log:
-                changed = True
-
-        if changed:
+        diff = self.resource.diff(
+            self.runner,
+            self.object.get("LoadBalancerAttributes", {}),
+            group="attributes",
+        )
+        if not diff.matches():
             yield self.generic_action(
-                "Configure attributes",
+                ["Configure attributes"] + diff.lines(),
                 self.client.modify_load_balancer_attributes,
                 LoadBalancerName=serializers.Identifier(),
-                LoadBalancerAttributes=serializers.Argument("attributes"),
+                LoadBalancerAttributes=serializers.Resource(group="attributes"),
             )
 
     def update_health_check(self):

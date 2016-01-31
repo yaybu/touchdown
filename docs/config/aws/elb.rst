@@ -50,10 +50,15 @@ Load Balancer
         A :class:`HealthCheck` instance that describes how the load balancer
         should determine the health of its members.
 
-    .. attribute:: attributes
+    .. attribute:: idle_timeout
 
-        A :class:`Attributes` instance. ELB attributes control the behavior of
-        your instance.
+    .. attribute:: connection_draining
+
+    .. attribute:: cross_zone_load_balacning
+
+    .. attribute:: access_log
+
+        An :class:`~touchdown.aws.s3.Bucket` for storing access logs in.
 
 
 Listeners
@@ -82,22 +87,6 @@ Listeners
 
         This is a :class:`~touchdown.aws.iam.ServiceCertificate`. This is
         required if your listener is over SSL.
-
-
-Attributes
-----------
-
-.. class:: Attributes
-
-    .. attribute:: idle_timeout
-
-    .. attribute:: connection_draining
-
-    .. attribute:: cross_zone_load_balacning
-
-    .. attribute:: access_log
-
-        An :class:`~touchdown.aws.s3.Bucket` for storing access logs in.
 
 
 Health checks
