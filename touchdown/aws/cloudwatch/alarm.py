@@ -102,7 +102,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'cloudwatch'
     describe_action = "describe_alarms"
     describe_envelope = "MetricAlarms"
-    key = 'MetricAlarm'
+    key = 'AlarmName'
 
     def get_describe_filters(self):
         return {

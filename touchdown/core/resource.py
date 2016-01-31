@@ -221,6 +221,13 @@ class Resource(six.with_metaclass(ResourceType)):
             serializers.Resource(**kwargs),
         )
 
+    def diff(self, runner, value, **kwargs):
+        return serializers.Resource(**kwargs).diff(
+            runner,
+            self,
+            value
+        )
+
     @property
     def arguments(self):
         return list((name, field.argument) for (name, field) in self.meta.iter_fields_in_order())

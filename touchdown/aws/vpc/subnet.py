@@ -55,13 +55,6 @@ class Describe(SimpleDescribe, Plan):
         if not vpc.resource_id:
             return None
 
-        if self.key in self.object:
-            return {
-                "Filters": [
-                    {'Name': 'subnet-id', 'Values': [self.object[self.key]]}
-                ]
-            }
-
         return {
             "Filters": [
                 {'Name': 'cidrBlock', 'Values': [str(self.resource.cidr_block)]},
@@ -69,12 +62,8 @@ class Describe(SimpleDescribe, Plan):
             ],
         }
 
-    def describe_object(self):
-        object = super(Describe, self).describe_object()
-        if not object or not object.get(self.key, None):
-            return object
-
-        subnet_id = object[self.key]
+    def annotate_object(self, obj):
+        subnet_id = obj[self.key]
 
         network_acl = self.client.describe_network_acls(
             Filters=[
@@ -85,8 +74,8 @@ class Describe(SimpleDescribe, Plan):
         if network_acl:
             for assoc in network_acl[0].get('Associations', []):
                 if assoc['SubnetId'] == subnet_id:
-                    object['NetworkAclId'] = assoc['NetworkAclId']
-                    object['NetworkAclAssociationId'] = assoc['NetworkAclAssociationId']
+                    obj['NetworkAclId'] = assoc['NetworkAclId']
+                    obj['NetworkAclAssociationId'] = assoc['NetworkAclAssociationId']
                     break
 
         route_tables = self.client.describe_route_tables(
@@ -98,11 +87,17 @@ class Describe(SimpleDescribe, Plan):
         if route_tables:
             for assoc in route_tables[0].get('Associations', []):
                 if assoc['SubnetId'] == subnet_id:
-                    object['RouteTableId'] = assoc['RouteTableId']
-                    object['RouteTableAssociationId'] = assoc['RouteTableAssociationId']
+                    obj['RouteTableId'] = assoc['RouteTableId']
+                    obj['RouteTableAssociationId'] = assoc['RouteTableAssociationId']
                     break
 
-        return object
+        return obj
+
+    def describe_object(self):
+        object = super(Describe, self).describe_object()
+        if not object or not object.get(self.key, None):
+            return object
+        return self.annotate_object(object)
 
 
 class Apply(SimpleApply, Describe):

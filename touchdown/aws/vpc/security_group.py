@@ -125,13 +125,6 @@ class Describe(SimpleDescribe, Plan):
         if not vpc.resource_id:
             return None
 
-        if self.key in self.object:
-            return {
-                "Filters": [
-                    {'Name': 'group-id', 'Values': [self.object[self.key]]}
-                ]
-            }
-
         vpc = self.runner.get_plan(self.resource.vpc)
         return {
             "Filters": [

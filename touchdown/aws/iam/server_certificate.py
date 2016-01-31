@@ -14,14 +14,14 @@
 
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import asymmetric
+from cryptography.hazmat.primitives import asymmetric, serialization
 
 from touchdown.core.resource import Resource
 from touchdown.core.plan import Plan
-from touchdown.core import argument, errors
+from touchdown.core import argument, datetime, errors
 
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..replacement import ReplacementDescribe, ReplacementApply, ReplacementDestroy
 
 
 def split_cert_chain(chain):
@@ -41,17 +41,34 @@ class ServerCertificate(Resource):
 
     resource_name = "server_certificate"
     field_order = [
+        "private_key",
         "certificate_body",
         "certificate_chain",
     ]
 
-    name = argument.String(field="ServerCertificateName")
+    name = argument.String(field="ServerCertificateName", update=False)
     path = argument.String(field='Path')
+    private_key = argument.String(field="PrivateKey", secret=True, update=False)
     certificate_body = argument.String(field="CertificateBody")
-    private_key = argument.String(field="PrivateKey", secret=True)
     certificate_chain = argument.String(field="CertificateChain")
 
     account = argument.Resource(BaseAccount)
+
+    def clean_certificate_body(self, value):
+        backend = default_backend()
+        cert = load_pem_x509_certificate(value, backend)
+        private_key = serialization.load_pem_private_key(
+            self.private_key.encode("utf-8"),
+            password=None,
+            backend=backend,
+        )
+
+        if cert.public_key().public_numbers() != private_key.public_key().public_numbers():
+            raise errors.Error(
+                "Certificate does not match private_key",
+            )
+
+        return value.strip()
 
     def clean_certificate_chain(self, value):
         # Perform a basic validation of the SSL chain.
@@ -81,33 +98,45 @@ class ServerCertificate(Resource):
                         i
                     ))
 
-        return value
+        return value.strip()
 
 
-class Describe(SimpleDescribe, Plan):
+class Describe(ReplacementDescribe, Plan):
 
     resource = ServerCertificate
     service_name = 'iam'
-    describe_action = "get_server_certificate"
-    describe_envelope = "ServerCertificate"
-    describe_notfound_exception = "NoSuchEntity"
+    describe_action = "list_server_certificates"
+    describe_envelope = "ServerCertificateMetadataList"
+    describe_filters = {}
     key = 'ServerCertificateName'
+    biggest_serial = 0
 
-    def describe_object(self):
-        object = super(Describe, self).describe_object()
-        if object:
-            result = dict(object['ServerCertificateMetadata'])
-            result['CertificateBody'] = object['CertificateBody']
-            result['CertificateChain'] = object['CertificateChain']
-            return result
+    def get_possible_objects(self):
+        for obj in super(Describe, self).get_possible_objects():
+            response = self.client.get_server_certificate(
+                ServerCertificateName=self.name_for_remote(obj),
+            )['ServerCertificate']
+
+            result = dict(response['ServerCertificateMetadata'])
+            result['CertificateBody'] = response['CertificateBody']
+            result['CertificateChain'] = response['CertificateChain']
+
+            yield result
 
 
-class Apply(SimpleApply, Describe):
+class Apply(ReplacementApply, Describe):
 
     create_action = "upload_server_certificate"
     create_response = "not-that-useful"
+    destroy_action = "delete_server_certificate"
+
+    def is_stale(self, server_certificate):
+        if server_certificate['Expiration'] >= datetime.now():
+            # Don't delete valid certificates
+            return False
+        return super(Apply, self).is_stale(server_certificate)
 
 
-class Destroy(SimpleDestroy, Describe):
+class Destroy(ReplacementDestroy, Describe):
 
     destroy_action = "delete_server_certificate"

@@ -54,14 +54,13 @@ class Waiter(Action):
         for i in range(self.eventual_consistency_threshold):
             current_state = 'waiting'
             response = self.poll()
-
             for acceptor in acceptors:
                 if acceptor.matcher_func(response):
                     current_state = acceptor.state
                     break
             else:
                 if 'Error' in response:
-                    raise errors.Error('Unexpected error encountered.')
+                    raise errors.Error('Unexpected error encountered. {}'.format(response['Error']))
 
             if current_state == 'failure':
                 raise errors.Error('Waiter encountered a terminal failure state')
@@ -92,8 +91,6 @@ class Waiter(Action):
 
         else:
             raise errors.Error("Operation took too long to complete")
-
-        self.plan.object = self.plan.describe_object()
 
 
 class GenericAction(Action):
@@ -134,11 +131,11 @@ class GenericAction(Action):
                     getattr(self.plan, "create_envelope", self.plan.describe_envelope[:-1]),
                     object,
                 )
+            elif self.plan.create_response == "id-only":
+                self.plan.object = {
+                    self.plan.key: object[self.plan.key]
+                }
             else:
-                if self.plan.create_response == "id-only":
-                    self.plan.object = {
-                        self.plan.key: object[self.plan.key]
-                    }
                 self.plan.object = self.plan.describe_object()
 
 
@@ -147,7 +144,7 @@ class PostCreation(Action):
     description = ["Sanity check created resource"]
 
     def run(self):
-        self.plan.object = self.plan.describe_object()
+        self.plan.object = self.plan.get_object_by_id(self.plan.resource_id)
         if not self.plan.object:
             raise errors.Error("Object creation failed")
 
@@ -171,7 +168,7 @@ class RefreshMetadata(Action):
     description = ["Refresh resource metadata"]
 
     def run(self):
-        self.plan.object = self.plan.describe_object()
+        self.plan.object = self.plan.get_object_by_id(self.plan.resource_id)
 
 
 class SetTags(Action):
@@ -295,10 +292,13 @@ class SimpleDescribe(SimplePlan):
 
         return {}
 
-    def lookup_version(self, name):
+    def annotate_object(self, obj):
+        return obj
+
+    def get_object_by_id(self, key):
         for obj in self.get_possible_objects():
-            if obj.get(self.key, '') == name:
-                return obj
+            if obj.get(self.key, '') == key:
+                return self.annotate_object(obj)
 
     def generic_action(self, description, callable, serializer=None, **kwargs):
         return GenericAction(
@@ -422,6 +422,8 @@ class SimpleApply(SimpleDescribe):
             yield self.create_object()
             for action in self.name_object():
                 yield action
+            if self.create_response != "full-description":
+                yield RefreshMetadata(self)
             created = True
 
         if created:
@@ -433,6 +435,7 @@ class SimpleApply(SimpleDescribe):
                 )
                 if created or not waiter.ready():
                     yield waiter
+                    yield RefreshMetadata(self)
 
             if self.create_response != "full-description" and not self.waiter:
                 yield PostCreation(self)

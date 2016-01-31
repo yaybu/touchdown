@@ -69,20 +69,24 @@ class Describe(SimpleDescribe, Plan):
     resource = Queue
     service_name = 'sqs'
     describe_action = 'get_queue_url'
-    describe_envelope = "{QueueUrl: QueueUrl}"
+    describe_envelope = "@"
     describe_notfound_exception = "AWS.SimpleQueueService.NonExistentQueue"
     key = "QueueUrl"
 
     def get_describe_filters(self):
         return {"QueueName": self.resource.name}
 
+    def annotate_object(self, queue):
+        queue.update(self.client.get_queue_attributes(
+            QueueUrl=queue['QueueUrl'],
+            AttributeNames=['All'],
+        )['Attributes'])
+        return queue
+
     def describe_object(self):
         object = super(Describe, self).describe_object()
         if object:
-            object.update(self.client.get_queue_attributes(
-                QueueUrl=object['QueueUrl'],
-                AttributeNames=['All'],
-            )['Attributes'])
+            object = self.annotate_object(object)
         return object
 
 
@@ -90,7 +94,6 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_queue"
     create_response = "id-only"
-    # waiter = "bucket_exists"
 
     def update_object(self):
         d = serializers.Resource(group="attributes").diff(self.runner, self.resource, self.object)

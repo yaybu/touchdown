@@ -20,7 +20,7 @@ from touchdown.core import argument
 from .vpc import VPC
 from touchdown.core import serializers
 from touchdown.aws.common import Resource
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..replacement import ReplacementDescribe, ReplacementApply, ReplacementDestroy
 
 
 class PortRange(Resource):
@@ -121,7 +121,7 @@ class NetworkACL(Resource):
     vpc = argument.Resource(VPC, field="VpcId")
 
 
-class Describe(SimpleDescribe, Plan):
+class Describe(ReplacementDescribe, Plan):
 
     resource = NetworkACL
     service_name = 'ec2'
@@ -167,65 +167,33 @@ class Describe(SimpleDescribe, Plan):
         return True
 
     def describe_object_matches(self, network_acl):
-        if self.key in self.object and network_acl[self.key] == self.object[self.key]:
-            return True
-
-        tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
-        name = tags.get('Name', '')
-
-        if name != self.resource.name and not name.startswith(self.resource.name + "."):
-            return False
-
-        try:
-            serial = name.rsplit(".", 1)[1]
-            self.biggest_serial = max(int(serial), self.biggest_serial)
-        except (IndexError, TypeError, ValueError):
-            pass
-
+        super(Describe, self).describe_object_matches(network_acl)
         return self._compare_rules(network_acl)
 
-    def get_possible_objects(self):
-        for network_acl in super(Describe, self).get_possible_objects():
-            tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
-            name = tags.get('Name', '')
+    def name_for_remote(self, network_acl):
+        tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
+        return tags.get('Name', '')
 
-            # Only ignore ACL's for the current resource
-            if name != self.resource.name and not name.startswith(self.resource.name + "."):
-                continue
-
-            # Don't delete the default ACL
-            if network_acl['IsDefault']:
-                continue
-
-            yield network_acl
+    def is_possible_object(self, obj):
+        if obj['IsDefault']:
+            return False
+        return super(Describe, self).is_possible_object(obj)
 
 
-class Apply(SimpleApply, Describe):
+class Apply(ReplacementApply, Describe):
 
     create_action = "create_network_acl"
     waiter = "network_acl_available"
     waiter_eventual_consistency_threshold = 5
+    destroy_action = "delete_network_acl"
 
-    def prepare_to_create(self):
-        for network_acl in self.get_possible_objects():
-            # Don't try and delete the matching network acl
-            if network_acl['NetworkAclId'] == self.resource_id:
-                continue
-            # Don't try and delete ACL's that are in use
-            if len(network_acl['Associations']) != 0:
-                continue
+    def get_create_serializer(self):
+        return serializers.Resource()
 
-            yield self.generic_action(
-                "Destroy stale network acl: {}".format(network_acl['NetworkAclId']),
-                self.client.delete_network_acl,
-                NetworkAclId=network_acl['NetworkAclId'],
-            )
-
-    def get_create_name(self):
-        return "{}.{}".format(
-            self.resource.name,
-            self.biggest_serial + 1,
-        )
+    def is_stale(self, network_acl):
+        if len(network_acl['Associations']) > 0:
+            return False
+        return super(Apply, self).is_stale(network_acl)
 
     def _insert_rule(self, rule, rule_number, egress):
         return self.generic_action(
@@ -256,17 +224,6 @@ class Apply(SimpleApply, Describe):
                 yield action
 
 
-class Destroy(SimpleDestroy, Describe):
+class Destroy(ReplacementDestroy, Describe):
 
     destroy_action = "delete_network_acl"
-
-    def get_actions(self):
-        for network_acl in self.get_possible_objects():
-            tags = {tag['Key']: tag['Value'] for tag in network_acl.get("Tags", [])}
-            name = tags.get('Name', '')
-
-            yield self.generic_action(
-                "Destroy network acl: {} ({})".format(name, network_acl['NetworkAclId']),
-                self.client.delete_network_acl,
-                NetworkAclId=network_acl['NetworkAclId'],
-            )

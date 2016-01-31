@@ -55,7 +55,7 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             if issubclass(impl, self.ignore):
                 continue
 
-            if impl.describe_action is None:
+            if getattr(impl, "describe_action", None) is None:
                 continue
 
             service = session.get_service_model(impl.service_name)

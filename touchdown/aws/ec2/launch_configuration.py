@@ -15,19 +15,17 @@
 import base64
 
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument
+from touchdown.core import argument, resource, serializers
+from touchdown.core.utils import force_str
 
 from ..account import BaseAccount
 from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
-from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
-from touchdown.core import serializers
-from touchdown.core.utils import force_str
-
+from ..replacement import ReplacementDescribe, ReplacementApply, ReplacementDestroy
 from .keypair import KeyPair
 
 
-class LaunchConfiguration(Resource):
+class LaunchConfiguration(resource.Resource):
 
     resource_name = "launch_configuration"
 
@@ -76,12 +74,10 @@ class LaunchConfiguration(Resource):
         field="PlacementTenancy",
     )
 
-    keep_last = argument.Integer(default=5)
-
     account = argument.Resource(BaseAccount)
 
 
-class Describe(SimpleDescribe, Plan):
+class Describe(ReplacementDescribe, Plan):
 
     resource = LaunchConfiguration
     service_name = 'autoscaling'
@@ -90,66 +86,25 @@ class Describe(SimpleDescribe, Plan):
     describe_filters = {}
     key = 'LaunchConfigurationName'
 
-    biggest_serial = 0
-
     def get_possible_objects(self):
         for obj in super(Describe, self).get_possible_objects():
-            if not obj["LaunchConfigurationName"].startswith(self.resource.name + "."):
-                continue
             if "UserData" in obj and obj["UserData"]:
                 obj["UserData"] = force_str(base64.b64decode(obj["UserData"]))
             yield obj
 
-    def describe_object_matches(self, lc):
-        try:
-            serial = lc["LaunchConfigurationName"].rsplit(".", 1)[1]
-            self.biggest_serial = max(int(serial), self.biggest_serial)
-        except (IndexError, TypeError, ValueError):
-            pass
 
-        if self.resource.matches(self.runner, lc):
-            return True
-
-
-class Apply(SimpleApply, Describe):
+class Apply(ReplacementApply, Describe):
 
     create_action = "create_launch_configuration"
     create_response = "not-that-useful"
+    destroy_action = "delete_launch_configuration"
 
     signature = (
         Present("image"),
         Present("instance_type"),
     )
 
-    def get_create_serializer(self):
-        return serializers.Resource(
-            LaunchConfigurationName=".".join((
-                self.resource.name,
-                str(self.biggest_serial + 1),
-            )),
-        )
 
-    def prepare_to_create(self):
-        configs = []
-        for config in self.get_possible_objects():
-            if self.object and config['LaunchConfigurationName'] == self.object['LaunchConfigurationName']:
-                # Make sure we don't delete the launch config that matches self.resource!!!
-                continue
-            configs.append({
-                "LaunchConfigurationName": config["LaunchConfigurationName"],
-                "CreatedTime": config["CreatedTime"],
-            })
-
-        configs.sort(key=lambda config: config["CreatedTime"])
-
-        for config in configs[:-self.resource.keep_last]:
-            yield self.generic_action(
-                "Delete stale configuration: {}".format(config['LaunchConfigurationName']),
-                self.client.delete_launch_configuration,
-                LaunchConfigurationName=config['LaunchConfigurationName'],
-            )
-
-
-class Destroy(SimpleDestroy, Describe):
+class Destroy(ReplacementDestroy, Describe):
 
     destroy_action = "delete_launch_configuration"

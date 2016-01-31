@@ -259,17 +259,21 @@ class Describe(SimpleDescribe, Plan):
     def describe_object_matches(self, d):
         return self.resource.name == d['Comment'] or self.resource.name in d['Aliases'].get('Items', [])
 
+    def annotate_object(self, obj):
+        result = self.client.get_distribution(Id=obj['Id'])
+        distribution = {
+            "ETag": result["ETag"],
+            "Id": obj["Id"],
+            "DomainName": result["Distribution"]["DomainName"],
+            "Status": result["Distribution"]["Status"],
+        }
+        distribution.update(result['Distribution']['DistributionConfig'])
+        return distribution
+
     def describe_object(self):
         distribution = super(Describe, self).describe_object()
         if distribution:
-            result = self.client.get_distribution(Id=distribution['Id'])
-            distribution = {
-                "ETag": result["ETag"],
-                "Id": distribution["Id"],
-                "DomainName": result["Distribution"]["DomainName"],
-                "Status": result["Distribution"]["Status"],
-            }
-            distribution.update(result['Distribution']['DistributionConfig'])
+            distribution = self.annotate_object(distribution)
         return distribution
 
 
