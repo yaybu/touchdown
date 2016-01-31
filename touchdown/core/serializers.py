@@ -256,6 +256,9 @@ class Boolean(Formatter):
 
 class String(Formatter):
     def render(self, runner, object):
+        if object is None:
+            return None
+
         try:
             return force_str(self.inner.render(runner, object))
         except ValueError:
@@ -500,7 +503,7 @@ class List(Serializer):
         for i, o in enumerate(old):
             for j, n in enumerate(new):
                 if self.child.diff(runner, n, o).matches():
-                    matches.setdefault(i, []).append(i)
+                    matches.setdefault(j, []).append(i)
         return matches
 
     def _find_longest_intersection(self, old, new, intersections):
@@ -515,7 +518,7 @@ class List(Serializer):
                     start_old = j - length + 1
                     start_new = i - length + 1
             longest_intersections = _longest_intersections
-        return length, start_new, start_old
+        return length, start_old, start_new
 
     def _walk_intersections(self, runner, old, new):
         length, start_old, start_new = self._find_longest_intersection(
@@ -541,13 +544,22 @@ class List(Serializer):
         diffs = diff.ListDiff()
         idx = 0
         pending = []
-        for op, vals in self._walk_intersections(runner, value, object):
+        intersections = itertools.chain(
+            self._walk_intersections(runner, value, object),
+            [('*', [])],
+        )
+        for op, vals in intersections:
             if op == "-":
                 pending = vals
             elif op == "+":
                 for i, (old, new) in enumerate(zip_longest(pending, vals), idx):
                     diffs.add(i, self.child.diff(runner, new, old))
                 pending = []
+            elif pending and op in ("=", "*"):
+                for i, old in enumerate(pending, idx):
+                    diffs.add(i, self.child.diff(runner, None, old))
+                pending = []
+
             idx += len(vals)
         return diffs
 

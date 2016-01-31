@@ -135,3 +135,87 @@ class TestListOfStringsDiff(unittest.TestCase):
         self.assertEqual(d.diffs[1][1].local_value, "'b'")
         self.assertEqual(d.diffs[2][1].remote_value, "(unset)")
         self.assertEqual(d.diffs[2][1].local_value, "'c'")
+
+    def test_all_deletes(self):
+        d = self.diff([], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 3)
+
+        self.assertEqual(d.diffs[0][1].local_value, "(unset)")
+        self.assertEqual(d.diffs[0][1].remote_value, "'a'")
+        self.assertEqual(d.diffs[1][1].local_value, "(unset)")
+        self.assertEqual(d.diffs[1][1].remote_value, "'b'")
+        self.assertEqual(d.diffs[2][1].local_value, "(unset)")
+        self.assertEqual(d.diffs[2][1].remote_value, "'c'")
+
+    def test_delete_at_start(self):
+        d = self.diff(["b", "c"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "'a'")
+        self.assertEqual(d.diffs[0][1].local_value, "(unset)")
+
+    def test_delete_in_middle(self):
+        d = self.diff(["a", "c"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "'b'")
+        self.assertEqual(d.diffs[0][1].local_value, "(unset)")
+
+    def test_delete_at_end(self):
+        d = self.diff(["a", "b"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "'c'")
+        self.assertEqual(d.diffs[0][1].local_value, "(unset)")
+
+    def test_replace_at_start(self):
+        d = self.diff(["Z", "b", "c"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "'a'")
+        self.assertEqual(d.diffs[0][1].local_value, "'Z'")
+
+    def test_replace_in_middle(self):
+        d = self.diff(["a", "Z", "c"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "'b'")
+        self.assertEqual(d.diffs[0][1].local_value, "'Z'")
+
+    def test_replace_at_end(self):
+        d = self.diff(["a", "b", "Z"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "'c'")
+        self.assertEqual(d.diffs[0][1].local_value, "'Z'")
+
+    def test_insert_at_start(self):
+        d = self.diff(["Z", "a", "b", "c"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "(unset)")
+        self.assertEqual(d.diffs[0][1].local_value, "'Z'")
+
+    def test_insert_in_middle(self):
+        d = self.diff(["a", "Z", "b", "c"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "(unset)")
+        self.assertEqual(d.diffs[0][1].local_value, "'Z'")
+
+    def test_insert_at_end(self):
+        d = self.diff(["a", "b", "c", "Z"], ["a", "b", "c"])
+        self.assertEqual(False, d.matches())
+        self.assertEqual(len(d), 1)
+
+        self.assertEqual(d.diffs[0][1].remote_value, "(unset)")
+        self.assertEqual(d.diffs[0][1].local_value, "'Z'")

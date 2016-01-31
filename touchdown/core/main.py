@@ -76,11 +76,11 @@ def configure_parser(parser, workspace, console):
         ))
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Manage your infrastructure")
     console = ConsoleFrontend()
     configure_parser(parser, Touchdownfile(), console)
-    args = parser.parse_args()
+    args = parser.parse_args(argv or sys.argv[1:])
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
