@@ -353,7 +353,7 @@ class Dict(Serializer):
         rendered = self._render(self.kwargs, runner, object)
 
         for k, v in rendered.items():
-            if k not in value:
+            if not value or k not in value:
                 d.add(k, diff.ValueDiff("", v))
                 continue
             if isinstance(v, dict) and isinstance(value[k], dict):
@@ -361,9 +361,10 @@ class Dict(Serializer):
                 continue
             d.add(k, diff.ValueDiff(v, value[k]))
 
-        for k, v in value.items():
-            if k not in rendered:
-                d.add(k, diff.ValueDiff(v, ""))
+        if value:
+            for k, v in value.items():
+                if k not in rendered:
+                    d.add(k, diff.ValueDiff(v, ""))
 
         return d
 

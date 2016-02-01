@@ -151,7 +151,7 @@ class Apply(SimpleApply, Describe):
         )
         if not diff.matches():
             yield self.generic_action(
-                ["Configure attributes"] + diff.lines(),
+                ["Configure attributes"] + list(diff.lines()),
                 self.client.modify_load_balancer_attributes,
                 LoadBalancerName=serializers.Identifier(),
                 LoadBalancerAttributes=serializers.Resource(group="attributes"),

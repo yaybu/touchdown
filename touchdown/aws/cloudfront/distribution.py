@@ -273,12 +273,6 @@ class Describe(SimpleDescribe, Plan):
         distribution.update(result['Distribution']['DistributionConfig'])
         return distribution
 
-    def describe_object(self):
-        distribution = super(Describe, self).describe_object()
-        if distribution:
-            distribution = self.annotate_object(distribution)
-        return distribution
-
 
 class Apply(SimpleApply, Describe):
 

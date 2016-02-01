@@ -286,7 +286,7 @@ class SimpleDescribe(SimplePlan):
 
         if len(objects) == 1:
             logger.debug("Found object {}".format(objects[0]))
-            return objects[0]
+            return self.annotate_object(objects[0])
 
         return {}
 

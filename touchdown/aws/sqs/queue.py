@@ -80,12 +80,6 @@ class Describe(SimpleDescribe, Plan):
         )['Attributes'])
         return queue
 
-    def describe_object(self):
-        object = super(Describe, self).describe_object()
-        if object:
-            object = self.annotate_object(object)
-        return object
-
 
 class Apply(SimpleApply, Describe):
 

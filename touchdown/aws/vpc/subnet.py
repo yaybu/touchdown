@@ -93,12 +93,6 @@ class Describe(SimpleDescribe, Plan):
 
         return obj
 
-    def describe_object(self):
-        object = super(Describe, self).describe_object()
-        if not object or not object.get(self.key, None):
-            return object
-        return self.annotate_object(object)
-
 
 class Apply(SimpleApply, Describe):
 
