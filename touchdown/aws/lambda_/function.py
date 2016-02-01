@@ -16,14 +16,16 @@ import base64
 import hashlib
 import inspect
 import zipfile
+
 from six import StringIO
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present, XOR
-from touchdown.core import argument, serializers
 from touchdown.aws.iam import Role
+from touchdown.core import argument, serializers
+from touchdown.core.plan import XOR, Plan, Present
+from touchdown.core.resource import Resource
+
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class FunctionSerializer(serializers.Formatter):

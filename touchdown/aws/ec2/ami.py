@@ -15,21 +15,23 @@
 import random
 import string
 
+from touchdown import ssh
+from touchdown.core import argument, errors, serializers
+from touchdown.core.action import Action
+from touchdown.core.plan import Plan, Present
+from touchdown.core.resource import Resource
+from touchdown.provisioner import Provisioner
+
+from ..account import BaseAccount
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+
 try:
     from contextlib import ExitStack
 except ImportError:
     from contextlib2 import ExitStack
 
-from touchdown.core.action import Action
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present
-from touchdown.core import argument, errors, serializers
 
-from touchdown.provisioner import Provisioner
-from touchdown import ssh
 
-from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 def resource_id(prefix='', length=8, chars=string.ascii_lowercase+string.digits):

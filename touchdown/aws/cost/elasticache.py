@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import plan
 from touchdown.aws.elasticache import CacheCluster, ReplicationGroup
+from touchdown.core import plan
 
 from .common import CostEstimator, PricingData
 

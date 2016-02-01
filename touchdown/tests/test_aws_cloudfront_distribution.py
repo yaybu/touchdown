@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import unittest
+
 import mock
 
+from touchdown.aws.cloudfront import Distribution
+from touchdown.aws.session import session
 from touchdown.core import errors, serializers
 
-from touchdown.aws.cloudfront import Distribution
-
 from . import aws
-from touchdown.aws.session import session
 
 
 class TestMetadata(unittest.TestCase):

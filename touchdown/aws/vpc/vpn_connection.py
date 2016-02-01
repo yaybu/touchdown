@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 
-from .vpc import VPC
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from .customer_gateway import CustomerGateway
+from .vpc import VPC
 from .vpn_gateway import VpnGateway
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class VpnConnection(Resource):

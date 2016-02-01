@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
 from touchdown.core import argument, serializers
+from touchdown.core.resource import Resource
 
 from ..s3 import Bucket
 

@@ -14,7 +14,7 @@
 
 from touchdown.core import serializers
 
-from .common import SimpleDescribe, SimpleApply, SimpleDestroy
+from .common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class ReplacementDescribe(SimpleDescribe):

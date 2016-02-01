@@ -14,11 +14,11 @@
 
 import json
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, serializers
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from touchdown.core.plan import Plan, Present
+from touchdown.core.resource import Resource
 
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from .function import Function
 
 

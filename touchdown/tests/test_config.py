@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import itertools
-import unittest
-import tempfile
 import shutil
+import tempfile
+import unittest
 
-from touchdown.core import workspace, errors, goals, serializers
+from touchdown.core import errors, goals, serializers, workspace
 from touchdown.core.map import SerialMap
 from touchdown.frontends import ConsoleFrontend
 

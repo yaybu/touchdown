@@ -14,8 +14,9 @@
 
 import unittest
 
-from touchdown.core.workspace import Workspace
 from touchdown.core import errors
+from touchdown.core.workspace import Workspace
+
 from . import aws
 
 

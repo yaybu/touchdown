@@ -17,14 +17,13 @@ from __future__ import absolute_import
 import random
 import string
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import dsa, rsa
-from cryptography.hazmat.primitives import serialization
 from cryptography.fernet import Fernet
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import dsa, rsa
 
 from touchdown.core import serializers
 from touchdown.core.utils import force_str
-
 
 DJANGO_SECRET_KEY_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 

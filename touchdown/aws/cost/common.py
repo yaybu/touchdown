@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
 import re
 from decimal import Decimal
+
+import requests
+
+from touchdown.aws import common
+from touchdown.core import errors
 
 try:
     import demjson
@@ -26,8 +30,6 @@ try:
 except ImportError:
     jmespath = None
 
-from touchdown.core import errors
-from touchdown.aws import common
 
 
 class PricingData(object):

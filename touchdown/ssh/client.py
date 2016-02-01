@@ -19,8 +19,8 @@ import os
 import socket
 import time
 
-import six
 import paramiko
+import six
 
 from touchdown.core import errors
 from touchdown.core.utils import force_str

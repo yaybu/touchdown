@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import six
-from six.moves import configparser
 
-from touchdown.core.plan import Plan
+from six.moves import configparser
 from touchdown.core import argument, resource
+from touchdown.core.plan import Plan
 from touchdown.interfaces import File, FileNotFound
 
 

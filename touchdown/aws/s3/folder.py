@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import mimetypes
 import hashlib
+import mimetypes
+import os
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
 from touchdown.core import argument
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 
+from ..common import SimpleApply, SimpleDescribe
 from .bucket import Bucket
-from ..common import SimpleDescribe, SimpleApply
 
 
 class Folder(Resource):

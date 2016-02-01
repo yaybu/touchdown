@@ -14,11 +14,10 @@
 
 from threading import Lock
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
 from touchdown.core import argument
 from touchdown.core.datetime import now
-
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 from touchdown.core.workspace import Workspace
 
 from .session import Session

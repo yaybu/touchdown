@@ -14,12 +14,12 @@
 
 import base64
 import tarfile
-from six import StringIO
 
 from cryptography.fernet import Fernet
+from six import StringIO
 
-from touchdown.core.plan import Plan
 from touchdown.core import argument
+from touchdown.core.plan import Plan
 from touchdown.interfaces import File
 
 from .key import Key

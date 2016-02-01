@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.action import Action
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers
 from touchdown.config import String
+from touchdown.core import argument, serializers
+from touchdown.core.action import Action
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class ElasticIp(Resource):

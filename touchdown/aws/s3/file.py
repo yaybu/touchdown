@@ -14,13 +14,12 @@
 
 from botocore.client import ClientError
 
+from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
-from touchdown.core import argument
-
-from .bucket import Bucket
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from touchdown.core import serializers
 from touchdown.interfaces import File, FileNotFound
+
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from .bucket import Bucket
 
 
 class File(File):

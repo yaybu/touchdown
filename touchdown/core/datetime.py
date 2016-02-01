@@ -14,8 +14,10 @@
 
 from __future__ import absolute_import
 
-from datetime import datetime, timedelta, tzinfo
 import re
+from datetime import datetime, timedelta, tzinfo
+
+from touchdown.core import errors
 
 try:
     import pytz
@@ -27,7 +29,6 @@ try:
 except ImportError:
     parser = None
 
-from touchdown.core import errors
 
 
 REGEX_DELTA = re.compile(

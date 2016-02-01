@@ -14,14 +14,18 @@
 
 import base64
 
-from touchdown.core.plan import Plan, Present
 from touchdown.core import argument, resource, serializers
+from touchdown.core.plan import Plan, Present
 from touchdown.core.utils import force_str
 
 from ..account import BaseAccount
-from ..vpc import SecurityGroup
 from ..iam import InstanceProfile
-from ..replacement import ReplacementDescribe, ReplacementApply, ReplacementDestroy
+from ..replacement import (
+    ReplacementApply,
+    ReplacementDescribe,
+    ReplacementDestroy,
+)
+from ..vpc import SecurityGroup
 from .keypair import KeyPair
 
 

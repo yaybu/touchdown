@@ -14,8 +14,8 @@
 
 import os
 
-from touchdown.core.plan import Plan
 from touchdown.core import argument
+from touchdown.core.plan import Plan
 from touchdown.interfaces import File, FileNotFound
 
 from .folder import LocalFolder

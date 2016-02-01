@@ -14,10 +14,8 @@
 
 import os
 
-from dateutil import parser
-
 from botocore import session
-
+from dateutil import parser
 
 session = session.get_session()
 

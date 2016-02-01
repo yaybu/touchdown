@@ -14,10 +14,10 @@
 
 import itertools
 import json
-from six.moves import zip_longest
 
-from touchdown.core.utils import force_str
+from six.moves import zip_longest
 from touchdown.core import diff, errors
+from touchdown.core.utils import force_str
 
 
 class FieldNotPresent(Exception):

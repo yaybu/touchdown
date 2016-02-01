@@ -19,8 +19,8 @@ import inspect
 import logging
 import sys
 
-from touchdown.core.workspace import Touchdownfile
 from touchdown.core import errors, goals, map
+from touchdown.core.workspace import Touchdownfile
 from touchdown.frontends import ConsoleFrontend
 
 

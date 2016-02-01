@@ -13,15 +13,14 @@
 # limitations under the License.
 
 import unittest
-import mock
 
-from botocore import xform_name
 import botocore.session
-
-from touchdown.core import serializers
+import mock
+from botocore import xform_name
 
 from touchdown.aws import common
 from touchdown.aws.elasticache import CacheCluster
+from touchdown.core import serializers
 
 
 class TestGenericAction(unittest.TestCase):

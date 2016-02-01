@@ -13,10 +13,9 @@
 # limitations under the License.
 
 from six.moves import configparser
-
+from touchdown.core import argument, errors, resource, serializers
 from touchdown.core.action import Action
 from touchdown.core.plan import Plan
-from touchdown.core import argument, errors, resource, serializers
 
 from . import IniFile
 

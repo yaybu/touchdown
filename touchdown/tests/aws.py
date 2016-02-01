@@ -12,31 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 import unittest
+
 import mock
 import six
-import json
+import vcr
+from botocore.endpoint import Endpoint as OldEndpoint
+from botocore.vendored.requests.adapters import HTTPAdapter
+from botocore.vendored.requests.exceptions import ConnectionError
+
+from touchdown.core import errors, goals, workspace
+from touchdown.core.map import SerialMap
+from touchdown.core.utils import force_bytes
+from touchdown.frontends import ConsoleFrontend
 
 try:
     from contextlib import ExitStack
 except ImportError:
     from contextlib2 import ExitStack
 
-import vcr
 
-from touchdown.core import workspace, errors, goals
-from touchdown.frontends import ConsoleFrontend
-from touchdown.core.map import SerialMap
-from touchdown.core.utils import force_bytes
 
-from botocore.vendored.requests.exceptions import ConnectionError
-from botocore.vendored.requests.adapters import HTTPAdapter
 try:
     from botocore.vendored.requests.packages.urllib3.response import HTTPResponse
 except ImportError:
     from urllib3.response import HTTPResponse
-from botocore.endpoint import Endpoint as OldEndpoint
 
 
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")

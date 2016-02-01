@@ -14,9 +14,9 @@
 
 from botocore.exceptions import ClientError
 
-from touchdown.core import plan, errors
 from touchdown.aws import common
 from touchdown.aws.rds import Database
+from touchdown.core import errors, plan
 
 
 class Plan(common.SimplePlan, plan.Plan):

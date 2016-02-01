@@ -14,11 +14,11 @@
 
 import uuid
 
-from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
+from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
-from ..common import Resource, SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
 from ..vpc import VPC
 from .alias_target import AliasTarget
 

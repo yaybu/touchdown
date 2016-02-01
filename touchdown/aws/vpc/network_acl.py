@@ -13,14 +13,16 @@
 # limitations under the License.
 
 from six.moves import zip_longest
-
-from touchdown.core.plan import Plan
-from touchdown.core import argument
-
-from .vpc import VPC
-from touchdown.core import serializers
 from touchdown.aws.common import Resource
-from ..replacement import ReplacementDescribe, ReplacementApply, ReplacementDestroy
+from touchdown.core import argument, serializers
+from touchdown.core.plan import Plan
+
+from ..replacement import (
+    ReplacementApply,
+    ReplacementDescribe,
+    ReplacementDestroy,
+)
+from .vpc import VPC
 
 
 class PortRange(Resource):

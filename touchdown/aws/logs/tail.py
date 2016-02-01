@@ -15,13 +15,13 @@
 # This code is not currently exposed publically. It is an example of how to
 # stream from a aws log using the FilterLogEvents API.
 
-import time
 import datetime
+import time
 
-from touchdown.core import plan
-from touchdown.core.datetime import as_seconds
 from touchdown.aws import common
 from touchdown.aws.logs import LogGroup
+from touchdown.core import plan
+from touchdown.core.datetime import as_seconds
 
 
 class Plan(common.SimplePlan, plan.Plan):

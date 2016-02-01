@@ -17,13 +17,13 @@ import re
 
 from botocore.exceptions import ClientError
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
 from touchdown.core import argument, serializers
 from touchdown.core.errors import InvalidParameter
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class CorsRule(Resource):

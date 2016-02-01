@@ -15,11 +15,12 @@
 from __future__ import absolute_import, print_function
 
 import signal
+
 import six
 
-from .progress import ProgressBar
 from ..base import BaseFrontend
 from ..noninteractive import ProgressBar as NonInteractiveProgressBar
+from .progress import ProgressBar
 
 
 class ConsoleFrontend(BaseFrontend):

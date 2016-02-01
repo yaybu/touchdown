@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+
 import mock
 
 from touchdown.aws.vpc import SecurityGroup

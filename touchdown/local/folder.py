@@ -14,10 +14,10 @@
 
 import os
 
-from touchdown.core.workspace import Workspace
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
 from touchdown.core import argument, errors
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
+from touchdown.core.workspace import Workspace
 
 
 class LocalFolder(Resource):

@@ -14,8 +14,8 @@
 
 import unittest
 
-from touchdown.core import serializers
 from touchdown.config import expressions
+from touchdown.core import serializers
 
 
 class TestExpressions(unittest.TestCase):

@@ -14,13 +14,13 @@
 
 import time
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
-from touchdown.core import argument, serializers, errors
+from touchdown.core import argument, errors, serializers
 from touchdown.core.action import Action
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from .vpc import VPC
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class AttachmentStateWaiter(Action):

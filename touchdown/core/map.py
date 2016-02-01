@@ -15,12 +15,12 @@
 from __future__ import division
 
 import logging
-import time
 import threading
+import time
+
 from six.moves import queue
 
 from . import errors
-
 
 logger = logging.getLogger(__name__)
 

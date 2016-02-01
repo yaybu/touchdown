@@ -15,17 +15,16 @@
 import random
 import time
 
-from touchdown.core.action import Action
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present
-from touchdown.core import argument, errors, serializers
-
 from touchdown import ssh
+from touchdown.core import argument, errors, serializers
+from touchdown.core.action import Action
+from touchdown.core.plan import Plan, Present
+from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from ..elb import LoadBalancer
 from ..vpc import Subnet
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 from .launch_configuration import LaunchConfiguration
 
 

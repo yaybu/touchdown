@@ -16,8 +16,8 @@ import os
 import unittest
 
 from touchdown.aws.ec2.keypair import PublicKeyFromPrivateKey
-from . import aws
 
+from . import aws
 
 PUBLIC_KEY_PATH = os.path.join(
     os.path.dirname(__file__),

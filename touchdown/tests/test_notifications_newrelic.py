@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
 import unittest
 
-from touchdown.core import workspace, errors, goals
+import mock
+
+from touchdown.core import errors, goals, workspace
 from touchdown.core.map import SerialMap
 from touchdown.frontends import ConsoleFrontend
 

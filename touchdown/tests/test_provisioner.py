@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import os
-import unittest
 import tempfile
+import unittest
 
-from touchdown.core import workspace, errors, serializers, goals
+from touchdown.core import errors, goals, serializers, workspace
 from touchdown.core.map import SerialMap
 from touchdown.frontends import ConsoleFrontend
 

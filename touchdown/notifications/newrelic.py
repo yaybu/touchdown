@@ -14,7 +14,15 @@
 
 import requests
 
-from touchdown.core import argument, action, errors, plan, resource, serializers, workspace
+from touchdown.core import (
+    action,
+    argument,
+    errors,
+    plan,
+    resource,
+    serializers,
+    workspace,
+)
 
 
 class NewRelicDeploymentNotification(resource.Resource):

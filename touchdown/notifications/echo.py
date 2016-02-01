@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, action, plan, resource, serializers, workspace
+from touchdown.core import (
+    action,
+    argument,
+    plan,
+    resource,
+    serializers,
+    workspace,
+)
 
 
 class EchoNotification(resource.Resource):

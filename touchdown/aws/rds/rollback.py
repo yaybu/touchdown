@@ -17,10 +17,10 @@ import time
 import jmespath
 from botocore.exceptions import ClientError
 
-from touchdown.core import plan, errors
-from touchdown.core.datetime import parse_datetime, now
 from touchdown.aws import common
 from touchdown.aws.rds import Database
+from touchdown.core import errors, plan
+from touchdown.core.datetime import now, parse_datetime
 
 
 def get_from_jmes(db, **kwargs):

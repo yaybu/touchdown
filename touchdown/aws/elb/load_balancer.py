@@ -14,18 +14,17 @@
 
 import time
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present
-from touchdown.core import argument, serializers
+from touchdown.core import argument, errors, serializers
 from touchdown.core.action import Action
-from touchdown.core import errors
+from touchdown.core.plan import Plan, Present
+from touchdown.core.resource import Resource
 
+from .. import route53
 from ..account import BaseAccount
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from ..iam import ServerCertificate
 from ..s3 import Bucket
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
-from ..vpc import Subnet, SecurityGroup
-from .. import route53
+from ..vpc import SecurityGroup, Subnet
 
 
 class Listener(Resource):

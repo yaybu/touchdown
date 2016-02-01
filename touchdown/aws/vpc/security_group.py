@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
+from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument
+from touchdown.core.resource import Resource
 
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from .vpc import VPC
-from touchdown.core import serializers
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
 
 
 class Rule(Resource):

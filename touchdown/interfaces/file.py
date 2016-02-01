@@ -16,9 +16,9 @@ import os
 import subprocess
 import tempfile
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan
 from touchdown.core import argument, errors, serializers
+from touchdown.core.plan import Plan
+from touchdown.core.resource import Resource
 
 
 class FileNotFound(errors.Error):

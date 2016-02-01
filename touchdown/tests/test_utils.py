@@ -14,7 +14,7 @@
 
 import unittest
 
-from touchdown.core.utils import force_str, force_unicode, force_bytes
+from touchdown.core.utils import force_bytes, force_str, force_unicode
 
 
 class TestStringHelpers(unittest.TestCase):

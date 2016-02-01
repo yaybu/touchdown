@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from __future__ import division
+
 import os
 
-from . import dependencies, map, errors
+from . import dependencies, errors, map
 from .cache import JSONFileCache
 
 

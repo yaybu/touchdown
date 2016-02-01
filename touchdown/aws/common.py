@@ -13,18 +13,16 @@
 # limitations under the License.
 
 import datetime
-from inspect import isgeneratorfunction
 import logging
 import time
-
-from botocore.exceptions import ClientError
+from inspect import isgeneratorfunction
 
 import jmespath
+from botocore.exceptions import ClientError
 
-from touchdown.core import errors, serializers, resource
+from touchdown.core import errors, resource, serializers
 from touchdown.core.action import Action
 from touchdown.core.plan import Present
-
 
 logger = logging.getLogger(__name__)
 

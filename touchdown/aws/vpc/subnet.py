@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.resource import Resource
+from touchdown.core import argument, errors, serializers
 from touchdown.core.plan import Plan, Present
-from touchdown.core import argument, serializers, errors
+from touchdown.core.resource import Resource
 
-from .vpc import VPC
-from .route_table import RouteTable
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from .network_acl import NetworkACL
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from .route_table import RouteTable
+from .vpc import VPC
 
 
 class Subnet(Resource):

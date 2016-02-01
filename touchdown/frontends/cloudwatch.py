@@ -14,11 +14,12 @@
 
 import calendar
 import datetime
-import time
 import threading
-from six.moves import queue
+import time
 
 from botocore.exceptions import ClientError
+
+from six.moves import queue
 
 from .noninteractive import NonInteractiveFrontend
 

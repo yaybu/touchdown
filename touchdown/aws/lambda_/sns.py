@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import serializers
 from touchdown.aws import sns
+from touchdown.core import serializers
+
 from .function import Function
 
 

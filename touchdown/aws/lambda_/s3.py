@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, serializers
 from touchdown.aws.s3 import NotificationConfiguration
+from touchdown.core import argument, serializers
+
 from .function import Function
 
 

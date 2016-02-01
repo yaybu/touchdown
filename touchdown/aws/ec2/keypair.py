@@ -15,17 +15,17 @@
 import base64
 import struct
 
-from paramiko.util import deflate_long
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
+from paramiko.util import deflate_long
 
-from touchdown.core.resource import Resource
-from touchdown.core.plan import Plan, Present, XOR
 from touchdown.core import argument, serializers
+from touchdown.core.plan import XOR, Plan, Present
+from touchdown.core.resource import Resource
 from touchdown.core.utils import force_bytes, force_str
 
 from ..account import BaseAccount
-from ..common import SimpleDescribe, SimpleApply, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class PublicKeyFromPrivateKey(serializers.Formatter):

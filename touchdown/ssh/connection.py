@@ -14,7 +14,15 @@
 
 import time
 
-from touchdown.core import adapters, argument, errors, plan, serializers, workspace
+from touchdown.core import (
+    adapters,
+    argument,
+    errors,
+    plan,
+    serializers,
+    workspace,
+)
+from touchdown.provisioner import Target
 
 try:
     from . import client
@@ -22,7 +30,6 @@ try:
 except ImportError:
     client = None
 
-from touchdown.provisioner import Target
 
 
 class Instance(adapters.Adapter):

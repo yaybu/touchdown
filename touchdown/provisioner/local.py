@@ -14,14 +14,11 @@
 
 import errno
 import os
-import tempfile
 import subprocess
 import sys
+import tempfile
 
-from touchdown.core import argument
-from touchdown.core import errors
-from touchdown.core import plan
-from touchdown.core import workspace
+from touchdown.core import argument, errors, plan, workspace
 
 from .provisioner import Target
 

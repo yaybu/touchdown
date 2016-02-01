@@ -14,10 +14,10 @@
 
 from six import StringIO
 
-from touchdown.core.plan import Plan
 from touchdown.core import argument
-from touchdown.interfaces import File
+from touchdown.core.plan import Plan
 from touchdown.core.utils import force_bytes
+from touchdown.interfaces import File
 
 from .gpg import Gpg
 
