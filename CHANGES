@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.6.2 (unreleased)
+0.7.0 (2016-02-02)
 ------------------
 
 - Support 'update by replacement' for IAM Server Certificates.
