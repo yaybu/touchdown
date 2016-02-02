@@ -15,6 +15,7 @@
 from . import (
     account,
     vpc,
+    acm,
     apigateway,
     ec2,
     cloudfront,
@@ -40,6 +41,7 @@ from . import (
 __all__ = [
     'account',
     'vpc',
+    'acm',
     'apigateway',
     'ec2',
     'cloudfront',
