@@ -9,6 +9,20 @@ Changelog for Touchdown
 - Validates that an IAM Server Certificate `private_key` belongs to its
   `certificate_body`.
 
+- ELB attributes are now part of the load balancer object itself, so::
+
+          aws.add_load_balancer(
+              name="my-elb",
+              <snip>,
+      -       attributes={
+      -           "cross_zone_load_balancing": True,
+      -            "connection_draining": 30,
+      -       },
+      +       cross_zone_load_balancing=True,
+      +       connection_draining=30,
+          )
+
+
 
 0.6.1 (2016-01-27)
 ------------------
