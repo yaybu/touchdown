@@ -31,7 +31,6 @@ except ImportError:
     client = None
 
 
-
 class Instance(adapters.Adapter):
     pass
 

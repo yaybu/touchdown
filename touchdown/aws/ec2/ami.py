@@ -31,9 +31,6 @@ except ImportError:
     from contextlib2 import ExitStack
 
 
-
-
-
 def resource_id(prefix='', length=8, chars=string.ascii_lowercase+string.digits):
     return prefix + ''.join(random.choice(chars) for _ in range(length))
 

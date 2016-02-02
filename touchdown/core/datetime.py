@@ -30,7 +30,6 @@ except ImportError:
     parser = None
 
 
-
 REGEX_DELTA = re.compile(
     r'(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?'
 )

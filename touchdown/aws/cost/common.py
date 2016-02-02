@@ -31,7 +31,6 @@ except ImportError:
     jmespath = None
 
 
-
 class PricingData(object):
 
     REGIONS = {

@@ -34,7 +34,6 @@ except ImportError:
     from contextlib2 import ExitStack
 
 
-
 try:
     from botocore.vendored.requests.packages.urllib3.response import HTTPResponse
 except ImportError:
