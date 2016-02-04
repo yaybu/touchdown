@@ -95,6 +95,11 @@ class ServerCertificate(Resource):
             try:
                 verifier.verify()
             except:
+                error_message = "\n".join([
+                    "Invalid chain for  {} at position {}.",
+                    "Excepted cert with subject '{}' and subject key identifier '{}'.",
+                    "Got cert with subject '{}' and subject key identifier '{}'.",
+                ])
                 cert_name = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 cert_issuer = cert.issuer.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 akib = cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_KEY_IDENTIFIER).value.key_identifier
@@ -103,7 +108,7 @@ class ServerCertificate(Resource):
                 skib = issuer.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER).value.digest
                 ski = ":".join("{:02x}".format(ord(c)) for c in skib)
                 raise errors.Error(
-                    "Invalid chain for  {} at position {}.\nExcepted cert with subject '{}' and subject key identifier '{}'.\nGot cert with subject '{}' and subject key identifier '{}'.".format(
+                    error_message.format(
                         cert_name,
                         i,
                         cert_issuer,
