@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.7.1 (unreleased)
+0.7.1 (2016-02-05)
 ------------------
 
 - Don't try and delete launch configurations that are still in use.
