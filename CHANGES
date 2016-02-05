@@ -6,6 +6,8 @@ Changelog for Touchdown
 
 - Don't try and delete launch configurations that are still in use.
 
+- Better error messages when validating IAM certificate chains.
+
 - Fix compatibility with progressbar2 >= 3.6.0. Previously it would work but
   there were some formatting issues.
 
