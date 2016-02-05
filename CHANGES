@@ -4,7 +4,11 @@ Changelog for Touchdown
 0.7.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix typo in error message.
+
+- Fix formatting error when diffing JSON payloads (such as for a `user_data`
+  attribute on a launch config). In this case the direction of the change could
+  be incorrect. (The actual change would be correct, however).
 
 
 0.7.1 (2016-02-05)
