@@ -17,7 +17,7 @@ from . import aws
 
 class TestRole(aws.RecordedBotoCoreTest):
 
-    def test_create_and_delete_role(self):
+    def test_create_and_delete_launch_configuration(self):
         self.aws.add_launch_configuration(
             name='my-test-lc',
             image='ami-cba130bc',

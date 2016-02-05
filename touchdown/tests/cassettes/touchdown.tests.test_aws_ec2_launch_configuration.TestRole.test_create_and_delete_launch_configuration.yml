@@ -1,0 +1,319 @@
+interactions:
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations/>\n  </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>423066fe-cc01-11e5-a5fb-3fc98720f597</RequestId>\n  </ResponseMetadata>\n\
+        </DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['350']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:07 GMT']
+      x-amzn-requestid: [423066fe-cc01-11e5-a5fb-3fc98720f597]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations/>\n  </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>42457571-cc01-11e5-a75e-71f002c9f565</RequestId>\n  </ResponseMetadata>\n\
+        </DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['350']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:07 GMT']
+      x-amzn-requestid: [42457571-cc01-11e5-a75e-71f002c9f565]
+    status: {code: 200, message: OK}
+- request:
+    body: InstanceMonitoring.Enabled=false&ImageId=ami-cba130bc&Version=2011-01-01&LaunchConfigurationName=my-test-lc.1&Action=CreateLaunchConfiguration&InstanceType=t2.micro
+    headers:
+      Content-Length: ['164']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<CreateLaunchConfigurationResponse xmlns=\"http://autoscaling.amazonaws.com/doc/2011-01-01/\"\
+        >\n  <ResponseMetadata>\n    <RequestId>4259998f-cc01-11e5-85f9-f370032d2ce3</RequestId>\n\
+        \  </ResponseMetadata>\n</CreateLaunchConfigurationResponse>\n"}
+    headers:
+      content-length: ['237']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:07 GMT']
+      x-amzn-requestid: [4259998f-cc01-11e5-85f9-f370032d2ce3]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <RamdiskId/>\n        <EbsOptimized>false</EbsOptimized>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>4280833a-cc01-11e5-9b4f-83a673820889</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:08 GMT']
+      x-amzn-requestid: [4280833a-cc01-11e5-9b4f-83a673820889]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <EbsOptimized>false</EbsOptimized>\n        <RamdiskId/>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>4299fe7e-cc01-11e5-b879-196ccb0f6862</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:08 GMT']
+      x-amzn-requestid: [4299fe7e-cc01-11e5-b879-196ccb0f6862]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <EbsOptimized>false</EbsOptimized>\n        <RamdiskId/>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>42aff7b9-cc01-11e5-9baa-a51e4a468c69</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:08 GMT']
+      x-amzn-requestid: [42aff7b9-cc01-11e5-9baa-a51e4a468c69]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <RamdiskId/>\n        <EbsOptimized>false</EbsOptimized>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>42c79e01-cc01-11e5-a89b-53a41bfc3229</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:09 GMT']
+      x-amzn-requestid: [42c79e01-cc01-11e5-a89b-53a41bfc3229]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <EbsOptimized>false</EbsOptimized>\n        <RamdiskId/>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>42d9eddb-cc01-11e5-866d-8332485f3d7e</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:09 GMT']
+      x-amzn-requestid: [42d9eddb-cc01-11e5-866d-8332485f3d7e]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeAutoScalingGroups&Version=2011-01-01
+    headers:
+      Content-Length: ['51']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeAutoScalingGroupsResponse xmlns=\"http://autoscaling.amazonaws.com/doc/2011-01-01/\"\
+        >\n  <DescribeAutoScalingGroupsResult>\n    <AutoScalingGroups/>\n  </DescribeAutoScalingGroupsResult>\n\
+        \  <ResponseMetadata>\n    <RequestId>42eefc83-cc01-11e5-9b4f-83a673820889</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeAutoScalingGroupsResponse>\n"}
+    headers:
+      content-length: ['335']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:08 GMT']
+      x-amzn-requestid: [42eefc83-cc01-11e5-9b4f-83a673820889]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <EbsOptimized>false</EbsOptimized>\n        <RamdiskId/>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>4306a341-cc01-11e5-9baa-a51e4a468c69</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:08 GMT']
+      x-amzn-requestid: [4306a341-cc01-11e5-9baa-a51e4a468c69]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations>\n      <member>\n        <KernelId/>\n       \
+        \ <EbsOptimized>false</EbsOptimized>\n        <RamdiskId/>\n        <UserData/>\n\
+        \        <ImageId>ami-cba130bc</ImageId>\n        <BlockDeviceMappings/>\n\
+        \        <ClassicLinkVPCSecurityGroups/>\n        <InstanceType>t2.micro</InstanceType>\n\
+        \        <KeyName/>\n        <LaunchConfigurationARN>arn:aws:autoscaling:eu-west-1:x0x0x0x0x0x0:launchConfiguration:e98ce748-942b-4b21-b036-d8f1f4ab84b6:launchConfigurationName/my-test-lc.1</LaunchConfigurationARN>\n\
+        \        <LaunchConfigurationName>my-test-lc.1</LaunchConfigurationName>\n\
+        \        <CreatedTime>2016-02-05T12:09:08.609Z</CreatedTime>\n        <SecurityGroups/>\n\
+        \        <InstanceMonitoring>\n          <Enabled>false</Enabled>\n      \
+        \  </InstanceMonitoring>\n      </member>\n    </LaunchConfigurations>\n \
+        \ </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n    <RequestId>431b637a-cc01-11e5-8813-b32550152208</RequestId>\n\
+        \  </ResponseMetadata>\n</DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['1134']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:09 GMT']
+      x-amzn-requestid: [431b637a-cc01-11e5-8813-b32550152208]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DeleteLaunchConfiguration&Version=2011-01-01&LaunchConfigurationName=my-test-lc.1
+    headers:
+      Content-Length: ['88']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DeleteLaunchConfigurationResponse xmlns=\"http://autoscaling.amazonaws.com/doc/2011-01-01/\"\
+        >\n  <ResponseMetadata>\n    <RequestId>432f60e7-cc01-11e5-9b4f-83a673820889</RequestId>\n\
+        \  </ResponseMetadata>\n</DeleteLaunchConfigurationResponse>\n"}
+    headers:
+      content-length: ['237']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:09 GMT']
+      x-amzn-requestid: [432f60e7-cc01-11e5-9b4f-83a673820889]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations/>\n  </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>43483fb1-cc01-11e5-8b91-4d4736b0ad5d</RequestId>\n  </ResponseMetadata>\n\
+        </DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['350']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:09 GMT']
+      x-amzn-requestid: [43483fb1-cc01-11e5-8b91-4d4736b0ad5d]
+    status: {code: 200, message: OK}
+- request:
+    body: Action=DescribeLaunchConfigurations&Version=2011-01-01
+    headers:
+      Content-Length: ['54']
+      Content-Type: [application/x-www-form-urlencoded]
+    method: !!python/unicode 'POST'
+    uri: https://autoscaling.eu-west-1.amazonaws.com/
+  response:
+    body: {string: !!python/unicode "<DescribeLaunchConfigurationsResponse xmlns=\"\
+        http://autoscaling.amazonaws.com/doc/2011-01-01/\">\n  <DescribeLaunchConfigurationsResult>\n\
+        \    <LaunchConfigurations/>\n  </DescribeLaunchConfigurationsResult>\n  <ResponseMetadata>\n\
+        \    <RequestId>435cb279-cc01-11e5-b8eb-b79b566e5a2d</RequestId>\n  </ResponseMetadata>\n\
+        </DescribeLaunchConfigurationsResponse>\n"}
+    headers:
+      content-length: ['350']
+      content-type: [text/xml]
+      date: ['Fri, 05 Feb 2016 12:09:10 GMT']
+      x-amzn-requestid: [435cb279-cc01-11e5-b8eb-b79b566e5a2d]
+    status: {code: 200, message: OK}
+version: 1
