@@ -24,7 +24,7 @@ class StdWrapper(object):
         self.inner = inner
 
     def write(self, text):
-        self.inner.write('\r' + ' ' * self.pb.term_width + '\r' + text + self.pb._format_line())
+        self.inner.write(text.ljust(self.pb.term_width, ' ') + '\r' + self.pb._format_line() + '\r')
         self.inner.flush()
 
     def flush(self):

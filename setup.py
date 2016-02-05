@@ -34,7 +34,7 @@ setup(
         'netaddr',
         'fuselage>=0.0.10',
         'botocore>=1.3.23',
-        'progressbar2>=3.0.0',
+        'progressbar2>=3.6.0',
         'requests',
         'python-gnupg',
     ],
