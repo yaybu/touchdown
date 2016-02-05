@@ -97,7 +97,7 @@ class ServerCertificate(Resource):
             except:
                 error_message = "\n".join([
                     "Invalid chain for  {} at position {}.",
-                    "Excepted cert with subject '{}' and subject key identifier '{}'.",
+                    "Expected cert with subject '{}' and subject key identifier '{}'.",
                     "Got cert with subject '{}' and subject key identifier '{}'.",
                 ])
                 cert_name = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
