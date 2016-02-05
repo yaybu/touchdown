@@ -90,6 +90,18 @@ class Describe(ReplacementDescribe, Plan):
     describe_filters = {}
     key = 'LaunchConfigurationName'
 
+    _active_launch_configs = None
+
+    @property
+    def active_launch_configs(self):
+        if not self._active_launch_configs:
+            active = self._active_launch_configs = set()
+            dasg = self.client.get_paginator("describe_auto_scaling_groups")
+            for page in dasg.paginate():
+                for asg in page.get('AutoScalingGroups', []):
+                    active.add(asg['LaunchConfigurationName'])
+        return self._active_launch_configs
+
     def get_possible_objects(self):
         for obj in super(Describe, self).get_possible_objects():
             if "UserData" in obj and obj["UserData"]:
@@ -107,6 +119,12 @@ class Apply(ReplacementApply, Describe):
         Present("image"),
         Present("instance_type"),
     )
+
+    def is_stale(self, launch_config):
+        # Don't try and delete launch configuration that are still in use
+        if launch_config['LaunchConfigurationName'] in self.active_launch_configs:
+            return False
+        return super(Apply, self).is_stale(launch_config)
 
 
 class Destroy(ReplacementDestroy, Describe):
