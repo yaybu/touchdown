@@ -451,6 +451,10 @@ class Resource(Dict):
 
     def diff(self, runner, obj, value):
         d = diff.AttributeDiff()
+
+        if not obj:
+            return diff.ItemRemoved(value)
+
         for field in obj.meta.iter_fields_in_order():
             arg = field.argument
             if not field.present(obj):

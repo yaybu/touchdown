@@ -65,6 +65,21 @@ class AttributeDiff(object):
         return '\n'.join(self.lines())
 
 
+class ItemRemoved(object):
+
+    def __init__(self, value):
+        self.value = value
+
+    def matches(self):
+        return False
+
+    def lines(self):
+        return ["Item removed"]
+
+    def __str__(self):
+        return '\n'.join(self.lines())
+
+
 class ListDiff(object):
 
     def __init__(self):
