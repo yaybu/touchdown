@@ -182,6 +182,10 @@ class BuildInstance(Action):
             self.plan.echo("Waiting for image to become available")
             self.plan.client.get_waiter("image_available").wait(ImageIds=[image["ImageId"]])
 
+        self.plan.object = {
+            self.plan.key: image[self.plan.key]
+        }
+
 
 class Describe(SimpleDescribe, Plan):
 
@@ -198,7 +202,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = "create_image"
-    create_response = "not-that-useful"
+    create_response = "id-only"
 
     signature = (
         Present("name"),

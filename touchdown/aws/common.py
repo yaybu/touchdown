@@ -297,6 +297,7 @@ class SimpleDescribe(SimplePlan):
         for obj in self.get_possible_objects():
             if obj.get(self.key, '') == key:
                 return self.annotate_object(obj)
+        return {}
 
     def generic_action(self, description, callable, serializer=None, **kwargs):
         return GenericAction(
@@ -420,8 +421,6 @@ class SimpleApply(SimpleDescribe):
             yield self.create_object()
             for action in self.name_object():
                 yield action
-            if self.create_response != "full-description":
-                yield RefreshMetadata(self)
             created = True
 
         if created:
@@ -434,6 +433,8 @@ class SimpleApply(SimpleDescribe):
                 if created or not waiter.ready():
                     yield waiter
                     yield RefreshMetadata(self)
+            elif self.create_response != "full-description":
+                yield RefreshMetadata(self)
 
             if self.create_response != "full-description" and not self.waiter:
                 yield PostCreation(self)
