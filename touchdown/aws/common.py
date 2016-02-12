@@ -430,7 +430,6 @@ class SimpleApply(SimpleDescribe):
 class TagsMixin(object):
 
     def update_tags(self):
-        return
         if getattr(self.resource, "immutable_tags", False) and self.object:
             return
 
@@ -452,7 +451,7 @@ class TagsMixin(object):
     def update_object(self):
         for action in super(TagsMixin, self).update_object():
             yield action
-        for action in uper(TagsMixin, self).update_tags():
+        for action in self.update_tags():
             yield action
 
 
