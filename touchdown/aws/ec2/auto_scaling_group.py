@@ -28,6 +28,15 @@ from ..vpc import Subnet
 from .launch_configuration import LaunchConfiguration
 
 
+class AutoScalingGroupTag(Resource):
+
+    resource_name = "auto_scaling_group_tag"
+
+    name = argument.String(field="Key", min=1, max=127)
+    value = argument.String(field="Value", min=0, max=255)
+    propagate = argument.Boolean(field="PropagateAtLaunch", default=True)
+
+
 class AutoScalingGroup(Resource):
 
     resource_name = "auto_scaling_group"
@@ -58,6 +67,12 @@ class AutoScalingGroup(Resource):
     placement_group = argument.String(max=255, field="PlacementGroup")
     termination_policies = argument.List(default=lambda i: ["Default"], field="TerminationPolicies")
     replacement_policy = argument.String(choices=['singleton', 'graceful'], default='graceful')
+
+    tags = argument.ResourceList(
+        AutoScalingGroupTag,
+        serializer=serializers.List(serializers.Resource()),
+        field="Tags",
+    )
 
     account = argument.Resource(BaseAccount)
 

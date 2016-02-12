@@ -375,25 +375,6 @@ class SimpleApply(SimpleDescribe):
                 ))
             )
 
-    def update_tags(self):
-        if getattr(self.resource, "immutable_tags", False) and self.object:
-            return
-
-        if hasattr(self.resource, "tags"):
-            local_tags = dict(self.resource.tags)
-            remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
-
-            tags = {}
-            for k, v in local_tags.items():
-                if k not in remote_tags or remote_tags[k] != v:
-                    tags[k] = v
-
-            if tags:
-                yield SetTags(
-                    self,
-                    tags=tags,
-                )
-
     def update_object(self):
         if self.update_action and self.object:
             logger.debug("Checking resource {} for changes".format(self.resource))
@@ -441,11 +422,37 @@ class SimpleApply(SimpleDescribe):
 
             yield PrintMetadata(self)
 
-        for change in self.update_tags():
-            yield change
-
         logger.debug("Looking for changes to apply")
         for action in self.update_object():
+            yield action
+
+
+class TagsMixin(object):
+
+    def update_tags(self):
+        return
+        if getattr(self.resource, "immutable_tags", False) and self.object:
+            return
+
+        if hasattr(self.resource, "tags"):
+            local_tags = dict(self.resource.tags)
+            remote_tags = dict((v["Key"], v["Value"]) for v in self.object.get('Tags', []))
+
+            tags = {}
+            for k, v in local_tags.items():
+                if k not in remote_tags or remote_tags[k] != v:
+                    tags[k] = v
+
+            if tags:
+                yield SetTags(
+                    self,
+                    tags=tags,
+                )
+
+    def update_object(self):
+        for action in super(TagsMixin, self).update_object():
+            yield action
+        for action in uper(TagsMixin, self).update_tags():
             yield action
 
 
