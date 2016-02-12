@@ -23,7 +23,7 @@ from touchdown.aws.iam import Role
 from touchdown.core import argument, serializers
 from touchdown.core.plan import XOR, Plan, Present
 from touchdown.core.resource import Resource
-from touchdown.core.aws.vpc import SecurityGroup, Subnet
+from touchdown.aws.vpc import SecurityGroup, Subnet
 
 from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
