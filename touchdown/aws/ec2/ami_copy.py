@@ -17,7 +17,7 @@ from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 from .ami import Image
 
 
@@ -55,7 +55,7 @@ class Describe(SimpleDescribe, Plan):
         return {"Filters": [{"Name": "name", "Values": [self.resource.name]}]}
 
 
-class Apply(SimpleApply, Describe):
+class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "copy_image"
     create_response = "id-only"

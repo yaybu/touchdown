@@ -23,7 +23,7 @@ from touchdown.core.resource import Resource
 from touchdown.provisioner import Provisioner
 
 from ..account import BaseAccount
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 
 try:
     from contextlib import ExitStack
@@ -199,7 +199,7 @@ class Describe(SimpleDescribe, Plan):
         return {"Filters": [{"Name": "name", "Values": [self.resource.name]}]}
 
 
-class Apply(SimpleApply, Describe):
+class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "create_image"
     create_response = "id-only"
