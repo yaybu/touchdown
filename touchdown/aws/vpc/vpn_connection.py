@@ -16,7 +16,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
 
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 from .customer_gateway import CustomerGateway
 from .vpc import VPC
 from .vpn_gateway import VpnGateway
@@ -64,7 +64,7 @@ class Describe(SimpleDescribe, Plan):
         }
 
 
-class Apply(SimpleApply, Describe):
+class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "create_vpn_connection"
     waiter = "vpn_connection_available"

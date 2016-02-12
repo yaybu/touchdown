@@ -21,6 +21,7 @@ from ..replacement import (
     ReplacementApply,
     ReplacementDescribe,
     ReplacementDestroy,
+    TagsMixin,
 )
 from .vpc import VPC
 
@@ -182,7 +183,7 @@ class Describe(ReplacementDescribe, Plan):
         return super(Describe, self).is_possible_object(obj)
 
 
-class Apply(ReplacementApply, Describe):
+class Apply(TagsMixin, ReplacementApply, Describe):
 
     create_action = "create_network_acl"
     waiter = "network_acl_available"

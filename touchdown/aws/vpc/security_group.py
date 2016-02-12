@@ -16,7 +16,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 from .vpc import VPC
 
 
@@ -133,7 +133,7 @@ class Describe(SimpleDescribe, Plan):
         }
 
 
-class Apply(SimpleApply, Describe):
+class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "create_security_group"
     create_response = "id-only"

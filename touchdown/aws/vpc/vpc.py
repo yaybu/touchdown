@@ -17,7 +17,7 @@ from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 
 
 class VPC(Resource):
@@ -49,7 +49,7 @@ class Describe(SimpleDescribe, Plan):
         }
 
 
-class Apply(SimpleApply, Describe):
+class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "create_vpc"
     waiter = 'vpc_available'

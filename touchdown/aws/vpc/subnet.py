@@ -16,7 +16,7 @@ from touchdown.core import argument, errors, serializers
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 from .network_acl import NetworkACL
 from .route_table import RouteTable
 from .vpc import VPC
@@ -94,7 +94,7 @@ class Describe(SimpleDescribe, Plan):
         return obj
 
 
-class Apply(SimpleApply, Describe):
+class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "create_subnet"
     waiter = "subnet_available"
