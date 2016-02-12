@@ -98,6 +98,13 @@ class Function(Resource):
     memory = argument.Integer(name="MemorySize", default=128, min=128, max=1536)
     publish = argument.Boolean(name="Publish", default=True)
 
+    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds", group="vpc_config")
+    subnets = argument.ResourceList(Subnet, field="SubnetIds", group="vpc_config")
+    vpc_config = argument.Serializer(
+        serializer=serializers.Resource(group="vpc_config"),
+        field="VpcConfig",
+    )
+
     account = argument.Resource(BaseAccount)
 
 
