@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from six.moves import zip_longest
-from touchdown.aws.common import Resource
+from touchdown.aws.common import Resource, TagsMixin
 from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
@@ -21,7 +21,6 @@ from ..replacement import (
     ReplacementApply,
     ReplacementDescribe,
     ReplacementDestroy,
-    TagsMixin,
 )
 from .vpc import VPC
 
