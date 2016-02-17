@@ -32,6 +32,9 @@ class AutoScalingGroupTag(Resource):
 
     resource_name = "auto_scaling_group_tag"
 
+    resource_type = argument.Serializer(serializer=serializers.Const("auto-scaling-group"), field="ResourceType")
+    resource_id = argument.ReadOnly(lambda x: x.parent.name, field="ResourceId")
+
     name = argument.String(field="Key", min=1, max=127)
     value = argument.String(field="Value", min=0, max=255)
     propagate = argument.Boolean(field="PropagateAtLaunch", default=True)
@@ -72,6 +75,7 @@ class AutoScalingGroup(Resource):
         AutoScalingGroupTag,
         serializer=serializers.List(serializers.Resource()),
         field="Tags",
+        update=False,
     )
 
     account = argument.Resource(BaseAccount)
@@ -237,8 +241,25 @@ class Apply(SimpleApply, Describe):
         Present("launch_configuration"),
     )
 
+    def update_tags(self):
+        diff = serializers.Argument("tags").diff(
+            self.runner,
+            self.resource,
+            self.object.get("Tags", []),
+        )
+
+        if not diff.matches():
+            yield self.generic_action(
+                ["Update tags"] + list(diff.lines()),
+                self.client.create_or_update_tags,
+                Tags=serializers.Argument("tags"),
+            )
+
     def update_object(self):
         for change in super(Apply, self).update_object():
+            yield change
+
+        for change in self.update_tags():
             yield change
 
         if self.resource.min_size and self.resource.min_size > 0:
