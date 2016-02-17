@@ -79,7 +79,7 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
             self.send_message(handler(msg))
 
 
-class AgentServer(socketserver.UnixStreamServer):
+class AgentServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
 
     def __init__(self, socket_file):
         socketserver.UnixStreamServer.__init__(self, socket_file, AgentRequestHandler)
