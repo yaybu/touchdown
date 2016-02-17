@@ -6,6 +6,10 @@ Changelog for Touchdown
 
 - Add support for AWS Lambda security groups and subnets.
 
+- Support propagating tags for autoscaling groups.
+
+- Fix SSH on newer versions of ubuntu.
+
 Touchdown now requires botocore 1.3.26 or higher.
 
 
