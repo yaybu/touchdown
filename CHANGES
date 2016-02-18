@@ -10,6 +10,8 @@ Changelog for Touchdown
 
 - Fix SSH on newer versions of ubuntu.
 
+- You can now set `evaluate_target_health` on a route53 alias target.
+
 Touchdown now requires botocore 1.3.26 or higher.
 
 

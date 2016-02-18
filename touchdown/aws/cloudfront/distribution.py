@@ -342,17 +342,27 @@ class AliasTarget(route53.AliasTarget):
 
     """ Adapts a Distribution into a AliasTarget """
 
-    input = Distribution
+    web_distribution = argument.Resource(
+        Distribution,
+        field="DNSName",
+        serializer=serializers.Context(
+            serializers.Property("DomainName"),
+            serializers.Expression(lambda r, o: route53._normalize(o)),
+        ),
+    )
 
-    def get_serializer(self, runner, **kwargs):
-        return serializers.Context(
-            serializers.Const(self.adapts),
-            serializers.Dict(
-                DNSName=serializers.Context(
-                    serializers.Property("DomainName"),
-                    serializers.Expression(lambda r, o: route53._normalize(o)),
-                ),
-                HostedZoneId="Z2FDTNDATAQYW2",
-                EvaluateTargetHealth=False,
-            )
-        )
+    hosted_zone_id = argument.String(
+        default="Z2FDTNDATAQYW2",
+        field="HostedZoneId",
+    )
+
+    evaluate_target_health = argument.Boolean(
+        default=False,
+        field="EvaluateTargetHealth",
+    )
+
+    @classmethod
+    def clean(cls, value):
+        if isinstance(value, Distribution):
+            return super(AliasTarget, cls).clean({"web_distribution": value})
+        return super(AliasTarget, cls).clean(value)

@@ -217,17 +217,32 @@ class AliasTarget(route53.AliasTarget):
 
     """ Adapts a LoadBalancer into a AliasTarget """
 
-    input = LoadBalancer
+    resource_name = "load_balancer_alias_target"
 
-    def get_serializer(self, runner, **kwargs):
-        return serializers.Context(
-            serializers.Const(self.adapts),
-            serializers.Dict(
-                DNSName=serializers.Context(
-                    serializers.Property("CanonicalHostedZoneName"),
-                    serializers.Expression(lambda r, o: route53._normalize(o)),
-                ),
-                HostedZoneId=serializers.Property("CanonicalHostedZoneNameID"),
-                EvaluateTargetHealth=False,
-            )
+    load_balancer = argument.Resource(
+        LoadBalancer,
+        field="DNSName",
+        serializer=serializers.Context(
+            serializers.Property("CanonicalHostedZoneName"),
+            serializers.Expression(lambda r, o: route53._normalize(o)),
+        ),
+    )
+
+    hosted_zone_id = argument.Serializer(
+        field="HostedZoneId",
+        serializer=serializers.Context(
+            serializers.Expression(lambda r, o: o.load_balancer),
+            serializers.Property("CanonicalHostedZoneNameID"),
         )
+    )
+
+    evaluate_target_health = argument.Boolean(
+        field="EvaluateTargetHealth",
+        default=False,
+    )
+
+    @classmethod
+    def clean(cls, value):
+        if isinstance(value, LoadBalancer):
+            return super(AliasTarget, cls).clean({"load_balancer": value})
+        return super(AliasTarget, cls).clean(value)

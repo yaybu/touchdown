@@ -61,7 +61,6 @@ class Record(Resource):
     # region = argument.String(field="Region")
     # geo_location = argument.String(field="GeoLocation")
     # failover = argument.String(choices=["PRIMARY", "SECONDARY"], field="Failover")
-    # alias_target = argument.Resource(field="AliasTarget")
     # health_check = argument.Resource(field="HealthCheckId")
 
 

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core.adapters import Adapter
+from touchdown.core.resource import Resource
 
 
-class AliasTarget(Adapter):
+class AliasTarget(Resource):
     resource_name = "alias_target"

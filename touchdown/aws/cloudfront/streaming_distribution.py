@@ -168,17 +168,21 @@ class AliasTarget(route53.AliasTarget):
 
     """ Adapts a StreamingDistribution into a AliasTarget """
 
-    input = StreamingDistribution
+    streaming_distribution = argument.Resource(
+        StreamingDistribution,
+        field="DNSName",
+        serializer=serializers.Context(
+            serializers.Property("DomainName"),
+            serializers.Expression(lambda r, o: route53._normalize(o)),
+        ),
+    )
 
-    def get_serializer(self, runner, **kwargs):
-        return serializers.Context(
-            serializers.Const(self.adapts),
-            serializers.Dict(
-                DNSName=serializers.Context(
-                    serializers.Property("DomainName"),
-                    serializers.Expression(lambda r, o: route53._normalize(o)),
-                ),
-                HostedZoneId="Z2FDTNDATAQYW2",
-                EvaluateTargetHealth=False,
-            )
-        )
+    hosted_zone_id = argument.String(
+        default="Z2FDTNDATAQYW2",
+        field="HostedZoneId",
+    )
+
+    evaluate_target_health = argument.Boolean(
+        default=False,
+        field="EvaluateTargetHealth",
+    )
