@@ -20,10 +20,10 @@ import zipfile
 from six import StringIO
 
 from touchdown.aws.iam import Role
+from touchdown.aws.vpc import SecurityGroup, Subnet
 from touchdown.core import argument, serializers
 from touchdown.core.plan import XOR, Plan, Present
 from touchdown.core.resource import Resource
-from touchdown.aws.vpc import SecurityGroup, Subnet
 
 from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy

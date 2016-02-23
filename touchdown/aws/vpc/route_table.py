@@ -15,7 +15,13 @@
 from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
-from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
+from ..common import (
+    Resource,
+    SimpleApply,
+    SimpleDescribe,
+    SimpleDestroy,
+    TagsMixin,
+)
 from .internet_gateway import InternetGateway
 from .vpc import VPC
 from .vpn_gateway import VpnGateway
