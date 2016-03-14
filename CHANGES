@@ -6,7 +6,7 @@ Changelog for Touchdown
 
 - Add support for AWS Lambda security groups and subnets.
 
-- Support propagating tags for autoscaling groups.
+- Support propagating tags for autoscaling groups and removing tags from ASG's.
 
 - Fix SSH on newer versions of ubuntu.
 

@@ -255,6 +255,22 @@ class Apply(SimpleApply, Describe):
                 Tags=serializers.Argument("tags"),
             )
 
+        to_delete = []
+        for d in self.object.get("Tags", []):
+            if d["Key"] not in (t.name for t in self.resource.tags):
+                to_delete.append({
+                    "ResourceId": self.resource.name,
+                    "ResourceType": "auto-scaling-group",
+                    "Key": d["Key"],
+                })
+
+        if to_delete:
+            yield self.generic_action(
+                ["Delete stale tags"] + ['* ' + t['Key'] for t in to_delete],
+                self.client.delete_tags,
+                Tags=to_delete,
+            )
+
     def update_object(self):
         for change in super(Apply, self).update_object():
             yield change
