@@ -215,6 +215,8 @@ class Expression(Serializer):
         self.callback = callback
 
     def render(self, runner, object):
+        if isinstance(object, Pending):
+            return object
         return self.callback(runner, object)
 
 
@@ -439,10 +441,13 @@ class Resource(Dict):
         self.group = group
         super(Resource, self).__init__(**kwargs)
 
-    def should_ignore_field(self, field, value):
+    def should_ignore_field(self, object, field, value):
         arg = field.argument
         if not hasattr(arg, "field"):
             return True
+        if not arg.empty_serializer and not field.present(object):
+            if value is None:
+                return True
         if arg.field in self.kwargs:
             return True
         if self.mode == "create" and not getattr(arg, "create", True):
@@ -465,7 +470,7 @@ class Resource(Dict):
 
         for field in object.meta.iter_fields_in_order():
             value = field.get_value(object)
-            if self.should_ignore_field(field, value):
+            if self.should_ignore_field(object, field, value):
                 continue
             kwargs[field.argument.field] = Argument(field.name, field)
 
