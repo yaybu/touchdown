@@ -150,7 +150,12 @@ class LoggingConfig(Resource):
 
     enabled = argument.Boolean(field="Enabled", default=False)
     include_cookies = argument.Boolean(field="IncludeCookies", default=False)
-    bucket = argument.Resource(Bucket, field="Bucket", serializer=serializers.Default(default=None), default="")
+    bucket = argument.Resource(
+        Bucket,
+        field="Bucket",
+        serializer=serializers.Append(".s3.amazonaws.com", serializers.Property("Name")),
+        empty_serializer=serializers.Const(""),
+    )
     prefix = argument.String(field="Prefix", default="")
 
 

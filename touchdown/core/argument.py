@@ -26,6 +26,7 @@ class Argument(object):
 
     default = None
     serializer = serializers.Identity()
+    empty_serializer = None
     adapters = {}
 
     def __init__(self, default=None, help=None, **kwargs):

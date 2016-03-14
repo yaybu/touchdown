@@ -180,7 +180,13 @@ class Argument(Serializer):
         return result
 
     def render(self, runner, object):
-        result = self.get_inner(runner, object)
+        try:
+            result = self.get_inner(runner, object)
+        except FieldNotPresent:
+            if self.field.argument.empty_serializer:
+                return self.field.argument.empty_serializer.render(runner, object)
+            raise
+
         if isinstance(result, Serializer):
             result = result.render(runner, object)
             if self.field:
@@ -191,7 +197,13 @@ class Argument(Serializer):
         return result
 
     def diff(self, runner, object, value):
-        result = self.get_inner(runner, object)
+        try:
+            result = self.get_inner(runner, object)
+        except FieldNotPresent:
+            if self.field.empty_serializer:
+                return self.field.empty_serializer.diff(runner, object, value)
+            raise
+
         if isinstance(result, Serializer):
             return result.diff(runner, result, value)
         return object.meta.fields[self.attribute].argument.serializer.diff(runner, result, value)
@@ -309,6 +321,19 @@ class Json(Formatter):
         return self.inner.diff(runner, object, json.loads(value))
 
 
+class Append(Formatter):
+
+    def __init__(self, post_string, inner=Identity()):
+        super(Append, self).__init__(inner)
+        self.post_string = post_string
+
+    def render(self, runner, object):
+        inner = self.inner.render(runner, object)
+        if isinstance(inner, Pending):
+            return inner
+        return "{}{}".format(inner, self.post_string)
+
+
 class Format(Formatter):
     def __init__(self, format_string, inner=Identity()):
         super(Format, self).__init__(inner)
@@ -416,8 +441,6 @@ class Resource(Dict):
 
     def should_ignore_field(self, field, value):
         arg = field.argument
-        if value is None:
-            return True
         if not hasattr(arg, "field"):
             return True
         if arg.field in self.kwargs:
@@ -444,7 +467,6 @@ class Resource(Dict):
             value = field.get_value(object)
             if self.should_ignore_field(field, value):
                 continue
-
             kwargs[field.argument.field] = Argument(field.name, field)
 
         return self._render(kwargs, runner, object)

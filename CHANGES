@@ -12,6 +12,9 @@ Changelog for Touchdown
 
 - You can now set `evaluate_target_health` on a route53 alias target.
 
+- Support for an 'empty' serializer. Mostly when a field isn't set it shouldn't
+  have a value when serialized. CloudFront is an exception.
+
 Touchdown now requires botocore 1.3.26 or higher.
 
 
