@@ -1,5 +1,3 @@
-import os
-
 from setuptools import find_packages, setup
 
 version = '0.7.5.dev0'
@@ -9,11 +7,11 @@ setup(
     version=version,
     url="http://yaybu.com/",
     description="Orchestration and configuration management in Python",
-    long_description = open("README.rst").read(),
+    long_description=open("README.rst").read(),
     author="Isotoma Limited",
     author_email="support@isotoma.com",
     license="Apache Software License",
-    classifiers = [
+    classifiers=[
         "Intended Audience :: System Administrators",
         "Operating System :: POSIX",
         "License :: OSI Approved :: Apache Software License",
