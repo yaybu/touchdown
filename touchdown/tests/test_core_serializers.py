@@ -41,7 +41,9 @@ class TestSerializing(unittest.TestCase):
         self.assertEqual(result, "test")
 
     def test_required(self):
-        serializer = serializers.Required(serializers.Argument("description"))
+        field = mock.Mock()
+        field.argument.empty_serializer = None
+        serializer = serializers.Required(serializers.Argument("description", field))
         self.assertRaises(serializers.RequiredFieldNotPresent, serializer.render, self.runner, self.resource)
 
     def test_boolean(self):
