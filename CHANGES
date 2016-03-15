@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.8.0 (unreleased)
+0.8.0 (2016-03-15)
 ------------------
 
 - Add support for AWS Lambda security groups and subnets.
