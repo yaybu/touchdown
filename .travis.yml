@@ -17,7 +17,7 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - coverage run $(which py.test) touchdown
+  - py.test --cov=. touchdown
   - flake8 touchdown
 
 after_success:
