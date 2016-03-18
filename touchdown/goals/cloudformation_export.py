@@ -15,9 +15,9 @@
 import collections
 import json
 
-from touchdown.core.map import SerialMap
 from touchdown.core import plan
 from touchdown.core.goals import Goal, register
+from touchdown.core.map import SerialMap
 
 
 class Properties(object):
