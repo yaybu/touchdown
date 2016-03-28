@@ -16,7 +16,7 @@ coverage==4.0.3
 codecov==1.6.3
 flake8==2.5.4
 flake8-isort==1.2
-isort==4.2.2
+isort==4.2.3
 mccabe==0.4.0
 mock==1.3.0
 pep8==1.5.7  # rq.filter: <1.6
