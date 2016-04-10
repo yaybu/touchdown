@@ -26,6 +26,6 @@ pytest==2.9.1
 pytest-cov==2.2.1
 requests==2.9.1
 vcrpy==1.7.4
-wrapt==1.10.7
+wrapt==1.10.8
 
 -e .
