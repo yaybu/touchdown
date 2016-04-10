@@ -43,7 +43,7 @@ class ApplyAction(Action):
     def run(self):
         allocator = self.runner.get_service(self.resource.network, "ip_allocator")
         allocation = allocator.allocate(self.resource.name, self.resource.size)
-        self.runner.get_service(self.resource, "set").execute(allocation)
+        self.runner.get_service(self.resource, "set").execute(str(allocation))
 
 
 class Apply(plan.Plan):
