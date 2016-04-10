@@ -115,6 +115,24 @@ class _Mixins(object):
         self.assertRaises(errors.NothingChanged, self.call, "apply")
         assert self.get("lists.variable2") == self.get("lists.variable2")
 
+    def test_retain_ips(self):
+        net = self.config.add_ip_network(
+            name="subnets",
+            network='10.30.0.0/20',
+        )
+        net.add_ip_allocation(
+            name='app-a',
+            size=25,
+        )
+        net.add_ip_allocation(
+            name='app-b',
+            size=25,
+        )
+        self.call("apply")
+        self.assertRaises(errors.NothingChanged, self.call, "apply")
+        assert self.get("subnets.app-a") == '10.30.0.0/25'
+        assert self.get("subnets.app-b") == '10.30.0.128/25'
+
     def test_echo_string(self):
         self.workspace.add_echo(
             text=self.strings_variable1,

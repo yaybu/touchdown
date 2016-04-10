@@ -17,6 +17,8 @@ from .integer import Integer
 from .list import List
 from .string import String
 from .variable import Variable
+from .ip_network import Network
+from .ip_allocation import Allocation
 
 
 __all__ = [
@@ -25,4 +27,6 @@ __all__ = [
     "List",
     "String",
     "Variable",
+    "Network",
+    "Allocation",
 ]
