@@ -15,7 +15,7 @@
 from touchdown.core import argument, plan, resource
 from touchdown.core.action import Action
 
-from . import ip_network, variable
+from . import ip_allocations, variable
 
 
 class Allocation(resource.Resource):
@@ -25,7 +25,7 @@ class Allocation(resource.Resource):
 
     name = argument.String()
     size = argument.Integer(default=25)
-    network = argument.Resource(ip_network.Network)
+    network = argument.Resource(ip_allocations.Allocations)
 
     def clean_name(self, name):
         return self.network.name + "." + name

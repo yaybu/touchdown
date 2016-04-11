@@ -116,7 +116,7 @@ class _Mixins(object):
         assert self.get("lists.variable2") == self.get("lists.variable2")
 
     def test_retain_ips(self):
-        net = self.config.add_ip_network(
+        net = self.config.add_ip_allocations(
             name="subnets",
             network='10.30.0.0/20',
         )
@@ -162,9 +162,10 @@ class TestIpNetwork(_Mixins, unittest.TestCase):
         return folder.add_file(name='test.cfg')
 
     def test_ensure_allocator_state_preserved(self):
-        net = self.config.add_ip_network(
+        network = self.config.add_ip_network(name="environment.network")
+        net = self.config.add_ip_allocations(
             name="subnets",
-            network='10.30.0.0/20',
+            network=network,
         )
         net.add_ip_allocation(
             name='app-a',
@@ -174,6 +175,7 @@ class TestIpNetwork(_Mixins, unittest.TestCase):
             name='app-b',
             size=25,
         )
+        self.call("set", "environment.network", "10.30.0.0/20")
         self.call("set", "subnets.app-a", "10.30.0.0/25")
         self.call("apply")
         self.assertRaises(errors.NothingChanged, self.call, "apply")

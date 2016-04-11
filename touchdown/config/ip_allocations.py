@@ -17,14 +17,14 @@ import threading
 
 import netaddr
 
-from touchdown.core import argument, plan, resource
+from touchdown.core import argument, plan, resource, serializers
 
 from . import IniFile
 
 
-class Network(resource.Resource):
+class Allocations(resource.Resource):
 
-    resource_name = "ip_network"
+    resource_name = "ip_allocations"
 
     name = argument.String()
     network = argument.IPNetwork()
@@ -33,34 +33,38 @@ class Network(resource.Resource):
 
 class Describe(plan.Plan):
 
-    resource = Network
+    resource = Allocations
     name = "describe"
+
+    def network(self):
+        return serializers.maybe(self.resource.network).render(
+            self.runner,
+            self.resource,
+        )
 
     def get_actions(self):
         conf = self.runner.get_service(self.resource.config, "describe")
         self.object = {}
         for key, value in conf.walk(self.resource.name):
             self.object[key] = value
-        self.runner.get_service(self.resource, "ip_allocator").load(self.object)
+        self.runner.get_service(self.resource, "ip_allocator").load(self.network(), self.object)
         return []
 
 
-class NetworkApply(plan.Plan):
+class IpAllocator(plan.Plan):
 
     """
     Given an ipaddress.ip_network, manage allocating it into smaller allocations
     """
 
-    resource = Network
+    resource = Allocations
     name = "ip_allocator"
 
     def __init__(self, *args, **kwargs):
-        super(NetworkApply, self).__init__(*args, **kwargs)
-        self.allocations = {}
-        self.free = {int(self.resource.network.prefixlen): [self.resource.network]}
+        super(IpAllocator, self).__init__(*args, **kwargs)
         self.allocation_lock = threading.Lock()
 
-    def load(self, state):
+    def load(self, network, state):
         """
         Given a list of allocations that have already been applied, ensure that
         `self.allocations` and `self.free` is correct.
@@ -68,17 +72,19 @@ class NetworkApply(plan.Plan):
         with self.allocation_lock:
             self.allocations = state
             state_set = netaddr.IPSet(state.values())
-            network_set = netaddr.IPSet([self.resource.network])
+            network_set = netaddr.IPSet([network])
             self.free = collections.defaultdict(list)
             for network in (network_set - state_set).iter_cidrs():
                 self.free[network.prefixlen].append(network)
 
     def allocate(self, name, prefixlen):
-        if prefixlen < int(self.resource.network.prefixlen):
-            raise ValueError("Cannot fit /{} inside /{}".format(prefixlen, self.resource.network.prefixlen))
+        network = self.runner.get_service(self.resource, "describe").network()
+
+        if prefixlen < int(network.prefixlen):
+            raise ValueError("Cannot fit /{} inside /{}".format(prefixlen, network.prefixlen))
 
         with self.allocation_lock:
-            for i in range(prefixlen, int(self.resource.network.prefixlen) - 1, -1):
+            for i in range(prefixlen, int(network.prefixlen) - 1, -1):
                 if self.free.get(i, None):
                     selected = self.free[i].pop()
                     break
