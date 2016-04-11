@@ -76,6 +76,9 @@ class Set(plan.Plan):
     resource = Allocation
     name = "set"
 
+    def from_string(self, value):
+        return value
+
     def execute(self, value):
         conf = self.runner.get_service(
             self.resource.network.config,

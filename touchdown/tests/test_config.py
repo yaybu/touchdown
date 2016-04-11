@@ -153,3 +153,29 @@ class LocalFileWithGpgTestCase(_Mixins, unittest.TestCase):
         folder = self.workspace.add_local_folder(name=self.test_dir)
         gpg = self.workspace.add_gpg(passphrase='password', symmetric=True)
         return gpg.add_cipher(file=folder.add_file(name='test.cfg'))
+
+
+class TestIpNetwork(_Mixins, unittest.TestCase):
+
+    def setup_file(self):
+        folder = self.workspace.add_local_folder(name=self.test_dir)
+        return folder.add_file(name='test.cfg')
+
+    def test_ensure_allocator_state_preserved(self):
+        net = self.config.add_ip_network(
+            name="subnets",
+            network='10.30.0.0/20',
+        )
+        net.add_ip_allocation(
+            name='app-a',
+            size=25,
+        )
+        net.add_ip_allocation(
+            name='app-b',
+            size=25,
+        )
+        self.call("set", "subnets.app-a", "10.30.0.0/25")
+        self.call("apply")
+        self.assertRaises(errors.NothingChanged, self.call, "apply")
+        assert self.get("subnets.app-a") == '10.30.0.0/25'
+        assert self.get("subnets.app-b") == '10.30.0.128/25'

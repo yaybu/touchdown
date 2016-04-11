@@ -64,6 +64,13 @@ class Describe(Plan):
         except (configparser.NoSectionError, configparser.NoOptionError):
             raise KeyError(key)
 
+    def walk(self, key):
+        c = self.read()
+        try:
+            return c.items(key)
+        except configparser.NoSectionError:
+            return []
+
     def get_actions(self):
         self.object = self.read()
         return []

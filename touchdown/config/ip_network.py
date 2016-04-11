@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import threading
+
+import netaddr
 
 from touchdown.core import argument, plan, resource
 
@@ -26,6 +29,20 @@ class Network(resource.Resource):
     name = argument.String()
     network = argument.IPNetwork()
     config = argument.Resource(IniFile)
+
+
+class Describe(plan.Plan):
+
+    resource = Network
+    name = "describe"
+
+    def get_actions(self):
+        conf = self.runner.get_service(self.resource.config, "describe")
+        self.object = {}
+        for key, value in conf.walk(self.resource.name):
+            self.object[key] = value
+        self.runner.get_service(self.resource, "ip_allocator").load(self.object)
+        return []
 
 
 class NetworkApply(plan.Plan):
@@ -42,6 +59,19 @@ class NetworkApply(plan.Plan):
         self.allocations = {}
         self.free = {int(self.resource.network.prefixlen): [self.resource.network]}
         self.allocation_lock = threading.Lock()
+
+    def load(self, state):
+        """
+        Given a list of allocations that have already been applied, ensure that
+        `self.allocations` and `self.free` is correct.
+        """
+        with self.allocation_lock:
+            self.allocations = state
+            state_set = netaddr.IPSet(state.values())
+            network_set = netaddr.IPSet([self.resource.network])
+            self.free = collections.defaultdict(list)
+            for network in (network_set - state_set).iter_cidrs():
+                self.free[network.prefixlen].append(network)
 
     def allocate(self, name, prefixlen):
         if prefixlen < int(self.resource.network.prefixlen):
