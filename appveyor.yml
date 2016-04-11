@@ -15,7 +15,7 @@ install:
 - python --version
 - python -m pip install --upgrade setuptools pip wheel
 - appveyor\\run.cmd python -m pip install --cache-dir=C:\wheelhouse -r requirements.txt
-- appveyor\\run.cmd python -m pip uninstall pycrypto
+- appveyor\\run.cmd python -m pip uninstall -y pycrypto
 - appveyor\\run.cmd python -m pip install pycryptodome
 cache: C:\wheelhouse
 build: off
