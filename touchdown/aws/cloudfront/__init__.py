@@ -14,6 +14,7 @@
 
 from .distribution import Distribution
 from .streaming_distribution import StreamingDistribution
+from . import tail  # noqa
 
 __all__ = [
     'Distribution',

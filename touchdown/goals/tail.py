@@ -75,7 +75,7 @@ class Tail(Goal):
     def execute(self, stream, start="5m ago", end=None, follow=False):
         tailers = self.collect_as_dict("tail")
         if stream not in tailers:
-            raise errors.Error("No such log group '{}'".format(stream))
+            raise errors.Error("No such log stream '{}'".format(stream))
         tailers[stream].tail(start, end, follow)
 
 register(Tail)

@@ -19,6 +19,8 @@ Changelog for Touchdown
 
   This would allocate the first available `/25` in `10.41.0.0/20`.
 
+- Add support for using the `tail` command against CloudFront distributions.
+
 
 0.8.0 (2016-03-15)
 ------------------
