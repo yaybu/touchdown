@@ -82,6 +82,13 @@ class Bucket(Resource):
         group="notifications",
     )
 
+    accelerate = argument.String(
+        choice=['Enabled', 'Suspended'],
+        default='Suspended',
+        field='Status',
+        group='accelerate',
+    )
+
     account = argument.Resource(BaseAccount)
 
 
@@ -141,6 +148,24 @@ class Apply(SimpleApply, Describe):
         return self.client.get_bucket_notification_configuration(
             Bucket=self.resource.name,
         )
+
+    def update_accelerate_config(self):
+        update = not self.object
+        if not update:
+            remote = self.client.get_bucket_accelerate_configuration(
+                Bucket=self.resource.name,
+            )
+            update = remote['Status'] != self.resource.accelerate
+
+        if update:
+            yield self.generic_action(
+                "Update acceleration configuration",
+                self.client.put_bucket_accelerate_config,
+                Bucket=self.resource.name,
+                AccelerateConfiguration={
+                    "Status": self.resource.accelerate,
+                }
+            )
 
     def update_notification_config(self):
         local_s = serializers.Default(
@@ -203,6 +228,9 @@ class Apply(SimpleApply, Describe):
             )
 
         for action in self.update_notification_config():
+            yield action
+
+        for action in self.update_accelerate_config():
             yield action
 
 
