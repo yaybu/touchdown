@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six.moves import configparser
 from touchdown.core import argument, errors, resource, serializers
 from touchdown.core.action import Action
 from touchdown.core.plan import Plan
@@ -35,7 +34,11 @@ class Describe(Plan):
     name = "describe"
 
     def get_actions(self):
-        val, user_set = self.runner.get_service(self.resource, "get").execute()
+        try:
+            val, user_set = self.runner.get_service(self.resource, "get").execute()
+        except KeyError:
+            val = None
+            user_set = False
         self.object = {
             "Value": val,
             "UserSet": user_set,
@@ -60,11 +63,15 @@ class Apply(Plan):
 
     resource = Variable
     name = "apply"
+    apply_action = ApplyAction
 
     def get_actions(self):
-        val, user_set = self.runner.get_service(self.resource, "get").execute()
+        try:
+            val, user_set = self.runner.get_service(self.resource, "get").execute()
+        except KeyError:
+            user_set = False
         if not user_set and self.resource.retain_default:
-            yield ApplyAction(self)
+            yield self.apply_action(self)
 
 
 class Set(Plan):
@@ -82,12 +89,7 @@ class Set(Plan):
         conf = self.runner.get_service(self.resource.config, "describe")
         if "." not in self.resource.name:
             raise errors.Error("You didn't specify a section")
-        section, name = self.resource.name.rsplit(".", 1)
-        c = conf.read()
-        if not c.has_section(section):
-            c.add_section(section)
-        c.set(section, name, "\n".join(self.to_lines(value)))
-        conf.write(c)
+        conf.set(self.resource.name, "\n".join(self.to_lines(value)))
 
 
 class Get(Plan):
@@ -106,17 +108,15 @@ class Get(Plan):
         conf = self.runner.get_service(self.resource.config, "describe")
         if "." not in self.resource.name:
             raise errors.Error("You didn't specify a section")
-        section, name = self.resource.name.rsplit(".", 1)
-        c = conf.read()
-
         try:
-            return self.from_lines(c.get(section, name).splitlines()), True
-        except (configparser.NoSectionError, configparser.NoOptionError):
+            value = conf.get(self.resource.name)
+        except KeyError:
             default = serializers.maybe(self.resource.default).render(
                 self.runner,
                 self.resource,
             )
             return default, False
+        return self.from_lines(value.splitlines()), True
 
 
 class Refresh(Plan):

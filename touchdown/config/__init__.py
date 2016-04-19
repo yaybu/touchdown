@@ -15,8 +15,11 @@
 from .ini import IniFile
 from .integer import Integer
 from .list import List
+from .network import IPNetwork
 from .string import String
 from .variable import Variable
+from .ip_allocations import Allocations
+from .ip_allocation import Allocation
 
 
 __all__ = [
@@ -25,4 +28,7 @@ __all__ = [
     "List",
     "String",
     "Variable",
+    "IPNetwork",
+    "Allocations",
+    "Allocation",
 ]

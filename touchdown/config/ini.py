@@ -48,6 +48,29 @@ class Describe(Plan):
             pass
         return config
 
+    def set(self, key, value):
+        section, name = key.rsplit(".", 1)
+        c = self.read()
+        if not c.has_section(section):
+            c.add_section(section)
+        c.set(section, name, value)
+        self.write(c)
+
+    def get(self, key):
+        section, name = key.rsplit(".", 1)
+        c = self.read()
+        try:
+            return c.get(section, name)
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            raise KeyError(key)
+
+    def walk(self, key):
+        c = self.read()
+        try:
+            return c.items(key)
+        except configparser.NoSectionError:
+            return []
+
     def get_actions(self):
         self.object = self.read()
         return []

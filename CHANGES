@@ -1,10 +1,23 @@
 Changelog for Touchdown
 =======================
 
-0.8.1 (unreleased)
+0.9.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Touchdown can now manage allocation of parts of a network range through the
+  `ip_network` type::
+
+      network = config.add_ip_network(
+          name='subnets',
+          network='10.41.0.0/20',
+      )
+
+      app_serves = network.add_ip_allocation(
+          name='app_servers',
+          size='25',
+      )
+
+  This would allocate the first available `/25` in `10.41.0.0/20`.
 
 
 0.8.0 (2016-03-15)
