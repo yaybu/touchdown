@@ -64,6 +64,7 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_nat_gateway"
     waiter = "nat_gateway_available"
+    signature = ()
 
 
 class Destroy(SimpleDestroy, Describe):

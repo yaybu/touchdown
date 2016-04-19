@@ -92,4 +92,4 @@ class Describe(variable.Describe):
     resource = Allocation
 
 
-argument.String.register_adapter(Allocation, variable.VariableAsString)
+argument.IPNetwork.register_adapter(Allocation, variable.VariableAsString)
