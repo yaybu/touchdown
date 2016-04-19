@@ -269,6 +269,7 @@ class Boolean(Formatter):
 
 
 class String(Formatter):
+
     def render(self, runner, object):
         if object is None:
             return None
