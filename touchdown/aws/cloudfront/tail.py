@@ -15,13 +15,9 @@
 # This code is not currently exposed publically. It is an example of how to
 # stream from a aws log using the FilterLogEvents API.
 
-import datetime
-import time
-
 from touchdown.aws import common
 from touchdown.aws.cloudfront import Distribution
 from touchdown.core import plan
-from touchdown.core.datetime import as_seconds
 
 
 class Plan(common.SimplePlan, plan.Plan):
@@ -29,6 +25,32 @@ class Plan(common.SimplePlan, plan.Plan):
     name = "tail"
     resource = Distribution
     service_name = "s3"
+
+    fields = [
+        "date",
+        "time",
+        "x-edge-location",
+        "sc-bytes",
+        "c-ip",
+        "cs-method",
+        "cs(Host)",
+        "cs-uri-stem",
+        "sc-status",
+        "cs(Referer)",
+        "cs(User-Agent)",
+        "cs-uri-query",
+        "cs(Cookie)",
+        "x-edge-result-type",
+        "x-edge-request-id",
+        "x-host-header",
+        "cs-protocol",
+        "cs-bytes",
+        "time-taken",
+        "x-forwarded-for",
+        "ssl-protocol",
+        "ssl-cipher",
+        "x-edge-response-result-type",
+    ]
 
     def tail(self, start, end, follow):
         if follow:
@@ -55,7 +77,7 @@ class Plan(common.SimplePlan, plan.Plan):
             contents = filter(lambda c: c['LastModified'] <= end, contents)
 
         print("#Version: 1.0")
-        print("#Fields: date time x-edge-location sc-bytes c-ip cs-method cs(Host) cs-uri-stem sc-status cs(Referer) cs(User-Agent) cs-uri-query cs(Cookie) x-edge-result-type x-edge-request-id x-host-header cs-protocol cs-bytes time-taken x-forwarded-for ssl-protocol ssl-cipher x-edge-response-result-type")
+        print("#Fields: {}".format(" ".join(self.fields)))
 
         for log in contents:
             response = self.client.get_object(
@@ -71,7 +93,6 @@ class Plan(common.SimplePlan, plan.Plan):
                 mode='r',
                 fileobj=body,
             )
-
 
             lines = blob.read().split("\n")
             for line in lines[2:]:
