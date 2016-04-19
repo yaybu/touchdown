@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.9.0 (unreleased)
+0.9.0 (2016-04-19)
 ------------------
 
 - Touchdown can now manage allocation of parts of a network range through the
