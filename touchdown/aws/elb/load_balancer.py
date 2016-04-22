@@ -21,6 +21,7 @@ from touchdown.core.resource import Resource
 
 from .. import route53
 from ..account import BaseAccount
+from ..acm import Certificate
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 from ..iam import ServerCertificate
 from ..s3 import Bucket
@@ -39,6 +40,11 @@ class Listener(Resource):
         ServerCertificate,
         field="SSLCertificiateId",
         serializer=serializers.Property("Arn"),
+    )
+    acm_certificate = argument.Resource(
+        Certificate,
+        field="SSLCertificiateId",
+        serializer=serializers.Property("CertificateArn"),
     )
 
 

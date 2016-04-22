@@ -20,6 +20,7 @@ from touchdown.core.resource import Resource
 
 from .. import route53
 from ..account import BaseAccount
+from ..acm import Certificate
 from ..common import (
     RefreshMetadata,
     SimpleApply,
@@ -227,6 +228,13 @@ class Distribution(Resource):
         serializer=serializers.Property("ServerCertificateId"),
     )
 
+    acm_certificate = argument.Resource(
+        Certificate,
+        field="Certificate",
+        group="viewer-certificate",
+        serializer=serializers.Property("CertificateArn"),
+    )
+
     ssl_support_method = argument.String(
         default="sni-only",
         choices=["sni-only", "vip"],
@@ -245,7 +253,9 @@ class Distribution(Resource):
         field="ViewerCertificate",
         serializer=serializers.Resource(
             group="viewer-certificate",
-            CertificateSource=serializers.Expression(lambda r, o: "iam" if o.ssl_certificate else "cloudfront"),
+            CertificateSource=serializers.Expression(
+                lambda r, o: "acm" if o.acm_certificate else "iam" if o.ssl_certificate else "cloudfront"
+            ),
         ),
     )
 
