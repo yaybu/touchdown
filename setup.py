@@ -32,7 +32,7 @@ setup(
         'contextlib2',
         'netaddr',
         'fuselage>=0.0.10',
-        'botocore>=1.3.26',
+        'botocore>=1.4.12',
         'progressbar2>=3.6.0',
         'requests',
         'python-gnupg',
