@@ -15,6 +15,7 @@
 from .ami import Image
 from .ami_copy import ImageCopy
 from .keypair import KeyPair
+from .instance import Instance
 from .auto_scaling_group import AutoScalingGroup
 from .auto_scaling_policy import Policy
 from .launch_configuration import LaunchConfiguration
@@ -23,6 +24,7 @@ from .launch_configuration import LaunchConfiguration
 __all__ = [
     'Image',
     'ImageCopy',
+    'Instance',
     'KeyPair',
     'AutoScalingGroup',
     'Policy',
