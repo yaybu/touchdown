@@ -160,7 +160,7 @@ class Apply(SimpleApply, Describe):
         if update:
             yield self.generic_action(
                 "Update acceleration configuration",
-                self.client.put_bucket_accelerate_config,
+                self.client.put_bucket_accelerate_configuration,
                 Bucket=self.resource.name,
                 AccelerateConfiguration={
                     "Status": self.resource.accelerate,

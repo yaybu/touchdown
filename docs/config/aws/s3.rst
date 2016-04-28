@@ -25,6 +25,10 @@ Simple storage service
         The region of the bucket. The default is to create the bucket in the
         sane region as the region specified by the account.
 
+    .. attribute:: accelerate
+
+        Set this to ``Enabled`` to enable Transfer Acceleration.
+
     .. attribute:: rules
 
         A list of CORS rules::
