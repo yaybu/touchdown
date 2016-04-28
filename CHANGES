@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.9.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for standing up standalone EC2 instances (outside of an ASG).
 
 
 0.9.0 (2016-04-19)
