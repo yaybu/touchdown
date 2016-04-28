@@ -24,8 +24,8 @@ class DomainValidationOption(Resource):
 
     resource_name = "domain_validation_option"
 
-    domain = argument.String(name="DomainName")
-    validation_domain = argument.String(name="ValidationDomain")
+    domain = argument.String(field="DomainName")
+    validation_domain = argument.String(field="ValidationDomain")
 
 
 class Certificate(Resource):
@@ -66,7 +66,6 @@ class Apply(SimpleApply, Describe):
 
     signature = [
         Present("name"),
-        Present("bucket"),
     ]
 
 
