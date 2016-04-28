@@ -38,7 +38,7 @@ class Listener(Resource):
     instance_port = argument.Integer(field="InstancePort")
     ssl_certificate = argument.Resource(
         ServerCertificate,
-        field="SSLCertificiateId",
+        field="SSLCertificateId",
         serializer=serializers.Property("Arn"),
     )
     acm_certificate = argument.Resource(
