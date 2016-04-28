@@ -22,6 +22,8 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class DomainValidationOption(Resource):
 
+    resource_name = "domain_validation_option"
+
     domain = argument.String(name="DomainName")
     validation_domain = argument.String(name="ValidationDomain")
 
