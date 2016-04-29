@@ -212,6 +212,14 @@ content from ``backend.example.com`` on port 8080 abd 8443::
         Specifies the permitted backend ssl versions. Defaults to SSLv3 and TLSv1.
 
 
+You can also directly connect to an elb load balancer::
+
+    .. attribute:: load_balancer
+
+	A `touchdown.aws.elb.LoadBalancer` instance to send HTTP or HTTP
+        traffic to.
+
+
 Cache behaviours
 ~~~~~~~~~~~~~~~
 

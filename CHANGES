@@ -10,6 +10,8 @@ Changelog for Touchdown
 
 - Ensure ElastiCache replication group knows its max name length.
 
+- Allow a load balancer to be used as CustomOrigin.
+
 
 0.9.0 (2016-04-19)
 ------------------

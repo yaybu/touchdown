@@ -70,6 +70,48 @@ class CustomOrigin(Resource):
     )
 
 
+class LoadBalancerOrigin(Resource):
+
+    resource_name = "elb_origin"
+    dot_ignore = True
+
+    extra_serializers = {
+        "CustomHeaders": serializers.Dict(
+            Quantity=0,
+            Items=[],
+        ),
+    }
+
+    name = argument.String(field='Id')
+    load_balancer = argument.Resource(
+        LoadBalancer,
+        field='DomainName',
+        serializer=serializers=serializers.Property("DNSName"),
+    )
+    origin_path = argument.String(default='', field='OriginPath')
+
+    http_port = argument.Integer(default=80, field='HTTPPort', group='custom-origin-config')
+    https_port = argument.Integer(default=443, field='HTTPSPort', group='custom-origin-config')
+    protocol = argument.String(
+        choices=['http-only', 'match-viewer'],
+        default='match-viewer',
+        field='OriginProtocolPolicy',
+        group='custom-origin-config',
+    )
+    ssl_policy = argument.List(
+        choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
+        default=['SSLv3', 'TLSv1'],
+        field="OriginSslProtocols",
+        group="custom-origin-config",
+        serializer=CloudFrontList(serializers.List()),
+    )
+
+    _custom_origin_config = argument.Serializer(
+        serializer=serializers.Resource(group="custom-origin-config"),
+        field="CustomOriginConfig",
+    )
+
+
 class DefaultCacheBehavior(Resource):
 
     resource_name = "default_cache_behaviour"
@@ -190,7 +232,7 @@ class Distribution(Resource):
     root_object = argument.String(default='/', field="DefaultRootObject")
     enabled = argument.Boolean(default=True, field="Enabled")
     origins = argument.ResourceList(
-        (S3Origin, CustomOrigin),
+        (S3Origin, CustomOrigin, LoadBalancerOrigin),
         field="Origins",
         serializer=CloudFrontResourceList(),
     )
