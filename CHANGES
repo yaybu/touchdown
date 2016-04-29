@@ -12,6 +12,9 @@ Changelog for Touchdown
 
 - Allow a load balancer to be used as CustomOrigin.
 
+We are now only testing with paramiko 2.0.0 and later. This has dropped
+pycrypto in favour of cryptograph (which we already depend on).
+
 
 0.9.0 (2016-04-19)
 ------------------
