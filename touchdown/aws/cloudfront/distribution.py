@@ -87,7 +87,7 @@ class LoadBalancerOrigin(Resource):
     load_balancer = argument.Resource(
         LoadBalancer,
         field='DomainName',
-        serializer=serializers=serializers.Property("DNSName"),
+        serializer=serializers.Property("DNSName"),
     )
     origin_path = argument.String(default='', field='OriginPath')
 
