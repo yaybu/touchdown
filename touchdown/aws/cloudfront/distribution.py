@@ -28,6 +28,7 @@ from ..common import (
     SimpleDestroy,
 )
 from ..iam import ServerCertificate
+from .elb import LoadBalancer
 from ..s3 import Bucket
 from .common import CloudFrontList, CloudFrontResourceList, S3Origin
 
