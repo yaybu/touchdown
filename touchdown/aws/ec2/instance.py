@@ -22,6 +22,18 @@ from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
+class BlockDevice(Resource):
+
+    resource_name = "block_device"
+
+    virtual_name = argument.String(field="VirtualName")
+    device_name = argument.String(field="DeviceName")
+    disabled = argument.Boolean(
+        field="NoDevice",
+        serializer=serializers.Const(""),
+    )
+
+
 class NetworkInterface(Resource):
 
     resource_name = "network_interface"
@@ -43,6 +55,11 @@ class Instance(Resource):
     network_interfaces = argument.ResourceList(
         NetworkInterface,
         field="NetworkInterfaces",
+    )
+
+    block_devices = argument.ResourceList(
+        BlockDevice,
+        field="BlockDeviceMappings",
     )
 
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds")
