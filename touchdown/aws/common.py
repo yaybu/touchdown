@@ -118,10 +118,7 @@ class GenericAction(Action):
         params = self.serializer.render(self.runner, self.resource)
         logger.debug("Invoking with params {}".format(params))
 
-        try:
-            object = self.func(**params)
-        except ClientError as e:
-            raise errors.Error("{}: {}".format(self.plan.resource, e))
+        object = self.func(**params)
 
         if self.is_creation_action:
             if self.plan.create_response == "full-description":
@@ -135,6 +132,39 @@ class GenericAction(Action):
                 }
             else:
                 self.plan.object = self.plan.describe_object()
+
+
+class RetryAction(Action):
+
+    def __init__(self, plan, action):
+        self.plan = plan
+        self.action = action
+
+    @property
+    def description(self):
+        return self.action.description
+
+    def should_retry(self, response):
+        retryable = getattr(self.plan, "retryable", {})
+        if not response['Error']['Code'] in retryable:
+            return False
+        msgs = retryable[e.response['Error']['Code']]
+        if not msgs:
+            return True
+        for msg in msgs:
+            if msg == response['Error']['Message']:
+                return True
+        return False
+
+    def run(self):
+        for i in range(10):
+            try:
+                return self.action.run()
+            except ClientError as e:
+                if not self.should_retry(e.response):
+                    raise
+            time.sleep(i)
+        raise e
 
 
 class PostCreation(Action):
@@ -300,13 +330,14 @@ class SimpleDescribe(SimplePlan):
         return {}
 
     def generic_action(self, description, callable, serializer=None, **kwargs):
-        return GenericAction(
+        ga = GenericAction(
             self,
             description,
             callable,
             serializer,
             **kwargs
         )
+        return RetryAction(self, ga)
 
     def get_waiter(self, description, waiter, eventual_consistency_threshold=1):
         return Waiter(self, description, waiter, eventual_consistency_threshold)
