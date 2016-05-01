@@ -60,6 +60,7 @@ class Instance(Resource):
     block_devices = argument.ResourceList(
         BlockDevice,
         field="BlockDeviceMappings",
+        serializer=serializers.List(serializers.Resource()),
     )
 
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds")
