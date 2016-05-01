@@ -144,6 +144,11 @@ class Apply(SimpleApply, Describe):
     create_action = "create_load_balancer"
     create_response = "not-that-useful"
 
+    retryable = {
+        # "Server Certificate not found for the key: .*"
+        "CertificateNotFound": [],
+    }
+
     signature = [
         Present('name'),
         Present('listeners'),

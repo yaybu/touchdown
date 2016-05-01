@@ -125,6 +125,12 @@ class Apply(SimpleApply, Describe):
     create_envelope = "@"
     update_action = "update_function_configuration"
 
+    retryable = {
+        "InvalidParameterValueException": [
+            "The role defined for the function cannot be assumed by Lambda.",
+        ],
+    }
+
     signature = (
         Present('name'),
         Present('role'),
