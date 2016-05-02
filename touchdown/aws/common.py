@@ -118,20 +118,35 @@ class GenericAction(Action):
         params = self.serializer.render(self.runner, self.resource)
         logger.debug("Invoking with params {}".format(params))
 
-        object = self.func(**params)
+        return self.func(**params)
 
-        if self.is_creation_action:
-            if self.plan.create_response == "full-description":
-                self.plan.object = jmespath.search(
-                    getattr(self.plan, "create_envelope", self.plan.describe_envelope[:-1]),
-                    object,
-                )
-            elif self.plan.create_response == "id-only":
-                self.plan.object = {
-                    self.plan.key: object[self.plan.key]
-                }
-            else:
-                self.plan.object = self.plan.describe_object()
+
+class CreateAction(Action):
+
+    def __init__(self, plan, action):
+        self.plan = plan
+        self.action = action
+
+    @property
+    def description(self):
+        return self.action.description
+
+    def run(self):
+        result = self.action.run()
+
+        if self.plan.create_response == "full-description":
+            self.plan.object = jmespath.search(
+                getattr(self.plan, "create_envelope", self.plan.describe_envelope[:-1]),
+                result,
+            )
+        elif self.plan.create_response == "id-only":
+            self.plan.object = {
+                self.plan.key: result[self.plan.key]
+            }
+        else:
+            self.plan.object = self.plan.describe_object()
+
+        return result
 
 
 class RetryAction(Action):
@@ -148,7 +163,7 @@ class RetryAction(Action):
         retryable = getattr(self.plan, "retryable", {})
         if not response['Error']['Code'] in retryable:
             return False
-        msgs = retryable[e.response['Error']['Code']]
+        msgs = retryable[response['Error']['Code']]
         if not msgs:
             return True
         for msg in msgs:
@@ -387,8 +402,7 @@ class SimpleApply(SimpleDescribe):
             getattr(self.client, self.create_action),
             self.get_create_serializer(),
         )
-        g.is_creation_action = True
-        return g
+        return CreateAction(self, g)
 
     def name_object(self):
         if "name" not in self.resource.meta.fields:
