@@ -291,6 +291,12 @@
           "matcher": "pathAny",
           "state": "failure",
           "argument": "Reservations[].Instances[].State.Name"
+        },
+        {
+          "matcher": "path",
+          "expected": true,
+          "argument": "length(Reservations[]) == `0`",
+          "state": "success"
         }
       ]
     },

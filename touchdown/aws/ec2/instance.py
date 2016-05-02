@@ -110,14 +110,6 @@ class Destroy(SimpleDestroy, Describe):
     destroy_action = "terminate_instances"
     waiter = "instance_terminated"
 
-    def get_describe_filters(self):
-        return {
-            "Filters": [
-                {"Name": "tag:Name", "Values": [self.resource.name]},
-                # {"Name": "instance-state-name", "Values": ["pending", "running"]},
-            ]
-        }
-
     def get_destroy_serializer(self):
         return serializers.Dict(
             InstanceIds=serializers.ListOfOne(serializers.Property("InstanceId")),
