@@ -60,6 +60,12 @@ class Apply(SimpleApply, Describe):
     update_action = "update_trail"
     create_response = "not-that-useful"
 
+    retryable = {
+        "InvalidCloudWatchLogsRoleArnException": [
+            "Access denied. Check the trust relationships for your role.",
+        ],
+    }
+
     signature = [
         Present("name"),
         Present("bucket"),
