@@ -7,13 +7,14 @@
       "operation": "DescribeInstances",
       "acceptors": [
         {
-          "matcher": "status",
-          "expected": 200,
+          "matcher": "path",
+          "expected": true,
+          "argument": "length(Reservations[]) > `0`",
           "state": "success"
         },
         {
           "matcher": "error",
-          "expected": "InvalidInstanceIDNotFound",
+          "expected": "InvalidInstanceID.NotFound",
           "state": "retry"
         }
       ]
@@ -152,6 +153,24 @@
         }
       ]
     },
+    "ImageExists": {
+      "operation": "DescribeImages",
+      "maxAttempts": 40,
+      "delay": 15,
+      "acceptors": [
+        {
+          "matcher": "path",
+          "expected": true,
+          "argument": "length(Images[]) > `0`",
+          "state": "success"
+        },
+        {
+          "matcher": "error",
+          "expected": "InvalidAMIID.NotFound",
+          "state": "retry"
+        }
+      ]
+    },
     "ImageAvailable": {
       "operation": "DescribeImages",
       "maxAttempts": 160,
@@ -199,6 +218,11 @@
           "matcher": "pathAny",
           "state": "failure",
           "argument": "Reservations[].Instances[].State.Name"
+        },
+        {
+          "matcher": "error",
+          "expected": "InvalidInstanceID.NotFound",
+          "state": "retry"
         }
       ]
     },
@@ -212,6 +236,11 @@
           "matcher": "pathAll",
           "argument": "InstanceStatuses[].InstanceStatus.Status",
           "expected": "ok"
+        },
+        {
+          "matcher": "error",
+          "expected": "InvalidInstanceID.NotFound",
+          "state": "retry"
         }
       ]
     },
@@ -265,28 +294,57 @@
         }
       ]
     },
+    "KeyPairExists": {
+      "operation": "DescribeKeyPairs",
+      "delay": 5,
+      "maxAttempts": 6,
+      "acceptors": [
+        {
+          "expected": true,
+          "matcher": "pathAll",
+          "state": "success",
+          "argument": "length(KeyPairs[].KeyName) > `0`"
+        },
+        {
+          "expected": "InvalidKeyPair.NotFound",
+          "matcher": "error",
+          "state": "retry"
+        }
+      ]
+    },
     "NatGatewayAvailable": {
-      "delay": 15,
       "operation": "DescribeNatGateways",
+      "delay": 15,
       "maxAttempts": 40,
       "acceptors": [
         {
-          "expected": "available",
-          "matcher": "pathAll",
           "state": "success",
-          "argument": "NatGateways[].State"
+          "matcher": "pathAll",
+          "argument": "NatGateways[].State",
+          "expected": "available"
         },
         {
-          "expected": "deleted",
-          "matcher": "pathAny",
           "state": "failure",
-          "argument": "NatGateways[].State"
+          "matcher": "pathAny",
+          "argument": "NatGateways[].State",
+          "expected": "failed"
         },
         {
-          "expected": "deleting",
-          "matcher": "pathAny",
           "state": "failure",
-          "argument": "NatGateways[].State"
+          "matcher": "pathAny",
+          "argument": "NatGateways[].State",
+          "expected": "deleting"
+        },
+        {
+          "state": "failure",
+          "matcher": "pathAny",
+          "argument": "NatGateways[].State",
+          "expected": "deleted"
+        },
+        {
+          "state": "retry",
+          "matcher": "error",
+          "expected": "NatGatewayNotFound"
         }
       ]
     },
@@ -300,6 +358,24 @@
           "matcher": "pathAll",
           "state": "success",
           "argument": "NatGateways[].State"
+        }
+      ]
+    },
+    "NetworkInterfaceAvailable": {
+      "operation": "DescribeNetworkInterfaces",
+      "delay": 20,
+      "maxAttempts": 10,
+      "acceptors": [
+        {
+          "expected": "available",
+          "matcher": "pathAll",
+          "state": "success",
+          "argument": "NetworkInterfaces[].Status"
+        },
+        {
+          "expected": "InvalidNetworkInterfaceID.NotFound",
+          "matcher": "error",
+          "state": "failure"
         }
       ]
     },
@@ -424,7 +500,7 @@
         },
         {
           "matcher": "error",
-          "expected": "InvalidVolumeNotFound",
+          "expected": "InvalidVolume.NotFound",
           "state": "success"
         }
       ]
@@ -502,6 +578,23 @@
           "matcher": "pathAny",
           "state": "failure",
           "argument": "VpnConnections[].State"
+        }
+      ]
+    },
+    "VpcPeeringConnectionExists": {
+      "delay": 15,
+      "operation": "DescribeVpcPeeringConnections",
+      "maxAttempts": 40,
+      "acceptors": [
+        {
+          "matcher": "status",
+          "expected": 200,
+          "state": "success"
+        },
+        {
+          "matcher": "error",
+          "expected": "InvalidVpcPeeringConnectionID.NotFound",
+          "state": "retry"
         }
       ]
     },
