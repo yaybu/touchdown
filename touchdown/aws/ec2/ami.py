@@ -47,6 +47,7 @@ class Image(Resource):
     instance_type = argument.String(default="m3.medium")
 
     username = argument.String()
+    forwarded_keys = argument.Dict()
     provisioner = argument.Resource(Provisioner)
 
     # architecture = argument.String(field="Architecture", default="x86_64", choices=["x86_64", "i386"])
