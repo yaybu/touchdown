@@ -50,6 +50,14 @@ class Client(paramiko.SSHClient):
         super(Client, self).__init__(*args, **kwargs)
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+    def setup_forwarded_keys(self, channel):
+        if not self.plan.resource.forwarded_keys:
+            return
+        agent = ParamikoAgentServer()
+        for key, value in self.plan.resource.forwarded_keys.items():
+            agent.add(private_key_from_string(value), key)
+        channel.request_forward_agent(agent.handler)
+
     def _run(self, transport, command, input_encoding=None, echo=None):
         if echo is None:
             echo = self.ui.echo
@@ -58,13 +66,7 @@ class Client(paramiko.SSHClient):
             input_encoding = self.input_encoding
 
         channel = transport.open_session()
-
-        if self.plan.resource.forwarded_keys:
-            agent = ParamikoAgentServer()
-            for key, value in self.plan.resource.forwarded_keys.items():
-                agent.add(private_key_from_string(value), key)
-            channel.request_forward_agent(agent.handler)
-
+        self.setup_forwarded_keys(channel)
         try:
             channel.exec_command(command)
 
