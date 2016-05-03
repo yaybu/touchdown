@@ -22,7 +22,7 @@ class ConnectionError(Exception):
     pass
 
 
-class AgentRequestHandler(socketserver.BaseRequestHandler):
+class AgentHandler(object):
 
     def _read(self, wanted):
         result = b''
