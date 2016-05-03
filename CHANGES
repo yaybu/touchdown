@@ -6,6 +6,9 @@ Changelog for Touchdown
 
 - Add support for S3 bucket acceleration.
 
+- Given a dictionary of SSH keys paramiko will now make them available as
+  though through agent forwarding.
+
 - Add support for standing up standalone EC2 instances (outside of an ASG).
 
 - Ensure ElastiCache replication group knows its max name length.

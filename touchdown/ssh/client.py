@@ -24,6 +24,7 @@ import six
 
 from touchdown.core import errors
 from touchdown.core.utils import force_str
+from touchdown.ssh.agent import ParamikoAgentServer
 
 
 def private_key_from_string(private_key):
@@ -57,6 +58,13 @@ class Client(paramiko.SSHClient):
             input_encoding = self.input_encoding
 
         channel = transport.open_session()
+
+        if self.plan.resource.forwarded_keys:
+            agent = ParamikoAgentServer()
+            for key, value in self.plan.resource.forwarded_keys.items():
+                agent.add(private_key_from_string(value), key)
+            channel.request_forward_agent(agent.handler)
+
         try:
             channel.exec_command(command)
 

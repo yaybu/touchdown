@@ -22,9 +22,9 @@ from touchdown.core import plan, serializers
 from .connection import Connection
 
 try:
-    from .agent import AgentServer
+    from .agent import PosixAgentServer
 except ImportError:
-    AgentServer = None
+    PosixAgentServer = None
 
 
 class SshMixin(object):
@@ -64,10 +64,10 @@ class SshMixin(object):
         environ['SSH_AUTH_SOCK'] = socket_file
         del environ['SHELL']
 
-        if AgentServer:
+        if PosixAgentServer:
             child_pid = os.fork()
             if child_pid:
-                a = AgentServer(socket_file)
+                a = PosixAgentServer(socket_file)
                 a.add(self.resource.private_key, "touchdown.pem")
                 try:
                     a.serve_while_pid(child_pid)

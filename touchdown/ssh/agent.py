@@ -25,9 +25,9 @@ class ConnectionError(Exception):
 class AgentRequestHandler(socketserver.BaseRequestHandler):
 
     def _read(self, wanted):
-        result = ''
+        result = b''
         while len(result) < wanted:
-            buf = self.request.recv(wanted - len(result))
+            buf = self.read(wanted - len(result))
             if not buf:
                 raise ConnectionError()
             result += buf
@@ -40,7 +40,7 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
 
     def send_message(self, msg):
         msg = asbytes(msg)
-        self.request.sendall(struct.pack('>I', len(msg)) + msg)
+        self.send(struct.pack('>I', len(msg)) + msg)
 
     def handler_11(self, msg):
         # SSH2_AGENTC_REQUEST_IDENTITIES = 11
@@ -59,9 +59,9 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
         msg.get_int()
         m = Message()
         if not pkey:
-            m.add_byte(chr(SSH_AGENT_FAILURE))
+            m.add_byte(byte_chr(SSH_AGENT_FAILURE))
             return m
-        m.add_byte(chr(SSH2_AGENT_SIGN_RESPONSE))
+        m.add_byte(byte_chr(SSH2_AGENT_SIGN_RESPONSE))
         m.add_string(pkey.sign_ssh_data(data).asbytes())
         return m
 
@@ -79,10 +79,19 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
             self.send_message(handler(msg))
 
 
-class AgentServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
+class PosixAgentHandler(socketserver.BaseRequestHandler, AgentHandler):
+
+    def read(self, size):
+        return self.request.read(size)
+
+    def send(self, data):
+        self.request.sendall(data)
+
+
+class PostixAgentServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
 
     def __init__(self, socket_file):
-        socketserver.UnixStreamServer.__init__(self, socket_file, AgentRequestHandler)
+        socketserver.UnixStreamServer.__init__(self, socket_file, PosixAgentHandler)
         self.identities = {}
 
     def add(self, pkey, comment):
@@ -98,3 +107,31 @@ class AgentServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
 
         self.shutdown()
         self.server_close()
+
+
+class ParamikoAgentHandler(AgentHandler):
+
+    def __init__(self, server, channel):
+        self.server = server
+        self.channel = channel
+
+    def read(self, size):
+        return self.channel.recv(size)
+
+    def send(self, data):
+        self.channel.send(data)
+
+
+class ParamikoAgentServer(object):
+
+    def __init__(self):
+        self.identities = {}
+
+    def add(self, pkey, comment):
+        self.identities[pkey.asbytes()] = (pkey, comment)
+
+    def handle(self, channel):
+        handler = ParamikoAgentHandler(self, channel)
+        t = threading.Thread(target=handler.handle)
+        t.daemon = True
+        t.start()

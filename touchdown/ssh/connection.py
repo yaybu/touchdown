@@ -49,6 +49,8 @@ class Connection(Target):
 
     proxy = argument.Resource("touchdown.ssh.connection.Connection")
 
+    forwarded_keys = argument.Dict()
+
     root = argument.Resource(workspace.Workspace)
 
     def clean_private_key(self, private_key):
