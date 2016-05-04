@@ -56,7 +56,7 @@ class Client(paramiko.SSHClient):
         agent = ParamikoAgentServer()
         for key, value in self.plan.resource.forwarded_keys.items():
             agent.add(private_key_from_string(value), key)
-        channel.request_forward_agent(agent.handler)
+        channel.request_forward_agent(agent.handle)
 
     def _run(self, transport, command, input_encoding=None, echo=None):
         if echo is None:
@@ -112,7 +112,7 @@ class Client(paramiko.SSHClient):
                 transport = self.get_transport()
                 cmd = path
                 if sudo:
-                    cmd = "sudo " + path
+                    cmd = "sudo -E " + path
                 self._run(transport, cmd)
             finally:
                 sftp.remove(path)
