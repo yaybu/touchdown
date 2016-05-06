@@ -36,10 +36,11 @@ class Session(object):
         self.expiration = expiration
         self.region = region
 
-    def create_client(self, service):
+    def create_client(self, service, api_version=None):
         return session.create_client(
             service_name=service,
             region_name=self.region,
+            api_version=api_version,
             aws_access_key_id=self.access_key_id,
             aws_secret_access_key=self.secret_access_key,
             aws_session_token=self.session_token,
