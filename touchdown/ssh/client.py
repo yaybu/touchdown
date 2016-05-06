@@ -24,7 +24,11 @@ import six
 
 from touchdown.core import errors
 from touchdown.core.utils import force_str
-from touchdown.ssh.agent import ParamikoAgentServer
+
+try:
+    from touchdown.ssh.agent import ParamikoAgentServer
+except ImportError:
+    ParamikoAgentServer = None
 
 
 def private_key_from_string(private_key):
@@ -51,6 +55,8 @@ class Client(paramiko.SSHClient):
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     def setup_forwarded_keys(self, channel):
+        if not ParamikoAgentServer:
+            return
         if not self.plan.resource.forwarded_keys:
             return
         agent = ParamikoAgentServer()
