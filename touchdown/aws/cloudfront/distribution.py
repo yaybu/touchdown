@@ -309,6 +309,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Distribution
     service_name = 'cloudfront'
+    api_version = '2016-01-28'
     describe_filters = {}
     describe_action = "list_distributions"
     describe_envelope = 'DistributionList.Items'

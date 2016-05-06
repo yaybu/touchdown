@@ -236,6 +236,7 @@ class SetTags(Action):
 class SimplePlan(object):
 
     _client = None
+    api_version = None
 
     @property
     def session(self):
@@ -245,7 +246,7 @@ class SimplePlan(object):
     def client(self):
         session = self.session
         if not self._client:
-            self._client = session.create_client(self.service_name)
+            self._client = session.create_client(self.service_name, self.api_version)
         return self._client
 
 
