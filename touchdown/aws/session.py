@@ -29,19 +29,18 @@ session.create_client("ec2", "eu-west-1")
 
 class Session(object):
 
-    def __init__(self, access_key_id, secret_access_key, session_token, expiration, region, api_version=None):
+    def __init__(self, access_key_id, secret_access_key, session_token, expiration, region):
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.session_token = session_token
         self.expiration = expiration
         self.region = region
-        self.api_version = api_version
 
-    def create_client(self, service):
+    def create_client(self, service, api_version=None):
         return session.create_client(
             service_name=service,
             region_name=self.region,
-            api_version=self.api_version,
+            api_version=api_version,
             aws_access_key_id=self.access_key_id,
             aws_secret_access_key=self.secret_access_key,
             aws_session_token=self.session_token,
