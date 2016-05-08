@@ -4,7 +4,9 @@ Changelog for Touchdown
 0.10.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Windows fixes.
+
+- CloudFront compatibility improvements (more resiliant to upstream API changes).
 
 
 0.10.0 (2016-05-05)
