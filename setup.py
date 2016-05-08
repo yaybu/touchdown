@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-version = '0.10.1'
+version = '0.10.2.dev0'
 
 setup(
     name='touchdown',
