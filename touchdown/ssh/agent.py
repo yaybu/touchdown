@@ -79,19 +79,22 @@ class AgentHandler(object):
             self.send_message(handler(msg))
 
 
-class PosixAgentHandler(socketserver.BaseRequestHandler, AgentHandler):
+class PosixAgentHandler(AgentHandler, socketserver.BaseRequestHandler):
+
+    def __init__(self, *args, **kwargs):
+        socketserver.BaseRequestHandler.__init__(self, *args, **kwargs)
 
     def read(self, size):
-        return self.request.read(size)
+        return self.request.recv(size)
 
     def send(self, data):
         self.request.sendall(data)
 
 
-class PostixAgentServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
+class PosixAgentServer(socketserver.ThreadingUnixStreamServer):
 
     def __init__(self, socket_file):
-        socketserver.UnixStreamServer.__init__(self, socket_file, PosixAgentHandler)
+        socketserver.ThreadingUnixStreamServer.__init__(self, socket_file, PosixAgentHandler)
         self.identities = {}
 
     def add(self, pkey, comment):

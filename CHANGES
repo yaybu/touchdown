@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.10.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix SSH agent forwarding.
 
 
 0.10.1 (2016-05-08)
