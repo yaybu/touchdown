@@ -57,14 +57,15 @@ class SshMixin(object):
         cmd = self.get_command_and_args()
         cmd.extend(args)
 
-        socket_dir = tempfile.mkdtemp(prefix='ssh-')
-        socket_file = os.path.join(socket_dir, 'agent.{}'.format(os.getpid()))
-
         environ = os.environ.copy()
-        environ['SSH_AUTH_SOCK'] = socket_file
-        del environ['SHELL']
 
-        if PosixAgentServer:
+        if self.resource.private_key and PosixAgentServer:
+            socket_dir = tempfile.mkdtemp(prefix='ssh-')
+            socket_file = os.path.join(socket_dir, 'agent.{}'.format(os.getpid()))
+
+            environ['SSH_AUTH_SOCK'] = socket_file
+            del environ['SHELL']
+
             child_pid = os.fork()
             if child_pid:
                 a = PosixAgentServer(socket_file)

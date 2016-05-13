@@ -117,7 +117,7 @@ class Client(paramiko.SSHClient):
             try:
                 transport = self.get_transport()
                 cmd = path
-                if sudo:
+                if sudo and self.get_transport().get_username() != "root":
                     cmd = "sudo -E " + path
                 self._run(transport, cmd)
             finally:
