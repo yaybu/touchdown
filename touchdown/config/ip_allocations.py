@@ -69,10 +69,12 @@ class IpAllocator(plan.Plan):
         Given a list of allocations that have already been applied, ensure that
         `self.allocations` and `self.free` is correct.
         """
+        network_set = netaddr.IPSet([network])
+        state = {k: v for (k, v) in state if v in network}
+        state_set = netaddr.IPSet(state.values())
+
         with self.allocation_lock:
             self.allocations = state
-            state_set = netaddr.IPSet(state.values())
-            network_set = netaddr.IPSet([network])
             self.free = collections.defaultdict(list)
             for network in (network_set - state_set).iter_cidrs():
                 self.free[network.prefixlen].append(network)
