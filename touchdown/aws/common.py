@@ -111,10 +111,13 @@ class GenericAction(Action):
             return self._description
         return [self._description]
 
+    def get_arguments(self):
+        return self.serializer.render(self.runner, self.resource)
+
     def run(self):
         logger.debug("Calling {}".format(self.func))
 
-        params = self.serializer.render(self.runner, self.resource)
+        params = self.get_arguments()
         logger.debug("Invoking with params {}".format(params))
 
         return self.func(**params)
@@ -260,6 +263,8 @@ class SimpleDescribe(SimplePlan):
         Present('name'),
     )
 
+    GenericAction = GenericAction
+
     def __init__(self, runner, resource):
         super(SimpleDescribe, self).__init__(runner, resource)
         self.object = {}
@@ -368,7 +373,7 @@ class SimpleDescribe(SimplePlan):
         return {}
 
     def generic_action(self, description, callable, serializer=None, **kwargs):
-        ga = GenericAction(
+        ga = self.GenericAction(
             self,
             description,
             callable,
