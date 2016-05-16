@@ -155,7 +155,7 @@ class Apply(SimpleApply, Describe):
             remote = self.client.get_bucket_accelerate_configuration(
                 Bucket=self.resource.name,
             )
-            update = remote['Status'] != self.resource.accelerate
+            update = remote.get('Status', 'Suspended') != self.resource.accelerate
 
         if update:
             yield self.generic_action(
@@ -216,7 +216,9 @@ class Apply(SimpleApply, Describe):
         if not self.object and self.resource.policy:
             update_policy = True
         elif self.resource.policy:
-            if self.get_remote_bucket_policy() != json.loads(self.resource.policy):
+            remote_policy = self.get_remote_bucket_policy()
+            local_policy = json.loads(self.resource.policy)
+            if remote_policy != local_policy:
                 update_policy = True
 
         if update_policy:
