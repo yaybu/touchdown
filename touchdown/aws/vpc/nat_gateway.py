@@ -55,7 +55,7 @@ class Describe(SimpleDescribe, Plan):
 
         return {
             "Filters": [
-                {"Name": "subnet-id", "Values": subnet.resource_id},
+                {"Name": "subnet-id", "Values": [subnet.resource_id]},
             ]
         }
 
