@@ -58,7 +58,7 @@ class Function(Resource):
     arn = argument.Output("FunctionArn")
 
     name = argument.String(field="FunctionName", min=1, max=140)
-    description = argument.String(name="Description")
+    description = argument.String(name="Description", max=256)
     timeout = argument.Integer(name="Timeout", default=3)
     runtime = argument.String(
         field="Runtime",
