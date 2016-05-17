@@ -19,3 +19,8 @@ cache: C:\wheelhouse
 build: off
 test_script:
 - python -m pytest touchdown
+notifications:
+  - provider: Slack
+    auth_token:
+      secure: 3B+1y9v9ei1yPhW9DEy75z+OdRATgFN3ktUTIAqpcvm6ObcJ+aZcuohLqs0Mk5Qf4Kl+1FbsZ1F3kDxr+4pkoA==
+    channel: general
