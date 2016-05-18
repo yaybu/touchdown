@@ -4,9 +4,9 @@ Framework
 Resource modelling
 ------------------
 
-The core idea behind Touchdown is that you model your instrastructure with
+The core idea behind Touchdown is that you model your infrastructure with
 "Resource" objects. These are declarative objects for describing your
-instrastructure. Implementation wise they work a bit like a typical python ORM::
+infrastructure. Implementation wise they work a bit like a typical python ORM::
 
     class Database(Resource):
 
@@ -129,6 +129,16 @@ Finding existing resources at Amazon
         This is the name of an API service, for example ``ec2`` or ``sns``. It
         matches the parameter you would pass to botocore's ``create_client()``.
 
+Under the hood finding a resource generally involves calling an API that returns a list of resources. Touchdown will automatically handle pagination where botocore provides a paginator but it needs helping filtering the objects returned:
+
+  * Some listing API's take a name parameter and can return a list of a single matching item.
+
+  * Some take a list of filter predicates and values. These let you filter on everything from the instance size to its state to a tag.
+
+  * Some API's do not support any server side filtering at all. We have to retrieve all ojects and filter then client side.
+
+The following attributes and functions control how the object finding process works.
+
     .. attribute:: describe_action
 
         The name of a botocore API. For example ``list_topics`` or ``describe_roles``.
@@ -141,40 +151,6 @@ Finding existing resources at Amazon
             @property
             def describe_filters(self):
                 return {"Name": self.resource.name}
-
-    .. attribute:: describe_envelope
-
-        The envelope that the response is wrapped in. This is a jmespath
-        expression. For example, a CloudFront Distribution will return data like
-        this::
-
-            {"DistributionList": "Items": [...]}
-
-        So the expression is ``DistributionList.Items``.
-
-    .. attribute:: describe_object_matches
-
-        A callable that does client side filtering of a list of Amazon resources.
-        It is called for each item retrieved and passed the parsed JSON. It
-        should return ``True`` if it matches the current resource.
-
-        For example::
-
-            def describe_object_matches(self, data):
-                return data['Name'] == self.resource.name
-
-        This is much less efficient than passing a filter to the API, but not
-        all AWS API's have advanced enough filtering.
-
-    .. attribute:: describe_notfound_exception
-
-        The kind of botocore ``ClientError`` that is raised when a matching
-        item cannot be found.
-
-    .. attribute:: key
-
-        This is the field in the result that contains that object id. For
-        example, ``SecurityGroupId`` or ``SubnetId``.
 
     .. method:: get_describe_filters()
 
@@ -221,13 +197,72 @@ Finding existing resources at Amazon
         doesn't have a resource_id then it can't exist, and as the
         ``RouteTable`` must be in a ``VPC`` it can't exist either.
 
+    .. attribute:: describe_object_matches
+
+        A callable that does client side filtering of a list of Amazon resources.
+        It is called for each item retrieved and passed the parsed JSON. It
+        should return ``True`` if it matches the current resource.
+
+        For example::
+
+            def describe_object_matches(self, data):
+                return data['Name'] == self.resource.name
+
+        This is much less efficient than passing a filter to the API, but not
+        all AWS API's have advanced enough filtering.
+
+    .. attribute:: describe_notfound_exception
+
+        Some API's will return an empty list when there are no matching results. However some will return an error that manifests as a botocore ``ClientError`` exception. If the error type matches ``describe_notfound_exception`` then it will be captured and treated like the API return no matches.
+
+
+The data returned by the API may need some massaging before it is useful.
+
+    .. attribute:: describe_envelope
+
+        The envelope that the response is wrapped in. This is a jmespath
+        expression. For example, a CloudFront Distribution will return data like
+        this::
+
+            {
+                "DistributionList": {
+                    "Items": [
+                        "Id": "ABZDEFG",
+                        "DomainName": "www.example.com",
+                        ...
+                    ]
+                }
+            }
+
+        So the expression is ``DistributionList.Items``.
+
+    .. attribute:: key
+
+        This is the field in the result that contains that object id. For
+        example, ``SecurityGroupId`` or ``SubnetId``.
+
+        This field is how `serializers.Identifier()` determines the unique id for a resource: It simply looks up the `key` in the description of the resource that was retrieved.
+
+    .. method:: annotate_object
+
+        Some list API's do not return enough information to be usable by touchdown. We have to extend that information by calling an additional API. `annotate_object()` is a hook that is called on the output of the describe step so that subclasses can add this additional information.
+
+        For example, `WAF` does not return much information from its `list_rules` API so in order to get the predicates for that rule we need to annotate the results::
+
+            def annotate_object(self, rule):
+                result = self.client.get_rule(
+                    RuleId=self.object['RuleId'],
+                )
+                rule.update(result['Rule'])
+                return rule
+
 
 Creating new instances
 ----------------------
 
 Before creating a new instance we have to check if an instance exists already.
 We leverage the ``SimpleDescribe`` subclass we have already made to do this,
-and mixin the ``SipleApply`` mixin to create an instance if its missing (and
+and mix in the ``SimpleApply`` mixin to create an instance if its missing (and
 apply any required changes).
 
 
