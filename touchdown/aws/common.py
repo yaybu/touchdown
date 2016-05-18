@@ -15,7 +15,6 @@
 import datetime
 import logging
 import time
-from inspect import isgeneratorfunction
 
 import jmespath
 from botocore.exceptions import ClientError
@@ -299,8 +298,6 @@ class SimpleDescribe(SimplePlan):
         results = jmespath.search(self.describe_envelope, results)
         if results is None:
             return []
-        elif not isgeneratorfunction(results) and not isinstance(results, list):
-            return [results]
         return results
 
     def get_possible_objects(self):

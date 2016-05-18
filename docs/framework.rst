@@ -236,6 +236,11 @@ The data returned by the API may need some massaging before it is useful.
 
         So the expression is ``DistributionList.Items``.
 
+        If you need to use an API that returns a single item rather than a list of items you can use jmespath here too. For example, in SQS we use `get_queue_url` instead of a listing API:
+
+            describe_action = 'get_queue_url'
+            describe_envelope = "[@]"
+
     .. attribute:: key
 
         This is the field in the result that contains that object id. For

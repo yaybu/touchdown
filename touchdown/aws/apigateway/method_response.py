@@ -41,7 +41,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'apigateway'
     describe_action = "get_method_response"
     describe_notfound_exception = "NotFoundException"
-    describe_envelope = "@"
+    describe_envelope = "[@]"
     key = 'httpMethod'
 
     def get_describe_filters(self):
