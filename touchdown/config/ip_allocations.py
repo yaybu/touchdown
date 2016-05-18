@@ -70,7 +70,7 @@ class IpAllocator(plan.Plan):
         `self.allocations` and `self.free` is correct.
         """
         network_set = netaddr.IPSet([network])
-        state = {k: v for (k, v) in state if v in network}
+        state = {k: v for (k, v) in state.items() if netaddr.IPNetwork(v) in network}
         state_set = netaddr.IPSet(state.values())
 
         with self.allocation_lock:
