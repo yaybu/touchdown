@@ -42,6 +42,18 @@ class GetChangeTokenDescribe(SimpleDescribe):
     def describe_object_matches(self, d):
         return self.resource.name == d['Name']
 
+    def annotate_object(self, obj):
+        # Need to do a request to get the detailed information for the
+        # object - we don't get this for free when doing a list.
+        annotate_action = getattr(self.client, self.annotate_action)
+
+        # This will unfurl to be something like::
+        #     rule = client.get_rule(RuleId=obj['RuleId'])
+        #     obj.update(rule['Rule'])
+        obj.update(annotate_action(**{self.key: obj[self.key]})[self.describe_envelope[:-1]])
+
+        return obj
+
 class GetChangeTokenApply(SimpleApply):
 
     GenericAction = GetChangeTokenAction

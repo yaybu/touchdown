@@ -57,11 +57,8 @@ class Describe(GetChangeTokenDescribe, Plan):
     service_name = 'waf'
     describe_action = "list_ip_sets"
     describe_envelope = "IPSets"
+    annotate_action = "get_ip_set"
     key = 'IPSetId'
-
-    def annotate_object(self, obj):
-        obj.update(self.client.get_ip_set(**{self.key: obj[self.key]})[self.describe_envelope[:-1]])
-        return obj
 
 
 class Apply(GetChangeTokenApply, Describe):

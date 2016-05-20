@@ -48,13 +48,8 @@ class Describe(GetChangeTokenDescribe, Plan):
     service_name = 'waf'
     describe_action = "list_web_acls"
     describe_envelope = "WebACLSs"
+    annotate_action = "get_web_acl"
     key = 'WebACLId'
-
-    def annotate_object(self, obj):
-        # Need to do a request to get the detailed information for the
-        # object - we don't get this for free when doing a list.
-        obj.update(self.client.get_web_acl(**{self.key: obj[self.key]})[self.describe_envelope[:-1]])
-        return obj
 
 
 class Apply(GetChangeTokenApply, Describe):
