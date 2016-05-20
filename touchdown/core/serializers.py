@@ -191,10 +191,8 @@ class Argument(Serializer):
             result = result.render(runner, object)
             if self.field:
                 result = self.field.clean_value(object, result)
-        else:
-            result = object.meta.fields[self.attribute].argument.serializer.render(runner, result)
 
-        return result
+        return object.meta.fields[self.attribute].argument.serializer.render(runner, result)
 
     def diff(self, runner, object, value):
         try:
