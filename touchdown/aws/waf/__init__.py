@@ -13,8 +13,12 @@
 # limitations under the License.
 
 from .ip_set import IpSet
+from .rule import Rule
+from .web_acl import WebACL
 
 
 __all__ = [
     "IpSet",
+    "Rule",
+    "WebACL",
 ]
