@@ -17,7 +17,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
-from .get_change_token import (
+from .waf import (
     GetChangeTokenApply,
     GetChangeTokenDescribe,
     GetChangeTokenDestroy,
