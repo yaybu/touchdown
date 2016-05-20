@@ -64,40 +64,10 @@ class Describe(WafDescribe, Plan):
 class Apply(WafApply, Describe):
 
     create_action = "create_ip_set"
-
-    def update_object(self):
-        changes = []
-        description = ["Update ip set"]
-
-        for local in self.resource.addresses:
-            for remote in self.object.get('IPSetDescriptors', []):
-                if local.matches(self.runner, remote):
-                    break
-            else:
-                changes.append(serializers.Dict(**{
-                    "Action": "INSERT",
-                    "IPSetDescriptor": local.serializer_with_kwargs(),
-                }))
-                description.append("Type => {}, Address={}, Action=INSERT".format(local.address_type, local.address))
-
-        for remote in self.object.get('IPSetDescriptors', []):
-            for local in self.resource.addresses:
-                if local.matches(self.runner, remote):
-                    break
-            else:
-                changes.append(serializers.Dict(**{
-                    "Action": "DELETE",
-                    "IPSetDescriptor": remote,
-                }))
-                description.append("Type => {}, Address={}, Action=DELETE".format(remote["Type"], remote["Value"]))
-
-        if changes:
-            yield self.generic_action(
-                description,
-                self.client.update_ip_set,
-                IPSetId=serializers.Identifier(),
-                Updates=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
-            )
+    local_container = "addresses"
+    container_update_action = 'update_ip_set'
+    container = 'IPSetDescriptors'
+    container_member = 'IPSetDescriptor'
 
 
 class Destroy(WafDestroy, Describe):

@@ -56,6 +56,11 @@ class Apply(WafApply, Describe):
 
     create_action = "create_web_acl"
 
+    local_children = "activated_rules"
+    container_update_action = 'update_web_acl'
+    container = 'Rules'
+    container_member = 'ActivatedRule'
+
     def update_object(self):
         changes = []
         description = ["Update Web ACL"]

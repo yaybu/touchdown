@@ -58,6 +58,46 @@ class WafApply(SimpleApply):
 
     GenericAction = GetChangeTokenAction
 
+    def update_object(self):
+        changes = []
+        description = ["Update children of {}".format(self.resouce.name)]
+
+        for local in getattr(self.resource, self.local_container):
+            for remote in self.object.get(self.container, []):
+                if local.matches(self.runner, remote):
+                    break
+            else:
+                changes.append(serializers.Dict(**{
+                    "Action": "INSERT",
+                    self.container_member: local.serializer_with_kwargs(),
+                }))
+                #description.append("Type => {}, Predicate={}, Action=INSERT".format(local.match_type, local.ip_set))
+
+        for remote in self.object.get(self.container, []):
+            for local in getattr(self.resource, self.local_container):
+                if local.matches(self.runner, remote):
+                    break
+            else:
+                changes.append(serializers.Dict(**{
+                    "Action": "DELETE",
+                    self.container_member: remote,
+                }))
+                # TODO: consider doing a call here to a better
+                # description for the deleted resource.
+                #description.append("Type => {}, Predicate={}, Action=DELETE".format(remote["Type"], remote["DataId"]))
+
+        if changes:
+            kwargs = {
+                self.key: serializers.Identifier(),
+                Updates=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
+            }
+
+            yield self.generic_action(
+                description,
+                getattr(self.client, self.container_update_action),
+                **kwargs,
+            )
+
 
 class WafDestroy(SimpleDestroy):
 

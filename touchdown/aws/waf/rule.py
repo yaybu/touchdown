@@ -66,41 +66,10 @@ class Apply(WafApply, Describe):
 
     create_action = "create_rule"
 
-    def update_object(self):
-        changes = []
-        description = ["Update rule"]
-
-        for local in self.resource.predicates:
-            for remote in self.object.get('Predicates', []):
-                if local.matches(self.runner, remote):
-                    break
-            else:
-                changes.append(serializers.Dict(**{
-                    "Action": "INSERT",
-                    "Predicate": local.serializer_with_kwargs(),
-                }))
-                description.append("Type => {}, Predicate={}, Action=INSERT".format(local.match_type, local.ip_set))
-
-        for remote in self.object.get('Predicates', []):
-            for local in self.resource.predicates:
-                if local.matches(self.runner, remote):
-                    break
-            else:
-                changes.append(serializers.Dict(**{
-                    "Action": "DELETE",
-                    "Predicate": remote,
-                }))
-                # TODO: consider doing a call here to a better
-                # description for the deleted resource.
-                description.append("Type => {}, Predicate={}, Action=DELETE".format(remote["Type"], remote["DataId"]))
-
-        if changes:
-            yield self.generic_action(
-                description,
-                self.client.update_rule,
-                RuleId=serializers.Identifier(),
-                Updates=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
-            )
+    local_container = "rules"
+    container_update_action = 'update_rule'
+    container = 'Predicates'
+    container_member = 'Predicate'
 
 
 class Destroy(WafDestroy, Describe):
