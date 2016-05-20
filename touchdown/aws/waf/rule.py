@@ -17,7 +17,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
-from .ip_set import IPSet
+from .ip_set import IpSet
 from .waf import WafApply, WafDescribe, WafDestroy
 
 
@@ -33,7 +33,7 @@ class IPMatch(Match):
     resource_name = "ip_match"
 
     match_type = argument.Serializer(serializer=serializers.Const("IPMatch"), field="Type")
-    ip_set = argument.Resource(IPSet, field='DataId')
+    ip_set = argument.Resource(IpSet, field='DataId')
 
 
 class Rule(Resource):
