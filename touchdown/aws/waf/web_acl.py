@@ -50,9 +50,6 @@ class Describe(GetChangeTokenDescribe, Plan):
     describe_envelope = "WebACLSs"
     key = 'WebACLId'
 
-    def get_describe_filters(self):
-        return {"Limit": 20}
-
     def describe_object_matches(self, d):
         return self.resource.name == d['Name']
 

@@ -32,16 +32,19 @@ class GetChangeTokenAction(GenericAction):
             return super(GetChangeTokenAction, self).run()
 
 
+class GetChangeTokenDescribe(SimpleDescribe):
+
+    GenericAction = GetChangeTokenAction
+
+    def get_describe_filters(self):
+        return {"Limit": 20}
+
+
 class GetChangeTokenApply(SimpleApply):
 
     GenericAction = GetChangeTokenAction
 
 
 class GetChangeTokenDestroy(SimpleDestroy):
-
-    GenericAction = GetChangeTokenAction
-
-
-class GetChangeTokenDescribe(SimpleDescribe):
 
     GenericAction = GetChangeTokenAction
