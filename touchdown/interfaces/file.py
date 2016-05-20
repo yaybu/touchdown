@@ -133,7 +133,7 @@ class FileAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, "fileio").read()
+        return runner.get_service(self.resource, "fileio").read().read()
 
     def dependencies(self, object):
         return frozenset((self.resource, ))
