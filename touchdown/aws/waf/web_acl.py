@@ -17,11 +17,15 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
+from .rule import Rule
 from .waf import WafApply, WafDescribe, WafDestroy
 
 
 class ActivatedRule(Resource):
-    negated = argument.Boolean(field='Negated')
+
+    action = argument.Boolean(field='Action', choices=['BLOCK', 'ALLOW', 'COUNT'])
+    priority = argument.Integer(field='Priority')
+    rule = argument.Resource(Rule, field='RuleId')
 
 
 class WebACL(Resource):
