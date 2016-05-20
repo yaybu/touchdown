@@ -13,15 +13,11 @@
 # limitations under the License.
 
 from touchdown.aws.common import Resource
-from touchdown.core import argument, serializers
+from touchdown.core import argument
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
-from .waf import (
-    WafApply,
-    WafDescribe,
-    WafDestroy,
-)
+from .waf import WafApply, WafDescribe, WafDestroy
 
 
 class IPSetDescriptor(Resource):

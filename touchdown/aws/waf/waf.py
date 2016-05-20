@@ -14,6 +14,7 @@
 
 import threading
 
+from touchdown.core import serializers
 from ..common import GenericAction, SimpleApply, SimpleDescribe, SimpleDestroy
 
 
@@ -54,6 +55,7 @@ class WafDescribe(SimpleDescribe):
 
         return obj
 
+
 class WafApply(SimpleApply):
 
     GenericAction = GetChangeTokenAction
@@ -71,7 +73,7 @@ class WafApply(SimpleApply):
                     "Action": "INSERT",
                     self.container_member: local.serializer_with_kwargs(),
                 }))
-                #description.append("Type => {}, Predicate={}, Action=INSERT".format(local.match_type, local.ip_set))
+                # description.append("Type => {}, Predicate={}, Action=INSERT".format(local.match_type, local.ip_set))
 
         for remote in self.object.get(self.container, []):
             for local in getattr(self.resource, self.local_container):
@@ -84,18 +86,18 @@ class WafApply(SimpleApply):
                 }))
                 # TODO: consider doing a call here to a better
                 # description for the deleted resource.
-                #description.append("Type => {}, Predicate={}, Action=DELETE".format(remote["Type"], remote["DataId"]))
+                # description.append("Type => {}, Predicate={}, Action=DELETE".format(remote["Type"], remote["DataId"]))
 
         if changes:
             kwargs = {
                 self.key: serializers.Identifier(),
-                Updates=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
+                "Updates": serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
             }
 
             yield self.generic_action(
                 description,
                 getattr(self.client, self.container_update_action),
-                **kwargs,
+                **kwargs
             )
 
 
@@ -119,8 +121,8 @@ class WafDestroy(SimpleDestroy):
                 "Action": "DELETE",
                 self.container_member: remote,
             }))
-            #FIXME: Make this nicer
-            #description.append("Type => {}, Address={}, Action=DELETE".format(remote["Type"], remote["Value"]))
+            # FIXME: Make this nicer
+            # description.append("Type => {}, Address={}, Action=DELETE".format(remote["Type"], remote["Value"]))
 
         if changes:
             kwargs = {
@@ -131,8 +133,8 @@ class WafDestroy(SimpleDestroy):
             yield self.generic_action(
                 description,
                 getattr(self.client, self.container_update_action),
-                **kwargs,
+                **kwargs
             )
 
-        for obj in super(Destroy, self).destroy_object():
+        for obj in super(WafDestroy, self).destroy_object():
             yield obj

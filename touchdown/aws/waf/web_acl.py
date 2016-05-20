@@ -17,12 +17,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
-from .waf import (
-    WafApply,
-    WafDescribe,
-    WafDestroy,
-)
-from .ip_set import IPSet
+from .waf import WafApply, WafDescribe, WafDestroy
 
 
 class ActivatedRule(Resource):
