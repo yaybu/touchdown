@@ -61,4 +61,38 @@ class GetChangeTokenApply(SimpleApply):
 
 class GetChangeTokenDestroy(SimpleDestroy):
 
+    """
+    Subclasses of this destroy action must set:
+
+        `container` - for example IPSetDescriptors
+        `container_member` - for example IPSetDescriptor
+    """
+
     GenericAction = GetChangeTokenAction
+
+    def destroy_object(self):
+        changes = []
+        description = ["Delete all children from {}".format(self.resource.resource_name)]
+
+        for remote in self.object.get(self.container, []):
+            changes.append(serializers.Dict(**{
+                "Action": "DELETE",
+                self.container_member: remote,
+            }))
+            #FIXME: Make this nicer
+            #description.append("Type => {}, Address={}, Action=DELETE".format(remote["Type"], remote["Value"]))
+
+        if changes:
+            kwargs = {
+                self.key: serializers.Identifier(),
+                "Updates": serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
+            }
+
+            yield self.generic_action(
+                description,
+                getattr(self.client, self.container_update_action),
+                **kwargs,
+            )
+
+        for obj in super(Destroy, self).destroy_object():
+            yield obj

@@ -103,25 +103,6 @@ class Apply(GetChangeTokenApply, Describe):
 class Destroy(GetChangeTokenDestroy, Describe):
 
     destroy_action = "delete_ip_set"
-
-    def destroy_object(self):
-        changes = []
-        description = ["Delete all IPs from IP Set"]
-
-        for remote in self.object.get('IPSetDescriptors', []):
-            changes.append(serializers.Dict(**{
-                "Action": "DELETE",
-                "IPSetDescriptor": remote,
-            }))
-            description.append("Type => {}, Address={}, Action=DELETE".format(remote["Type"], remote["Value"]))
-
-        if changes:
-            yield self.generic_action(
-                description,
-                self.client.update_ip_set,
-                IPSetId=serializers.Identifier(),
-                Updates=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
-            )
-
-        for obj in super(Destroy, self).destroy_object():
-            yield obj
+    container_update_action = 'update_ip_set'
+    container = 'IPSetDescriptors'
+    container_member = 'IPSetDescriptor'
