@@ -50,9 +50,6 @@ class Describe(GetChangeTokenDescribe, Plan):
     describe_envelope = "WebACLSs"
     key = 'WebACLId'
 
-    def describe_object_matches(self, d):
-        return self.resource.name == d['Name']
-
     def annotate_object(self, obj):
         # Need to do a request to get the detailed information for the
         # object - we don't get this for free when doing a list.

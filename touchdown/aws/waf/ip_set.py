@@ -59,9 +59,6 @@ class Describe(GetChangeTokenDescribe, Plan):
     describe_envelope = "IPSets"
     key = 'IPSetId'
 
-    def describe_object_matches(self, d):
-        return self.resource.name == d['Name']
-
     def annotate_object(self, obj):
         obj.update(self.client.get_ip_set(**{self.key: obj[self.key]})[self.describe_envelope[:-1]])
         return obj
