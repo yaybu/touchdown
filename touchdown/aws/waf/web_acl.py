@@ -18,9 +18,9 @@ from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
 from .waf import (
-    GetChangeTokenApply,
-    GetChangeTokenDescribe,
-    GetChangeTokenDestroy,
+    WafApply,
+    WafDescribe,
+    WafDestroy,
 )
 from .ip_set import IPSet
 
@@ -42,7 +42,7 @@ class WebACL(Resource):
     account = argument.Resource(BaseAccount)
 
 
-class Describe(GetChangeTokenDescribe, Plan):
+class Describe(WafDescribe, Plan):
 
     resource = WebACL
     service_name = 'waf'
@@ -52,7 +52,7 @@ class Describe(GetChangeTokenDescribe, Plan):
     key = 'WebACLId'
 
 
-class Apply(GetChangeTokenApply, Describe):
+class Apply(WafApply, Describe):
 
     create_action = "create_web_acl"
 
@@ -93,7 +93,7 @@ class Apply(GetChangeTokenApply, Describe):
             )
 
 
-class Destroy(GetChangeTokenDestroy, Describe):
+class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_web_acl"
     container_update_action = 'update_web_acl'

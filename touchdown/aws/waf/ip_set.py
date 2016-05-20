@@ -18,9 +18,9 @@ from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
 from .waf import (
-    GetChangeTokenApply,
-    GetChangeTokenDescribe,
-    GetChangeTokenDestroy,
+    WafApply,
+    WafDescribe,
+    WafDestroy,
 )
 
 
@@ -51,7 +51,7 @@ class IpSet(Resource):
     account = argument.Resource(BaseAccount)
 
 
-class Describe(GetChangeTokenDescribe, Plan):
+class Describe(WafDescribe, Plan):
 
     resource = IpSet
     service_name = 'waf'
@@ -61,7 +61,7 @@ class Describe(GetChangeTokenDescribe, Plan):
     key = 'IPSetId'
 
 
-class Apply(GetChangeTokenApply, Describe):
+class Apply(WafApply, Describe):
 
     create_action = "create_ip_set"
 
@@ -100,7 +100,7 @@ class Apply(GetChangeTokenApply, Describe):
             )
 
 
-class Destroy(GetChangeTokenDestroy, Describe):
+class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_ip_set"
     container_update_action = 'update_ip_set'

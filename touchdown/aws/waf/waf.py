@@ -32,7 +32,7 @@ class GetChangeTokenAction(GenericAction):
             return super(GetChangeTokenAction, self).run()
 
 
-class GetChangeTokenDescribe(SimpleDescribe):
+class WafDescribe(SimpleDescribe):
 
     GenericAction = GetChangeTokenAction
 
@@ -54,12 +54,12 @@ class GetChangeTokenDescribe(SimpleDescribe):
 
         return obj
 
-class GetChangeTokenApply(SimpleApply):
+class WafApply(SimpleApply):
 
     GenericAction = GetChangeTokenAction
 
 
-class GetChangeTokenDestroy(SimpleDestroy):
+class WafDestroy(SimpleDestroy):
 
     """
     Subclasses of this destroy action must set:

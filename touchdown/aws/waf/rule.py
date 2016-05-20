@@ -18,9 +18,9 @@ from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
 from .waf import (
-    GetChangeTokenApply,
-    GetChangeTokenDescribe,
-    GetChangeTokenDestroy,
+    WafApply,
+    WafDescribe,
+    WafDestroy,
 )
 from .ip_set import IPSet
 
@@ -52,7 +52,7 @@ class Rule(Resource):
     account = argument.Resource(BaseAccount)
 
 
-class Describe(GetChangeTokenDescribe, Plan):
+class Describe(WafDescribe, Plan):
 
     resource = Rule
     service_name = 'waf'
@@ -62,7 +62,7 @@ class Describe(GetChangeTokenDescribe, Plan):
     key = 'RuleId'
 
 
-class Apply(GetChangeTokenApply, Describe):
+class Apply(WafApply, Describe):
 
     create_action = "create_rule"
 
@@ -103,7 +103,7 @@ class Apply(GetChangeTokenApply, Describe):
             )
 
 
-class Destroy(GetChangeTokenDestroy, Describe):
+class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_rule"
     container_update_action = 'update_rule'
