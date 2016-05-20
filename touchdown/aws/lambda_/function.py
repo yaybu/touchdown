@@ -115,7 +115,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'lambda'
     describe_action = "get_function_configuration"
     describe_notfound_exception = "ResourceNotFoundException"
-    describe_envelope = "@"
+    describe_envelope = "[@]"
     key = 'FunctionName'
 
 

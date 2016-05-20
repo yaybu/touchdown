@@ -61,7 +61,7 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             methods = {xform_name(s): s for s in service.operation_names}
             operation = service.operation_model(methods[impl.describe_action])
 
-            if impl.describe_envelope == "@":
+            if impl.describe_envelope in ["@", "[@]"]:
                 continue
 
             if "." not in impl.describe_envelope and ":" not in impl.describe_envelope:

@@ -32,16 +32,6 @@ class TestMetadata(unittest.TestCase):
 
 class TestCloudFrontDistributionSerializing(unittest.TestCase):
 
-    def setUp(self):
-        uuid = mock.Mock()
-        uuid.return_value = "e64daba4-dddf-478e-a39b-b15a74325330"
-
-        self.uuid = mock.patch('uuid.uuid4', uuid)
-        self.uuid.start()
-
-    def tearDown(self):
-        self.uuid.stop()
-
     def test_simple_distribution(self):
         distribution = Distribution(
             None,
