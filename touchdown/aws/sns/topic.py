@@ -16,9 +16,9 @@ from touchdown.core import argument, serializers
 from touchdown.core.adapters import Adapter
 from touchdown.core.plan import Plan
 
+from .. import cloudwatch
 from ..account import BaseAccount
 from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
-from .. import cloudwatch
 
 
 class Subscription(Adapter):

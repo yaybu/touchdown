@@ -50,4 +50,5 @@ class NotificationConfiguration(resource.Resource):
                 FilterRules=serializers.List(serializers.Resource()),
             ),
         ),
-     )
+    )
+
