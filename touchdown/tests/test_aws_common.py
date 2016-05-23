@@ -64,5 +64,8 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             if impl.describe_envelope in ["@", "[@]"]:
                 continue
 
+            if impl.describe_envelope.startswith("["):
+                continue
+
             if "." not in impl.describe_envelope and ":" not in impl.describe_envelope:
                 assert impl.describe_envelope in operation.output_shape.members
