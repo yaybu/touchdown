@@ -51,4 +51,3 @@ class NotificationConfiguration(resource.Resource):
             ),
         ),
     )
-
