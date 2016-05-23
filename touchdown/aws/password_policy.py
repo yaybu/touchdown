@@ -45,7 +45,7 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'iam'
     describe_action = 'get_account_password_policy'
     describe_notfound_exception = 'NoSuchEntity'
-    describe_envelope = 'PasswordPolicy'
+    describe_envelope = '[PasswordPolicy]'
     key = ''
 
     def get_describe_filters(self):
