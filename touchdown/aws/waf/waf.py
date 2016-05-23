@@ -20,6 +20,16 @@ from ..common import GenericAction, SimpleApply, SimpleDescribe, SimpleDestroy
 
 class GetChangeTokenAction(GenericAction):
 
+    """
+    Before every call to a WAF change API first call `get_change_token` and
+    inject its response into our API call. *Every* API to create or update a
+    WAF resource must have a change token or it will be rejected.
+
+    Wrap all 'action' API calls in a lock so they don't happen concurrently.
+    This is because the WAF service does not support concurrent changes
+    whatsoever, but touchdown will run in parallel by default.
+    """
+
     change_token_lock = threading.Lock()
 
     def get_arguments(self):
@@ -38,9 +48,19 @@ class WafDescribe(SimpleDescribe):
     GenericAction = GetChangeTokenAction
 
     def get_describe_filters(self):
+        """
+        The 'Limit' field is mandatory so set it to a sensible default for all
+        WAF API's
+        """
         return {"Limit": 20}
 
     def describe_object_matches(self, d):
+        """
+        Perform client side filtering of WAF resources found with the list API.
+
+        There is no server-side filtering at all, and all client-side filtering
+        is by comparing self.resource.name against remote['Name'].
+        """
         return self.resource.name == d['Name']
 
     def annotate_object(self, obj):
