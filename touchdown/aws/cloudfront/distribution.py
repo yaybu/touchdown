@@ -30,6 +30,7 @@ from ..common import (
 from ..elb import LoadBalancer
 from ..iam import ServerCertificate
 from ..s3 import Bucket
+from ..waf import WebACL
 from .common import CloudFrontList, CloudFrontResourceList, S3Origin
 
 
@@ -223,7 +224,6 @@ class Distribution(Resource):
                 "Quantity": 0,
             },
         }),
-        "WebACLId": serializers.Const(""),
     }
 
     name = argument.String()
@@ -300,6 +300,11 @@ class Distribution(Resource):
                 lambda r, o: "acm" if o.acm_certificate else "iam" if o.ssl_certificate else "cloudfront"
             ),
         ),
+    )
+
+    web_acl = argument.Resource(
+        WebACL,
+        field="WebACLId",
     )
 
     account = argument.Resource(BaseAccount)
