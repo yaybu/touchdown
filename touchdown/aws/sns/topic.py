@@ -18,6 +18,7 @@ from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
 from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
+from .. import cloudwatch
 
 
 class Subscription(Adapter):
@@ -109,3 +110,17 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_topic"
+
+
+class AlarmDestination(cloudwatch.AlarmDestination):
+
+    """ Adapts a sns Topic into an AlarmDestination """
+
+    input = Topic
+
+    @property
+    def resource_name(self):
+        return self.adapts.resource_name
+
+    def get_serializer(self, runner, **kwargs):
+        return self.adapts.arn
