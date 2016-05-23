@@ -12,7 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, resource
+from touchdown.core import argument, resource, serializers
+
+
+class KeyFilterRule(resource.Resource):
+
+    resource_name = "filter_rule"
+
+    name = argument.String(field="Name", choices=["prefix", "suffix"])
+    value = argument.String(field="Value")
 
 
 class NotificationConfiguration(resource.Resource):
@@ -34,16 +42,12 @@ class NotificationConfiguration(resource.Resource):
         ],
     ), field="Events")
 
-    # filters = argument.List(
-    #    field="Filter",
-    #    serializer=serializers.Dict(
-    #        Key=serializer.Dict(
-    #            FilterRules=serializer.List(
-    #                serializer.Dict(
-    #                    Name='prefix',
-    #                    Value='....',
-    #                )
-    #            )
-    #        )
-    #    )
-    # )
+    filters = argument.ResourceList(
+        KeyFilterRule,
+        field="Filter",
+        serializer=serializers.Dict(
+            Key=serializers.Dict(
+                FilterRules=serializers.List(serializers.Resource()),
+            ),
+        ),
+     )
