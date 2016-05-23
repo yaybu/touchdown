@@ -596,14 +596,14 @@ class List(Serializer):
 
     def diff_stupid(self, runner, object, value):
         diffs = diff.ListDiff()
-        for i, (renderable, v) in enumerate(zip_longest(object, value)):
+        for i, (renderable, v) in enumerate(zip_longest(object or [], value or [])):
             diffs.add(i, self.child.diff(runner, renderable, v))
         return diffs
 
     def diff(self, runner, object, value):
-        if len(object) < 50 and len(value) < 50:
+        if object and value and len(object) < 50 and len(value) < 50:
             return self.diff_slow(runner, object, value)
-        return self.diff_stupid(self, runner, object, value)
+        return self.diff_stupid(runner, object, value)
 
     def dependencies(self, object):
         return frozenset(self.child.dependencies(object))
