@@ -65,6 +65,7 @@ class Apply(WafApply, Describe):
 
     create_action = "create_ip_set"
 
+
 class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_ip_set"

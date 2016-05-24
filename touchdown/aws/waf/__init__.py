@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .byte_match import ByteMatchSet
 from .ip_set import IpSet
 from .rule import Rule
 from .web_acl import WebACL
 
 
 __all__ = [
+    "ByteMatchSet",
     "IpSet",
     "Rule",
     "WebACL",

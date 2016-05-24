@@ -75,6 +75,7 @@ class Apply(WafApply, Describe):
 
     create_action = "create_web_acl"
 
+
 class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_web_acl"
