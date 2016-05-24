@@ -305,6 +305,7 @@ class Distribution(Resource):
     web_acl = argument.Resource(
         WebACL,
         field="WebACLId",
+        empty_serializer=serializers.Const(""),
     )
 
     account = argument.Resource(BaseAccount)
