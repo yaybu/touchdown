@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.aws.common import Resource
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
@@ -43,6 +43,7 @@ class IpSet(Resource):
         IPSetDescriptor,
         field="IPSetDescriptors",
         create=False,
+        serializer=serializers.List(serializers.Resource()),
     )
     account = argument.Resource(BaseAccount)
 

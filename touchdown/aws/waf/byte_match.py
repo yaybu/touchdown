@@ -81,6 +81,7 @@ class ByteMatchSet(Resource):
         ByteMatchTuple,
         field="ByteMatchTuple",
         create=False,
+        serializer=serializers.List(serializers.Resource()),
     )
     account = argument.Resource(BaseAccount)
 
