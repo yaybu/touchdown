@@ -22,14 +22,19 @@ from .waf import WafApply, WafDescribe, WafDestroy
 
 
 class Match(Resource):
+
     """A match gives some context to a set. This class is expected to be
     subclassed for each type of match.
 
     """
+
+    resource_name = "match"
+
     negated = argument.Boolean(field='Negated')
 
 
 class IPMatch(Match):
+
     resource_name = "ip_match"
 
     match_type = argument.Serializer(serializer=serializers.Const("IPMatch"), field="Type")
@@ -37,6 +42,8 @@ class IPMatch(Match):
 
 
 class Rule(Resource):
+
+    resource_name = "rule"
 
     name = argument.String(field='Name')
     metric_name = argument.String(field='MetricName')
@@ -56,7 +63,7 @@ class Describe(WafDescribe, Plan):
     describe_envelope = "Rules"
     annotate_action = "get_rule"
     key = 'RuleId'
-    local_container = "rules"
+    local_container = "predicates"
     container_update_action = 'update_rule'
     container = 'Predicates'
     container_member = 'Predicate'
