@@ -82,8 +82,18 @@ class WafDescribe(SimpleDescribe):
         return getattr(self.resource, self.local_container, [])
 
     def describe_local(self, local):
-        field = self.get_local_container_field()
-        desc = ["Inserting {}:".format(field.resource_class.resource_name)]
+        desc = ["Inserting {}:".format(local.resource_name)]
+        for field in local.meta.iter_fields_in_order():
+            if field.name.startswith("_"):
+                continue
+            if not getattr(field.argument, "field", None):
+                continue
+            if not field.present(local):
+                continue
+            desc.append("    {}: {}".format(
+                field.name,
+                getattr(local, field.name, "(unset)"),
+            ))
         return desc
 
     def describe_remote(self, remote):
@@ -95,10 +105,10 @@ class WafDescribe(SimpleDescribe):
         # description for the deleted resource - turn its GUID into its name
         field = self.get_local_container_field()
         desc = ["Removing {}:".format(field.resource_class.resource_name)]
-        for field in field.resource_class.iter_fields_in_order():
-            if not field.field or field.field not in remote:
+        for field in field.resource_class.meta.iter_fields_in_order():
+            if not getattr(field.argument, "field", None) or field.argument.field not in remote:
                 continue
-            desc.append("    {}: {}", field.name, remote[field.field])
+            desc.append("    {}: {}".format(field.name, remote[field.argument.field]))
         return desc
 
 
