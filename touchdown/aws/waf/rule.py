@@ -17,6 +17,7 @@ from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 
 from ..account import BaseAccount
+from .byte_match import ByteMatchSet
 from .ip_set import IpSet
 from .waf import WafApply, WafDescribe, WafDestroy
 
@@ -30,7 +31,17 @@ class Match(Resource):
 
     resource_name = "match"
 
+    match_type = argument.Serializer(serializers=serializers.Const("UnknownType"), field="Type")
     negated = argument.Boolean(field='Negated')
+    data_id = argument.String(field='DataId')
+
+
+class ByteMatch(Match):
+
+    resource_name = "byte_match"
+
+    match_type = argument.Serializer(serializer=serializers.Const("ByteMatch"), field="Type")
+    byte_match_set = argument.Resource(ByteMatchSet, field='DataId')
 
 
 class IPMatch(Match):
