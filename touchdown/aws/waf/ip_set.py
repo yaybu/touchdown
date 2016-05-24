@@ -55,20 +55,16 @@ class Describe(WafDescribe, Plan):
     describe_envelope = "IPSets"
     annotate_action = "get_ip_set"
     key = 'IPSetId'
-
-
-class Apply(WafApply, Describe):
-
-    create_action = "create_ip_set"
     local_container = "addresses"
     container_update_action = 'update_ip_set'
     container = 'IPSetDescriptors'
     container_member = 'IPSetDescriptor'
 
 
+class Apply(WafApply, Describe):
+
+    create_action = "create_ip_set"
+
 class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_ip_set"
-    container_update_action = 'update_ip_set'
-    container = 'IPSetDescriptors'
-    container_member = 'IPSetDescriptor'

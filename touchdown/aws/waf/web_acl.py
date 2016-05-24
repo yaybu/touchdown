@@ -49,57 +49,16 @@ class Describe(WafDescribe, Plan):
     describe_envelope = "WebACLSs"
     annotate_action = "get_web_acl"
     key = 'WebACLId'
+    container_update_action = 'update_web_acl'
+    container = 'Rules'
+    container_member = 'ActivatedRule'
+    local_children = "activated_rules"
 
 
 class Apply(WafApply, Describe):
 
     create_action = "create_web_acl"
 
-    local_children = "activated_rules"
-    container_update_action = 'update_web_acl'
-    container = 'Rules'
-    container_member = 'ActivatedRule'
-
-    def update_object(self):
-        changes = []
-        description = ["Update Web ACL"]
-
-        for local in self.resource.predicates:
-            for remote in self.object.get('Predicates', []):
-                if local.matches(self.runner, remote):
-                    break
-            else:
-                changes.append(serializers.Dict(**{
-                    "Action": "INSERT",
-                    "Predicate": local.serializer_with_kwargs(),
-                }))
-                description.append("Type => {}, Predicate={}, Action=INSERT".format(local.match_type, local.ip_set))
-
-        for remote in self.object.get('Predicates', []):
-            for local in self.resource.predicates:
-                if local.matches(self.runner, remote):
-                    break
-            else:
-                changes.append(serializers.Dict(**{
-                    "Action": "DELETE",
-                    "Predicate": remote,
-                }))
-                # TODO: consider doing a call here to a better
-                # description for the deleted resource.
-                description.append("Type => {}, Predicate={}, Action=DELETE".format(remote["Type"], remote["DataId"]))
-
-        if changes:
-            yield self.generic_action(
-                description,
-                self.client.update_web_acl,
-                WebACLId=serializers.Identifier(),
-                Updates=serializers.Context(serializers.Const(changes), serializers.List(serializers.SubSerializer())),
-            )
-
-
 class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_web_acl"
-    container_update_action = 'update_web_acl'
-    container = 'Rules'
-    container_member = 'ActivatedRule'

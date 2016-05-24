@@ -87,6 +87,10 @@ class WafDescribe(SimpleDescribe):
         return desc
 
     def describe_remote(self, remote):
+        """
+        Given a remote object that has no correlation to a local object pretty
+        print the remote object (using the touchdown field names)
+        """
         # TODO: consider doing a call here to a better
         # description for the deleted resource - turn its GUID into its name
         field = self.get_local_container_field()

@@ -56,21 +56,17 @@ class Describe(WafDescribe, Plan):
     describe_envelope = "Rules"
     annotate_action = "get_rule"
     key = 'RuleId'
-
-
-class Apply(WafApply, Describe):
-
-    create_action = "create_rule"
-
     local_container = "rules"
     container_update_action = 'update_rule'
     container = 'Predicates'
     container_member = 'Predicate'
 
 
+class Apply(WafApply, Describe):
+
+    create_action = "create_rule"
+
+
 class Destroy(WafDestroy, Describe):
 
     destroy_action = "delete_rule"
-    container_update_action = 'update_rule'
-    container = 'Predicates'
-    container_member = 'Predicate'
