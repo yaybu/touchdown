@@ -65,7 +65,8 @@ Resources
    :doc:`Simple Storage Service <config/aws/s3>` |
    :doc:`SSL Certificates <config/acm>` |
    :doc:`Transcoding <config/aws/elastictranscoder>` |
-   :doc:`VPNs <config/aws/vpn>`
+   :doc:`VPNs <config/aws/vpn>` |
+   :doc:`Web Application Firewall <config/aws/waf>`
 
  * **Provisioning:**
    :doc:`Provisioner targets <config/provisioner/targets>` |
