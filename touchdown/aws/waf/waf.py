@@ -76,14 +76,14 @@ class WafDescribe(SimpleDescribe):
         return obj
 
     def get_local_container_field(self):
-        return self.resource.meta.fields[self.local_container].argument
+        return self.resource.meta.fields[self.local_container].argument.list_of
 
     def get_local_container_items(self):
         return getattr(self.resource, self.local_container, [])
 
     def describe_local(self, local):
         field = self.get_local_container_field()
-        desc = ["Inserting {}:".format(field.resource.resource_name)]
+        desc = ["Inserting {}:".format(field.resource_class.resource_name)]
         return desc
 
     def describe_remote(self, remote):
@@ -94,8 +94,8 @@ class WafDescribe(SimpleDescribe):
         # TODO: consider doing a call here to a better
         # description for the deleted resource - turn its GUID into its name
         field = self.get_local_container_field()
-        desc = ["Removing {}:".format(field.resource.resource_name)]
-        for field in field.resource.iter_fields_in_order():
+        desc = ["Removing {}:".format(field.resource_class.resource_name)]
+        for field in field.resource_class.iter_fields_in_order():
             if not field.field or field.field not in remote:
                 continue
             desc.append("    {}: {}", field.name, remote[field.field])
@@ -106,7 +106,7 @@ class WafApply(SimpleApply):
 
     GenericAction = GetChangeTokenAction
 
-    def update_object(self, remote):
+    def update_object(self):
         changes = []
         description = ["Update children of {}".format(self.resource.name)]
 
