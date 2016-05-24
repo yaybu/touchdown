@@ -23,16 +23,32 @@ from .waf import WafApply, WafDescribe, WafDestroy
 
 class ActivatedRule(Resource):
 
-    action = argument.Boolean(field='Action', choices=['BLOCK', 'ALLOW', 'COUNT'])
+    resource_name = "activated_rule"
+
+    action = argument.String(
+        field='Action',
+        choices=['BLOCK', 'ALLOW', 'COUNT'],
+        serializer=serializers.Dict(
+            Type=serializers.String(),
+        ),
+    )
     priority = argument.Integer(field='Priority')
     rule = argument.Resource(Rule, field='RuleId')
 
 
 class WebACL(Resource):
 
+    resource_name = "web_acl"
+
     name = argument.String(field='Name')
     metric_name = argument.String(field='MetricName')
-    default_action = argument.String(field='DefaultAction', choices=['BLOCK', 'ALLOW', 'COUNT'])
+    default_action = argument.String(
+        field='DefaultAction',
+        choices=['BLOCK', 'ALLOW', 'COUNT'],
+        serializer=serializers.Dict(
+            Type=serializers.String(),
+        )
+    )
     activated_rules = argument.ResourceList(
         ActivatedRule,
         field='ActivatedRules',
