@@ -32,7 +32,7 @@ class Match(Resource):
     resource_name = "match"
 
     match_type = argument.Serializer(serializers=serializers.Const("UnknownType"), field="Type")
-    negated = argument.Boolean(field='Negated')
+    negated = argument.Boolean(field='Negated', default=False)
     data_id = argument.String(field='DataId')
 
 
