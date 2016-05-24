@@ -62,13 +62,13 @@ class Describe(WafDescribe, Plan):
     resource = WebACL
     service_name = 'waf'
     describe_action = "list_web_acls"
-    describe_envelope = "WebACLSs"
+    describe_envelope = "WebACLs"
     annotate_action = "get_web_acl"
     key = 'WebACLId'
     container_update_action = 'update_web_acl'
     container = 'Rules'
     container_member = 'ActivatedRule'
-    local_children = "activated_rules"
+    local_container = "activated_rules"
 
 
 class Apply(WafApply, Describe):
