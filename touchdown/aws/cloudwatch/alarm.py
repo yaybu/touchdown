@@ -118,6 +118,7 @@ class Apply(SimpleApply, Describe):
 
     signature = [
         Present("name"),
+        Present("namespace"),
         Present("metric"),
         Present("statistic"),
         Present("period"),
