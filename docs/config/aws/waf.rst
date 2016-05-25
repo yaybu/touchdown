@@ -168,6 +168,25 @@ IP Set
 
     .. attribute:: name
 
+        The name of the ip_set. This must be unique within a region.
+
+    .. attribute:: addresses
+
+        A list of IP networks to match against::
+
+            ips = aws.add_ip_set(
+                name='my-ips',
+                addresses=[
+                    '8.8.8.8/32',
+                ]
+            )
+
+        As a CloudFront distribution can only be accessed from the public internet these should be public addresses. IP's in the following networks are not valid:
+
+          * ``10.0.0.0/8``
+          * ``172.16.0.0/12``
+          * ``192.168.0.0/16``
+
 
 Byte Match Set
 --------------
@@ -181,3 +200,65 @@ Byte Match Set
         )
 
     .. attribute:: name
+
+        The name of the byte_match_set. This must be unique within a region.
+
+    .. attribute:: byte_matches
+
+        A list of data to match against::
+
+        byte_matches = aws.add_byte_match_set(
+            name='my-byte-matches',
+            byte_matches=[{
+                "field": "URI",
+                "transformation": "URL_DECODE",
+                "position": "STARTS_WITH",
+                "target": "/admin/",
+            }],
+        )
+
+        .. attribute:: field
+
+            Must be one of:
+
+                ``URI``
+                ``QUERY_STRING``
+                ``HEADER``
+                ``METHOD``
+                   Use this to limit your matches to a ``GET`` or ``POST`` method, etc.
+                ``BODY``
+                   Match against the first 8192 bytes of he body of the request.
+
+        .. attribute:: header
+
+            You can only use this attribute if ``field`` is set to ``HEADER``.
+
+        .. attribute:: transformation
+
+            A transformation to apply before comparing the selected ``field`` to ``target``.
+
+            Must be one of:
+
+                ``CMD_LINE``
+                ``COMPRESS_WHITE_SPACE``
+                ``HTML_ENTITY_DECODE``
+                ``LOWERCASE``
+                ``URL_DECODE``
+                ``NONE``
+                    Don't apply any transformations to the string before matching against it.
+
+            The default value is ``NONE``.
+
+        .. attribute:: position
+
+            Where in the chosen ``field`` to look for ``target``. Must be one of:
+
+                ``CONTAINS``
+                ``CONTAINS_WORD``
+                ``EXACTLY``
+                ``STARTS_WITH``
+                ``ENDS_WITH``
+
+        .. attribute:: target
+
+            Some byte data to look for in the chosen ``field`` after applying a ``transformation``. Must be between 1 and 50 bytes.
