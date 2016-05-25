@@ -14,7 +14,7 @@
 
 from touchdown.aws.common import Resource
 from touchdown.core import argument, serializers
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 
 from ..account import BaseAccount
 from .rule import Rule
@@ -74,6 +74,12 @@ class Describe(WafDescribe, Plan):
 class Apply(WafApply, Describe):
 
     create_action = "create_web_acl"
+
+    signature = (
+        Present("name"),
+        Present("metric_name"),
+        Present("default_action"),
+    )
 
 
 class Destroy(WafDestroy, Describe):

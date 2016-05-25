@@ -14,7 +14,7 @@
 
 from touchdown.aws.common import Resource
 from touchdown.core import argument, serializers
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 
 from ..account import BaseAccount
 from .byte_match import ByteMatchSet
@@ -83,6 +83,11 @@ class Describe(WafDescribe, Plan):
 class Apply(WafApply, Describe):
 
     create_action = "create_rule"
+
+    signature = (
+        Present("name"),
+        Present("metric_name"),
+    )
 
 
 class Destroy(WafDestroy, Describe):
