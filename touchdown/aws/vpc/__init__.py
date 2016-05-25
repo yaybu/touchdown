@@ -14,6 +14,7 @@
 
 from .customer_gateway import CustomerGateway
 from .elastic_ip import ElasticIp
+from .endpoint import Endpoint
 from .internet_gateway import InternetGateway
 from .nat_gateway import NatGateway
 from .network_acl import NetworkACL
@@ -29,6 +30,7 @@ __all__ = [
     'VPC',
     'CustomerGateway',
     'ElasticIp',
+    'Endpoint',
     'InternetGateway',
     'NatGateway',
     'NetworkACL',
