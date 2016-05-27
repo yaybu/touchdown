@@ -262,8 +262,13 @@ class Formatter(Serializer):
 
 class Boolean(Formatter):
 
+    def __init__(self, inner=Identity(), on_true=True, on_false=False):
+        super(Boolean, self).__init__(inner)
+        self.on_true = on_true
+        self.on_false = on_false
+
     def render(self, runner, object):
-        return True if self.inner.render(runner, object) else False
+        return self.on_true if self.inner.render(runner, object) else self.on_false
 
 
 class String(Formatter):
