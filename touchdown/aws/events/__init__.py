@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .rule import Rule
+from .rule import EventRule
 
 
 __all__ = [
-    'Rule',
+    'EventRule',
 ]
