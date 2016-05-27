@@ -28,9 +28,9 @@ class EventTarget(Resource):
     name = argument.String(field="Id")
 
     function = argument.Resource(
-         Function,
-         field="Arn",
-         serializer=serializers.Property("FunctionArn"),
+        Function,
+        field="Arn",
+        serializer=serializers.Property("FunctionArn"),
     )
 
     @classmethod
