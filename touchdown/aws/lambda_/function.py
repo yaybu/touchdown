@@ -87,7 +87,7 @@ class Function(Resource):
     )
 
     code_from_s3 = argument.Resource(
-        "touchdown.aws.s3.File",
+        "touchdown.aws.s3.file.File",
         field="Code",
         serializer=serializers.Dict(
             S3Bucket=serializers.Property("Bucket"),

@@ -26,7 +26,7 @@ class Resource(resource.Resource):
     name = argument.String(field="pathPart")
 
     parent_resource = argument.Resource(
-        "touchdown.aws.apigateway.rsource.Resource",
+        "touchdown.aws.apigateway.resource.Resource",
         field="parentId",
     )
     api = argument.Resource(

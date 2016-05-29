@@ -61,7 +61,7 @@ Function
 
     .. attribute:: code_from_s3
 
-        An S3 :py:class:`~touchdown.aws.s3.File`.
+        An S3 :py:class:`~touchdown.aws.s3.file.File`.
 
         A new version of the lambda function is published when touchdown detects that the date/time stamp of this file is newer than the last modified stamp on the lambda function.
 
