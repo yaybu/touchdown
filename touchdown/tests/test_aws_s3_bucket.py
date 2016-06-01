@@ -12,9 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import unittest
+
+import mock
+
 from touchdown.core.errors import InvalidParameter
+from touchdown.core import workspace, goals
+from touchdown.core.map import SerialMap
+from touchdown import frontends
 
 from . import aws
+
+
+class TestBucketDescribe(unittest.TestCase):
+
+    def setUp(self):
+        self.workspace = workspace.Workspace()
+        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
+        self.goal = goals.create(
+            "apply",
+            self.workspace,
+            frontends.ConsoleFrontend(interactive=False),
+            map=SerialMap
+        )
+
+    def test_annotate_object(self):
+        bucket = self.aws.add_bucket(name="mybucket")
+        desc = self.goal.get_service(bucket, "describe")
+
+        desc.client.get_bucket_location = mock.Mock(return_value={"LocationConstraint": "eu-central-1"})
+        desc.client.get_bucket_cors = mock.Mock(return_value={"CORSRules": []})
+        desc.client.get_bucket_policy = mock.Mock(return_value={"Policy": "{}"})
+        desc.client.get_bucket_notification_configuration = mock.Mock(return_value={})
+        desc.client.get_bucket_accelerate_configuration = mock.Mock(return_value={})
+
+        obj = desc.annotate_object({"Name": "ZzZzZz"})
+
+        # Assert API calls are assigning data to object
+        self.assertEqual(obj['LocationConstraint'], "eu-central-1")
+
+        # Assert name isn't trodden on by annotate_object
+        self.assertEqual(obj["Name"], "ZzZzZz")
 
 
 class TestBucketValidation(aws.RecordedBotoCoreTest):

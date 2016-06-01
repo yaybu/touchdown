@@ -111,13 +111,43 @@ class Describe(SimpleDescribe, Plan):
                 return False
         return False
 
-    def describe_object(self):
-        bucket = super(Describe, self).describe_object()
-        if bucket:
-            bucket["LocationConstraint"] = self.client.get_bucket_location(
-                Bucket=self.resource.name)['LocationConstraint']
-            if bucket['LocationConstraint'] is None:
-                bucket['LocationConstraint'] = 'us-east-1'
+    def get_location_constraint(self):
+        response = self.client.get_bucket_location(Bucket=self.resource.name)
+        return response['LocationConstraint'] or 'us-east-1'
+
+    def get_cors_rules(self):
+        try:
+            return self.client.get_bucket_cors(Bucket=self.resource.name)["CORSRules"]
+        except ClientError as e:
+            if e.response['Error']['Code'] != "NoSuchCORSConfiguration":
+                raise
+        return []
+
+    def get_bucket_policy(self):
+        try:
+            remote = self.client.get_bucket_policy(Bucket=self.resource.name)["Policy"]
+        except ClientError as e:
+            if e.response['Error']['Code'] != "NoSuchBucketPolicy":
+                raise
+            return {}
+        return json.loads(remote)
+
+    def get_notification_config(self):
+        return self.client.get_bucket_notification_configuration(
+            Bucket=self.resource.name,
+        )
+
+    def get_accelerate_config(self):
+        return self.client.get_bucket_accelerate_configuration(
+            Bucket=self.resource.name,
+        )
+
+    def annotate_object(self, bucket):
+        bucket['LocationConstraint'] = self.get_location_constraint()
+        bucket['CORSRules'] = self.get_cors_rules()
+        bucket['Policy'] = self.get_bucket_policy()
+        bucket['NotificationConfiguration'] = self.get_notification_config()
+        bucket['AccelerationConfig'] = self.get_accelerate_config()
         return bucket
 
 
@@ -127,37 +157,8 @@ class Apply(SimpleApply, Describe):
     create_response = "not-that-useful"
     # waiter = "bucket_exists"
 
-    def get_remote_cors_rules(self):
-        try:
-            return self.client.get_bucket_cors(Bucket=self.resource.name)["CORSRules"]
-        except ClientError as e:
-            if e.response['Error']['Code'] != "NoSuchCORSConfiguration":
-                raise
-        return []
-
-    def get_remote_bucket_policy(self):
-        try:
-            remote = self.client.get_bucket_policy(Bucket=self.resource.name)["Policy"]
-        except ClientError as e:
-            if e.response['Error']['Code'] != "NoSuchBucketPolicy":
-                raise
-            return {}
-        return json.loads(remote)
-
-    def get_remote_notification_config(self):
-        return self.client.get_bucket_notification_configuration(
-            Bucket=self.resource.name,
-        )
-
     def update_accelerate_config(self):
-        update = not self.object
-        if not update:
-            remote = self.client.get_bucket_accelerate_configuration(
-                Bucket=self.resource.name,
-            )
-            update = remote.get('Status', 'Suspended') != self.resource.accelerate
-
-        if update:
+        if self.object.get('Status', 'Suspended') != self.resource.accelerate:
             yield self.generic_action(
                 "Update acceleration configuration",
                 self.client.put_bucket_accelerate_configuration,
@@ -181,13 +182,16 @@ class Apply(SimpleApply, Describe):
         if local and not self.object:
             update_notifications = True
         elif self.object:
-            remote = self.get_remote_notification_config()
-            d = serializers.Resource(group="notifications").diff(self.runner, self.resource, remote)
+            d = serializers.Resource(group="notifications").diff(
+               self.runner,
+               self.resource,
+               self.object['NotificationConfiguration'],
+            )
             update_notifications = not d.matches()
 
         if update_notifications:
             yield self.generic_action(
-                "Update notification configuration",
+                ["Update notification configuration"] + list(d.lines()),
                 self.client.put_bucket_notification_configuration,
                 Bucket=self.resource.name,
                 NotificationConfiguration=local_s,
@@ -199,7 +203,7 @@ class Apply(SimpleApply, Describe):
             update_cors = True
         elif self.resource.rules:
             local = [serializers.Resource().render(self.runner, rule) for rule in self.resource.rules]
-            if self.get_remote_cors_rules() != local:
+            if self.object['CORSRules'] != local:
                 update_cors = True
 
         if update_cors:
@@ -216,7 +220,7 @@ class Apply(SimpleApply, Describe):
         if not self.object and self.resource.policy:
             update_policy = True
         elif self.resource.policy:
-            remote_policy = self.get_remote_bucket_policy()
+            remote_policy = self.object['Policy']
             local_policy = json.loads(self.resource.policy)
             if remote_policy != local_policy:
                 update_policy = True
