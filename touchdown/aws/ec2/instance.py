@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown import ssh
+from touchdown.aws.ec2 import KeyPair
 from touchdown.aws.iam import InstanceProfile
 from touchdown.aws.vpc import SecurityGroup, Subnet
-from touchdown.core import argument, serializers
+from touchdown.core import argument, errors, serializers
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
@@ -49,7 +51,7 @@ class Instance(Resource):
     name = argument.String(min=3, max=128, field="Name", group="tags")
     ami = argument.String(field="ImageId")
     instance_type = argument.String(field="InstanceType")
-    key_name = argument.String(field="KeyName")
+    key_pair = argument.Resource(KeyPair, field="KeyName")
     subnet = argument.Resource(Subnet, field="SubnetId")
     instance_profile = argument.Resource(InstanceProfile, field="IamInstanceProfile")
     network_interfaces = argument.ResourceList(
@@ -114,3 +116,31 @@ class Destroy(SimpleDestroy, Describe):
         return serializers.Dict(
             InstanceIds=serializers.ListOfOne(serializers.Property("InstanceId")),
         )
+
+
+class Instance(ssh.Instance):
+
+    resource_name = "ec2_instance"
+    input = Instance
+
+    def get_network_id(self, runner):
+        #FIXME: We can save on some steps if we only do this once
+        obj = runner.get_plan(self.adapts).describe_object()
+        return obj.get('VpcId', None)
+
+    def get_serializer(self, runner, **kwargs):
+        obj = runner.get_plan(self.adapts).describe_object()
+
+        if getattr(self.parent, "proxy", None) and self.parent.proxy.instance:
+            if hasattr(self.parent.proxy.instance, "get_network_id"):
+                network = self.parent.proxy.instance.get_network_id(runner)
+                if network == self.get_network_id(runner):
+                    return serializers.Const(obj['PrivateIpAddress'])
+
+        if obj.get('PublicDnsName', ''):
+            return serializers.Const(obj['PublicDnsName'])
+
+        if obj.get('PublicIpAddress', ''):
+            return serializers.Const(obj['PublicIpAddress'])
+
+        raise errors.Error("Instance {} not available".format(self.adapts))
