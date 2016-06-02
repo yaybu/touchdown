@@ -47,6 +47,7 @@ class Describe(SimpleDescribe, Plan):
     describe_action = "describe_nat_gateways"
     describe_envelope = "NatGateways"
     key = "NatGatewayId"
+    signature = ()
 
     def get_describe_filters(self):
         subnet = self.runner.get_plan(self.resource.subnet)
@@ -64,7 +65,6 @@ class Apply(SimpleApply, Describe):
 
     create_action = "create_nat_gateway"
     waiter = "nat_gateway_available"
-    signature = ()
 
 
 class Destroy(SimpleDestroy, Describe):
