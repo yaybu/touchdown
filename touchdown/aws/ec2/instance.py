@@ -124,7 +124,7 @@ class Instance(ssh.Instance):
     input = Instance
 
     def get_network_id(self, runner):
-        #FIXME: We can save on some steps if we only do this once
+        # FIXME: We can save on some steps if we only do this once
         obj = runner.get_plan(self.adapts).describe_object()
         return obj.get('VpcId', None)
 

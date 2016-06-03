@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import unittest
-
 import mock
 
-from touchdown.core.errors import InvalidParameter
-from touchdown.core import workspace, goals
-from touchdown.core.map import SerialMap
+from botocore.stub import Stubber
+
 from touchdown import frontends
+from touchdown.core import goals, workspace
+from touchdown.core.errors import InvalidParameter
+from touchdown.core.map import SerialMap
 
 from . import aws
 
@@ -40,16 +41,42 @@ class TestBucketDescribe(unittest.TestCase):
         bucket = self.aws.add_bucket(name="mybucket")
         desc = self.goal.get_service(bucket, "describe")
 
+        desc.client.meta.events.unregister("after-call.s3.GetBucketLocation")
+
+        stub = Stubber(desc.client)
+
+        # See https://github.com/boto/botocore/pull/937
         desc.client.get_bucket_location = mock.Mock(return_value={"LocationConstraint": "eu-central-1"})
-        desc.client.get_bucket_cors = mock.Mock(return_value={"CORSRules": []})
-        desc.client.get_bucket_policy = mock.Mock(return_value={"Policy": "{}"})
-        desc.client.get_bucket_notification_configuration = mock.Mock(return_value={})
-        desc.client.get_bucket_accelerate_configuration = mock.Mock(return_value={})
+        # stub.add_response(
+        #     'get_bucket_location',
+        #     {'LocationConstraint': 'eu-central-1'},
+        #     {'Bucket': 'mybucket'},
+        # )
+        stub.add_response(
+            'get_bucket_cors',
+            {'CORSRules': []},
+            {'Bucket': 'mybucket'},
+        )
+        stub.add_response(
+            'get_bucket_policy',
+            {'Policy': '{}'},
+            {'Bucket': 'mybucket'},
+        )
+        stub.add_response(
+            'get_bucket_notification_configuration',
+            {},
+            {'Bucket': 'mybucket'},
+        )
+        stub.add_response(
+            'get_bucket_accelerate_configuration',
+            {},
+            {'Bucket': 'mybucket'},
+        )
 
-        obj = desc.annotate_object({"Name": "ZzZzZz"})
-
-        # Assert API calls are assigning data to object
-        self.assertEqual(obj['LocationConstraint'], "eu-central-1")
+        with stub:
+            obj = desc.annotate_object({
+                "Name": "ZzZzZz"
+            })
 
         # Assert name isn't trodden on by annotate_object
         self.assertEqual(obj["Name"], "ZzZzZz")

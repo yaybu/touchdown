@@ -183,9 +183,9 @@ class Apply(SimpleApply, Describe):
             update_notifications = True
         elif self.object:
             d = serializers.Resource(group="notifications").diff(
-               self.runner,
-               self.resource,
-               self.object['NotificationConfiguration'],
+                self.runner,
+                self.resource,
+                self.object['NotificationConfiguration'],
             )
             update_notifications = not d.matches()
 
