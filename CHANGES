@@ -4,7 +4,34 @@ Changelog for Touchdown
 0.10.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add support for SSHing into EC2 instances (even going via other EC2 instances
+  managed by an autoscaling group).
+
+- Add CloudWatch events. In particular you can now define schedules to drive
+  lambda functions.
+
+- Fix support for nested resources in API Gateway.
+
+- Makes `namesapce` a required field on a CloudWatch Alarm.
+
+- Add a max length on the lambda function description field.
+
+- Add support for key filters when setting up S3 notifications.
+
+- S3 ported to use the `annotate_object` API.
+
+- Allow CloudWatch Alarm's to trigger an SNS Topic.
+
+- Fix the describe filters for NAT Gateway (which should let Touchdown actually
+  find NAT Gateways now).
+
+- Ignore invalid IP addresses when loading existing IP allocations.
+
+- Don't try and use `sudo` when SSH'd into a node as `root`.
+
+- Fix passing `File` resources to string arguments.
+
+- Only present an SSH agent if a `private_key` is provided.
 
 
 0.10.2 (2016-05-12)
