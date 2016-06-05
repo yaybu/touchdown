@@ -21,7 +21,7 @@ from touchdown.core import goals, workspace
 from touchdown.core.map import SerialMap
 
 
-class TestBucketDescribe(unittest.TestCase):
+class TestWafRule(unittest.TestCase):
 
     def setUp(self):
         self.workspace = workspace.Workspace()
@@ -54,3 +54,19 @@ class TestBucketDescribe(unittest.TestCase):
             })
 
         self.assertEqual(obj["RuleId"], "ZzZzZz")
+
+    def test_delete_rule(self):
+        rule = self.aws.add_rule(name="myrule")
+
+        dest = self.goal.get_service(rule, "destroy")
+        dest.object = {
+            "Predicates": [{
+                "Foo": 1,
+            }],
+        }
+
+        stub = Stubber(dest.client)
+        with stub:
+            plan = list(dest.destroy_object())
+
+        self.assertEqual(len(plan), 2)
