@@ -287,9 +287,13 @@ class SimpleDescribe(SimplePlan):
         """
         Unwinds a paginator and applies a jmespath expression to each page.
         """
-        for page in paginated:
-            for row in jmespath.search(expression, page) or []:
-                yield row
+        try:
+            for page in paginated:
+                for row in jmespath.search(expression, page) or []:
+                    yield row
+        except ClientError as e:
+            if e.response['Error']['Code'] == self.describe_notfound_exception:
+                raise StopIteration
 
     def get_possible_objects(self):
         """
