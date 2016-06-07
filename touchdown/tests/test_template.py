@@ -14,9 +14,7 @@
 
 import unittest
 
-import mock
-
-from touchdown.core import errors, goals, workspace
+from touchdown.core import goals, serializers, workspace
 from touchdown.core.map import SerialMap
 from touchdown.frontends import ConsoleFrontend
 
@@ -39,13 +37,28 @@ class TestTemplate(unittest.TestCase):
     def test_static_template(self):
         template = self.workspace.add_jinja2_template(
             name="foo",
-            source="HELLO {{ name }}!",
+            source="hello {{ name }}!",
             context={
-                "name": "John",
+                "name": "john",
             },
         )
         state = self.apply()
         self.assertEqual(
             state.get_service(template, "apply").object["Rendered"],
-            "HELLO John!",
+            "hello john!",
+        )
+
+    def test_serializer_template(self):
+        template = self.workspace.add_jinja2_template(
+            name="foo",
+            source="hello {{ name }}!",
+            context=serializers.Dict(
+                name=serializers.Const("andrew"),
+            ),
+        )
+
+        state = self.apply()
+        self.assertEqual(
+            state.get_service(template, "apply").object["Rendered"],
+            "hello andrew!",
         )
