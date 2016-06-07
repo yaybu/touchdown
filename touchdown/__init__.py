@@ -18,6 +18,7 @@ import touchdown.gpg  # noqa
 import touchdown.local  # noqa
 import touchdown.provisioner  # noqa
 import touchdown.ssh  # noqa
+import touchdown.template  # noqa
 import touchdown.goals  # noqa
 import touchdown.notifications  # noqa
 
