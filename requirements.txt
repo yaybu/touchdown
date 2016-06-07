@@ -11,6 +11,8 @@ progressbar2==3.6.2
 cryptography==1.4
 python-gnupg==0.3.8
 
+Jinja2
+
 coverage==4.1
 codecov==2.0.5
 flake8==2.5.4
