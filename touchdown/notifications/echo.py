@@ -37,7 +37,9 @@ class NotificationAction(action.Action):
         yield "Echo to console"
 
     def run(self):
-        self.plan.echo(serializers.Resource().render(self.runner, self.resource)['text'])
+        text = serializers.Resource().render(self.runner, self.resource)['text']
+        self.plan.object = {"Text": text}
+        self.plan.echo(text)
 
 
 class Apply(plan.Plan):

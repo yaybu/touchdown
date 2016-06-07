@@ -62,3 +62,18 @@ class Apply(plan.Plan):
         if not jinja2:
             raise errors.Error("Jinja2 templates are not available. Please install 'jinja2'.")
         yield JinjaRenderAction(self)
+
+
+class TemplateAsString(serializers.Serializer):
+
+    def __init__(self, resource):
+        self.resource = resource
+
+    def render(self, runner, object):
+        return runner.get_service(self.resource, "apply").object["Rendered"]
+
+    def dependencies(self, object):
+        return frozenset((self.resource, ))
+
+
+argument.String.register_adapter(JinjaTemplate, lambda r: TemplateAsString(r))

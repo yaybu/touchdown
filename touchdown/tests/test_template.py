@@ -62,3 +62,22 @@ class TestTemplate(unittest.TestCase):
             state.get_service(template, "apply").object["Rendered"],
             "hello andrew!",
         )
+
+    def test_echo_template(self):
+        template = self.workspace.add_jinja2_template(
+            name="foo",
+            source="hello {{ name }}!",
+            context=serializers.Dict(
+                name=serializers.Const("mitchell"),
+            ),
+        )
+
+        echo = self.workspace.add_echo(
+            text=template,
+        )
+
+        state = self.apply()
+        self.assertEqual(
+            state.get_service(echo, "apply").object["Text"],
+            "hello mitchell!",
+        )
