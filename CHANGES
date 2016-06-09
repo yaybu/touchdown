@@ -4,7 +4,11 @@ Changelog for Touchdown
 0.11.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add a simple template resource that can be used anywhere a string can be
+  used.
+
+- Fix a regression in handling paginated resources that raise errors when no
+  resources can be found.
 
 
 0.11.0 (2016-06-03)
