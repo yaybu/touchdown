@@ -14,19 +14,19 @@
 
 from touchdown.core import argument, resource, serializers
 
-from .local import Local
+from .provisioner import Provisioner
 
 
-class LocalOutput(resource.Resource):
+class Output(resource.Resource):
 
-    resource_name = "local_output"
+    resource_name = "output"
 
     name = argument.String()
 
-    local = argument.Resource(Local)
+    provisioner = argument.Resource(Provisioner)
 
 
-class LocalOutputAsString(serializers.Serializer):
+class OutputAsString(serializers.Serializer):
 
     def __init__(self, resource):
         self.resource = resource
@@ -39,4 +39,4 @@ class LocalOutputAsString(serializers.Serializer):
         return frozenset((self.resource, ))
 
 
-argument.String.register_adapter(LocalOutput, lambda r: LocalOutputAsString(r))
+argument.String.register_adapter(Output, lambda r: OutputAsString(r))

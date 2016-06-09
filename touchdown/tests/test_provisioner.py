@@ -100,7 +100,7 @@ class TestCase(unittest.TestCase):
                 contents=serializers.Const("hello"),
             )
 
-            output = bundle.target.add_local_output(name=fp.name)
+            output = bundle.add_output(name=fp.name)
             echo = self.workspace.add_echo(text=output)
 
             self.assertEqual(
