@@ -34,6 +34,7 @@ class TestCase(unittest.TestCase):
             map=SerialMap
         )
         self.apply_runner.execute()
+        return self.apply_runner
 
     def test_destroy(self):
         self.destroy_runner = goals.create(
@@ -86,3 +87,23 @@ class TestCase(unittest.TestCase):
         )
         self.apply()
         self.assertFalse(os.path.exists(fp.name))
+
+    def test_output(self):
+        with tempfile.NamedTemporaryFile(delete=True) as fp:
+            fp.close()
+
+            bundle = self.workspace.add_fuselage_bundle(
+                target=self.workspace.add_local(),
+            )
+            bundle.add_file(
+                name=fp.name,
+                contents=serializers.Const("hello"),
+            )
+
+            output = bundle.target.add_local_output(name=fp.name)
+            echo = self.workspace.add_echo(text=output)
+
+            self.assertEqual(
+                self.apply().get_service(echo, "apply").object["Text"],
+                "hello",
+            )
