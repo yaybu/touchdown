@@ -32,8 +32,9 @@ class OutputAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
-        with open(self.resource.name) as fp:
-            return fp.read()
+        service = runner.get_service(self.resource.provisioner.target, "describe")
+        client = service.get_client()
+        return client.get_path_contents(self.resource.name)
 
     def dependencies(self, object):
         return frozenset((self.resource, ))
