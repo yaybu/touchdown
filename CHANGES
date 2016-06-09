@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.11.1 (unreleased)
+0.12.0 (2016-06-09)
 -------------------
 
 - Add a simple template resource that can be used anywhere a string can be
