@@ -26,7 +26,7 @@ pyflakes==1.1.0  # rq.filter: <1.2.0
 pytest==2.9.2
 pytest-cov==2.2.1
 requests==2.10.0
-vcrpy==1.7.4
+vcrpy==1.8.0
 wrapt==1.10.8
 
 -e .
