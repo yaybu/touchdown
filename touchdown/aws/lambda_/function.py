@@ -163,15 +163,10 @@ class Apply(SimpleApply, Describe):
                         update_code = True
 
         if update_code:
-            kwargs = {
-                "FunctionName": self.resource.name,
-                "Publish": True,
-            }
-            kwargs.update(serialized['Code'])
             yield self.generic_action(
                 "Update function code",
                 self.client.update_function_code,
-                **kwargs
+                serializers.Resource(Publish=True),
             )
 
 

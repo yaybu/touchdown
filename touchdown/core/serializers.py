@@ -193,6 +193,7 @@ class Argument(Serializer):
         try:
             result = getattr(object, self.attribute)
         except AttributeError:
+            raise
             raise FieldNotPresent(self.attribute)
         if not object.meta.fields[self.attribute].present(object):
             if result is None:
@@ -219,8 +220,8 @@ class Argument(Serializer):
         try:
             result = self.get_inner(runner, object)
         except FieldNotPresent:
-            if self.field.empty_serializer:
-                return self.field.empty_serializer.diff(runner, object, value)
+            if self.field.argument.empty_serializer:
+                return self.field.argument.empty_serializer.diff(runner, object, value)
             raise
 
         if isinstance(result, Serializer):
@@ -228,8 +229,17 @@ class Argument(Serializer):
         return object.meta.fields[self.attribute].argument.serializer.diff(runner, result, value)
 
     def pending(self, runner, object):
-        raise ValueError("Not implemented yet")
-        return self.inner.pending(runner, object)
+        try:
+            inner = self.get_inner(runner, object)
+        except FieldNotPresent:
+            if self.field.argument.empty_serializer:
+                return self.field.argument.empty_serializer.pending(runner, object)
+            return False
+
+        if maybe(inner).pending(runner, object):
+            return True
+
+        return object.meta.fields[self.attribute].argument.serializer.pending(runner, inner)
 
 
 class Expression(Serializer):
@@ -552,7 +562,13 @@ class Resource(Dict):
         return d
 
     def pending(self, runner, object):
-        raise ValueError("Not Implemented")
+        for field in object.meta.iter_fields_in_order():
+            value = field.get_value(object)
+            if self.should_ignore_field(object, field, value):
+                continue
+            if Argument(field.name, field).pending(runner, object):
+                return True
+        return False
 
     def dependencies(self, object):
         raise NotImplementedError(self.dependencies, object)
