@@ -55,6 +55,9 @@ class Serializer(object):
         rendered = self.render(runner, object)
         return diff.ValueDiff(value, rendered)
 
+    def pending(self):
+        return True
+
     def dependencies(self, object):
         return frozenset()
 
@@ -64,6 +67,9 @@ class Identity(Serializer):
     def render(self, runner, object):
         return object
 
+    def pending(self, runner, object):
+        return isinstance(object, Pending)
+
     def dependencies(self, object):
         return frozenset()
 
@@ -72,6 +78,9 @@ class SubSerializer(Serializer):
 
     def render(self, runner, object):
         return object.render(runner, object)
+
+    def pending(self, runner, object):
+        return object.pending(runner, object)
 
     def dependencies(self, object):
         return frozenset()
@@ -94,6 +103,9 @@ class Chain(Serializer):
             raise FieldNotPresent()
         return list(result)
 
+    def pending(self, runner, object):
+        return any(itertools.chain(*(c.pending(runner, object) for c in self.children)))
+
     def dependencies(self, object):
         return frozenset(itertools.chain(*(c.dependencies(object) for c in self.children)))
 
@@ -105,6 +117,9 @@ class Const(Serializer):
 
     def render(self, runner, object):
         return self.const
+
+    def pending(self, runner, object):
+        return isinstance(object, Pending)
 
     def dependencies(self, object):
         if hasattr(self.const, "add_dependency"):
@@ -139,6 +154,9 @@ class Identifier(Serializer):
         d.diffs.insert(0, ("name", diff.ValueDiff(value, rendered)))
         return d
 
+    def pending(self, runner, object):
+        return self.inner.pending(runner, object)
+
     def dependencies(self, object):
         return self.inner.dependencies(object)
 
@@ -157,6 +175,9 @@ class Property(Serializer):
         if self.property not in target_plan.object:
             raise errors.Error("{} not available".format(self.property))
         return target_plan.object[self.property]
+
+    def pending(self, runner, object):
+        return self.inner.pending(runner, object)
 
     def dependencies(self, object):
         return self.inner.dependencies(object)
@@ -206,6 +227,10 @@ class Argument(Serializer):
             return result.diff(runner, result, value)
         return object.meta.fields[self.attribute].argument.serializer.diff(runner, result, value)
 
+    def pending(self, runner, object):
+        raise ValueError("Not implemented yet")
+        return self.inner.pending(runner, object)
+
 
 class Expression(Serializer):
 
@@ -217,6 +242,9 @@ class Expression(Serializer):
             return object
         return self.callback(runner, object)
 
+    def pending(self, runner, object):
+        return isinstance(object, Pending)
+
 
 class Annotation(Serializer):
 
@@ -224,6 +252,9 @@ class Annotation(Serializer):
 
     def __init__(self, inner):
         self.inner = inner
+
+    def pending(self, runner, object):
+        return self.inner.pending(runner, object)
 
     def dependencies(self, object):
         return self.inner.dependencies(object)
@@ -255,6 +286,9 @@ class Formatter(Serializer):
 
     def __init__(self, inner=Identity()):
         self.inner = inner
+
+    def pending(self, runner, object):
+        return self.inner.pending(runner, object)
 
     def dependencies(self, object):
         return self.inner.dependencies(object)
@@ -399,6 +433,9 @@ class Dict(Serializer):
 
         return d
 
+    def pending(self, runner, object):
+        return self.inner.pending(runner, object)
+
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))
 
@@ -431,6 +468,9 @@ class Map(Dict):
 
         return d
 
+    def pending(self, runner, object):
+        return any(maybe(v).pending(runner, v) for v in object.values()) 
+
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in object.values())))
 
@@ -448,7 +488,7 @@ class Resource(Dict):
     def should_ignore_field(self, object, field, value):
         arg = field.argument
         if not hasattr(arg, "field"):
-            return True
+             return True
         if not arg.empty_serializer and not field.present(object):
             if value is None:
                 return True
@@ -510,6 +550,9 @@ class Resource(Dict):
                 continue
 
         return d
+
+    def pending(self, runner, object):
+        raise ValueError("Not Implemented")
 
     def dependencies(self, object):
         raise NotImplementedError(self.dependencies, object)
@@ -610,6 +653,9 @@ class List(Serializer):
             return self.diff_slow(runner, object, value)
         return self.diff_stupid(runner, object, value)
 
+    def pending(self, runner, object):
+        raise NotImplementedError(self.pending)
+
     def dependencies(self, object):
         return frozenset(self.child.dependencies(object))
 
@@ -629,6 +675,9 @@ class Context(Serializer):
     def diff(self, runner, object, value):
         object = self.serializer.render(runner, object)
         return self.inner.diff(runner, object, value)
+
+    def pending(self, runner, object):
+        return self.inner.pending(runner, object) or self.serializer.pending(runner, object)
 
     def dependencies(self, object):
         return self.inner.dependencies(object).union(self.serializer.dependencies(object))

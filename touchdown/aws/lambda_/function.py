@@ -147,16 +147,20 @@ class Apply(SimpleApply, Describe):
     def update_object(self):
         update_code = False
         if self.object:
-            serialized = serializers.Resource().render(self.runner, self.resource)
-            if 'ZipFile' in serialized['Code']:
-                hasher = hashlib.sha256(serialized['Code']['ZipFile'])
-                digest = base64.b64encode(hasher.digest()).decode('utf-8')
-                if self.object['CodeSha256'] != digest:
-                    update_code = True
-            elif 'S3Bucket' in serialized['Code']:
-                f = self.get_plan(self.resource.code_from_s3)
-                if f.object['LastModified'] > self.object['LastModified']:
-                    update_code = True
+            serializer = serializers.Resource()
+            if serializer.pending(self.runner, self.resource):
+                update_code = True
+            else:
+                serialized = serializer.render(self.runner, self.resource)
+                if 'ZipFile' in serialized['Code']:
+                    hasher = hashlib.sha256(serialized['Code']['ZipFile'])
+                    digest = base64.b64encode(hasher.digest()).decode('utf-8')
+                    if self.object['CodeSha256'] != digest:
+                        update_code = True
+                elif 'S3Bucket' in serialized['Code']:
+                    f = self.get_plan(self.resource.code_from_s3)
+                    if f.object['LastModified'] > self.object['LastModified']:
+                        update_code = True
 
         if update_code:
             kwargs = {
