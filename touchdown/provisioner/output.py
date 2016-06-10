@@ -32,6 +32,13 @@ class OutputAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
+        # If this is serialized before the provisioner has done stuff then
+        # return a Pending object.
+        provisioner = runner.get_service(self.resource.provisioner, "apply")
+        if provisioner.object["Result"] == "Pending":
+            return serializers.Pending(self.resource.provisioner)
+
+        # Extract the contents from the file on the (potentially remote) target
         service = runner.get_service(self.resource.provisioner.target, "describe")
         client = service.get_client()
         return client.get_path_contents(self.resource.name)
