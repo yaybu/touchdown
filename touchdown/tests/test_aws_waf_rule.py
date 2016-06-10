@@ -78,23 +78,23 @@ class TestWafRule(unittest.TestCase):
             }],
         }
 
-    def test_update_rule(self):
+    def test_create_rule(self):
         """Test that when we update a rule, we perform the expected client
         calls.
 
         """
         goal = self.create_goal('apply')
         rule = self.aws.add_rule(name='myrule', metric_name='mymetric')
-        apply_service = goal.get_service(rule, 'apply')
+        apply = goal.get_service(rule, 'apply')
 
-        stub = Stubber(apply_service.client)
+        stub = Stubber(apply.client)
         stub.add_response(
             'get_change_token',
             expected_params={},
             service_response={'ChangeToken': 'mychangetoken1'},
         )
         stub.add_response(
-            'update_rule',
+            'create_rule',
             expected_params={
                 'ChangeToken': 'mychangetoken1',
                 'Name': 'myrule',
@@ -104,9 +104,51 @@ class TestWafRule(unittest.TestCase):
             },
         )
 
-        actions = apply_service.update_object()
+        action = apply.create_object()
         with stub:
-            for action in actions:
+            action.run()
+
+    def test_update_rule(self):
+        """Test that when we update a rule, we perform the expected client
+        calls.
+
+        """
+
+        goal = self.create_goal('apply')
+        rule = self.aws.add_rule(
+            name='myrule',
+            metric_name='mymetric',
+            predicates=[])
+
+        apply = goal.get_service(rule, 'apply')
+        apply.object = {
+            'RuleId': 'my-rule-id',
+        }
+
+        stub = Stubber(apply.client)
+        stub.add_response(
+            'get_change_token',
+            expected_params={},
+            service_response={'ChangeToken': 'mychangetoken1'},
+        )
+        stub.add_response(
+            'update_rule',
+            expected_params={
+                'ChangeToken': 'mychangetoken1',
+                'Updates': [{
+                    'Action': 'INSERT',
+                    'Predicate': {
+                        'Negated': False,
+                        'Type': 'IPMatch',
+                        'DataId': 'my-ip-set-id'}}],
+                'RuleId': 'my-rule-id'},
+            service_response={
+                'ChangeToken': 'mychangetoken1'
+            },
+        )
+
+        with stub:
+            for action in apply.update_object():
                 action.run()
 
     def test_update_rule_with_predicates(self):
