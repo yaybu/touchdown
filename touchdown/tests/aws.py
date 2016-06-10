@@ -297,9 +297,9 @@ class Stubber(BaseStubber):
 
     """
 
-    # def __exit__(self, exc_type, exc_value, traceback):
-    #     super(Stubber, self).__exit__(exc_type, exc_value, traceback)
-    #     # Only do this check if we are exiting cleanly, otherwise we
-    #     # mask the actual exception.
-    #     if exc_type is None:
-    #         self.assert_no_pending_responses()
+    def __exit__(self, exc_type, exc_value, traceback):
+        super(Stubber, self).__exit__(exc_type, exc_value, traceback)
+        # Only do this check if we are exiting cleanly, otherwise we
+        # mask the actual exception.
+        if exc_type is None:
+            self.assert_no_pending_responses()
