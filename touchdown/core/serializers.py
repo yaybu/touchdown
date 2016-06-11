@@ -479,7 +479,7 @@ class Map(Dict):
         return d
 
     def pending(self, runner, object):
-        return any(maybe(v).pending(runner, v) for v in object.values()) 
+        return any(maybe(v).pending(runner, v) for v in object.values())
 
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in object.values())))
@@ -498,7 +498,7 @@ class Resource(Dict):
     def should_ignore_field(self, object, field, value):
         arg = field.argument
         if not hasattr(arg, "field"):
-             return True
+            return True
         if not arg.empty_serializer and not field.present(object):
             if value is None:
                 return True

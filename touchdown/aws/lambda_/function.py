@@ -51,7 +51,7 @@ class FunctionSerializer(serializers.Formatter):
         zf.close()
         return buf.getvalue()
 
-argument.String.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
+argument.String.register_adapter(types.FunctionType, lambda r: FunctionSerializer(serializers.Const(r)))
 
 
 class Function(Resource):
@@ -174,7 +174,7 @@ class Apply(SimpleApply, Describe):
             hasher = hashlib.sha256(serialized['Code']['ZipFile'])
             digest = base64.b64encode(hasher.digest()).decode('utf-8')
             if self.object['CodeSha256'] != digest:
-                 update_code = True
+                update_code = True
 
         if update_code:
             yield self.generic_action(
@@ -229,7 +229,6 @@ class Apply(SimpleApply, Describe):
 
         for action in super(Apply, self).update_object():
             yield action
-
 
 
 class Destroy(SimpleDestroy, Describe):
