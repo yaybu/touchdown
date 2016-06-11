@@ -74,6 +74,7 @@ class Function(Resource):
 
     code = argument.Function(
         field="Code",
+        update=False,
         serializer=serializers.Dict(
             ZipFile=FunctionSerializer(),
         )
@@ -81,6 +82,7 @@ class Function(Resource):
 
     code_from_bytes = argument.String(
         field="Code",
+        update=False,
         serializer=serializers.Dict(
             ZipFile=serializers.String(),
         )
@@ -89,6 +91,7 @@ class Function(Resource):
     code_from_s3 = argument.Resource(
         "touchdown.aws.s3.file.File",
         field="Code",
+        update=False,
         serializer=serializers.Dict(
             S3Bucket=serializers.Property("Bucket"),
             S3Key=serializers.Property("Key"),
@@ -168,6 +171,10 @@ class Apply(SimpleApply, Describe):
                 self.client.update_function_code,
                 serializers.Resource(Publish=True),
             )
+
+        for obj in super(Apply, self).update_object():
+            yield obj
+
 
 
 class Destroy(SimpleDestroy, Describe):
