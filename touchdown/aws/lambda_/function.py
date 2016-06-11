@@ -15,6 +15,7 @@
 import base64
 import hashlib
 import inspect
+import types
 import zipfile
 
 from six import StringIO
@@ -50,6 +51,8 @@ class FunctionSerializer(serializers.Formatter):
         zf.close()
         return buf.getvalue()
 
+argument.String.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
+
 
 class Function(Resource):
 
@@ -72,15 +75,7 @@ class Function(Resource):
         serializer=serializers.Property("Arn"),
     )
 
-    code = argument.Function(
-        field="Code",
-        update=False,
-        serializer=serializers.Dict(
-            ZipFile=FunctionSerializer(),
-        )
-    )
-
-    code_from_bytes = argument.String(
+    code = argument.String(
         field="Code",
         update=False,
         serializer=serializers.Dict(
@@ -88,7 +83,7 @@ class Function(Resource):
         )
     )
 
-    code_from_s3 = argument.Resource(
+    s3_file = argument.Resource(
         "touchdown.aws.s3.file.File",
         field="Code",
         update=False,
@@ -142,8 +137,7 @@ class Apply(SimpleApply, Describe):
         # Present('runtime'),
         XOR(
             Present('code'),
-            Present('code_from_bytes'),
-            Present('code_from_s3'),
+            Present('s3_file'),
         ),
     )
 
@@ -166,7 +160,59 @@ class Apply(SimpleApply, Describe):
 
         return versions
 
+    def update_code_by_zip(self):
+        if not self.resource.code:
+            return
+
+        update_code = False
+        arg = serializers.Argument("code", self.resource.meta.fields["code"])
+        if arg.pending(self.runner, self.resource):
+            digest = '<...>'
+            update_code = True
+        else:
+            serialized = arg.render(self.runner, self.resource)
+            hasher = hashlib.sha256(serialized['Code']['ZipFile'])
+            digest = base64.b64encode(hasher.digest()).decode('utf-8')
+            if self.object['CodeSha256'] != digest:
+                 update_code = True
+
+        if update_code:
+            yield self.generic_action(
+                ["Update function code", "{} => {}".format(self.object['CodeSha256'], digest)],
+                self.client.update_function_code,
+                FunctionName=self.resource.name,
+                ZipFile=self.resource.code,
+                Publish=True,
+            )
+
+    def update_code_by_s3(self):
+        if not self.resource.s3_file:
+            return
+
+        update_code = False
+        arg = serializers.Argument("code", self.resource.meta.fields["code"])
+        if arg.pending(self.runner, self.resource):
+            update_code = True
+
+        if self.object.get('S3Bucket', '') != self.resource.s3_file.bucket.name:
+            update_code = True
+
+        if self.object.get('S3Key', '') != self.resource.s3_file.name:
+            update_code = True
+
+        if update_code:
+            yield self.generic_action(
+                "Update function code",
+                self.client.update_function_code,
+                FunctionName=self.resource.name,
+                S3Bucket=self.resource.s3_file.bucket.name,
+                S3Key=self.resource.s3_file.name,
+            )
+
     def update_object(self):
+        if not self.object:
+            return
+
         for version in self.get_all_unaliased_versions():
             yield self.generic_action(
                 "Delete old version {Version}".format(**version),
@@ -175,32 +221,14 @@ class Apply(SimpleApply, Describe):
                 Qualifier=version['Version'],
             )
 
-        update_code = False
-        if self.object:
-            serializer = serializers.Resource()
-            if serializer.pending(self.runner, self.resource):
-                update_code = True
-            else:
-                serialized = serializer.render(self.runner, self.resource)
-                if 'ZipFile' in serialized['Code']:
-                    hasher = hashlib.sha256(serialized['Code']['ZipFile'])
-                    digest = base64.b64encode(hasher.digest()).decode('utf-8')
-                    if self.object['CodeSha256'] != digest:
-                        update_code = True
-                elif 'S3Bucket' in serialized['Code']:
-                    f = self.get_plan(self.resource.code_from_s3)
-                    if f.object['LastModified'] > self.object['LastModified']:
-                        update_code = True
+        for action in self.update_code_by_zip():
+            yield action
 
-        if update_code:
-            yield self.generic_action(
-                "Update function code",
-                self.client.update_function_code,
-                serializers.Resource(Publish=True),
-            )
+        for action in self.update_code_by_s3():
+            yield action
 
-        for obj in super(Apply, self).update_object():
-            yield obj
+        for action in super(Apply, self).update_object():
+            yield action
 
 
 
