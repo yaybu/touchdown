@@ -14,7 +14,7 @@
 
 import unittest
 
-from botocore.stub import Stubber
+from botocore.stub import ANY, Stubber
 
 from touchdown import frontends
 from touchdown.core import goals, workspace
@@ -39,13 +39,14 @@ class TestLambdaFunction(unittest.TestCase):
         )
 
     def test_get_all_unaliased_versions(self):
-        fn = self.aws.add_lambda_function(
+        self.fn = self.aws.add_lambda_function(
             name="myfunction",
             role=self.aws.get_role(name="myrole"),
             handler="mymodule.myfunction",
             code=dummy_function,
         )
-        apply_service = self.goal.get_service(fn, "apply")
+        apply_service = self.goal.get_service(self.fn, "apply")
+
         with Stubber(apply_service.client) as stub:
             stub.add_response(
                 'list_versions_by_function',
@@ -93,3 +94,27 @@ class TestLambdaFunction(unittest.TestCase):
             "FunctionName": "myfunction",
             "Version": "2",
         }])
+
+    def test_update_code(self):
+        self.fn = self.aws.add_lambda_function(
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            code=dummy_function,
+        )
+        self.apply_service = self.goal.get_service(self.fn, "apply")
+        self.apply_service.object = {
+            "FunctionName": "myfunction",
+        }
+        with Stubber(self.apply_service.client) as stub:
+            stub.add_response(
+                'update_function_code',
+                service_response={
+                    'FunctionName': 'myfunction',
+                },
+                expected_params={
+                    'FunctionName': 'myfunction',
+                    'ZipFile': ANY,
+                    'Publish': True,
+                },
+            )

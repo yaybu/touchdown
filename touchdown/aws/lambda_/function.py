@@ -15,6 +15,7 @@
 import base64
 import hashlib
 import inspect
+import itertools
 import types
 import zipfile
 
@@ -160,6 +161,15 @@ class Apply(SimpleApply, Describe):
 
         return versions
 
+    def remove_orphaned_versions(self):
+        for version in self.get_all_unaliased_versions():
+            yield self.generic_action(
+                "Delete old version {Version}".format(**version),
+                self.client.delete_function,
+                FunctionName=self.resource.name,
+                Qualifier=version['Version'],
+            )
+
     def update_code_by_zip(self):
         if not self.resource.code:
             return
@@ -211,24 +221,14 @@ class Apply(SimpleApply, Describe):
 
     def update_object(self):
         if not self.object:
-            return
+            return []
 
-        for version in self.get_all_unaliased_versions():
-            yield self.generic_action(
-                "Delete old version {Version}".format(**version),
-                self.client.delete_function,
-                FunctionName=self.resource.name,
-                Qualifier=version['Version'],
-            )
-
-        for action in self.update_code_by_zip():
-            yield action
-
-        for action in self.update_code_by_s3():
-            yield action
-
-        for action in super(Apply, self).update_object():
-            yield action
+        return itertools.chain(
+            self.remove_orphaned_versions(),
+            self.update_code_by_zip(),
+            self.update_code_by_s3(),
+            super(Apply, self).update_object(),
+        )
 
 
 class Destroy(SimpleDestroy, Describe):

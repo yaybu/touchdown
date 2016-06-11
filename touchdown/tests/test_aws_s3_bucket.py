@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import unittest
-import mock
 
 from botocore.stub import Stubber
 
@@ -41,17 +40,13 @@ class TestBucketDescribe(unittest.TestCase):
         bucket = self.aws.add_bucket(name="mybucket")
         desc = self.goal.get_service(bucket, "describe")
 
-        desc.client.meta.events.unregister("after-call.s3.GetBucketLocation")
-
         stub = Stubber(desc.client)
 
-        # See https://github.com/boto/botocore/pull/937
-        desc.client.get_bucket_location = mock.Mock(return_value={"LocationConstraint": "eu-central-1"})
-        # stub.add_response(
-        #     'get_bucket_location',
-        #     {'LocationConstraint': 'eu-central-1'},
-        #     {'Bucket': 'mybucket'},
-        # )
+        stub.add_response(
+            'get_bucket_location',
+            {'LocationConstraint': 'eu-central-1'},
+            {'Bucket': 'mybucket'},
+        )
         stub.add_response(
             'get_bucket_cors',
             {'CORSRules': []},
