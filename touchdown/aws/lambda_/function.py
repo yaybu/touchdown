@@ -58,8 +58,8 @@ class Function(Resource):
     arn = argument.Output("FunctionArn")
 
     name = argument.String(field="FunctionName", min=1, max=140)
-    description = argument.String(name="Description", max=256)
-    timeout = argument.Integer(name="Timeout", default=3)
+    description = argument.String(field="Description", max=256)
+    timeout = argument.Integer(field="Timeout", default=3)
     runtime = argument.String(
         field="Runtime",
         default='python2.7',
@@ -96,8 +96,8 @@ class Function(Resource):
         )
     )
 
-    memory = argument.Integer(name="MemorySize", default=128, min=128, max=1536)
-    publish = argument.Boolean(name="Publish", default=True)
+    memory = argument.Integer(field="MemorySize", default=128, min=128, max=1536)
+    publish = argument.Boolean(field="Publish", default=True)
 
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds", group="vpc_config")
     subnets = argument.ResourceList(Subnet, field="SubnetIds", group="vpc_config")
