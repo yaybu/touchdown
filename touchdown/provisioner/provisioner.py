@@ -45,10 +45,10 @@ class RunScript(action.Action):
         client = self.get_plan(self.resource.target).get_client()
         try:
             client.run_script(kwargs['script'])
-            self.object["Result"] = "Success"
+            self.plan.object["Result"] = "Success"
         except Exception as e:
-            self.object["Result"] = "Error"
-            self.object["ErrorMessage"] = str(e)
+            self.plan.object["Result"] = "Error"
+            self.plan.object["ErrorMessage"] = str(e)
             raise
 
 
