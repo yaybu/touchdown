@@ -147,7 +147,34 @@ class Apply(SimpleApply, Describe):
         ),
     )
 
+    def get_all_unaliased_versions(self):
+        versions = self.client.list_versions_by_function(FunctionName=self.resource.name)['Versions']
+
+        # Drop any that have aliases pointing at them
+        aliases = self.client.list_aliases(FunctionName=self.resource.name)
+        ignore_versions = list(a['FunctionVersion'] for a in aliases['Aliases'])
+        versions = filter(lambda x: x['Version'] not in ignore_versions, versions)
+
+        # Drop the version $LATEST - for our purposes its an alias and we don't
+        # want it
+        versions = filter(lambda x: x['Version'] != '$LATEST', versions)
+
+        # Sort on the Version and drop the last one. This should be the most
+        # recent one - i.e. what $LATEST is pointing at.
+        versions.sort(key=lambda x: int(x['Version']))
+        versions = versions[:-1]
+
+        return versions
+
     def update_object(self):
+        for version in self.get_all_unaliased_versions():
+            yield self.generic_action(
+                "Delete old version {Version}".format(**version),
+                self.client.delete_function,
+                FunctionName=self.resource.name,
+                Qualifier=version['Version'],
+            )
+
         update_code = False
         if self.object:
             serializer = serializers.Resource()
