@@ -155,7 +155,7 @@ class Apply(SimpleApply, Describe):
 
         # Sort on the Version and drop the last one. This should be the most
         # recent one - i.e. what $LATEST is pointing at.
-        versions.sort(key=lambda x: int(x['Version']))
+        versions = sorted(versions, key=lambda x: int(x['Version']))
         versions = versions[:-1]
 
         return versions
