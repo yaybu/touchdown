@@ -17,7 +17,7 @@ import json
 
 from six.moves import zip_longest
 from touchdown.core import diff, errors
-from touchdown.core.utils import force_str
+from touchdown.core.utils import force_bytes, force_str
 
 
 class FieldNotPresent(Exception):
@@ -328,6 +328,21 @@ class String(Formatter):
 
     def diff(self, runner, object, value):
         return super(String, self).diff(runner, object, None if value is None else str(value))
+
+
+class Bytes(Formatter):
+
+    def render(self, runner, object):
+        if object is None:
+            return None
+
+        try:
+            return force_bytes(self.inner.render(runner, object))
+        except ValueError:
+            return str(self.inner.render(runner, object))
+
+    def diff(self, runner, object, value):
+        return super(Bytes, self).diff(runner, object, None if value is None else str(value))
 
 
 class Integer(Formatter):

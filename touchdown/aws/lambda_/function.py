@@ -55,7 +55,7 @@ class FunctionSerializer(serializers.Serializer):
         zf.close()
         return buf.getvalue()
 
-argument.String.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
+argument.Bytes.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
 
 
 class Function(Resource):
@@ -79,11 +79,11 @@ class Function(Resource):
         serializer=serializers.Property("Arn"),
     )
 
-    code = argument.String(
+    code = argument.Bytes(
         field="Code",
         update=False,
         serializer=serializers.Dict(
-            ZipFile=serializers.String(),
+            ZipFile=serializers.Bytes(),
         )
     )
 
