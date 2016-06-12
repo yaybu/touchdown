@@ -49,3 +49,28 @@ class OutputAsString(serializers.Serializer):
 
 
 argument.String.register_adapter(Output, lambda r: OutputAsString(r))
+
+
+class OutputAsBytes(serializers.Serializer):
+
+    def __init__(self, resource):
+        self.resource = resource
+
+    def render(self, runner, object):
+        if self.pending(runner, object):
+            return serializers.Pending(self.resource)
+
+        # Extract the contents from the file on the (potentially remote) target
+        service = runner.get_service(self.resource.provisioner.target, "describe")
+        client = service.get_client()
+        return client.get_path_bytes(self.resource.name)
+
+    def pending(self, runner, object):
+        provisioner = runner.get_service(self.resource.provisioner, "apply")
+        return provisioner.object["Result"] == "Pending"
+
+    def dependencies(self, object):
+        return frozenset((self.resource, ))
+
+
+argument.Bytes.register_adapter(Output, lambda r: OutputAsBytes(r))
