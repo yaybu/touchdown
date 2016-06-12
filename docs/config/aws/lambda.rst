@@ -41,7 +41,9 @@ Function
 
     .. attribute:: code
 
-        A python callable. For example::
+        A Zip file as bytes.
+
+        This can be a python callable. For example::
 
             def hello_world(event, context):
                 print event
@@ -57,9 +59,7 @@ Function
 
         This is intended for proof of concept demos when first starting out with lambda - there is no mechanism to ship dependencies of this function, it is literally the output of `inspect.getsource()` that is uploaded.
 
-    .. attribute:: code_from_bytes
-
-    .. attribute:: code_from_s3
+    .. attribute:: s3_file
 
         An S3 :py:class:`~touchdown.aws.s3.file.File`.
 
