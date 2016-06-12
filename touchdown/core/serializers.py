@@ -55,8 +55,8 @@ class Serializer(object):
         rendered = self.render(runner, object)
         return diff.ValueDiff(value, rendered)
 
-    def pending(self):
-        return True
+    def pending(self, runner, obj):
+        return False
 
     def dependencies(self, object):
         return frozenset()
@@ -444,7 +444,7 @@ class Dict(Serializer):
         return d
 
     def pending(self, runner, object):
-        return self.inner.pending(runner, object)
+        return any(v.pending(runner, v) for v in self.kwargs.values())
 
     def dependencies(self, object):
         return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))

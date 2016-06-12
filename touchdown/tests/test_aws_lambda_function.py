@@ -95,6 +95,22 @@ class TestLambdaFunction(unittest.TestCase):
             "Version": "2",
         }])
 
+    def test_dont_update_code(self):
+        self.fn = self.aws.add_lambda_function(
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            code=dummy_function,
+        )
+        self.apply_service = self.goal.get_service(self.fn, "apply")
+        self.apply_service.object = {
+            "FunctionName": "myfunction",
+            "CodeSha256": "QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8="
+        }
+        with Stubber(self.apply_service.client):
+            for action in self.apply_service.update_code_by_zip():
+                action.run()
+
     def test_update_code(self):
         self.fn = self.aws.add_lambda_function(
             name="myfunction",
@@ -105,6 +121,7 @@ class TestLambdaFunction(unittest.TestCase):
         self.apply_service = self.goal.get_service(self.fn, "apply")
         self.apply_service.object = {
             "FunctionName": "myfunction",
+            "CodeSha256": ""
         }
         with Stubber(self.apply_service.client) as stub:
             stub.add_response(
@@ -118,3 +135,32 @@ class TestLambdaFunction(unittest.TestCase):
                     'Publish': True,
                 },
             )
+            for action in self.apply_service.update_code_by_zip():
+                action.run()
+
+    def test_update_code_via_s3(self):
+        self.fn = self.aws.add_lambda_function(
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            s3_file=self.aws.get_bucket(name="mybucket").get_file(name="myfile"),
+        )
+        self.apply_service = self.goal.get_service(self.fn, "apply")
+        self.apply_service.object = {
+            "FunctionName": "myfunction",
+        }
+        with Stubber(self.apply_service.client) as stub:
+            stub.add_response(
+                'update_function_code',
+                service_response={
+                    'FunctionName': 'myfunction',
+                },
+                expected_params={
+                    'FunctionName': 'myfunction',
+                    'S3Bucket': 'mybucket',
+                    'S3Key': 'myfile',
+                    'Publish': True,
+                },
+            )
+            for action in self.apply_service.update_code_by_s3():
+                action.run()

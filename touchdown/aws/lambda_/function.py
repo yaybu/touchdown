@@ -31,7 +31,10 @@ from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
-class FunctionSerializer(serializers.Formatter):
+class FunctionSerializer(serializers.Serializer):
+
+    def __init__(self, function):
+        self.function = function
 
     def mkinfo(self, name):
         info = zipfile.ZipInfo(
@@ -48,11 +51,11 @@ class FunctionSerializer(serializers.Formatter):
             mode='w',
             compression=zipfile.ZIP_DEFLATED
         )
-        zf.writestr(self.mkinfo("main.py"), inspect.getsource(func))
+        zf.writestr(self.mkinfo("main.py"), inspect.getsource(self.function))
         zf.close()
         return buf.getvalue()
 
-argument.String.register_adapter(types.FunctionType, lambda r: FunctionSerializer(serializers.Const(r)))
+argument.String.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
 
 
 class Function(Resource):
@@ -181,7 +184,7 @@ class Apply(SimpleApply, Describe):
             update_code = True
         else:
             serialized = arg.render(self.runner, self.resource)
-            hasher = hashlib.sha256(serialized['Code']['ZipFile'])
+            hasher = hashlib.sha256(serialized['ZipFile'])
             digest = base64.b64encode(hasher.digest()).decode('utf-8')
             if self.object['CodeSha256'] != digest:
                 update_code = True
@@ -217,6 +220,7 @@ class Apply(SimpleApply, Describe):
                 FunctionName=self.resource.name,
                 S3Bucket=self.resource.s3_file.bucket.name,
                 S3Key=self.resource.s3_file.name,
+                Publish=True,
             )
 
     def update_object(self):
