@@ -19,7 +19,7 @@ import itertools
 import types
 import zipfile
 
-from six import StringIO
+from six import BytesIO
 
 from touchdown.aws.iam import Role
 from touchdown.aws.vpc import SecurityGroup, Subnet
@@ -45,7 +45,7 @@ class FunctionSerializer(serializers.Serializer):
         return info
 
     def render(self, runner, func):
-        buf = StringIO()
+        buf = BytesIO()
         zf = zipfile.ZipFile(
             buf,
             mode='w',
