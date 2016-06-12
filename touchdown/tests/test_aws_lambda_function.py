@@ -113,6 +113,13 @@ class TestLambdaFunction(unittest.TestCase):
             "FunctionName": "myfunction",
             "CodeSha256": "QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8="
         }
+
+        # FIXME: Zip's produced on Windows have stables hashes (zipping the
+        # same thing repeatedly yields the same result)
+        # But the hashes are different from posix zips.
+        if sys.platform == "win32":
+            self.apply_service.object['CodeSha256'] = 'kI3Czz0As/qAcnAq0JzbVG/NzSPUS4khRcbHuKivW0k='
+
         with Stubber(self.apply_service.client):
             for action in self.apply_service.update_code_by_zip():
                 action.run()
