@@ -104,6 +104,24 @@ class Client(paramiko.SSHClient):
         finally:
             channel.close()
 
+    def get_path_contents(self, path):
+        sftp = self.open_sftp()
+        sftp.chdir(".")
+        try:
+            with sftp.file(path) as fp:
+                return fp.read()
+        finally:
+            sftp.close()
+
+    def get_path_bytes(self, path):
+        sftp = self.open_sftp()
+        sftp.chdir(".")
+        try:
+            with sftp.file(path) as fp:
+                return fp.read()
+        finally:
+            sftp.close()
+
     def run_script(self, script, sudo=True):
         sftp = self.open_sftp()
         sftp.chdir(".")

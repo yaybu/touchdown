@@ -16,6 +16,7 @@ from .provisioner import Provisioner, Target
 from .bash import Script
 from .fuselage import Bundle
 from .local import Local
+from .output import Output
 
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     "Script",
     "Bundle",
     "Local",
+    "Output",
 ]

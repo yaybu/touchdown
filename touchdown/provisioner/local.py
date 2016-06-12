@@ -39,6 +39,14 @@ class Connection(object):
         self.plan = plan
         self.resource = plan.resource
 
+    def get_path_contents(self, path):
+        with open(path) as fp:
+            return fp.read()
+
+    def get_path_bytes(self, path):
+        with open(path, "rb") as fp:
+            return fp.read()
+
     def run_script(self, script, stdout=None, stderr=None):
         fd, script_name = tempfile.mkstemp()
         try:

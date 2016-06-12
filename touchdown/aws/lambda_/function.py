@@ -15,9 +15,11 @@
 import base64
 import hashlib
 import inspect
+import itertools
+import types
 import zipfile
 
-from six import StringIO
+from six import BytesIO
 
 from touchdown.aws.iam import Role
 from touchdown.aws.vpc import SecurityGroup, Subnet
@@ -29,7 +31,10 @@ from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
-class FunctionSerializer(serializers.Formatter):
+class FunctionSerializer(serializers.Serializer):
+
+    def __init__(self, function):
+        self.function = function
 
     def mkinfo(self, name):
         info = zipfile.ZipInfo(
@@ -40,15 +45,17 @@ class FunctionSerializer(serializers.Formatter):
         return info
 
     def render(self, runner, func):
-        buf = StringIO()
+        buf = BytesIO()
         zf = zipfile.ZipFile(
             buf,
             mode='w',
             compression=zipfile.ZIP_DEFLATED
         )
-        zf.writestr(self.mkinfo("main.py"), inspect.getsource(func))
+        zf.writestr(self.mkinfo("main.py"), inspect.getsource(self.function))
         zf.close()
         return buf.getvalue()
+
+argument.Bytes.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
 
 
 class Function(Resource):
@@ -58,8 +65,8 @@ class Function(Resource):
     arn = argument.Output("FunctionArn")
 
     name = argument.String(field="FunctionName", min=1, max=140)
-    description = argument.String(name="Description", max=256)
-    timeout = argument.Integer(name="Timeout", default=3)
+    description = argument.String(field="Description", max=256)
+    timeout = argument.Integer(field="Timeout", default=3)
     runtime = argument.String(
         field="Runtime",
         default='python2.7',
@@ -72,23 +79,18 @@ class Function(Resource):
         serializer=serializers.Property("Arn"),
     )
 
-    code = argument.Function(
+    code = argument.Bytes(
         field="Code",
+        update=False,
         serializer=serializers.Dict(
-            ZipFile=FunctionSerializer(),
+            ZipFile=serializers.Bytes(),
         )
     )
 
-    code_from_bytes = argument.String(
-        field="Code",
-        serializer=serializers.Dict(
-            ZipFile=serializers.String(),
-        )
-    )
-
-    code_from_s3 = argument.Resource(
+    s3_file = argument.Resource(
         "touchdown.aws.s3.file.File",
         field="Code",
+        update=False,
         serializer=serializers.Dict(
             S3Bucket=serializers.Property("Bucket"),
             S3Key=serializers.Property("Key"),
@@ -96,8 +98,8 @@ class Function(Resource):
         )
     )
 
-    memory = argument.Integer(name="MemorySize", default=128, min=128, max=1536)
-    publish = argument.Boolean(name="Publish", default=True)
+    memory = argument.Integer(field="MemorySize", default=128, min=128, max=1536)
+    publish = argument.Boolean(field="Publish", default=True)
 
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds", group="vpc_config")
     subnets = argument.ResourceList(Subnet, field="SubnetIds", group="vpc_config")
@@ -139,36 +141,98 @@ class Apply(SimpleApply, Describe):
         # Present('runtime'),
         XOR(
             Present('code'),
-            Present('code_from_bytes'),
-            Present('code_from_s3'),
+            Present('s3_file'),
         ),
     )
 
-    def update_object(self):
+    def get_all_unaliased_versions(self):
+        versions = self.client.list_versions_by_function(FunctionName=self.resource.name)['Versions']
+
+        # Drop any that have aliases pointing at them
+        aliases = self.client.list_aliases(FunctionName=self.resource.name)
+        ignore_versions = list(a['FunctionVersion'] for a in aliases['Aliases'])
+        versions = filter(lambda x: x['Version'] not in ignore_versions, versions)
+
+        # Drop the version $LATEST - for our purposes its an alias and we don't
+        # want it
+        versions = filter(lambda x: x['Version'] != '$LATEST', versions)
+
+        # Sort on the Version and drop the last one. This should be the most
+        # recent one - i.e. what $LATEST is pointing at.
+        versions = sorted(versions, key=lambda x: int(x['Version']))
+        versions = versions[:-1]
+
+        return versions
+
+    def remove_orphaned_versions(self):
+        for version in self.get_all_unaliased_versions():
+            yield self.generic_action(
+                "Delete old version {Version}".format(**version),
+                self.client.delete_function,
+                FunctionName=self.resource.name,
+                Qualifier=version['Version'],
+            )
+
+    def update_code_by_zip(self):
+        if not self.resource.code:
+            return
+
         update_code = False
-        if self.object:
-            serialized = serializers.Resource().render(self.runner, self.resource)
-            if 'ZipFile' in serialized['Code']:
-                hasher = hashlib.sha256(serialized['Code']['ZipFile'])
-                digest = base64.b64encode(hasher.digest()).decode('utf-8')
-                if self.object['CodeSha256'] != digest:
-                    update_code = True
-            elif 'S3Bucket' in serialized['Code']:
-                f = self.get_plan(self.resource.code_from_s3)
-                if f.object['LastModified'] > self.object['LastModified']:
-                    update_code = True
+        arg = serializers.Argument("code", self.resource.meta.fields["code"])
+        if arg.pending(self.runner, self.resource):
+            digest = '<...>'
+            update_code = True
+        else:
+            serialized = arg.render(self.runner, self.resource)
+            hasher = hashlib.sha256(serialized['ZipFile'])
+            digest = base64.b64encode(hasher.digest()).decode('utf-8')
+            if self.object['CodeSha256'] != digest:
+                update_code = True
 
         if update_code:
-            kwargs = {
-                "FunctionName": self.resource.name,
-                "Publish": True,
-            }
-            kwargs.update(serialized['Code'])
+            yield self.generic_action(
+                ["Update function code", "{} => {}".format(self.object['CodeSha256'], digest)],
+                self.client.update_function_code,
+                FunctionName=self.resource.name,
+                ZipFile=self.resource.code,
+                Publish=True,
+            )
+
+    def update_code_by_s3(self):
+        if not self.resource.s3_file:
+            return
+
+        update_code = False
+        arg = serializers.Argument("code", self.resource.meta.fields["code"])
+        if arg.pending(self.runner, self.resource):
+            update_code = True
+
+        if self.object.get('S3Bucket', '') != self.resource.s3_file.bucket.name:
+            update_code = True
+
+        if self.object.get('S3Key', '') != self.resource.s3_file.name:
+            update_code = True
+
+        if update_code:
             yield self.generic_action(
                 "Update function code",
                 self.client.update_function_code,
-                **kwargs
+                FunctionName=self.resource.name,
+                S3Bucket=self.resource.s3_file.bucket.name,
+                S3Key=self.resource.s3_file.name,
+                Publish=True,
             )
+
+    def update_object(self):
+        if not self.object:
+            return []
+
+        return itertools.chain(
+            self.remove_orphaned_versions(),
+            self.update_code_by_zip(),
+            self.update_code_by_s3(),
+            super(Apply, self).update_object(),
+        )
 
 
 class Destroy(SimpleDestroy, Describe):

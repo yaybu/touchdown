@@ -43,7 +43,13 @@ class RunScript(action.Action):
     def run(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         client = self.get_plan(self.resource.target).get_client()
-        client.run_script(kwargs['script'])
+        try:
+            client.run_script(kwargs['script'])
+            self.plan.object["Result"] = "Success"
+        except Exception as e:
+            self.plan.object["Result"] = "Error"
+            self.plan.object["ErrorMessage"] = str(e)
+            raise
 
 
 class Apply(plan.Plan):
@@ -52,5 +58,6 @@ class Apply(plan.Plan):
     resource = Provisioner
 
     def get_actions(self):
+        self.object = {"Result": "Pending"}
         if self.resource.target:
             yield RunScript(self)

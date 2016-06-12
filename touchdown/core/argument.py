@@ -19,7 +19,7 @@ import netaddr
 import six
 
 from . import errors, serializers
-from .utils import force_str
+from .utils import force_bytes, force_str
 
 
 class Argument(object):
@@ -196,6 +196,38 @@ class String(Argument):
         if self.regex is not None and not re.match(self.regex, value):
             raise errors.InvalidParameter(
                 "Regex validation failed ({})".format(self.regex),
+            )
+
+        return value
+
+
+class Bytes(Argument):
+
+    """ Represents a collection of bytes """
+
+    serializer = serializers.Bytes()
+
+    min = None
+    max = None
+
+    def clean(self, instance, value):
+        if value is None:
+            return value
+
+        if not isinstance(value, six.binary_type):
+            raise errors.InvalidParameter("Value {!r} is not a bytes".format(value))
+
+        # Cast to native string type for this python version
+        value = force_bytes(value)
+
+        if self.min is not None and len(value) < self.min:
+            raise errors.InvalidParameter(
+                "Value should be at least {} bytes".format(self.min),
+            )
+
+        if self.max is not None and len(value) > self.max:
+            raise errors.InvalidParameter(
+                "Value should be at most {} bytes".format(self.max),
             )
 
         return value
