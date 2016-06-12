@@ -7,6 +7,13 @@ Changelog for Touchdown
 - Allow a bundle to generate outputs that can then feed other aspects of the
   deployment process.
 
+- Allow new functions to actually set timeout, description and memory.
+
+- Fix updating settings on an exising lambda function.
+
+- Automatically remove old versions of lambda functions (that are not aliased
+  anywhere).
+
 
 0.12.0 (2016-06-09)
 -------------------
