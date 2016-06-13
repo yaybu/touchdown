@@ -20,15 +20,7 @@ from touchdown.core.map import SerialMap
 from touchdown.tests.aws import Stubber
 
 
-class TestWafRule(unittest.TestCase):
-    """Test that WAF rules can be created, updated and deleted.
-
-    Note: Because WAF uses a change token, every "real" request is
-    preceded by a call to `get_change_token`. The change token this
-    gives us should then be included in the request we actually want
-    to make, and it is also returned to us.
-
-    """
+class TestWafIpSet(unittest.TestCase):
 
     def setUp(self):
         self.workspace = workspace.Workspace()
@@ -42,50 +34,44 @@ class TestWafRule(unittest.TestCase):
             map=SerialMap
         )
 
-    def test_annotate_rule(self):
-        """Test that when we annotate a rule, we gain the expected data."""
+    def test_annotate_ip_set(self):
+        """Test that when we annotate an ipset, we gain the expected data."""
+
         goal = self.create_goal('get')
-        rule = self.aws.add_rule(name='myrule')
-        describe = goal.get_service(rule, 'describe')
+        ip_set = self.aws.add_ip_set(name='my-ip-set')
+        describe = goal.get_service(ip_set, 'describe')
 
         stub = Stubber(describe.client)
         stub.add_response(
-            'get_rule',
-            expected_params={'RuleId': 'my-rule-id'},
-            service_response={'Rule': {
-                'RuleId': 'my-rule-id',
-                'Predicates': [{
-                    'Negated': True,
-                    'Type': 'test',
-                    'DataId': 'dummy',
-                }],
+            'get_ip_set',
+            expected_params={'IPSetId': 'my-ip-set-id'},
+            service_response={'IPSet': {
+                'IPSetId': 'my-ip-set-id',
+                'IPSetDescriptors': [{'Type': 'IPV4', 'Value': '10.0.0.1/32'}]
             }},
         )
 
-        # When annotating this rule, we should get an object populated
-        # with the data from the predicates.
         with stub:
             obj = describe.annotate_object({
-                'RuleId': 'my-rule-id'
+                'IPSetId': 'my-ip-set-id',
             })
 
         assert obj == {
-            'RuleId': 'my-rule-id',
-            'Predicates': [{
-                'Negated': True,
-                'Type': 'test',
-                'DataId': 'dummy',
+            'IPSetId': 'my-ip-set-id',
+            'IPSetDescriptors': [{
+                'Type': 'IPV4',
+                'Value': '10.0.0.1/32',
             }],
         }
 
-    def test_create_rule(self):
-        """Test that when we create a rule, we perform the expected client
+    def test_create_ip_set(self):
+        """Test that when we create an IP set, we perform the expected client
         calls.
 
         """
         goal = self.create_goal('apply')
-        rule = self.aws.add_rule(name='myrule', metric_name='mymetric')
-        apply = goal.get_service(rule, 'apply')
+        ip_set = self.aws.add_ip_set(name='my-ip-set')
+        apply = goal.get_service(ip_set, 'apply')
 
         stub = Stubber(apply.client)
         stub.add_response(
@@ -94,11 +80,11 @@ class TestWafRule(unittest.TestCase):
             service_response={'ChangeToken': 'mychangetoken1'},
         )
         stub.add_response(
-            'create_rule',
+            'create_ip_set',
             expected_params={
                 'ChangeToken': 'mychangetoken1',
-                'Name': 'myrule',
-                'MetricName': 'mymetric'},
+                'Name': 'my-ip-set',
+            },
             service_response={
                 'ChangeToken': 'mychangetoken1'
             },
@@ -108,30 +94,23 @@ class TestWafRule(unittest.TestCase):
         with stub:
             action.run()
 
-    def test_update_rule_with_predicates(self):
-        """Test that when we update a rule to have a predicate, we pass the
-        information to link the rule to the match.
+    def test_update_ip_set_with_descriptors(self):
+        """Test that when we update a ip_set to have a descriptor, we pass the
+        information to link the ip set to the descriptor.
 
         """
         goal = self.create_goal('apply')
 
         ip_set = self.aws.add_ip_set(
             name='my-ip-set',
-            addresses=[])
+            addresses=[
+                '10.0.0.1/32'
+            ],
+        )
+
         apply = goal.get_service(ip_set, 'apply')
         apply.object = {
             'IPSetId': 'my-ip-set-id',
-        }
-
-        rule = self.aws.add_rule(
-            name='myrule',
-            metric_name='mymetric',
-            predicates=[
-                {'ip_set': ip_set}])
-
-        apply = goal.get_service(rule, 'apply')
-        apply.object = {
-            'RuleId': 'my-rule-id',
         }
 
         stub = Stubber(apply.client)
@@ -141,16 +120,15 @@ class TestWafRule(unittest.TestCase):
             service_response={'ChangeToken': 'mychangetoken1'},
         )
         stub.add_response(
-            'update_rule',
+            'update_ip_set',
             expected_params={
                 'ChangeToken': 'mychangetoken1',
                 'Updates': [{
                     'Action': 'INSERT',
-                    'Predicate': {
-                        'Negated': False,
-                        'Type': 'IPMatch',
-                        'DataId': 'my-ip-set-id'}}],
-                'RuleId': 'my-rule-id'},
+                    'IPSetDescriptor': {
+                        'Type': 'IPV4',
+                        'Value': '10.0.0.1/32'}}],
+                'IPSetId': 'my-ip-set-id'},
             service_response={
                 'ChangeToken': 'mychangetoken1'
             },
@@ -160,17 +138,19 @@ class TestWafRule(unittest.TestCase):
             for action in apply.update_object():
                 action.run()
 
-    def test_delete_rule(self):
-        """Test that the plan for deleting a rule has expected actions."""
+    def test_delete_ip_set(self):
+        """Test that the plan for deleting an ip_set performs the right
+        actions.
+
+        """
         goal = self.create_goal('destroy')
-        rule = self.aws.add_rule(name='myrule', metric_name='mymetric')
-        destroy = goal.get_service(rule, 'destroy')
+        ip_set = self.aws.add_ip_set(name='my-ip-set')
+        destroy = goal.get_service(ip_set, 'destroy')
         destroy.object = {
-            'RuleId': 'my-rule-id',
-            'Predicates': [{
-                'Negated': True,
-                'Type': 'test',
-                'DataId': 'dummy',
+            'IPSetId': 'my-ip-set-id',
+            'IPSetDescriptors': [{
+                'Type': 'IPV4',
+                'Value': '10.0.0.1/32',
             }],
         }
 
@@ -181,16 +161,16 @@ class TestWafRule(unittest.TestCase):
             service_response={'ChangeToken': 'mychangetoken1'},
         )
         stub.add_response(
-            'update_rule',
+            'update_ip_set',
             expected_params={
                 'ChangeToken': 'mychangetoken1',
                 'Updates': [{
                     'Action': 'DELETE',
-                    'Predicate': {
-                        'Negated': True,
-                        'Type': 'test',
-                        'DataId': 'dummy'}}],
-                'RuleId': 'my-rule-id'},
+                    'IPSetDescriptor': {
+                        'Type': 'IPV4',
+                        'Value': '10.0.0.1/32'}
+                }],
+                'IPSetId': 'my-ip-set-id'},
             service_response={'ChangeToken': 'mychangetoken1'}
         )
         stub.add_response(
@@ -199,10 +179,10 @@ class TestWafRule(unittest.TestCase):
             service_response={'ChangeToken': 'mychangetoken2'},
         )
         stub.add_response(
-            'delete_rule',
+            'delete_ip_set',
             expected_params={
                 'ChangeToken': 'mychangetoken2',
-                'RuleId': 'my-rule-id'},
+                'IPSetId': 'my-ip-set-id'},
             service_response={'ChangeToken': 'mychangetoken2'},
         )
         actions = destroy.destroy_object()
