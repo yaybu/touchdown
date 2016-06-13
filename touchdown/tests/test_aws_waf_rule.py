@@ -108,49 +108,6 @@ class TestWafRule(unittest.TestCase):
         with stub:
             action.run()
 
-    def test_update_rule(self):
-        """Test that when we update a rule, we perform the expected client
-        calls.
-
-        """
-
-        goal = self.create_goal('apply')
-        rule = self.aws.add_rule(
-            name='myrule',
-            metric_name='mymetric',
-            predicates=[])
-
-        apply = goal.get_service(rule, 'apply')
-        apply.object = {
-            'RuleId': 'my-rule-id',
-        }
-
-        stub = Stubber(apply.client)
-        stub.add_response(
-            'get_change_token',
-            expected_params={},
-            service_response={'ChangeToken': 'mychangetoken1'},
-        )
-        stub.add_response(
-            'update_rule',
-            expected_params={
-                'ChangeToken': 'mychangetoken1',
-                'Updates': [{
-                    'Action': 'INSERT',
-                    'Predicate': {
-                        'Negated': False,
-                        'Type': 'IPMatch',
-                        'DataId': 'my-ip-set-id'}}],
-                'RuleId': 'my-rule-id'},
-            service_response={
-                'ChangeToken': 'mychangetoken1'
-            },
-        )
-
-        with stub:
-            for action in apply.update_object():
-                action.run()
-
     def test_update_rule_with_predicates(self):
         """Test that when we update a rule to have a predicate, we pass the
         information to link the rule to the match.
