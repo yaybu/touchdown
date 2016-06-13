@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.12.1 (unreleased)
+0.13.0 (2016-06-13)
 -------------------
 
 - Allow a bundle to generate outputs that can then feed other aspects of the
