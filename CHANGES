@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.13.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Turn on CloudWatch-backed tailing for AWS Lambda functions.
 
 
 0.13.0 (2016-06-13)
