@@ -30,9 +30,12 @@ class Plan(common.SimplePlan, plan.Plan):
     resource = LogGroup
     service_name = "logs"
 
+    def get_log_group_name(self):
+        return self.resource.name
+
     def tail(self, start, end, follow):
         kwargs = {
-            'logGroupName': self.resource.name,
+            'logGroupName': self.get_log_group_name,
         }
         if start:
             kwargs['startTime'] = as_seconds(start)

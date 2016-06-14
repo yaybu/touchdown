@@ -1,4 +1,4 @@
-# Copyright 2015 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.aws.logs import tail
+
 from .function import Function
-from .permission import Permission
-from .s3 import S3LambdaNotification
-from .sns import Subscription
-from . import tail  # noqa
 
 
-__all__ = [
-    'Function',
-    'Permission',
-    'S3LambdaNotification',
-    'Subscription',
-]
+class Plan(tail.Plan):
+
+    name = "tail"
+    resource = Function
+    service_name = "logs"
+
+    def get_log_group_name(self):
+        return '/aws/lambda/{}'.format(self.resource.name)
