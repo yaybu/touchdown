@@ -35,7 +35,7 @@ class Plan(common.SimplePlan, plan.Plan):
 
     def tail(self, start, end, follow):
         kwargs = {
-            'logGroupName': self.get_log_group_name,
+            'logGroupName': self.get_log_group_name(),
         }
         if start:
             kwargs['startTime'] = as_seconds(start)
