@@ -47,24 +47,21 @@ class Connection(object):
         with open(path, "rb") as fp:
             return fp.read()
 
-    def run_script(self, script, stdout=None, stderr=None):
+    def run_script(self, script, args=None, sudo=False):
         fd, script_name = tempfile.mkstemp()
         try:
             with os.fdopen(fd, 'wb') as fh:
                 fh.write(script.read())
             os.chmod(script_name, 0o755)
 
-            command = [sys.executable]
-            if self.resource.user:
-                command = ['sudo', '-u', self.resource.user]
-
-            command.extend([script_name, '--no-changes-ok'])
+            command = [sys.executable, script_name]
 
             if self.resource.state:
                 command.extend(['--state', os.path.abspath('.fuselage')])
 
-            proc = subprocess.Popen(
-                command, stdout=stdout, stderr=stderr)
+            command.extend(args or [])
+
+            proc = subprocess.Popen(command)
             output, error_output = proc.communicate()
             exit_code = proc.returncode
             if exit_code != 0:

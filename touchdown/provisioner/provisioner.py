@@ -52,12 +52,25 @@ class RunScript(action.Action):
             raise
 
 
+class Describe(plan.Plan):
+
+    name = "describe"
+    resource = Provisioner
+
+    def describe_object(self):
+        return {"Result": "Pending"}
+
+    def get_actions(self):
+        self.object = self.describe_object()
+        return []
+
+
 class Apply(plan.Plan):
 
     name = "apply"
     resource = Provisioner
 
     def get_actions(self):
-        self.object = {"Result": "Pending"}
-        if self.resource.target:
+        self.object = self.runner.get_service(self.resource, "describe").describe_object()
+        if self.resource.target and self.object.get("Result", "Pending") == "Pending":
             yield RunScript(self)

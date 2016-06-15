@@ -16,6 +16,7 @@ from __future__ import print_function
 
 import binascii
 import os
+import pipes
 import socket
 import time
 
@@ -122,7 +123,7 @@ class Client(paramiko.SSHClient):
         finally:
             sftp.close()
 
-    def run_script(self, script, sudo=True):
+    def run_script(self, script, args=None, sudo=True):
         sftp = self.open_sftp()
         sftp.chdir(".")
 
@@ -137,6 +138,9 @@ class Client(paramiko.SSHClient):
                 cmd = path
                 if sudo and self.get_transport().get_username() != "root":
                     cmd = "sudo -E " + path
+                if args:
+                    args = " ".join(pipes.quote(a) for a in args)
+                    cmd = cmd + " " + args
                 self._run(transport, cmd)
             finally:
                 sftp.remove(path)

@@ -19,7 +19,6 @@ import sys
 import tempfile
 import unittest
 
-import pytest
 from botocore.stub import ANY, Stubber
 
 from touchdown import frontends
@@ -179,7 +178,6 @@ class TestLambdaFunction(unittest.TestCase):
                 action.run()
 
 
-@pytest.mark.skipif(sys.platform == 'win32', reason="does not run on windows")
 class TestLambdaFunctionIntegration(unittest.TestCase):
 
     def setUp(self):
@@ -194,14 +192,18 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
-    def test_build_a_zip(self):
+    def test_bundle_ran_and_output_different(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.test_dir)
+
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        bundle.add_execute(command="zip {} {}".format(
-            os.path.join(self.test_dir, "lambda.zip"),
-            __file__,
-        ))
+        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        bundle.add_file(
+            name=os.path.join(self.test_dir, "lambda.zip"),
+            source=lambda_zip,
+        )
         self.fn = self.aws.add_lambda_function(
             name="myfunction",
             role=self.aws.get_role(name="myrole"),
@@ -273,3 +275,235 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
         with role_stubber:
             with fn_stubber:
                 self.goal.execute()
+
+    def test_bundle_ran_and_output_same(self):
+        # The local bundle has a payload that will *always* do something
+        # It's an execute - there is no way for fuselage to skip running it
+        # So we expect the lambda
+        self.test_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.test_dir)
+
+        bundle = self.workspace.add_fuselage_bundle(
+            target=self.workspace.add_local()
+        )
+        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        bundle.add_file(
+            name=os.path.join(self.test_dir, "lambda.zip"),
+            source=lambda_zip,
+        )
+        fn = self.aws.add_lambda_function(
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            code=bundle.add_output(name=lambda_zip),
+        )
+
+        role_service = self.goal.get_service(fn.role, "describe")
+        fn_service = self.goal.get_service(fn, "apply")
+
+        role_stubber = Stubber(role_service.client)
+        role_stubber.add_response(
+            'list_roles',
+            service_response={
+                'Roles': [{
+                    'RoleName': 'myrole',
+                    'Path': '/iam/myrole',
+                    'RoleId': '1234567890123456',
+                    'Arn': '12345678901234567890',
+                    'CreateDate': datetime.datetime.now(),
+                }],
+            },
+            expected_params={},
+        )
+
+        fn_stubber = Stubber(fn_service.client)
+        fn_stubber.add_response(
+            'get_function_configuration',
+            service_response={
+                'FunctionName': 'myfunction',
+                'CodeSha256': 'LjWn8H6iob8nXeoTeRwWTGctKEUJb6L6epmiwUQVCr0=',
+                'Handler': 'mymodule.myfunction',
+                'Role': '12345678901234567890',
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'list_versions_by_function',
+            service_response={
+                'Versions': [],
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'list_aliases',
+            service_response={
+                'Aliases': [],
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+
+        with role_stubber:
+            with fn_stubber:
+                self.goal.execute()
+                self.assertEqual(len(self.goal.get_changes(bundle)), 1)
+                self.assertEqual(len(self.goal.get_changes(fn)), 1)
+                fn_stubber.assert_no_pending_responses()
+
+    def test_bundle_skipped_but_output_same(self):
+        bundle = self.workspace.add_fuselage_bundle(
+            target=self.workspace.add_local()
+        )
+        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        bundle.add_execute(
+            command="echo HELLO EVERYONE",
+            creates=lambda_zip,
+        )
+        self.fn = self.aws.add_lambda_function(
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            code=bundle.add_output(name=lambda_zip),
+        )
+
+        role_service = self.goal.get_service(self.fn.role, "describe")
+        fn_service = self.goal.get_service(self.fn, "apply")
+
+        role_stubber = Stubber(role_service.client)
+        role_stubber.add_response(
+            'list_roles',
+            service_response={
+                'Roles': [{
+                    'RoleName': 'myrole',
+                    'Path': '/iam/myrole',
+                    'RoleId': '1234567890123456',
+                    'Arn': '12345678901234567890',
+                    'CreateDate': datetime.datetime.now(),
+                }],
+            },
+            expected_params={},
+        )
+
+        fn_stubber = Stubber(fn_service.client)
+        fn_stubber.add_response(
+            'get_function_configuration',
+            service_response={
+                'FunctionName': 'myfunction',
+                'CodeSha256': 'LjWn8H6iob8nXeoTeRwWTGctKEUJb6L6epmiwUQVCr0=',
+                'Handler': 'mymodule.myfunction',
+                'Role': '12345678901234567890',
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'list_versions_by_function',
+            service_response={
+                'Versions': [],
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'list_aliases',
+            service_response={
+                'Aliases': [],
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+
+        with role_stubber:
+            with fn_stubber:
+                self.assertEqual(len(list(self.goal.plan())), 0)
+                self.assertEqual(len(self.goal.get_changes(bundle)), 0)
+
+    def test_bundle_skipped_but_output_different(self):
+        bundle = self.workspace.add_fuselage_bundle(
+            target=self.workspace.add_local()
+        )
+        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        bundle.add_execute(
+            command="echo HELLO EVERYONE",
+            creates=lambda_zip,
+        )
+        self.fn = self.aws.add_lambda_function(
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            code=bundle.add_output(name=lambda_zip),
+        )
+
+        role_service = self.goal.get_service(self.fn.role, "describe")
+        fn_service = self.goal.get_service(self.fn, "apply")
+
+        role_stubber = Stubber(role_service.client)
+        role_stubber.add_response(
+            'list_roles',
+            service_response={
+                'Roles': [{
+                    'RoleName': 'myrole',
+                    'Path': '/iam/myrole',
+                    'RoleId': '1234567890123456',
+                    'Arn': '12345678901234567890',
+                    'CreateDate': datetime.datetime.now(),
+                }],
+            },
+            expected_params={},
+        )
+
+        fn_stubber = Stubber(fn_service.client)
+        fn_stubber.add_response(
+            'get_function_configuration',
+            service_response={
+                'FunctionName': 'myfunction',
+                'CodeSha256': 'XXXXXXXXXXXX=',
+                'Handler': 'mymodule.myfunction',
+                'Role': '12345678901234567890',
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'list_versions_by_function',
+            service_response={
+                'Versions': [],
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'list_aliases',
+            service_response={
+                'Aliases': [],
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+            },
+        )
+        fn_stubber.add_response(
+            'update_function_code',
+            service_response={
+                'FunctionName': 'myfunction',
+            },
+            expected_params={
+                'FunctionName': 'myfunction',
+                'ZipFile': ANY,
+                'Publish': True,
+            },
+        )
+
+        with role_stubber:
+            with fn_stubber:
+                self.goal.execute()
+                self.assertEqual(len(self.goal.get_changes(bundle)), 0)
