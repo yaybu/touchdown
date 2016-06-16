@@ -35,6 +35,7 @@ from . import (
     s3,
     sns,
     sqs,
+    waf,
     external_account,
     password_policy,
 )
@@ -62,6 +63,7 @@ __all__ = [
     's3',
     'sns',
     'sqs',
+    'waf',
     'external_account',
     'password_policy',
 ]

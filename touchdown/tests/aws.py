@@ -20,6 +20,7 @@ import mock
 import six
 import vcr
 from botocore.endpoint import Endpoint as OldEndpoint
+from botocore.stub import Stubber as BaseStubber
 from botocore.vendored.requests.adapters import HTTPAdapter
 from botocore.vendored.requests.exceptions import ConnectionError
 
@@ -277,3 +278,28 @@ class RecordedBotoCoreTest(unittest.TestCase):
         self.destroy_runner = goals.create("destroy", self.workspace, ConsoleFrontend(interactive=False), map=SerialMap)
         self.destroy_runner.execute()
         self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
+
+
+class Stubber(BaseStubber):
+    """Extends the stubber from botocore so that it always asserts that
+    there are no leftover responses.
+
+    So, for eg:
+
+    stub = Stubber(client)
+    stub.add_response('get_abc', service_response={'a': 'b'})
+    with stub:
+        pass
+
+    By using this stubber, the above will fail because there is a
+    pending resquest. The botocore's stubber doesn't - you have to
+    remember to call `stub.assert_no_pending_responses()`.
+
+    """
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        super(Stubber, self).__exit__(exc_type, exc_value, traceback)
+        # Only do this check if we are exiting cleanly, otherwise we
+        # mask the actual exception.
+        if exc_type is None:
+            self.assert_no_pending_responses()
