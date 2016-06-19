@@ -101,6 +101,33 @@ class Bundle(provisioner.Provisioner):
     sudo = argument.Boolean(field='sudo', default=True)
 
 
+class Describe(provisioner.Describe):
+
+    name = "describe"
+    resource = Bundle
+
+    def describe_object(self):
+        if not self.resource.target:
+            # If target is not set we are probably dealing with an AMI... YUCK
+            # Bail out
+            return {"Result": "Pending"}
+
+        serializer = serializers.Resource()
+        if serializer.pending(self.runner, self.resource):
+            return {"Result": "Pending"}
+
+        kwargs = serializer.render(self.runner, self.resource)
+        client = self.runner.get_plan(self.resource.target).get_client()
+
+        try:
+            client.run_script(kwargs['script'], ["-s"])
+        except errors.CommandFailed as e:
+            if e.exit_code == 254:
+                return {"Result": "Success"}
+
+        return {"Result": "Pending"}
+
+
 class Apply(provisioner.Apply):
 
     resource = Bundle

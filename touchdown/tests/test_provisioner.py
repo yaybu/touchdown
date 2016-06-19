@@ -107,3 +107,19 @@ class TestCase(unittest.TestCase):
                 self.apply().get_service(echo, "apply").object["Text"],
                 "hello",
             )
+
+    def test_no_changes(self):
+        bundle = self.workspace.add_fuselage_bundle(
+            target=self.workspace.add_local(),
+        )
+        bundle.add_file(
+            name="ZZZZ__FILE_DOES_NOT_EXIST__ZZZZ",
+            policy="remove",
+        )
+        apply_service = goals.create(
+            "apply",
+            self.workspace,
+            ConsoleFrontend(interactive=False),
+            map=SerialMap
+        )
+        self.assertEqual(len(list(apply_service.plan())), 0)

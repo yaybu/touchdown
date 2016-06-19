@@ -23,12 +23,36 @@ from six import BytesIO
 
 from touchdown.aws.iam import Role
 from touchdown.aws.vpc import SecurityGroup, Subnet
-from touchdown.core import argument, serializers
+from touchdown.core import action, argument, serializers
 from touchdown.core.plan import XOR, Plan, Present
 from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+
+
+def get_code_sha256(bytes_value):
+    hasher = hashlib.sha256(bytes_value)
+    return base64.b64encode(hasher.digest()).decode('utf-8')
+
+
+class Skip(action.Action):
+
+    def __init__(self, inner):
+        super(Skip, self).__init__(inner.plan)
+        self.inner = inner
+
+    @property
+    def description(self):
+        return self.inner.description
+
+    def run(self):
+        arguments = self.inner.action.get_arguments()
+        if 'ZipFile' in arguments:
+            if get_code_sha256(arguments['ZipFile']) == self.plan.object['CodeSha256']:
+                self.plan.echo("Not uploading new zip as sha unchanged")
+                return
+        return self.inner.run()
 
 
 class FunctionSerializer(serializers.Serializer):
@@ -184,19 +208,18 @@ class Apply(SimpleApply, Describe):
             update_code = True
         else:
             serialized = arg.render(self.runner, self.resource)
-            hasher = hashlib.sha256(serialized['ZipFile'])
-            digest = base64.b64encode(hasher.digest()).decode('utf-8')
+            digest = get_code_sha256(serialized['ZipFile'])
             if self.object['CodeSha256'] != digest:
                 update_code = True
 
         if update_code:
-            yield self.generic_action(
+            yield Skip(self.generic_action(
                 ["Update function code", "{} => {}".format(self.object['CodeSha256'], digest)],
                 self.client.update_function_code,
                 FunctionName=self.resource.name,
                 ZipFile=self.resource.code,
                 Publish=True,
-            )
+            ))
 
     def update_code_by_s3(self):
         if not self.resource.s3_file:
