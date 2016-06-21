@@ -1,4 +1,4 @@
-# Copyright 2015 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .client import Client, private_key_from_string
-from .connection import Connection, Instance
-from .portfwd import PortForward
-
-from . import terminal  # noqa
+from . import errors, serializers
 
 
-__all__ = [
-    "Client",
-    "Connection",
-    "Instance",
-    "PortForward",
-    "private_key_from_string",
-]
+class Output(object):
+
+    def __init__(self, serializer):
+        self.serializer = serializer
+
+    def __set__(self, instance, value):
+        raise errors.Error("This attribute is read-only!")
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return serializers.Context(
+            serializers.Const(instance),
+            self.serializer,
+        )

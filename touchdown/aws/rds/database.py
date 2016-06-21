@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, serializers
+from touchdown.core import argument, output, serializers
 from touchdown.core.errors import InvalidParameter
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
@@ -59,6 +59,8 @@ class Database(Resource):
     apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
     # tags = argument.Dict()
     account = argument.Resource(BaseAccount)
+
+    endpoint_address = output.Output(serializers.Property("Endpoint.Address"))
 
     def clean_storage_encrypted(self, value):
         if not value:
