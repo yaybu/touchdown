@@ -162,6 +162,37 @@ class Destroy(SimpleDestroy, Describe):
             yield change
 
 
+class GetCredentialsPlan(Describe):
+
+    name = "get-credentials"
+    resource = Role
+    service_name = "iam"
+    _sts = None
+
+    @property
+    def sts(self):
+        if not self._sts:
+            self._sts = self.runner.get_plan(self.resource.account).session.create_client("sts")
+        return self._sts
+
+    def get_credentials(self):
+        role = self.describe_object()
+
+        creds = self.sts.assume_role(
+            RoleArn=role['Arn'],
+            RoleSessionName="touchdown-get-credentials",
+        )['Credentials']
+
+        prompt = self.resource.name
+
+        return (
+            "AWS_ACCESS_KEY_ID='{AccessKeyId}'; export AWS_ACCESS_KEY_ID;\n"
+            "AWS_SECRET_ACCESS_KEY='{SecretAccessKey}'; export AWS_SECRET_ACCESS_KEY;\n"
+            "AWS_SESSION_TOKEN='{SessionToken}'; export AWS_SESSION_TOKEN;\n"
+            "PS1=\"({Prompt}) $PS1\"; export PS1;\n"
+        ).format(Prompt=prompt, **creds)
+
+
 class Plan(Describe):
 
     name = "get-signin-url"
