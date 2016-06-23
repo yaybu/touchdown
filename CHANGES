@@ -7,6 +7,8 @@ Changelog for Touchdown
 - Add initial support for WAF. This can be used to restrict access by IP or
   block access to parts of a site by URI, headers or query string.
 
+- Rework Lambda deployment code - especially when using a local fuselage bundle.
+
 
 0.13.1 (2016-06-14)
 -------------------

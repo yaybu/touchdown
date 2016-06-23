@@ -123,7 +123,7 @@ class Function(Resource):
     )
 
     memory = argument.Integer(field="MemorySize", default=128, min=128, max=1536)
-    publish = argument.Boolean(field="Publish", default=True)
+    publish = argument.Boolean(field="Publish", default=True, update=False)
 
     security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds", group="vpc_config")
     subnets = argument.ResourceList(Subnet, field="SubnetIds", group="vpc_config")
