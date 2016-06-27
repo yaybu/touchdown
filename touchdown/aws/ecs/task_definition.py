@@ -96,25 +96,32 @@ class Container(Resource):
     resource_name = 'container_definition'
 
     name = argument.String(field='name', min=1)
-    image = argument.String(field='name', min=1)
+    image = argument.String(field='image', min=1)
     cpu = argument.Integer(field='cpu')
     memory = argument.Integer(field='memory')
     links = argument.List(argument.String(), filed='links')
-    port_mappings = argument.ResourceList(PortMapping, field='portMappings')
+    port_mappings = argument.ResourceList(
+        PortMapping,
+        field='portMappings',
+        serializer=serializers.List(serializers.Resource(), skip_empty=True),
+    )
     essential = argument.Boolean(field='essential')
     entry_point = argument.String(field='entryPoint')
     command = argument.String(field='command')
     environment = argument.ResourceList(
         EnvironmentKeyValue,
-        field='environment'
+        field='environment',
+        serializer=serializers.List(serializers.Resource(), skip_empty=True),
     )
     mount_point = argument.ResourceList(
         MountPoint,
-        field='mountPoints'
+        field='mountPoints',
+        serializer=serializers.List(serializers.Resource(), skip_empty=True),
     )
     volumes_from = argument.ResourceList(
         VolumeFrom,
-        field='volumes_from'
+        field='volumes_from',
+        serializer=serializers.List(serializers.Resource(), skip_empty=True),
     )
     hostname = argument.String(field='hostname')
     user = argument.String(field='user')
@@ -130,7 +137,11 @@ class Container(Resource):
     docker_security_options = argument.List(argument.String(), field='dockerSecurityOptions')
     docker_labels = argument.Dict(field='dockerLabels')
 
-    ulimits = argument.ResourceList(Ulimit, field='ulimits')
+    ulimits = argument.ResourceList(
+        Ulimit,
+        field='ulimits',
+        serializer=serializers.List(serializers.Resource(), skip_empty=True),
+    )
 
     log_group = argument.Resource(
         LogGroup,
@@ -143,8 +154,6 @@ class Container(Resource):
         ),
         field='logConfiguration',
     )
-
-    account = argument.Resource(BaseAccount)
 
 
 class Volume(Resource):
@@ -165,8 +174,18 @@ class TaskDefinition(Resource):
     resource_name = 'ecs_task_definition'
 
     name = argument.String(field='family', min=1, max=255)
-    containers = argument.ResourceList(Container, field='containerDefinitions')
-    volumes = argument.ResourceList(Volume, field='volumes')
+    containers = argument.ResourceList(
+        Container,
+        field='containerDefinitions',
+        serializer=serializers.List(serializers.Resource()),
+    )
+    volumes = argument.ResourceList(
+        Volume,
+        field='volumes',
+        serializer=serializers.List(serializers.Resource(), skip_empty=True),
+    )
+
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):
@@ -186,8 +205,14 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = 'register_task_definition'
+    create_envelope = 'taskDefinition'
 
 
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'deregister_task_definition'
+
+    def get_destroy_serializer(self):
+        # Some of the API's take `family` as an argument, but this isn't
+        # one of them - override the parameters to `delete_cluster`...
+        return serializers.Dict(taskDefinition=self.resource.name)
