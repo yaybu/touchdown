@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
 
@@ -48,3 +48,8 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'delete_cluster'
+
+    def get_destroy_serializer(self):
+        # Some of the API's take `clusterName` as an argument, but this isn't
+        # one of them - override the parameters to `delete_cluster`...
+        return serializers.Dict(cluster=self.resource.name)
