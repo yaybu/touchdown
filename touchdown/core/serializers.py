@@ -360,6 +360,11 @@ class Integer(Formatter):
         return int(self.inner.render(runner, object))
 
 
+class Float(Formatter):
+    def render(self, runner, object):
+        return float(self.inner.render(runner, object))
+
+
 class ListOfOne(Formatter):
 
     def __init__(self, *args, **kwargs):

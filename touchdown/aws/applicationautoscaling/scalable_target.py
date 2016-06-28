@@ -25,7 +25,9 @@ class ScalableTarget(Resource):
 
     resource_name = 'scalable_target'
 
-    service = argument.String(field='Service')
+    name = argument.Callable(lambda r: ':'.join((r.resource, r.scalable_dimension)))
+
+    service = argument.String(field='ServiceNamespace')
     resource = argument.String(field='ResourceId')
     scalable_dimension = argument.String(field='ScalableDimension')
     min_capacity = argument.Integer(field='MinCapacity')
@@ -38,10 +40,12 @@ class ScalableTarget(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = ScalableTarget
-    service_name = 'applicationautoscaling'
+    service_name = 'application-autoscaling'
     describe_action = 'describe_scalable_targets'
     describe_envelope = 'ScalableTargets'
-    key = 'clusterName'
+    key = 'ResourceId'
+
+    signature = ()
 
     def get_describe_filters(self):
         return {
@@ -56,6 +60,8 @@ class Apply(SimpleApply, Describe):
     create_action = 'register_scalable_target'
     create_response = 'not-that-useful'
 
+    signature = ()
+
 
 class Destroy(SimpleDestroy, Describe):
 
@@ -64,4 +70,8 @@ class Destroy(SimpleDestroy, Describe):
     def get_destroy_serializer(self):
         # Some of the API's take `clusterName` as an argument, but this isn't
         # one of them - override the parameters to `delete_cluster`...
-        return serializers.Dict(cluster=self.resource.name)
+        return serializers.Dict(
+            ServiceNamespace=self.resource.service,
+            ResourceId=self.resource.resource,
+            ScalableDimension=self.resource.scalable_dimension,
+        )

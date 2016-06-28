@@ -94,8 +94,8 @@ class ScalingPolicy(Resource):
 
 class Describe(SimpleDescribe, Plan):
 
-    resource = ScalableTarget
-    service_name = 'applicationautoscaling'
+    resource = ScalingPolicy
+    service_name = 'application-autoscaling'
     describe_action = 'describe_scaling_policies'
     describe_envelope = 'ScalingPolicies'
     key = 'PolicyName'

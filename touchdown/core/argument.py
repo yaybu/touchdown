@@ -250,6 +250,19 @@ class Integer(Argument):
         return value
 
 
+class Float(Argument):
+
+    serializer = serializers.Float()
+
+    def clean(self, instance, value):
+        if not isinstance(value, float):
+            try:
+                value = float(value)
+            except ValueError:
+                raise errors.InvalidParameter("%s is not a float" % value)
+        return value
+
+
 class IPAddress(String):
 
     serializer = serializers.String()
