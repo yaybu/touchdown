@@ -88,8 +88,9 @@ class Callable(ReadOnly):
             )
     '''
 
-    def __init__(self, func):
+    def __init__(self, func, *args, **kwargs):
         self.func = func
+        super(Callable, self).__init__(*args, **kwargs)
 
     def get_default(self, instance):
         return self.func(instance)

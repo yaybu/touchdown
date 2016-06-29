@@ -37,8 +37,19 @@ class ScalingPolicy(Resource):
 
     name = argument.String(field='PolicyName')
 
-    # FIXME: How to serialize this as 3 fields?
-    scalable_target = argument.Resource(ScalableTarget)
+    scalable_target = argument.Resource(
+        ScalableTarget,
+        field='ResourceId',
+        serializer=serializers.Expression(lambda x, y: '...'),
+    )
+    _service_namespace = argument.Callable(
+        lambda instance: instance.scalable_target.service if instance.scalable_target else None,
+        field='ServiceNamespace',
+    )
+    _scalable_dimension = argument.Callable(
+        lambda instance: instance.scalable_target.scalable_dimension if instance.scalable_target else None,
+        field='ScalableDimension',
+    )
 
     policy_type = argument.String(
         field='PolicyType',
@@ -100,6 +111,12 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = 'ScalingPolicies'
     key = 'PolicyName'
 
+    def get_describe_filters(self):
+        return {
+            'PolicyNames': [self.resource.name],
+            'ServiceNamespace': self.resource.scalable_target.service,
+        }
+
 
 class Apply(SimpleApply, Describe):
 
@@ -110,3 +127,11 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'delete_scaling_policy'
+
+    def get_destroy_serializer(self):
+        return serializers.Dict(
+            PolicyName=self.resource.name,
+            ServiceNamespace=self.resource.scalable_target.service,
+            ResourceId=self.resource.scalable_target.resource,
+            ScalableDimension=self.resource.scalable_target.scalable_dimension,
+        )
