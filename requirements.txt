@@ -7,7 +7,7 @@ ecdsa==0.13
 six==1.10.0
 fuselage==1.0.0
 demjson
-progressbar2==3.9.3
+progressbar2==3.9.4
 cryptography==1.4
 python-gnupg==0.3.8
 
