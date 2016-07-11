@@ -1,4 +1,4 @@
-# Copyright 2015 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
-
-from touchdown.core import argument, serializers
-
-from . import step
+from touchdown.core import argument, plan, resource, workspace
 
 
-class Script(step.Step):
+class Step(resource.Resource):
 
-    resource_name = 'script'
+    name = argument.String()
+    root = argument.Resource(workspace.Workspace)
 
-    script = argument.String(
-        field='script',
-        serializer=serializers.Expression(lambda r, o: six.StringIO(o)),
-    )
-    sudo = argument.Boolean(field='sudo', default=True)
+
+class NeedsRunning(plan.Plan):
+
+    name = 'needs-running'
+    resource = Step
+
+    def needs_running(self, client):
+        return True

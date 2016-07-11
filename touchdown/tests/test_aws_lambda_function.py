@@ -180,8 +180,10 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
+        bundle = self.workspace.add_fuselage_bundle()
+        prov = self.workspace.add_provisioner(
+            target=self.workspace.add_local(),
+            steps=[bundle],
         )
         lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_file(
@@ -192,7 +194,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
             name='myfunction',
             role=self.aws.get_role(name='myrole'),
             handler='mymodule.myfunction',
-            code=bundle.add_output(name=os.path.join(self.test_dir, 'lambda.zip')),
+            code=prov.add_output(name=os.path.join(self.test_dir, 'lambda.zip')),
         )
 
         role_service = goal.get_service(self.fn.role, 'describe')
@@ -269,8 +271,10 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
+        bundle = self.workspace.add_fuselage_bundle()
+        prov = self.workspace.add_provisioner(
+            target=self.workspace.add_local(),
+            steps=[bundle],
         )
         lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_file(
@@ -281,7 +285,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
             name='myfunction',
             role=self.aws.get_role(name='myrole'),
             handler='mymodule.myfunction',
-            code=bundle.add_output(name=lambda_zip),
+            code=prov.add_output(name=lambda_zip),
         )
 
         role_service = goal.get_service(fn.role, 'describe')
@@ -337,15 +341,17 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         with role_stubber:
             with fn_stubber:
                 goal.execute()
-                self.assertEqual(len(goal.get_changes(bundle)), 1)
+                self.assertEqual(len(goal.get_changes(prov)), 1)
                 self.assertEqual(len(goal.get_changes(fn)), 1)
                 fn_stubber.assert_no_pending_responses()
 
     def test_bundle_skipped_but_output_same(self):
         goal = self.create_goal('apply')
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
+        bundle = self.workspace.add_fuselage_bundle()
+        prov = self.workspace.add_provisioner(
+            target=self.workspace.add_local(),
+            steps=[bundle],
         )
         lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_execute(
@@ -356,7 +362,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
             name='myfunction',
             role=self.aws.get_role(name='myrole'),
             handler='mymodule.myfunction',
-            code=bundle.add_output(name=lambda_zip),
+            code=prov.add_output(name=lambda_zip),
         )
 
         role_service = goal.get_service(self.fn.role, 'describe')
@@ -412,13 +418,15 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         with role_stubber:
             with fn_stubber:
                 self.assertEqual(len(list(goal.plan())), 0)
-                self.assertEqual(len(goal.get_changes(bundle)), 0)
+                self.assertEqual(len(goal.get_changes(prov)), 0)
 
     def test_bundle_skipped_but_output_different(self):
         goal = self.create_goal('apply')
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
+        bundle = self.workspace.add_fuselage_bundle()
+        prov = self.workspace.add_provisioner(
+            target=self.workspace.add_local(),
+            steps=[bundle],
         )
         lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_execute(
@@ -429,7 +437,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
             name='myfunction',
             role=self.aws.get_role(name='myrole'),
             handler='mymodule.myfunction',
-            code=bundle.add_output(name=lambda_zip),
+            code=prov.add_output(name=lambda_zip),
         )
 
         role_service = goal.get_service(self.fn.role, 'describe')
@@ -496,4 +504,4 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         with role_stubber:
             with fn_stubber:
                 goal.execute()
-                self.assertEqual(len(goal.get_changes(bundle)), 0)
+                self.assertEqual(len(goal.get_changes(prov)), 0)

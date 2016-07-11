@@ -16,9 +16,9 @@ from __future__ import absolute_import
 
 import re
 
-from touchdown.core import argument, errors, resource, serializers
+from touchdown.core import argument, errors, plan, resource, serializers
 
-from . import provisioner
+from . import step
 
 try:
     import fuselage
@@ -89,7 +89,7 @@ class BundleSerializer(serializers.Serializer):
         return builder.build(b)
 
 
-class Bundle(provisioner.Provisioner):
+class Bundle(step.Step):
 
     resource_name = 'fuselage_bundle'
 
@@ -102,43 +102,28 @@ class Bundle(provisioner.Provisioner):
     sudo = argument.Boolean(field='sudo', default=True)
 
 
-class Describe(provisioner.Describe):
+class NeedsRunning(plan.Plan):
 
-    name = 'describe'
+    name = 'needs-running'
     resource = Bundle
 
-    def describe_object(self):
+    def needs_running(self, client):
         if self.resource.always_apply:
-            return {'Results': 'Pending'}
-
-        if not self.resource.target:
-            # If target is not set we are probably dealing with an AMI... YUCK
-            # Bail out
-            return {'Result': 'Pending'}
+            return True
 
         serializer = serializers.Resource()
         if serializer.pending(self.runner, self.resource):
-            return {'Result': 'Pending'}
+            return True
 
         kwargs = serializer.render(self.runner, self.resource)
-
-        try:
-            client = self.runner.get_plan(self.resource.target).get_client()
-        except errors.ServiceNotReady:
-            return {'Result': 'Pending'}
 
         try:
             client.run_script(kwargs['script'], ['-s'])
         except errors.CommandFailed as e:
             if e.exit_code == 254:
-                return {'Result': 'Success'}
+                return False
 
-        return {'Result': 'Pending'}
-
-
-class Apply(provisioner.Apply):
-
-    resource = Bundle
+        return True
 
 
 for attr, value in vars(resources).items():

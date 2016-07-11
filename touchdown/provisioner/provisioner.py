@@ -21,6 +21,8 @@ from touchdown.core import (
     workspace,
 )
 
+from .step import Step
+
 
 class Target(resource.Resource):
     resource_name = 'target'
@@ -30,7 +32,10 @@ class Provisioner(resource.Resource):
 
     resource_name = 'provisioner'
 
+    name = argument.String()
     target = argument.Resource(Target)
+    steps = argument.ResourceList(Step)
+
     root = argument.Resource(workspace.Workspace)
 
 
@@ -41,15 +46,18 @@ class RunScript(action.Action):
         yield 'Applying {} to {}'.format(self.resource, self.resource.target)
 
     def run(self):
-        kwargs = serializers.Resource().render(self.runner, self.resource)
         client = self.get_plan(self.resource.target).get_client()
-        try:
-            client.run_script(kwargs['script'])
-            self.plan.object['Result'] = 'Success'
-        except Exception as e:
-            self.plan.object['Result'] = 'Error'
-            self.plan.object['ErrorMessage'] = str(e)
-            raise
+        for step in self.resource.steps:
+            kwargs = serializers.Resource().render(self.runner, step)
+
+            try:
+                client.run_script(kwargs['script'])
+            except Exception as e:
+                self.plan.object['Result'] = 'Error'
+                self.plan.object['ErrorMessage'] = str(e)
+                raise
+
+        self.plan.object['Result'] = 'Success'
 
 
 class Describe(plan.Plan):
@@ -71,9 +79,14 @@ class Apply(plan.Plan):
     resource = Provisioner
 
     def get_actions(self):
-        self.object = self.runner.get_service(self.resource, 'describe').describe_object()
-        if self.resource.target and self.object.get('Result', 'Pending') == 'Pending':
-            yield RunScript(self)
+        client = self.runner.get_plan(self.resource.target).get_client()
+        for step in self.resource.steps:
+            if self.runner.get_service(step, 'needs-running').needs_running(client):
+                self.object = {'Result': 'Pending'}
+                yield RunScript(self)
+                break
+        else:
+            self.object = {'Result': 'Success'}
 
 
 class Destroy(plan.Plan):

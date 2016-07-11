@@ -260,7 +260,7 @@ class Float(Argument):
             try:
                 value = float(value)
             except ValueError:
-                raise errors.InvalidParameter("%s is not a float" % value)
+                raise errors.InvalidParameter('%s is not a float' % value)
         return value
 
 

@@ -34,12 +34,14 @@ class TestCase(WorkspaceTestCase):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
             fp.close()
 
-            bundle = self.workspace.add_fuselage_bundle(
-                target=self.workspace.add_local(),
-            )
+            bundle = self.workspace.add_fuselage_bundle()
             bundle.add_file(
                 name=fp.name,
                 contents='hello',
+            )
+            self.workspace.add_provisioner(
+                target=self.workspace.add_local(),
+                steps=[bundle],
             )
             self.apply()
             self.assertTrue(os.path.exists(fp.name))
@@ -49,12 +51,14 @@ class TestCase(WorkspaceTestCase):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
             fp.close()
 
-            bundle = self.workspace.add_fuselage_bundle(
-                target=self.workspace.add_local(),
-            )
+            bundle = self.workspace.add_fuselage_bundle()
             bundle.add_file(
                 name=fp.name,
                 contents=serializers.Const('hello'),
+            )
+            self.workspace.add_provisioner(
+                target=self.workspace.add_local(),
+                steps=[bundle],
             )
             self.apply()
             self.assertEquals(open(fp.name, 'r').read(), 'hello')
@@ -63,12 +67,14 @@ class TestCase(WorkspaceTestCase):
         with tempfile.NamedTemporaryFile(delete=False) as fp:
             fp.write(b'HELLO')
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local(),
-        )
+        bundle = self.workspace.add_fuselage_bundle()
         bundle.add_file(
             name=fp.name,
             policy='remove',
+        )
+        self.workspace.add_provisioner(
+            target=self.workspace.add_local(),
+            steps=[bundle],
         )
         self.apply()
         self.assertFalse(os.path.exists(fp.name))
@@ -77,15 +83,18 @@ class TestCase(WorkspaceTestCase):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
             fp.close()
 
-            bundle = self.workspace.add_fuselage_bundle(
-                target=self.workspace.add_local(),
-            )
+            bundle = self.workspace.add_fuselage_bundle()
             bundle.add_file(
                 name=fp.name,
                 contents=serializers.Const('hello'),
             )
 
-            output = bundle.add_output(name=fp.name)
+            prov = self.workspace.add_provisioner(
+                target=self.workspace.add_local(),
+                steps=[bundle],
+            )
+
+            output = prov.add_output(name=fp.name)
             echo = self.workspace.add_echo(text=output)
 
             self.assertEqual(
@@ -94,12 +103,14 @@ class TestCase(WorkspaceTestCase):
             )
 
     def test_no_changes(self):
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local(),
-        )
+        bundle = self.workspace.add_fuselage_bundle()
         bundle.add_file(
             name='ZZZZ__FILE_DOES_NOT_EXIST__ZZZZ',
             policy='remove',
+        )
+        self.workspace.add_provisioner(
+            target=self.workspace.add_local(),
+            steps=[bundle],
         )
         apply_service = self.create_goal('apply')
         self.assertEqual(len(list(apply_service.plan())), 0)
