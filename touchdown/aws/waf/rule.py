@@ -62,6 +62,7 @@ class Rule(Resource):
         Match,
         field='Predicates',
         create=False,
+        serializer=serializers.List(serializers.Resource()),
     )
     account = argument.Resource(BaseAccount)
 
