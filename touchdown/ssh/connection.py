@@ -85,7 +85,7 @@ class ConnectionPlan(plan.Plan):
         raise errors.Error("Error setting up proxy channel to {} after 20 tries".format(kwargs['hostname']))
 
     def get_client(self):
-        if self._client:
+        if self._client and self._client.get_transport().active:
             return self._client
 
         cli = client.Client(self)
