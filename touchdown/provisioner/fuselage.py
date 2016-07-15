@@ -93,6 +93,7 @@ class Bundle(provisioner.Provisioner):
 
     resource_name = "fuselage_bundle"
 
+    always_apply = argument.Boolean()
     resources = argument.List(
         argument.Resource(FuselageResource),
         field='script',
@@ -107,6 +108,9 @@ class Describe(provisioner.Describe):
     resource = Bundle
 
     def describe_object(self):
+        if self.resource.always_apply:
+            return {"Results": "Pending"}
+
         if not self.resource.target:
             # If target is not set we are probably dealing with an AMI... YUCK
             # Bail out
