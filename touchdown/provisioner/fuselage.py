@@ -117,7 +117,11 @@ class Describe(provisioner.Describe):
             return {"Result": "Pending"}
 
         kwargs = serializer.render(self.runner, self.resource)
-        client = self.runner.get_plan(self.resource.target).get_client()
+
+        try:
+            client = self.runner.get_plan(self.resource.target).get_client()
+        except errors.ServiceNotReady:
+            return {"Result": "Pending"}
 
         try:
             client.run_script(kwargs['script'], ["-s"])

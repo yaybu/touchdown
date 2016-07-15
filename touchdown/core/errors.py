@@ -17,6 +17,10 @@ class Error(Exception):
     pass
 
 
+class ServiceNotReady(Error):
+    pass
+
+
 class CommandFailed(Error):
 
     def __init__(self, exit_code, stdout=None, stderr=None):

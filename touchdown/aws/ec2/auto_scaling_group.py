@@ -353,7 +353,7 @@ class Instance(ssh.Instance):
         plan = runner.get_plan(self.adapts)
         obj = plan.describe_object()
         if len(obj.get("Instances", [])) == 0:
-            raise errors.Error("No instances currently running in group {}".format(self.adapts))
+            raise errors.ServiceNotReady("No instances currently running in group {}".format(self.adapts))
 
         asg_inservice = filter(
             lambda x: x['LifecycleState'] == 'InService',
@@ -361,7 +361,7 @@ class Instance(ssh.Instance):
         )
 
         if len(asg_inservice) == 0:
-            raise errors.Error("None of the instances in {} are in service".format(self.adapts))
+            raise errors.ServiceNotReady("None of the instances in {} are in service".format(self.adapts))
 
         # Annoyingly we have to get antother client (different API) to get info
         # on teh EC2 instances in our asg
@@ -376,7 +376,7 @@ class Instance(ssh.Instance):
             instances.extend(reservation.get("Instances", []))
 
         if len(instances) == 0:
-            raise errors.Error("No instances available in {}".format(self.adapts))
+            raise errors.ServiceNotReady("No instances available in {}".format(self.adapts))
 
         return instances
 
@@ -411,4 +411,4 @@ class Instance(ssh.Instance):
             if possible:
                 return serializers.Const(random.choice(possible))
 
-        raise errors.Error("No instances available in {} with ip address".format(self.adapts))
+        raise errors.ServiceNotReady("No instances available in {} with ip address".format(self.adapts))
