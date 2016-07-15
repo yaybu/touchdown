@@ -4,7 +4,11 @@ Changelog for Touchdown
 0.14.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Provisioner: Flag to make planning simpler
+
+- Provisioner: If ASG isn't available task is run
+
+- Provisioner: Fix SSHing where target changes between planning and execution
 
 
 0.14.0 (2016-06-23)
