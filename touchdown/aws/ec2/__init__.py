@@ -19,6 +19,7 @@ from .instance import Instance
 from .auto_scaling_group import AutoScalingGroup
 from .auto_scaling_policy import Policy
 from .launch_configuration import LaunchConfiguration
+from .volume import Volume
 
 
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     'AutoScalingGroup',
     'Policy',
     'LaunchConfiguration',
+    'Volume',
 ]
