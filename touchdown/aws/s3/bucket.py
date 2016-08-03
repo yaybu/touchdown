@@ -178,18 +178,13 @@ class Apply(SimpleApply, Describe):
             self.resource,
         )
 
-        update_notifications = False
-        if local and not self.object:
-            update_notifications = True
-        elif self.object:
-            d = serializers.Resource(group="notifications").diff(
-                self.runner,
-                self.resource,
-                self.object['NotificationConfiguration'],
-            )
-            update_notifications = not d.matches()
+        d = serializers.Resource(group="notifications").diff(
+            self.runner,
+            self.resource,
+            self.object.get('NotificationConfiguration', {}),
+        )
 
-        if update_notifications:
+        if d.matches():
             yield self.generic_action(
                 ["Update notification configuration"] + list(d.lines()),
                 self.client.put_bucket_notification_configuration,
