@@ -57,6 +57,7 @@ class Describe(SimpleDescribe, Plan):
 class Apply(SimpleApply, Describe):
 
     create_action = 'update_account_password_policy'
+    create_response = 'not-that-useful'
     update_action = 'update_account_password_policy'
 
 

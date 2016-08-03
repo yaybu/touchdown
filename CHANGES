@@ -8,6 +8,8 @@ Changelog for Touchdown
 
 - S3: Fix an issue with notification configuration for new buckets.
 
+- AWS: Fix password policy creation.
+
 
 0.14.1 (2016-07-15)
 -------------------
