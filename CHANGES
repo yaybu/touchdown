@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.14.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- AWS: Wait for password policy changes to be correctly applied.
 
 
 0.14.2 (2016-08-04)
