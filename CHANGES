@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.14.2 (unreleased)
+0.14.2 (2016-08-04)
 -------------------
 
 - EBS: Add support for creating/destroying EBS volumes.
