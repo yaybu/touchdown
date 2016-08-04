@@ -59,6 +59,7 @@ class Apply(SimpleApply, Describe):
     create_action = 'update_account_password_policy'
     create_response = 'not-that-useful'
     update_action = 'update_account_password_policy'
+    waiter = 'account_password_policy_exists'
 
 
 class Destroy(SimpleDestroy, Describe):
