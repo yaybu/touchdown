@@ -173,11 +173,6 @@ class Apply(SimpleApply, Describe):
             serializers.Resource(group="notifications"),
             serializers.Const({}),
         )
-        local = local_s.render(
-            self.runner,
-            self.resource,
-        )
-
         d = serializers.Resource(group="notifications").diff(
             self.runner,
             self.resource,
