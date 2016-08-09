@@ -118,7 +118,7 @@ class Destroy(SimpleDestroy, Describe):
         )
 
 
-class Instance(ssh.Instance):
+class SSHInstance(ssh.Instance):
 
     resource_name = "ec2_instance"
     input = Instance

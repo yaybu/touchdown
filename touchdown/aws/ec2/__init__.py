@@ -20,6 +20,7 @@ from .auto_scaling_group import AutoScalingGroup
 from .auto_scaling_policy import Policy
 from .launch_configuration import LaunchConfiguration
 from .volume import Volume
+from .volume_attachment import VolumeAttachment
 
 
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     'Policy',
     'LaunchConfiguration',
     'Volume',
+    'VolumeAttachment',
 ]
