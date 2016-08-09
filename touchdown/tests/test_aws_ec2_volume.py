@@ -19,14 +19,14 @@ from touchdown.tests.aws import StubberTestCase
 
 class TestVolumeCreation(StubberTestCase):
 
-    TEST_CASE_GOAL = 'apply'
-
     def test_create_volume(self):
+        goal = self.create_goal('apply')
+
         volume = self.aws.add_volume(
             name='myvolume',
             availability_zone='eu-west-1a',
         )
-        applicator = self.goal.get_service(volume, 'apply')
+        applicator = goal.get_service(volume, 'apply')
 
         with Stubber(applicator.client) as stub:
             stub.add_response(
@@ -61,14 +61,16 @@ class TestVolumeCreation(StubberTestCase):
                 },
             )
 
-            self.goal.execute()
+            goal.execute()
 
     def test_create_volume_idempotent(self):
+        goal = self.create_goal('apply')
+
         volume = self.aws.add_volume(
             name='myvolume',
             availability_zone='eu-west-1a',
         )
-        applicator = self.goal.get_service(volume, 'apply')
+        applicator = goal.get_service(volume, 'apply')
 
         with Stubber(applicator.client) as stub:
             stub.add_response(
@@ -85,20 +87,20 @@ class TestVolumeCreation(StubberTestCase):
                 },
             )
 
-            self.assertEqual(len(list(self.goal.plan())), 0)
-            self.assertEqual(len(self.goal.get_changes(volume)), 0)
+            self.assertEqual(len(list(goal.plan())), 0)
+            self.assertEqual(len(goal.get_changes(volume)), 0)
 
 
 class TestVolumeDeletion(StubberTestCase):
 
-    TEST_CASE_GOAL = 'destroy'
-
     def test_delete_volume(self):
+        goal = self.create_goal('destroy')
+
         volume = self.aws.add_volume(
             name='myvolume',
             availability_zone='eu-west-1a',
         )
-        applicator = self.goal.get_service(volume, 'destroy')
+        applicator = goal.get_service(volume, 'destroy')
 
         with Stubber(applicator.client) as stub:
             stub.add_response(
@@ -123,14 +125,16 @@ class TestVolumeDeletion(StubberTestCase):
                 },
             )
 
-            self.goal.execute()
+            goal.execute()
 
     def test_delete_volume_idempotent(self):
+        goal = self.create_goal('destroy')
+
         volume = self.aws.add_volume(
             name='myvolume',
             availability_zone='eu-west-1a',
         )
-        applicator = self.goal.get_service(volume, 'destroy')
+        applicator = goal.get_service(volume, 'destroy')
 
         with Stubber(applicator.client) as stub:
             stub.add_response(
@@ -145,5 +149,5 @@ class TestVolumeDeletion(StubberTestCase):
                 },
             )
 
-            self.assertEqual(len(list(self.goal.plan())), 0)
-            self.assertEqual(len(self.goal.get_changes(volume)), 0)
+            self.assertEqual(len(list(goal.plan())), 0)
+            self.assertEqual(len(goal.get_changes(volume)), 0)

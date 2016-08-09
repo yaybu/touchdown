@@ -282,19 +282,19 @@ class RecordedBotoCoreTest(unittest.TestCase):
 
 class StubberTestCase(unittest.TestCase):
 
-    TEST_CASE_GOAL = 'apply'
-
     def setUp(self):
         self.workspace = workspace.Workspace()
         self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            self.TEST_CASE_GOAL,
+        self.fixtures = ExitStack()
+        self.addCleanup(self.fixtures.close)
+
+    def create_goal(self, goal_name):
+        return goals.create(
+            goal_name,
             self.workspace,
             ConsoleFrontend(interactive=False),
             map=SerialMap
         )
-        self.fixtures = ExitStack()
-        self.addCleanup(self.fixtures.close)
 
 
 class Stubber(BaseStubber):

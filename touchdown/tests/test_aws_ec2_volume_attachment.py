@@ -23,8 +23,10 @@ from touchdown.tests.stubs.aws import (
 class TestVolumeAttachmentCreation(StubberTestCase):
 
     def test_create_volume_attachment(self):
+        goal = self.create_goal('apply')
+
         volume = self.fixtures.enter_context(VolumeStubber(
-            self.goal.get_service(
+            goal.get_service(
                 self.aws.get_volume(name='my-volume'),
                 'describe',
             )
@@ -32,7 +34,7 @@ class TestVolumeAttachmentCreation(StubberTestCase):
         volume.add_describe_volumes_one_response_by_name()
 
         ec2_instance = self.fixtures.enter_context(EC2InstanceStubber(
-            self.goal.get_service(
+            goal.get_service(
                 self.aws.get_ec2_instance(name='my-ec2-instance'),
                 'describe',
             )
@@ -40,7 +42,7 @@ class TestVolumeAttachmentCreation(StubberTestCase):
         ec2_instance.add_describe_instances_one_response_by_name()
 
         volume_attachment = self.fixtures.enter_context(VolumeAttachmentStubber(
-            self.goal.get_service(
+            goal.get_service(
                 ec2_instance.resource.add_volume_attachment(
                     volume=volume.resource,
                     device='/foo',
@@ -51,4 +53,4 @@ class TestVolumeAttachmentCreation(StubberTestCase):
         volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
         volume_attachment.add_attach_volume()
 
-        self.goal.execute()
+        goal.execute()
