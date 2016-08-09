@@ -46,3 +46,36 @@ class VolumeStubber(ServiceStubber):
                 ],
             },
         )
+
+    def add_create_volume(self, availability_zone='eu-west-1a'):
+        return self.add_response(
+            'create_volume',
+            service_response={
+                'VolumeId': 'vol-abcdef12345',
+            },
+            expected_params={
+                'AvailabilityZone': 'eu-west-1a',
+            },
+        )
+
+    def add_create_tags(self, **tags):
+        tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
+        self.add_response(
+            'create_tags',
+            service_response={
+            },
+            expected_params={
+                'Resources': ['vol-abcdef12345'],
+                'Tags': tag_list,
+            },
+        )
+
+    def add_delete_volume(self):
+        return self.add_response(
+            'delete_volume',
+            service_response={
+            },
+            expected_params={
+                'VolumeId': 'vol-abcdef12345',
+            },
+        )
