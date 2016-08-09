@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .bucket import BucketStubber
 from .ec2_instance import EC2InstanceStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
 
 
 __all__ = [
+    'BucketStubber',
     'EC2InstanceStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',

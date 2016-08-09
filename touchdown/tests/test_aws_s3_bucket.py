@@ -12,90 +12,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-
-from botocore.stub import Stubber
-
-from touchdown import frontends
-from touchdown.core import goals, workspace
 from touchdown.core.errors import InvalidParameter
-from touchdown.core.map import SerialMap
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import BucketStubber
 
 from . import aws
 
 
-class TestBucketDescribe(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            "apply",
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
+class TestBucketDescribe(StubberTestCase):
 
     def test_annotate_object(self):
-        bucket = self.aws.add_bucket(name="mybucket")
-        desc = self.goal.get_service(bucket, "describe")
+        goal = self.create_goal('apply')
 
-        stub = Stubber(desc.client)
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(name='mybucket'),
+                'describe',
+            )
+        ))
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
 
-        stub.add_response(
-            'get_bucket_location',
-            {'LocationConstraint': 'eu-central-1'},
-            {'Bucket': 'mybucket'},
-        )
-        stub.add_response(
-            'get_bucket_cors',
-            {'CORSRules': []},
-            {'Bucket': 'mybucket'},
-        )
-        stub.add_response(
-            'get_bucket_policy',
-            {'Policy': '{}'},
-            {'Bucket': 'mybucket'},
-        )
-        stub.add_response(
-            'get_bucket_notification_configuration',
-            {},
-            {'Bucket': 'mybucket'},
-        )
-        stub.add_response(
-            'get_bucket_accelerate_configuration',
-            {},
-            {'Bucket': 'mybucket'},
-        )
-
-        with stub:
-            obj = desc.annotate_object({
-                "Name": "ZzZzZz"
-            })
+        obj = bucket.service.annotate_object({
+            'Name': 'ZzZzZz'
+        })
 
         # Assert name isn't trodden on by annotate_object
-        self.assertEqual(obj["Name"], "ZzZzZz")
+        self.assertEqual(obj['Name'], 'ZzZzZz')
 
 
 class TestBucketValidation(aws.RecordedBotoCoreTest):
 
     def test_starts_with_period(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name=".foo")
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='.foo')
 
     def test_ends_with_period(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="foo.")
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='foo.')
 
     def test_double_period(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="foo..bar")
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='foo..bar')
 
     def test_starts_with_hyphen(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="-foo")
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='-foo')
 
     def test_ends_with_hyphen(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="foo-")
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='foo-')
 
     def test_hyphen(self):
-        self.aws.add_bucket(name="foo--bar")
+        self.aws.add_bucket(name='foo--bar')
 
     def test_upper(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="FOO")
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='FOO')
