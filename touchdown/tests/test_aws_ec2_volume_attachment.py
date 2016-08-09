@@ -20,114 +20,7 @@ from touchdown import frontends
 from touchdown.core import goals, workspace
 from touchdown.core.map import SerialMap
 
-
-class ServiceStubber(Stubber):
-
-    def __init__(self, service):
-        self.resource = service.resource
-        self.service = service
-        # assert service.client.service == self.client_service
-        super(ServiceStubber, self).__init__(service.client)
-
-
-class VolumeStubber(ServiceStubber):
-
-    client_service = 'ec2'
-
-    def add_describe_volumes_empty_response_by_name(self):
-        return self.add_response(
-            'describe_volumes',
-            service_response={
-                'Volumes': [],
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]}
-                ],
-            },
-        )
-
-    def add_describe_volumes_one_response_by_name(self):
-        return self.add_response(
-            'describe_volumes',
-            service_response={
-                'Volumes': [{
-                    'VolumeId': 'vol-abcdef12345',
-                }],
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]}
-                ],
-            },
-        )
-
-
-class EC2InstanceStubber(ServiceStubber):
-
-    client_service = 'ec2'
-
-    def add_describe_instances_empty_response_by_name(self):
-        return self.add_response(
-            'describe_instances',
-            service_response={
-                'Reservations': [],
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]},
-                    {'Name': 'instance-state-name', 'Values': ['pending', 'running']},
-                ],
-            },
-        )
-
-    def add_describe_instances_one_response_by_name(self):
-        return self.add_response(
-            'describe_instances',
-            service_response={
-                'Reservations': [{
-                    'Instances': [{
-                        'InstanceId': 'i-abcdef12345',
-                    }],
-                }]
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]},
-                    {'Name': 'instance-state-name', 'Values': ['pending', 'running']},
-                ],
-            },
-        )
-
-
-class VolumeAttachmentStubber(ServiceStubber):
-
-    def add_describe_attachments_empty_response_by_instance_and_volume(self):
-        return self.add_response(
-            'describe_volumes',
-            service_response={
-                'Volumes': [],
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'attachment.status', 'Values': ['attaching', 'attached']},
-                    {'Name': 'attachment.instance-id', 'Values': ['i-abcdef12345']}
-                ],
-                'VolumeIds': ['vol-abcdef12345'],
-            }
-        )
-
-    def add_attach_volume(self, device='/foo'):
-        return self.add_response(
-            'attach_volume',
-            service_response={
-            },
-            expected_params={
-                'Device': device,
-                'InstanceId': 'i-abcdef12345',
-                'VolumeId': 'vol-abcdef12345',
-            }
-        )
+from touchdown.tests.stubs.aws import EC2InstanceStubber, VolumeStubber, VolumeAttachmentStubber
 
 
 class TestVolumeAttachmentCreation(unittest.TestCase):
@@ -141,35 +34,36 @@ class TestVolumeAttachmentCreation(unittest.TestCase):
             frontends.ConsoleFrontend(interactive=False),
             map=SerialMap
         )
+        self.fixtures = ExitStack()
+        self.addCleanup(self.fixtures.close)
 
     def test_create_volume_attachment(self):
-        with ExitStack() as stack:
-            volume = stack.enter_context(VolumeStubber(
-                self.goal.get_service(
-                    self.aws.get_volume(name='my-volume'),
-                    'describe',
-                )
-            ))
-            volume.add_describe_volumes_one_response_by_name()
+        volume = self.fixtures.enter_context(VolumeStubber(
+            self.goal.get_service(
+                self.aws.get_volume(name='my-volume'),
+                'describe',
+            )
+        ))
+        volume.add_describe_volumes_one_response_by_name()
 
-            ec2_instance = stack.enter_context(EC2InstanceStubber(
-                self.goal.get_service(
-                    self.aws.get_ec2_instance(name='my-ec2-instance'),
-                    'describe',
-                )
-            ))
-            ec2_instance.add_describe_instances_one_response_by_name()
+        ec2_instance = self.fixtures.enter_context(EC2InstanceStubber(
+            self.goal.get_service(
+                self.aws.get_ec2_instance(name='my-ec2-instance'),
+                'describe',
+            )
+        ))
+        ec2_instance.add_describe_instances_one_response_by_name()
 
-            volume_attachment = stack.enter_context(VolumeAttachmentStubber(
-                self.goal.get_service(
-                    ec2_instance.resource.add_volume_attachment(
-                        volume=volume.resource,
-                        device='/foo',
-                    ),
-                    'apply',
-                )
-            ))
-            volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
-            volume_attachment.add_attach_volume()
+        volume_attachment = self.fixtures.enter_context(VolumeAttachmentStubber(
+            self.goal.get_service(
+                ec2_instance.resource.add_volume_attachment(
+                    volume=volume.resource,
+                    device='/foo',
+                ),
+                'apply',
+            )
+        ))
+        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
+        volume_attachment.add_attach_volume()
 
-            self.goal.execute()
+        self.goal.execute()
