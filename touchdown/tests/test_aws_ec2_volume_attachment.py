@@ -12,30 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-from contextlib2 import ExitStack
-from botocore.stub import Stubber
-
-from touchdown import frontends
-from touchdown.core import goals, workspace
-from touchdown.core.map import SerialMap
-
-from touchdown.tests.stubs.aws import EC2InstanceStubber, VolumeStubber, VolumeAttachmentStubber
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import (
+    EC2InstanceStubber,
+    VolumeAttachmentStubber,
+    VolumeStubber,
+)
 
 
-class TestVolumeAttachmentCreation(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            'apply',
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
-        self.fixtures = ExitStack()
-        self.addCleanup(self.fixtures.close)
+class TestVolumeAttachmentCreation(StubberTestCase):
 
     def test_create_volume_attachment(self):
         volume = self.fixtures.enter_context(VolumeStubber(

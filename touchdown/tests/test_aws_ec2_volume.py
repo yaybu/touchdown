@@ -12,26 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-
 from botocore.stub import Stubber
 
-from touchdown import frontends
-from touchdown.core import goals, workspace
-from touchdown.core.map import SerialMap
+from touchdown.tests.aws import StubberTestCase
 
 
-class TestVolumeCreation(unittest.TestCase):
+class TestVolumeCreation(StubberTestCase):
 
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            'apply',
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
+    TEST_CASE_GOAL = 'apply'
 
     def test_create_volume(self):
         volume = self.aws.add_volume(
@@ -101,17 +89,9 @@ class TestVolumeCreation(unittest.TestCase):
             self.assertEqual(len(self.goal.get_changes(volume)), 0)
 
 
-class TestVolumeDeletion(unittest.TestCase):
+class TestVolumeDeletion(StubberTestCase):
 
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            'destroy',
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
+    TEST_CASE_GOAL = 'destroy'
 
     def test_delete_volume(self):
         volume = self.aws.add_volume(

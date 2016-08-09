@@ -16,9 +16,7 @@ from touchdown.core import argument
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
-from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
-from ..kms import Key
 from .instance import Instance
 from .volume import Volume
 

@@ -15,3 +15,10 @@
 from .ec2_instance import EC2InstanceStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
+
+
+__all__ = [
+    'EC2InstanceStubber',
+    'VolumeAttachmentStubber',
+    'VolumeStubber',
+]
