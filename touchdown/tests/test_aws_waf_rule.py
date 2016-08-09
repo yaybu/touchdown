@@ -1,4 +1,4 @@
-# Copyright 2015 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-
-from touchdown import frontends
-from touchdown.core import goals, workspace
-from touchdown.core.map import SerialMap
-from touchdown.tests.aws import Stubber
+from touchdown.tests.aws import Stubber, StubberTestCase
 
 
-class TestWafRule(unittest.TestCase):
+class TestWafRule(StubberTestCase):
     """Test that WAF rules can be created, updated and deleted.
 
     Note: Because WAF uses a change token, every "real" request is
@@ -29,18 +24,6 @@ class TestWafRule(unittest.TestCase):
     to make, and it is also returned to us.
 
     """
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-
-    def create_goal(self, name):
-        return goals.create(
-            name,
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
 
     def test_annotate_rule(self):
         """Test that when we annotate a rule, we gain the expected data."""
