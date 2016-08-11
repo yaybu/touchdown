@@ -32,6 +32,26 @@ class VolumeAttachmentStubber(ServiceStubber):
             }
         )
 
+    def add_describe_attachments_one_response_by_instance_and_volume(self):
+        return self.add_response(
+            'describe_volumes',
+            service_response={
+                'Volumes': [{
+                    'VolumeId': 'vol-abcdef12345',
+                    'Attachments': [{
+                        'InstanceId': 'i-abcdef12345',
+                    }],
+                }],
+            },
+            expected_params={
+                'Filters': [
+                    {'Name': 'attachment.status', 'Values': ['attaching', 'attached']},
+                    {'Name': 'attachment.instance-id', 'Values': ['i-abcdef12345']}
+                ],
+                'VolumeIds': ['vol-abcdef12345'],
+            }
+        )
+
     def add_attach_volume(self, device='/foo'):
         return self.add_response(
             'attach_volume',
@@ -40,6 +60,16 @@ class VolumeAttachmentStubber(ServiceStubber):
             expected_params={
                 'Device': device,
                 'InstanceId': 'i-abcdef12345',
+                'VolumeId': 'vol-abcdef12345',
+            }
+        )
+
+    def add_detach_volume(self):
+        return self.add_response(
+            'detach_volume',
+            service_response={
+            },
+            expected_params={
                 'VolumeId': 'vol-abcdef12345',
             }
         )

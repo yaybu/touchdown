@@ -75,3 +75,8 @@ class Apply(TagsMixin, SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'detach_volume'
+    signature = (
+        Present('volume'),
+        Present('instance'),
+        Present('device'),
+    )
