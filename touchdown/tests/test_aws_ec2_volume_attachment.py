@@ -50,8 +50,8 @@ class TestVolumeAttachmentCreation(StubberTestCase):
                 'apply',
             )
         ))
-        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
-        volume_attachment.add_attach_volume()
+        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume(instance_id='i-79ebae15')
+        volume_attachment.add_attach_volume(instance_id='i-79ebae15')
 
         goal.execute()
 
@@ -83,7 +83,7 @@ class TestVolumeAttachmentCreation(StubberTestCase):
                 'apply',
             )
         ))
-        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume()
+        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume(instance_id='i-79ebae15')
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(volume.resource)), 0)
@@ -119,7 +119,7 @@ class TestVolumeAttachmentDeletion(StubberTestCase):
                 'destroy',
             )
         ))
-        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume()
+        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume(instance_id='i-79ebae15')
         volume_attachment.add_detach_volume()
 
         goal.execute()
@@ -152,7 +152,7 @@ class TestVolumeAttachmentDeletion(StubberTestCase):
                 'destroy',
             )
         ))
-        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
+        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume(instance_id='i-79ebae15')
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(volume.resource)), 0)

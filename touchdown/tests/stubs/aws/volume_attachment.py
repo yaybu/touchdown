@@ -17,7 +17,7 @@ from .service import ServiceStubber
 
 class VolumeAttachmentStubber(ServiceStubber):
 
-    def add_describe_attachments_empty_response_by_instance_and_volume(self):
+    def add_describe_attachments_empty_response_by_instance_and_volume(self, instance_id):
         return self.add_response(
             'describe_volumes',
             service_response={
@@ -26,40 +26,40 @@ class VolumeAttachmentStubber(ServiceStubber):
             expected_params={
                 'Filters': [
                     {'Name': 'attachment.status', 'Values': ['attaching', 'attached']},
-                    {'Name': 'attachment.instance-id', 'Values': ['i-abcdef12345']}
+                    {'Name': 'attachment.instance-id', 'Values': [instance_id]}
                 ],
                 'VolumeIds': ['vol-abcdef12345'],
             }
         )
 
-    def add_describe_attachments_one_response_by_instance_and_volume(self):
+    def add_describe_attachments_one_response_by_instance_and_volume(self, instance_id):
         return self.add_response(
             'describe_volumes',
             service_response={
                 'Volumes': [{
                     'VolumeId': 'vol-abcdef12345',
                     'Attachments': [{
-                        'InstanceId': 'i-abcdef12345',
+                        'InstanceId': instance_id,
                     }],
                 }],
             },
             expected_params={
                 'Filters': [
                     {'Name': 'attachment.status', 'Values': ['attaching', 'attached']},
-                    {'Name': 'attachment.instance-id', 'Values': ['i-abcdef12345']}
+                    {'Name': 'attachment.instance-id', 'Values': [instance_id]}
                 ],
                 'VolumeIds': ['vol-abcdef12345'],
             }
         )
 
-    def add_attach_volume(self, device='/foo'):
+    def add_attach_volume(self, instance_id, device='/foo'):
         return self.add_response(
             'attach_volume',
             service_response={
             },
             expected_params={
                 'Device': device,
-                'InstanceId': 'i-abcdef12345',
+                'InstanceId': instance_id,
                 'VolumeId': 'vol-abcdef12345',
             }
         )

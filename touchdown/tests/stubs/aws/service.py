@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from hashlib import sha1
+
 from botocore.stub import Stubber
 
 
@@ -44,3 +46,8 @@ class ServiceStubber(Stubber):
         # mask the actual exception.
         if exc_type is None:
             self.assert_no_pending_responses()
+
+    def make_id(self, name):
+        """ Return consistent "id's" given a name. Subclasses will typically
+        trim and prefix this to get something like i-abcd1234. """
+        return sha1(name).hexdigest()

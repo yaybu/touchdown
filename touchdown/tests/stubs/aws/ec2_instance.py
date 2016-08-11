@@ -19,6 +19,9 @@ class EC2InstanceStubber(ServiceStubber):
 
     client_service = 'ec2'
 
+    def make_id(self, name):
+        return 'i-' + super(EC2InstanceStubber, self).make_id(name)[:8]
+
     def add_describe_instances_empty_response_by_name(self):
         return self.add_response(
             'describe_instances',
@@ -39,7 +42,7 @@ class EC2InstanceStubber(ServiceStubber):
             service_response={
                 'Reservations': [{
                     'Instances': [{
-                        'InstanceId': 'i-abcdef12345',
+                        'InstanceId': self.make_id(self.resource.name),
                     }],
                 }]
             },
