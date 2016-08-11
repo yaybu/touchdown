@@ -52,11 +52,7 @@ class Describe(SimpleDescribe, Plan):
                 {
                     'Name': 'attachment.status',
                     'Values': ['attaching', 'attached'],
-                },
-                {
-                    'Name': 'attachment.instance-id',
-                    'Values': [instance.resource_id],
-                },
+                }
             ]
         }
 
@@ -70,6 +66,34 @@ class Apply(TagsMixin, SimpleApply, Describe):
         Present('instance'),
         Present('device'),
     )
+
+    def update_object(self):
+        if not self.object:
+            return
+
+        skip_creation = False
+        instance = self.runner.get_plan(self.resource.instance)
+        for attachment in self.object.get('Attachments', []):
+            if attachment['InstanceId'] == instance.resource_id:
+                if attachment['State'] in ('attaching', 'attached'):
+                    skip_creation = True
+            elif attachment['State'] == 'attached':
+                yield self.generic_action(
+                    'Detaching from instance {}'.format(attachment['InstanceId']),
+                    self.client.detach_volume,
+                    VolumeId=self.resource_id,
+                )
+                # yield self.get_waiter(
+                #    "Waiting for volume to be detached"
+                # )
+
+        if not skip_creation:
+            yield self.create_object()
+
+        # yield self.get_waiter(
+        #    "Waiting for volume to be attached",
+        #    self.waiter,
+        # )
 
 
 class Destroy(SimpleDestroy, Describe):

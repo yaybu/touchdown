@@ -25,8 +25,7 @@ class VolumeAttachmentStubber(ServiceStubber):
             },
             expected_params={
                 'Filters': [
-                    {'Name': 'attachment.status', 'Values': ['attaching', 'attached']},
-                    {'Name': 'attachment.instance-id', 'Values': [instance_id]}
+                    {'Name': 'attachment.status', 'Values': ['attaching', 'attached']}
                 ],
                 'VolumeIds': ['vol-abcdef12345'],
             }
@@ -40,13 +39,13 @@ class VolumeAttachmentStubber(ServiceStubber):
                     'VolumeId': 'vol-abcdef12345',
                     'Attachments': [{
                         'InstanceId': instance_id,
+                        'State': 'attached',
                     }],
                 }],
             },
             expected_params={
                 'Filters': [
-                    {'Name': 'attachment.status', 'Values': ['attaching', 'attached']},
-                    {'Name': 'attachment.instance-id', 'Values': [instance_id]}
+                    {'Name': 'attachment.status', 'Values': ['attaching', 'attached']}
                 ],
                 'VolumeIds': ['vol-abcdef12345'],
             }
