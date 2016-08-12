@@ -1,6 +1,6 @@
 # Copyright 2016 Isotoma Limited
 #
-# Licensed under the Apache License, Version 2.0 (the 'License');
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -34,6 +34,12 @@ class TestVolumeCreation(StubberTestCase):
         volume.add_describe_volumes_empty_response_by_name()
         volume.add_create_volume(availability_zone='eu-west-1a')
         volume.add_create_tags(Name='my-volume')
+
+        # Test that it waits for the volume to be available
+        volume.add_describe_volumes_one_response_by_name()
+
+        # And then it will refresh its metadata
+        volume.add_describe_volumes_one_response_by_name()
 
         goal.execute()
 
@@ -71,6 +77,11 @@ class TestVolumeDeletion(StubberTestCase):
         ))
         volume.add_describe_volumes_one_response_by_name()
         volume.add_delete_volume()
+
+        # Test that it waits for the volume to be gone
+        volume.add_describe_volumes_one_response_by_name()
+        volume.add_describe_volumes_one_response_by_name()
+        volume.add_describe_volumes_empty_response_by_name()
 
         goal.execute()
 

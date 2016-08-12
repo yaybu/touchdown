@@ -20,16 +20,10 @@ class VolumeStubber(ServiceStubber):
     client_service = 'ec2'
 
     def add_describe_volumes_empty_response_by_name(self):
-        return self.add_response(
+        return self.add_client_error(
             'describe_volumes',
-            service_response={
-                'Volumes': [],
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]}
-                ],
-            },
+            service_error_code='InvalidVolume.NotFound',
+            service_message='',
         )
 
     def add_describe_volumes_one_response_by_name(self):
@@ -38,6 +32,7 @@ class VolumeStubber(ServiceStubber):
             service_response={
                 'Volumes': [{
                     'VolumeId': 'vol-abcdef12345',
+                    'State': 'available',
                 }],
             },
             expected_params={
