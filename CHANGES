@@ -4,7 +4,11 @@ Changelog for Touchdown
 0.15.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- AWS EBS: Fix validation for volume_attachments. Certain operations expected
+  it to have a name, which is not the case.
+
+- SSH: Fix portforward cmd line entry point, which was incorrectly parsing port
+  specifications.
 
 
 0.15.0 (2016-08-12)
