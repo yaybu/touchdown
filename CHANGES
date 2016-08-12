@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.14.4 (unreleased)
+0.15.0 (2016-08-12)
 -------------------
 
 - AWS STS: Add `touchdown get-credentials ROLENAME`. This allows touchdown to
