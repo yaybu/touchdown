@@ -15,6 +15,8 @@
 import itertools
 import json
 
+import jmespath
+
 from six.moves import zip_longest
 from touchdown.core import diff, errors
 from touchdown.core.utils import force_bytes, force_str
@@ -164,7 +166,8 @@ class Identifier(Serializer):
 class Property(Serializer):
 
     def __init__(self, property, inner=Identity()):
-        self.property = property
+        self.selector = property
+        self.property = jmespath.compile(property)
         self.inner = inner
 
     def render(self, runner, object):
@@ -172,9 +175,10 @@ class Property(Serializer):
         target_plan = runner.get_plan(target)
         if not target_plan.resource_id:
             return Pending(target)
-        if self.property not in target_plan.object:
-            raise errors.Error("{} not available".format(self.property))
-        return target_plan.object[self.property]
+        result = self.property.search(target_plan.object)
+        if not result:
+            raise errors.Error("{} not available".format(self.selector))
+        return result
 
     def pending(self, runner, object):
         return self.inner.pending(runner, object)

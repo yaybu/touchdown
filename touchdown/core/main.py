@@ -36,6 +36,8 @@ class SubCommand(object):
         args = []
         for arg in argspec.args[1:]:
             args.append(getattr(namespace, arg))
+        if argspec.varargs:
+            args.extend(getattr(namespace, argspec.varargs))
         kwargs = {}
         for k, v in namespace._get_kwargs():
             if k not in argspec.args and argspec.keywords:
