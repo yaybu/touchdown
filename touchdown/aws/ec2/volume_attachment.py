@@ -42,6 +42,12 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = 'Volumes'
     key = 'VolumeId'
 
+    signature = (
+        Present('volume'),
+        Present('instance'),
+        Present('device'),
+    )
+
     def get_describe_filters(self):
         volume = self.runner.get_plan(self.resource.volume)
         if not volume.resource_id:
@@ -57,11 +63,6 @@ class Apply(TagsMixin, SimpleApply, Describe):
     create_action = 'attach_volume'
     create_envelope = '@'
     waiter = 'volume_in_use'
-    signature = (
-        Present('volume'),
-        Present('instance'),
-        Present('device'),
-    )
 
     def update_object(self):
         if not self.object:
@@ -103,8 +104,3 @@ class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'detach_volume'
     waiter = 'volume_available'
-    signature = (
-        Present('volume'),
-        Present('instance'),
-        Present('device'),
-    )
