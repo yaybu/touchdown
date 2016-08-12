@@ -119,6 +119,11 @@ class Walker(object):
         self.forward = DependencyMap(workspace)
         self.backward = DependencyMap(workspace, True)
 
+    def starting_at(self, *nodes):
+        retval = Traversal(self, None)
+        retval._cache = set(nodes)
+        return retval
+
     def most_depended(self):
         matches = set()
         for node, dependencies in self.backward.items():
