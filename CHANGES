@@ -4,7 +4,35 @@ Changelog for Touchdown
 0.14.4 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- AWS STS: Add `touchdown get-credentials ROLENAME`. This allows touchdown to
+  generate some temporary credentials and set them in the environment. The goal
+  of this feature is that you will be able to do this:
+
+    $ eval `touchdown get-credentials ROLE`
+    $ (deployment) awscli s3 sync ....
+
+  But for now the progress bar is also on stdout which stops this working.
+
+- AWS EC2: Add support for attaching EBS Volumes to EC2 Instances.
+
+- AWS EC2: Touchdown now waits after creating a Volume before trying to use it
+  with other resources.
+
+- SSH: Basic portforwarding rules can now be attached to SSH connections:
+
+    ssh_connection.add_port_forward(
+        name='db',
+        hostname='localhost',
+        port=5432,
+    )
+
+  This will allow you to connect to port 5432 on localhost (relative to the
+  machine you have SSH'd to) with:
+
+      touchdown portfwd db=8093
+
+  (In this case, port 8093 on your local machine will forward to port 5432 on
+  the remote machine).
 
 
 0.14.3 (2016-08-04)
