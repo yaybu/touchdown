@@ -53,7 +53,7 @@ class PortForward(Goal):
             help="Remote port to forward to local port (e.g. db=8093)",
         )
 
-    def get_services(self, *ports):
+    def get_services(self, ports):
         services = self.collect_as_dict("portfwd")
         if not services:
             raise errors.Error("No port-forwardable resources are defined")
