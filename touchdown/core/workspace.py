@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .resource import Resource
+from .selectors import Walker
 
 
 class Workspace(Resource):
@@ -28,7 +29,7 @@ class Workspace(Resource):
         return self
 
     def load(self):
-        pass
+        self.resources = Walker(self)
 
 
 class Touchdownfile(Workspace):
@@ -40,3 +41,4 @@ class Touchdownfile(Workspace):
         with open("Touchdownfile") as f:
             code = compile(f.read(), "Touchdownfile", "exec")
             exec(code, g)
+        return super(Touchdownfile, self).load()
