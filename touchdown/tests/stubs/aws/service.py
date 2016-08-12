@@ -16,6 +16,8 @@ from hashlib import sha1
 
 from botocore.stub import Stubber
 
+from touchdown.core.utils import force_bytes
+
 
 class ServiceStubber(Stubber):
 
@@ -50,4 +52,4 @@ class ServiceStubber(Stubber):
     def make_id(self, name):
         """ Return consistent "id's" given a name. Subclasses will typically
         trim and prefix this to get something like i-abcd1234. """
-        return sha1(name).hexdigest()
+        return sha1(force_bytes(name)).hexdigest()
