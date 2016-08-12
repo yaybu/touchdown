@@ -18,6 +18,7 @@ from .destroy import Destroy
 from .dot import Dot
 from .edit import Edit
 from .get import Get
+from .get_credentials import GetCredentials
 from .get_signin_url import GetSigninUrl
 from .refresh import Refresh
 from .rollback import Rollback
@@ -35,6 +36,7 @@ __all__ = [
     "Dot",
     "Edit",
     "Get",
+    "GetCredentials",
     "GetSigninUrl",
     "Refresh",
     "Rollback",
