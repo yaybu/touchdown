@@ -23,7 +23,7 @@ from ..kms import Key
 
 class Volume(Resource):
 
-    resource_name = "volume"
+    resource_name = 'volume'
 
     name = argument.String(min=3, max=128, field='Name', group='tags')
 
@@ -42,17 +42,19 @@ class Describe(SimpleDescribe, Plan):
     resource = Volume
     service_name = 'ec2'
     describe_action = 'describe_volumes'
+    describe_notfound_exception = 'InvalidVolume.NotFound'
     describe_envelope = 'Volumes'
     key = 'VolumeId'
 
     def get_describe_filters(self):
-        return {"Filters": [{"Name": "tag:Name", "Values": [self.resource.name]}]}
+        return {'Filters': [{'Name': 'tag:Name', 'Values': [self.resource.name]}]}
 
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = 'create_volume'
     create_envelope = '@'
+    waiter = 'volume_available'
     signature = (
         Present('name'),
         Present('availability_zone')
@@ -62,3 +64,4 @@ class Apply(TagsMixin, SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'delete_volume'
+    waiter = 'volume_deleted'

@@ -280,6 +280,24 @@ class RecordedBotoCoreTest(unittest.TestCase):
         self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
 
 
+class StubberTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.workspace = workspace.Workspace()
+        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
+        self.fixtures = ExitStack()
+        self.addCleanup(self.fixtures.close)
+        self.fixtures.enter_context(mock.patch('time.sleep'))
+
+    def create_goal(self, goal_name):
+        return goals.create(
+            goal_name,
+            self.workspace,
+            ConsoleFrontend(interactive=False),
+            map=SerialMap
+        )
+
+
 class Stubber(BaseStubber):
     """Extends the stubber from botocore so that it always asserts that
     there are no leftover responses.

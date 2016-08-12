@@ -1,4 +1,4 @@
-# Copyright 2014 Isotoma Limited
+# Copyright 2016 Isotoma Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .ami import Image
-from .ami_copy import ImageCopy
-from .keypair import KeyPair
-from .instance import Instance
-from .auto_scaling_group import AutoScalingGroup
-from .auto_scaling_policy import Policy
-from .launch_configuration import LaunchConfiguration
-from .volume import Volume
-from .volume_attachment import VolumeAttachment
+from .bucket import BucketStubber
+from .ec2_instance import EC2InstanceStubber
+from .volume_attachment import VolumeAttachmentStubber
+from .volume import VolumeStubber
 
 
 __all__ = [
-    'Image',
-    'ImageCopy',
-    'Instance',
-    'KeyPair',
-    'AutoScalingGroup',
-    'Policy',
-    'LaunchConfiguration',
-    'Volume',
-    'VolumeAttachment',
+    'BucketStubber',
+    'EC2InstanceStubber',
+    'VolumeAttachmentStubber',
+    'VolumeStubber',
 ]
