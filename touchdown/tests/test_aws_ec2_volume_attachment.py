@@ -50,8 +50,16 @@ class TestVolumeAttachmentCreation(StubberTestCase):
                 'apply',
             )
         ))
-        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
         volume_attachment.add_attach_volume(instance_id='i-79ebae15')
+
+        # Assert that it waits for the volume to be attached
+        volume_attachment.add_describe_attachments_one_response_by_volume_AVAILABLE()
+        volume_attachment.add_describe_attachments_one_response_by_volume_AVAILABLE()
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
+
+        # It will hit the API again to make sure it's metadata is up to date in this case
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
 
         goal.execute()
 
@@ -83,10 +91,13 @@ class TestVolumeAttachmentCreation(StubberTestCase):
                 'apply',
             )
         ))
-        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume(instance_id='i-abcd1234')
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-abcd1234')
         volume_attachment.add_detach_volume()
-        # volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_one_response_by_volume_AVAILABLE()
+
         volume_attachment.add_attach_volume(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_one_response_by_volume_AVAILABLE()
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
 
         goal.execute()
 
@@ -118,7 +129,7 @@ class TestVolumeAttachmentCreation(StubberTestCase):
                 'apply',
             )
         ))
-        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(volume.resource)), 0)
@@ -154,12 +165,17 @@ class TestVolumeAttachmentDeletion(StubberTestCase):
                 'destroy',
             )
         ))
-        volume_attachment.add_describe_attachments_one_response_by_instance_and_volume(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
         volume_attachment.add_detach_volume()
+
+        # Assert that it waits for the volume to be detached
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_one_response_by_volume_INUSE(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_one_response_by_volume_AVAILABLE()
 
         goal.execute()
 
-    def test_create_volume_attachment_is_idempotent(self):
+    def test_delete_volume_attachment_is_idempotent(self):
         goal = self.create_goal('destroy')
 
         volume = self.fixtures.enter_context(VolumeStubber(
@@ -187,7 +203,7 @@ class TestVolumeAttachmentDeletion(StubberTestCase):
                 'destroy',
             )
         ))
-        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume(instance_id='i-79ebae15')
+        volume_attachment.add_describe_attachments_empty_response_by_instance_and_volume()
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(volume.resource)), 0)

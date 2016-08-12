@@ -287,6 +287,7 @@ class StubberTestCase(unittest.TestCase):
         self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
         self.fixtures = ExitStack()
         self.addCleanup(self.fixtures.close)
+        self.fixtures.enter_context(mock.patch('time.sleep'))
 
     def create_goal(self, goal_name):
         return goals.create(

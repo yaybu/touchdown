@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.aws import common
+
 from touchdown.core import argument
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
@@ -42,18 +44,11 @@ class Describe(SimpleDescribe, Plan):
 
     def get_describe_filters(self):
         volume = self.runner.get_plan(self.resource.volume)
-        instance = self.runner.get_plan(self.resource.instance)
-        if not volume.resource_id or not instance.resource_id:
+        if not volume.resource_id:
             return None
 
         return {
-            'VolumeIds': [volume.resource_id],
-            'Filters': [
-                {
-                    'Name': 'attachment.status',
-                    'Values': ['attaching', 'attached'],
-                }
-            ]
+            'VolumeIds': [volume.resource_id]
         }
 
 
@@ -61,6 +56,7 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = 'attach_volume'
     create_envelope = '@'
+    waiter = 'volume_in_use'
     signature = (
         Present('volume'),
         Present('instance'),
@@ -71,34 +67,42 @@ class Apply(TagsMixin, SimpleApply, Describe):
         if not self.object:
             return
 
-        skip_creation = False
         instance = self.runner.get_plan(self.resource.instance)
         for attachment in self.object.get('Attachments', []):
             if attachment['InstanceId'] == instance.resource_id:
-                if attachment['State'] in ('attaching', 'attached'):
-                    skip_creation = True
+                break
             elif attachment['State'] == 'attached':
                 yield self.generic_action(
                     'Detaching from instance {}'.format(attachment['InstanceId']),
                     self.client.detach_volume,
                     VolumeId=self.resource_id,
                 )
-                # yield self.get_waiter(
-                #    "Waiting for volume to be detached"
-                # )
+                yield common.Waiter(
+                    self,
+                    ['Waiting for volume to be detached'],
+                    'volume_available',
+                    1
+                )
+                attachment = None
+                break
 
-        if not skip_creation:
+        if not attachment:
             yield self.create_object()
+            attachment = {'State': 'attaching'}
 
-        # yield self.get_waiter(
-        #    "Waiting for volume to be attached",
-        #    self.waiter,
-        # )
+        if attachment['State'] == 'attaching':
+            yield common.Waiter(
+                self,
+                ['Waiting for volume to be attached'],
+                'volume_in_use',
+                1
+            )
 
 
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'detach_volume'
+    waiter = 'volume_available'
     signature = (
         Present('volume'),
         Present('instance'),
