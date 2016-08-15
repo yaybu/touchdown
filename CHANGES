@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.15.1 (unreleased)
+0.15.1 (2016-08-15)
 -------------------
 
 - AWS EBS: Fix validation for volume_attachments. Certain operations expected
