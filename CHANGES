@@ -10,6 +10,8 @@ Changelog for Touchdown
 - SSH: Fix portforward cmd line entry point, which was incorrectly parsing port
   specifications.
 
+- Core: Some graph walking helpers were added to help testing.
+
 
 0.15.0 (2016-08-12)
 -------------------
