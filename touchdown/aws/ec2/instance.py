@@ -54,6 +54,9 @@ class Instance(Resource):
     key_pair = argument.Resource(KeyPair, field="KeyName")
     subnet = argument.Resource(Subnet, field="SubnetId")
     instance_profile = argument.Resource(InstanceProfile, field="IamInstanceProfile")
+
+    user_data = argument.String(field="UserData")
+
     network_interfaces = argument.ResourceList(
         NetworkInterface,
         field="NetworkInterfaces",
