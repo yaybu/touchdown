@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.15.2 (unreleased)
+0.15.2 (2016-08-16)
 -------------------
 
 - AWS EC2: Support `user_data` for ec2 instances.
