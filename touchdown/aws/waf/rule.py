@@ -71,6 +71,7 @@ class Describe(WafDescribe, Plan):
 
     resource = Rule
     service_name = 'waf'
+    api_version = '2015-08-24'
     describe_action = "list_rules"
     describe_envelope = "Rules"
     annotate_action = "get_rule"

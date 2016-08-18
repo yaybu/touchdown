@@ -42,6 +42,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = File
     service_name = 's3'
+    api_version = '2006-03-01'
     describe_action = "list_objects"
     describe_envelope = "Contents"
     key = 'Name'

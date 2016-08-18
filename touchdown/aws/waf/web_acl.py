@@ -61,6 +61,7 @@ class Describe(WafDescribe, Plan):
 
     resource = WebACL
     service_name = 'waf'
+    api_version = '2015-08-24'
     describe_action = "list_web_acls"
     describe_envelope = "WebACLs"
     annotate_action = "get_web_acl"

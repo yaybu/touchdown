@@ -49,6 +49,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Certificate
     service_name = "acm"
+    api_version = '2015-12-08'
     describe_action = "list_certificates"
     describe_envelope = "CertificateSummaryList"
     describe_filters = {}

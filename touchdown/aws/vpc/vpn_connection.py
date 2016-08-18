@@ -48,6 +48,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = VpnConnection
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_vpn_connections"
     describe_envelope = "VpnConnections"
     key = "VpnConnectionId"

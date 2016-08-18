@@ -36,6 +36,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = CustomerGateway
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_customer_gateways"
     describe_envelope = "CustomerGateways"
     key = "CustomerGatewayId"

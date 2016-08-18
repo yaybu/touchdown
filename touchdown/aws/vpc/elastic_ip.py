@@ -36,6 +36,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = ElasticIp
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_addresses"
     describe_envelope = "Addresses"
     key = "PublicIp"

@@ -61,6 +61,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Role
     service_name = 'iam'
+    api_version = '2010-05-08'
     describe_action = "list_roles"
     describe_envelope = "Roles"
     describe_filters = {}

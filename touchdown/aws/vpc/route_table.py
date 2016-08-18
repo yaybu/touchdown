@@ -61,6 +61,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = RouteTable
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_route_tables"
     describe_envelope = "RouteTables"
     key = "RouteTableId"

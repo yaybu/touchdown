@@ -44,6 +44,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Trail
     service_name = 'cloudtrail'
+    api_version = '2013-11-01'
     describe_action = "describe_trails"
     describe_envelope = "trailList"
     key = 'Name'

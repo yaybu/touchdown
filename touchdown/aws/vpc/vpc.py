@@ -37,6 +37,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = VPC
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_vpcs"
     describe_envelope = "Vpcs"
     key = 'VpcId'

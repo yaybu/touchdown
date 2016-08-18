@@ -44,6 +44,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = NatGateway
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_nat_gateways"
     describe_envelope = "NatGateways"
     key = "NatGatewayId"

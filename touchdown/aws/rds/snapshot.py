@@ -24,6 +24,7 @@ class Plan(common.SimplePlan, plan.Plan):
     name = "snapshot"
     resource = Database
     service_name = "rds"
+    api_version = '2014-10-31'
 
     def db_exists(self, name):
         try:

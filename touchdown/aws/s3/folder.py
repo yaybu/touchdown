@@ -44,6 +44,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Folder
     service_name = 's3'
+    api_version = '2006-03-01'
     key = 'Name'
     describe_action = None
 

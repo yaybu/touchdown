@@ -57,7 +57,9 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             if getattr(impl, "describe_action", None) is None:
                 continue
 
-            service = session.get_service_model(impl.service_name)
+            assert len(impl.api_version or '') == 10, '{} is not versioned'.format(impl)
+
+            service = session.get_service_model(impl.service_name, impl.api_version)
             methods = {xform_name(s): s for s in service.operation_names}
             operation = service.operation_model(methods[impl.describe_action])
 

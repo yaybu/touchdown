@@ -45,6 +45,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Topic
     service_name = 'sns'
+    api_version = '2010-03-31'
     describe_action = "list_topics"
     describe_envelope = "Topics"
     describe_filters = {}

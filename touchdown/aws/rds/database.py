@@ -86,6 +86,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Database
     service_name = 'rds'
+    api_version = '2014-10-31'
     describe_action = "describe_db_instances"
     describe_notfound_exception = "DBInstanceNotFound"
     describe_envelope = "DBInstances"

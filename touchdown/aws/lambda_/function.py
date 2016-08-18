@@ -139,6 +139,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Function
     service_name = 'lambda'
+    api_version = '2015-03-31'
     describe_action = "get_function_configuration"
     describe_notfound_exception = "ResourceNotFoundException"
     describe_envelope = "[@]"

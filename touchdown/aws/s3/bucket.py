@@ -96,6 +96,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Bucket
     service_name = 's3'
+    api_version = '2006-03-01'
     describe_action = "list_buckets"
     describe_envelope = "Buckets"
     describe_filters = {}

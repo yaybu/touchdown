@@ -49,6 +49,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Integration
     service_name = 'apigateway'
+    api_version = '2015-07-09'
     describe_action = "get_integration"
     describe_notfound_exception = "NotFoundException"
     describe_envelope = "[@]"

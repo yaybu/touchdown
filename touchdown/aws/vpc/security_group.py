@@ -115,6 +115,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = SecurityGroup
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_security_groups"
     describe_envelope = "SecurityGroups"
     key = 'GroupId'
