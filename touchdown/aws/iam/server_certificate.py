@@ -124,6 +124,7 @@ class Describe(ReplacementDescribe, Plan):
 
     resource = ServerCertificate
     service_name = 'iam'
+    api_version = '2010-05-08'
     describe_action = "list_server_certificates"
     describe_envelope = "ServerCertificateMetadataList"
     describe_filters = {}

@@ -38,6 +38,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Model
     service_name = 'apigateway'
+    api_version = '2015-07-09'
     describe_action = "get_models"
     describe_envelope = "items"
     key = 'id'

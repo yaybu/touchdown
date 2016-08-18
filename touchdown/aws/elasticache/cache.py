@@ -54,6 +54,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = CacheCluster
     service_name = 'elasticache'
+    api_version = '2015-02-02'
     describe_action = "describe_cache_clusters"
     describe_notfound_exception = "CacheClusterNotFound"
     describe_envelope = "CacheClusters"

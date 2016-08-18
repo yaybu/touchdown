@@ -80,6 +80,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = EventRule
     service_name = 'events'
+    api_version = '2015-10-07'
     describe_action = "list_rules"
     describe_envelope = "Rules"
     key = 'Name'

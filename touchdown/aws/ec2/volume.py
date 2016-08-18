@@ -41,6 +41,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Volume
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = 'describe_volumes'
     describe_notfound_exception = 'InvalidVolume.NotFound'
     describe_envelope = 'Volumes'

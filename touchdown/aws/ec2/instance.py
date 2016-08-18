@@ -79,6 +79,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Instance
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_instances"
     describe_envelope = "Reservations[].Instances[]"
     key = 'InstanceId'

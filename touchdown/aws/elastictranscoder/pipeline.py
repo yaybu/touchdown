@@ -76,6 +76,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Pipeline
     service_name = 'elastictranscoder'
+    api_version = '2012-09-25'
     describe_action = "list_pipelines"
     describe_envelope = "Pipelines"
     describe_filters = {}

@@ -33,6 +33,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = InternetGateway
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_internet_gateways"
     describe_envelope = "InternetGateways"
     key = "InternetGatewayId"

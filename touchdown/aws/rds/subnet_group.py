@@ -37,6 +37,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = SubnetGroup
     service_name = 'rds'
+    api_version = '2014-10-31'
     describe_action = "describe_db_subnet_groups"
     describe_notfound_exception = "DBSubnetGroupNotFoundFault"
     describe_envelope = "DBSubnetGroups"

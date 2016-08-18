@@ -41,6 +41,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Stage
     service_name = 'apigateway'
+    api_version = '2015-07-09'
     describe_action = "get_stages"
     describe_envelope = "item"  # This is not a typo
     key = 'id'

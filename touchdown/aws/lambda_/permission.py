@@ -42,6 +42,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Permission
     service_name = 'lambda'
+    api_version = '2015-03-31'
     describe_action = "get_policy"
     describe_notfound_exception = "ResourceNotFoundException"
     describe_envelope = "[@]"

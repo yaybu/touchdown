@@ -40,6 +40,7 @@ class Plan(common.SimplePlan, plan.Plan):
     name = "rollback"
     resource = Database
     service_name = "rds"
+    api_version = '2014-10-31'
 
     def get_database(self, name):
         try:

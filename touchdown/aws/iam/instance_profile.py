@@ -35,6 +35,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = InstanceProfile
     service_name = 'iam'
+    api_version = '2010-05-08'
     describe_action = "list_instance_profiles"
     describe_envelope = "InstanceProfiles"
     describe_filters = {}

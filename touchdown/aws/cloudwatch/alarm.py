@@ -100,6 +100,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Alarm
     service_name = 'cloudwatch'
+    api_version = '2010-08-01'
     describe_action = "describe_alarms"
     describe_envelope = "MetricAlarms"
     key = 'AlarmName'

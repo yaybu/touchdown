@@ -124,6 +124,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = LoadBalancer
     service_name = 'elb'
+    api_version = '2012-06-01'
     describe_action = "describe_load_balancers"
     describe_envelope = "LoadBalancerDescriptions"
     describe_notfound_exception = "LoadBalancerNotFound"

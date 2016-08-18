@@ -43,6 +43,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = PasswordPolicy
     service_name = 'iam'
+    api_version = '2010-05-08'
     describe_action = 'get_account_password_policy'
     describe_notfound_exception = 'NoSuchEntity'
     describe_envelope = '[PasswordPolicy]'

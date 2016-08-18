@@ -35,6 +35,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = ReplicationGroup
     service_name = 'elasticache'
+    api_version = '2015-02-02'
     describe_action = "describe_replication_groups"
     describe_envelope = "ReplicationGroups"
     describe_notfound_exception = "ReplicationGroupNotFoundFault"

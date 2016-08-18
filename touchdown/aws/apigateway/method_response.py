@@ -39,6 +39,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = MethodResponse
     service_name = 'apigateway'
+    api_version = '2015-07-09'
     describe_action = "get_method_response"
     describe_notfound_exception = "NotFoundException"
     describe_envelope = "[@]"

@@ -65,6 +65,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Queue
     service_name = 'sqs'
+    api_version = '2012-11-05'
     describe_action = 'get_queue_url'
     describe_envelope = "[@]"
     describe_notfound_exception = "AWS.SimpleQueueService.NonExistentQueue"

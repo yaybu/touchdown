@@ -34,6 +34,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Metric
     service_name = 'cloudwatch'
+    api_version = '2010-08-01'
     describe_action = "list_metrics"
     describe_envelope = "Metrics"
     key = 'MetricName'

@@ -46,6 +46,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Subnet
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_subnets"
     describe_envelope = "Subnets"
     key = 'SubnetId'

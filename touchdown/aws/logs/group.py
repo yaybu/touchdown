@@ -39,6 +39,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = LogGroup
     service_name = 'logs'
+    api_version = '2014-03-28'
     describe_action = 'describe_log_groups'
     describe_envelope = "logGroups"
     key = "logGroupName"

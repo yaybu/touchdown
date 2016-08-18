@@ -220,6 +220,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = AutoScalingGroup
     service_name = 'autoscaling'
+    api_version = '2011-01-01'
     describe_action = "describe_auto_scaling_groups"
     describe_envelope = "AutoScalingGroups"
     key = 'AutoScalingGroupName'

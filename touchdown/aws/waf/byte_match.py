@@ -90,6 +90,7 @@ class Describe(WafDescribe, Plan):
 
     resource = ByteMatchSet
     service_name = 'waf'
+    api_version = '2015-08-24'
     describe_action = "list_byte_match_sets"
     describe_envelope = "ByteMatchSets"
     annotate_action = "get_byte_match_set"

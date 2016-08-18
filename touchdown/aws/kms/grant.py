@@ -57,6 +57,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Grant
     service_name = 'kms'
+    api_version = '2014-11-01'
     describe_action = "list_grants"
     describe_envelope = "Grants"
     describe_filters = {}

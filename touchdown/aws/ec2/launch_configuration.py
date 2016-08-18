@@ -85,6 +85,7 @@ class Describe(ReplacementDescribe, Plan):
 
     resource = LaunchConfiguration
     service_name = 'autoscaling'
+    api_version = '2011-01-01'
     describe_action = "describe_launch_configurations"
     describe_envelope = "LaunchConfigurations"
     describe_filters = {}

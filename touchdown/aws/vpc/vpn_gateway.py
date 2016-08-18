@@ -66,6 +66,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = VpnGateway
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_vpn_gateways"
     describe_envelope = "VpnGateways"
     key = "VpnGatewayId"

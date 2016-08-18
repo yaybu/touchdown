@@ -127,6 +127,7 @@ class Describe(ReplacementDescribe, Plan):
 
     resource = NetworkACL
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_network_acls"
     describe_envelope = "NetworkAcls"
     key = 'NetworkAclId'

@@ -192,6 +192,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Image
     service_name = 'ec2'
+    api_version = '2015-10-01'
     describe_action = "describe_images"
     describe_envelope = "Images"
     key = 'ImageId'

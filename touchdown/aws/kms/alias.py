@@ -35,6 +35,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Alias
     service_name = 'kms'
+    api_version = '2014-11-01'
     describe_action = "list_aliases"
     describe_envelope = "Aliases"
     describe_filters = {}

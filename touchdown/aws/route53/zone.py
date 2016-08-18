@@ -98,6 +98,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = HostedZone
     service_name = 'route53'
+    api_version = '2013-04-01'
     describe_action = "list_hosted_zones"
     describe_envelope = "HostedZones"
     describe_filters = {}

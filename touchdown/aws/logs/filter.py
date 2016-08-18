@@ -48,6 +48,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Filter
     service_name = 'logs'
+    api_version = '2014-03-28'
     describe_action = 'describe_metric_filters'
     describe_notfound_exception = 'ResourceNotFoundException'
     describe_envelope = "metricFilters"

@@ -52,6 +52,7 @@ class Describe(WafDescribe, Plan):
 
     resource = IpSet
     service_name = 'waf'
+    api_version = '2015-08-24'
     describe_action = "list_ip_sets"
     describe_envelope = "IPSets"
     annotate_action = "get_ip_set"

@@ -37,6 +37,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Key
     service_name = 'kms'
+    api_version = '2014-11-01'
     describe_action = "list_keys"
     describe_envelope = "Keys"
     describe_filters = {}

@@ -91,6 +91,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = StreamingDistribution
     service_name = 'cloudfront'
+    api_version = '2016-01-28'
     describe_filters = {}
     describe_action = "list_streaming_distributions"
     describe_envelope = 'StreamingDistributionList.Items'
