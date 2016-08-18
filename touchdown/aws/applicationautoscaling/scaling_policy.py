@@ -107,6 +107,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = ScalingPolicy
     service_name = 'application-autoscaling'
+    api_version = '2016-02-06'
     describe_action = 'describe_scaling_policies'
     describe_envelope = 'ScalingPolicies'
     key = 'PolicyName'

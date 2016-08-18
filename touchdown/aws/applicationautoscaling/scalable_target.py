@@ -41,6 +41,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = ScalableTarget
     service_name = 'application-autoscaling'
+    api_version = '2016-02-06'
     describe_action = 'describe_scalable_targets'
     describe_envelope = 'ScalableTargets'
     key = 'ResourceId'

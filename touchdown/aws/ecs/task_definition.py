@@ -192,6 +192,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = TaskDefinition
     service_name = 'ecs'
+    api_version = '2014-11-13'
     describe_action = 'describe_task_definition'
     describe_envelope = '[taskDefinition]'
     key = 'family'

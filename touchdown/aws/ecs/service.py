@@ -50,6 +50,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Service
     service_name = 'ecs'
+    api_version = '2014-11-13'
     describe_action = 'describe_services'
     describe_envelope = 'services'
     key = 'serviceName'

@@ -32,6 +32,7 @@ class Describe(SimpleDescribe, Plan):
 
     resource = Cluster
     service_name = 'ecs'
+    api_version = '2014-11-13'
     describe_action = 'describe_clusters'
     describe_envelope = 'clusters'
     key = 'clusterName'
