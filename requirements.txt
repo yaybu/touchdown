@@ -15,7 +15,10 @@ Jinja2
 
 coverage==4.0.3
 codecov==2.0.3
-flake8==2.5.4
+
+# See https://github.com/gforcada/flake8-isort/pull/14
+flake8==2.5.4  # rq.filter: <3
+
 flake8-isort==1.2
 isort==4.2.5
 mccabe==0.4.0
