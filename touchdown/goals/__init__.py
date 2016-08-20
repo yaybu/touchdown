@@ -17,6 +17,7 @@ from .cost import Cost
 from .destroy import Destroy
 from .dot import Dot
 from .edit import Edit
+from .generate_policy import GeneratePolicy
 from .get import Get
 from .get_credentials import GetCredentials
 from .get_signin_url import GetSigninUrl
@@ -36,6 +37,7 @@ __all__ = [
     "Destroy",
     "Dot",
     "Edit",
+    "GeneratePolicy",
     "Get",
     "GetCredentials",
     "GetSigninUrl",
