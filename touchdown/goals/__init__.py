@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .apply import Apply
+from .cloudformation_export import Export
 from .cost import Cost
 from .destroy import Destroy
 from .dot import Dot
@@ -36,6 +37,7 @@ __all__ = [
     "Destroy",
     "Dot",
     "Edit",
+    "Export",
     "Get",
     "GetCredentials",
     "GetSigninUrl",
