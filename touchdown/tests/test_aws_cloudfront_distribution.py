@@ -16,7 +16,7 @@ import unittest
 
 import mock
 
-from touchdown.aws.cloudfront import Distribution
+from touchdown.aws.cloudfront.distribution import Distribution, Describe
 from touchdown.aws.session import session
 from touchdown.core import errors, serializers
 
@@ -26,7 +26,7 @@ from . import aws
 class TestMetadata(unittest.TestCase):
 
     def test_waiter_waity_enough(self):
-        waiter = session.get_waiter_model("cloudfront")
+        waiter = session.get_waiter_model("cloudfront", api_version=Describe.api_version)
         self.assertEqual(waiter.get_waiter("DistributionDeployed").max_attempts, 50)
 
 

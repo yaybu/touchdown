@@ -15,14 +15,15 @@
 import unittest
 
 from touchdown.aws.session import session
+from touchdown.aws.vpc.nat_gateway import Describe
 
 
 class TestMetadata(unittest.TestCase):
 
     def test_waiter_nat_available(self):
-        waiter = session.get_waiter_model("ec2")
+        waiter = session.get_waiter_model("ec2", api_version=Describe.api_version)
         self.assertEqual(waiter.get_waiter("NatGatewayAvailable").max_attempts, 40)
 
     def test_waiter_nat_deleted(self):
-        waiter = session.get_waiter_model("ec2")
+        waiter = session.get_waiter_model("ec2", api_version=Describe.api_version)
         self.assertEqual(waiter.get_waiter("NatGatewayDeleted").max_attempts, 40)
