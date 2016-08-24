@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.5 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Core: Various serialization fixes regarding detection of 'pending' resources.
 
 
 0.15.4 (2016-08-24)

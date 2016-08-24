@@ -181,7 +181,13 @@ class Property(Serializer):
         return result
 
     def pending(self, runner, object):
-        return self.inner.pending(runner, object)
+        if self.inner.pending(runner, object):
+            return True
+        target = self.inner.render(runner, object)
+        target_plan = runner.get_plan(target)
+        if not target_plan.resource_id:
+            return True
+        return False
 
     def dependencies(self, object):
         return self.inner.dependencies(object)
@@ -689,7 +695,10 @@ class List(Serializer):
         return self.diff_stupid(runner, object, value)
 
     def pending(self, runner, object):
-        raise NotImplementedError(self.pending)
+        for item in object:
+            if self.child.pending(runner, item):
+                return True
+        return False
 
     def dependencies(self, object):
         return frozenset(self.child.dependencies(object))
@@ -712,7 +721,10 @@ class Context(Serializer):
         return self.inner.diff(runner, object, value)
 
     def pending(self, runner, object):
-        return self.inner.pending(runner, object) or self.serializer.pending(runner, object)
+        if self.serializer.pending(runner, object):
+            return True
+        object = self.serializer.render(runner, object)
+        return self.inner.pending(runner, object)
 
     def dependencies(self, object):
         return self.inner.dependencies(object).union(self.serializer.dependencies(object))
