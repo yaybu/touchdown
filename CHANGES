@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- AWS Events: Clean up targets before trying to delete rules.
 
 
 0.15.2 (2016-08-16)
