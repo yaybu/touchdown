@@ -74,3 +74,13 @@ class Apply(plan.Plan):
         self.object = self.runner.get_service(self.resource, "describe").describe_object()
         if self.resource.target and self.object.get("Result", "Pending") == "Pending":
             yield RunScript(self)
+
+
+class Destroy(plan.Plan):
+
+    name = 'destroy'
+    resource = Provisioner
+
+    def get_actions(self):
+        # Provisioners explicitly do not participate in destruction
+        return []
