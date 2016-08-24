@@ -153,3 +153,15 @@ class Apply(SimpleApply, Describe):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = "delete_rule"
+
+    def destroy_object(self):
+        for remote in self.object.get("Targets", []):
+            yield self.generic_action(
+                ['Remove old target {}'.format(remote['Id'])],
+                self.client.remove_targets,
+                Rule=self.resource.name,
+                Ids=[remote['Id']],
+            )
+
+        for action in super(Destroy, self).destroy_object():
+            yield action
