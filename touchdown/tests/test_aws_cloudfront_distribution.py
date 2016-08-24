@@ -16,7 +16,7 @@ import unittest
 
 import mock
 
-from touchdown.aws.cloudfront.distribution import Distribution, Describe
+from touchdown.aws.cloudfront.distribution import Describe, Distribution
 from touchdown.aws.session import session
 from touchdown.core import errors, serializers
 

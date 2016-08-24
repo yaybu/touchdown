@@ -14,8 +14,8 @@
 
 import unittest
 
-from touchdown.aws.session import session
 from touchdown.aws.ec2.ami import Describe
+from touchdown.aws.session import session
 
 
 class TestMetadata(unittest.TestCase):
