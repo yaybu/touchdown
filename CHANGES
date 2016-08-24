@@ -6,6 +6,8 @@ Changelog for Touchdown
 
 - Provisioner: Provisioner explicitly does not participate in destroy goals.
 
+- AWS EC2: Wait for EC2 instance to be properly terminated
+
 
 0.15.3 (2016-08-24)
 -------------------

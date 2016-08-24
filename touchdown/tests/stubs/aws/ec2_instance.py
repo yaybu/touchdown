@@ -31,25 +31,70 @@ class EC2InstanceStubber(ServiceStubber):
             expected_params={
                 'Filters': [
                     {'Name': 'tag:Name', 'Values': [self.resource.name]},
-                    {'Name': 'instance-state-name', 'Values': ['pending', 'running']},
+                    {'Name': 'instance-state-name', 'Values': [
+                        'pending', 'running', 'shutting-down', ' stopping', 'stopped'
+                    ]},
                 ],
             },
         )
 
-    def add_describe_instances_one_response_by_name(self):
+    def add_describe_instances_one_response_by_name(self, state='running'):
         return self.add_response(
             'describe_instances',
             service_response={
                 'Reservations': [{
                     'Instances': [{
                         'InstanceId': self.make_id(self.resource.name),
+                        'State': {
+                            'Name': state
+                        },
                     }],
                 }]
             },
             expected_params={
                 'Filters': [
                     {'Name': 'tag:Name', 'Values': [self.resource.name]},
-                    {'Name': 'instance-state-name', 'Values': ['pending', 'running']},
+                    {'Name': 'instance-state-name', 'Values': [
+                        'pending', 'running', 'shutting-down', ' stopping', 'stopped'
+                    ]},
                 ],
+            },
+        )
+
+    def add_run_instance(self):
+        return self.add_response(
+            'run_instances',
+            service_response={
+                'Instances': [{
+                    'InstanceId': self.make_id(self.resource.name),
+                }],
+            },
+            expected_params={
+                'BlockDeviceMappings': [],
+                'MaxCount': 1,
+                'MinCount': 1,
+                'ImageId': 'foobarbaz',
+            },
+        )
+
+    def add_create_tags(self, **tags):
+        tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
+        self.add_response(
+            'create_tags',
+            service_response={
+            },
+            expected_params={
+                'Resources': [self.make_id(self.resource.name)],
+                'Tags': tag_list,
+            },
+        )
+
+    def add_terminate_instances(self):
+        return self.add_response(
+            'terminate_instances',
+            service_response={
+            },
+            expected_params={
+                'InstanceIds': [self.make_id(self.resource.name)],
             },
         )

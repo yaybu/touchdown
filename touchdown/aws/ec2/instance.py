@@ -88,7 +88,9 @@ class Describe(SimpleDescribe, Plan):
         return {
             "Filters": [
                 {"Name": "tag:Name", "Values": [self.resource.name]},
-                {"Name": "instance-state-name", "Values": ["pending", "running"]},
+                {"Name": "instance-state-name", "Values": [
+                    'pending', 'running', 'shutting-down', ' stopping', 'stopped'
+                ]},
             ]
         }
 
