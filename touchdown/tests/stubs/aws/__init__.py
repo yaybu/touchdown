@@ -16,6 +16,7 @@ from .bucket import BucketStubber
 from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
 from .event_rule import EventRuleStubber
+from .hosted_zone import HostedZoneStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
 
@@ -25,6 +26,7 @@ __all__ = [
     'DistributionStubber',
     'EC2InstanceStubber',
     'EventRuleStubber',
+    'HostedZoneStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',
 ]

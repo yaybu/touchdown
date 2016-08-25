@@ -136,65 +136,6 @@ class TestAdapter(HTTPAdapter):
         raise response
 
 
-class TestCase(unittest.TestCase):
-
-    def setUp(self):
-        self.responses = TestAdapter()
-
-        class TestEndpoint(OldEndpoint):
-
-            responses = self.responses
-
-            def __init__(self, *args, **kwargs):
-                OldEndpoint.__init__(self, *args, **kwargs)
-                self.http_session.mount('https://', self.responses)
-
-        self._patcher = mock.patch('botocore.endpoint.Endpoint', TestEndpoint)
-        self._patcher.start()
-
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            "apply",
-            self.workspace,
-            ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
-
-    def tearDown(self):
-        self._patcher.stop()
-
-
-class TestBasicUsage(TestCase):
-
-    def setUp(self):
-        super(TestBasicUsage, self).setUp()
-
-        self.setUpResource()
-
-        self.fixture_found = "aws_{}_describe".format(self.resource.resource_name)
-        self.fixture_404 = "aws_{}_describe_404".format(self.resource.resource_name)
-        self.fixture_create = "aws_{}_create".format(self.resource.resource_name)
-
-        self.plan = self.goal.get_plan(self.resource)
-        self.base_url = 'https://{}.eu-west-1.amazonaws.com/'.format(self.plan.service_name)
-
-    def setUpResource(self):
-        raise NotImplementedError(self.setUpResource)
-
-    def test_no_change(self):
-        self.responses.add_fixture("POST", self.base_url, self.fixture_found, expires=1)
-        self.assertRaises(errors.NothingChanged, self.goal.execute)
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
-
-    def test_create(self):
-        self.responses.add_fixture("POST", self.base_url, self.fixture_404, expires=1)
-        self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
-        self.responses.add_fixture("POST", self.base_url, self.fixture_found)
-        self.goal.execute()
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
-
-
 class RecordedBotoCoreTest(unittest.TestCase):
 
     def patches(self):

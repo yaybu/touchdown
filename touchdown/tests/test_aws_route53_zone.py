@@ -12,154 +12,202 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import errors
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import HostedZoneStubber
 
-from . import aws
+
+class TestHostedZoneCreation(StubberTestCase):
+
+    def test_create_hosted_zone(self):
+        goal = self.create_goal('apply')
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                ),
+                'apply',
+            )
+        ))
+
+        # This zone doesn't exist yet
+        zone.add_list_hosted_zones_empty_response()
+
+        # So create it
+        zone.add_create_hosted_zone()
+
+        # Check we managed it
+        zone.add_list_hosted_zones_one_response()
+        zone.add_list_hosted_zones_one_response()
+        zone.add_list_hosted_zones_one_response()
+
+        goal.execute()
+
+    def test_create_hosted_zone_idempotent(self):
+        goal = self.create_goal('apply')
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                ),
+                'apply',
+            )
+        ))
+
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
+
+        # There are no rrset - as locally
+        zone.add_list_resource_record_sets()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(zone.resource)), 0)
 
 
-class TestHostedZone(aws.TestCase):
-
-    def setUp(self):
-        super(TestHostedZone, self).setUp()
-
-        self.fixture_found = "aws_hosted_zone_describe"
-        self.fixture_404 = "aws_hosted_zone_describe_404"
-        self.fixture_create = "aws_hosted_zone_create"
-        self.base_url = 'https://route53.amazonaws.com/'
-
-    def test_no_change(self):
-        self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
-        self.resource = self.aws.add_hosted_zone(
-            name='example.com',
-        )
-        self.plan = self.goal.get_plan(self.resource)
-
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
-            "aws_hosted_zone_rrset_0",
-        )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
-        self.assertRaises(errors.NothingChanged, self.goal.execute)
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
-
-    def test_no_change_1(self):
-        self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
-        self.resource = self.aws.add_hosted_zone(
-            name='example.com',
-            records=[{
-                "name": "example.com.",
-                "type": "A",
-                "ttl": 900,
-                "values": ['127.0.0.1'],
-            }]
-        )
-        self.plan = self.goal.get_plan(self.resource)
-
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
-            "aws_hosted_zone_rrset_1",
-        )
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
-            "aws_hosted_zone_rrset_1",
-        )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
-        self.assertRaises(errors.NothingChanged, self.goal.execute)
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
-
-    # FIXME: Refactor tests so matching can be done in a generic way
-    def test_create(self):
-        self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
-        self.resource = self.aws.add_hosted_zone(
-            name='example.com',
-        )
-        self.plan = self.goal.get_plan(self.resource)
-
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
-            "aws_hosted_zone_rrset_0",
-        )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_404, expires=1)
-        self.responses.add_fixture("POST", self.base_url, self.fixture_create, expires=1)
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
-        self.goal.execute()
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
+class TestUpdateRrset(StubberTestCase):
 
     def test_add_rrset(self):
-        self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
-        self.resource = self.aws.add_hosted_zone(
-            name='example.com',
-            records=[{
-                "name": "example.com.",
-                "type": "A",
-                "ttl": 900,
-                "values": ['127.0.0.1'],
-            }]
-        )
-        self.plan = self.goal.get_plan(self.resource)
+        goal = self.create_goal('apply')
 
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
-            "aws_hosted_zone_rrset_0",
-        )
-        self.responses.add_fixture(
-            "POST",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
-            "aws_hosted_zone_rrset_change",
-        )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
-        self.goal.execute()
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                    records=[{
+                        'name': 'example.com.',
+                        'type': 'A',
+                        'ttl': 900,
+                        'values': ['127.0.0.1'],
+                    }],
+                ),
+                'apply',
+            )
+        ))
 
-    def test_delete_rrset(self):
-        self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
-        self.resource = self.aws.add_hosted_zone(
-            name='example.com',
-        )
-        self.plan = self.goal.get_plan(self.resource)
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
 
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
-            "aws_hosted_zone_rrset_1",
-        )
-        self.responses.add_fixture(
-            "POST",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
-            "aws_hosted_zone_rrset_change",
-        )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
-        self.goal.execute()
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
+        # There are no rrset
+        zone.add_list_resource_record_sets()
+
+        zone.add_change_resource_record_sets_upsert({
+            'Name': 'example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'ResourceRecords': [{'Value': '127.0.0.1'}],
+        })
+
+        goal.execute()
 
     def test_update_rrset(self):
-        self.expected_resource_id = '/hostedzone/Z111111QQQQQQQ'
-        self.resource = self.aws.add_hosted_zone(
-            name='example.com',
-            records=[{
-                "name": "example.com.",
-                "type": "A",
-                "ttl": 900,
-                "values": ['192.168.0.1'],
-            }]
-        )
-        self.plan = self.goal.get_plan(self.resource)
+        goal = self.create_goal('apply')
 
-        self.responses.add_fixture(
-            "GET",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset",
-            "aws_hosted_zone_rrset_1",
-        )
-        self.responses.add_fixture(
-            "POST",
-            "https://route53.amazonaws.com/2013-04-01/hostedzone/Z111111QQQQQQQ/rrset/",
-            "aws_hosted_zone_rrset_change",
-        )
-        self.responses.add_fixture("GET", "https://route53.amazonaws.com/2013-04-01/hostedzone", self.fixture_found)
-        self.goal.execute()
-        self.assertEqual(self.plan.resource_id, self.expected_resource_id)
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                    records=[{
+                        'name': 'example.com.',
+                        'type': 'A',
+                        'ttl': 900,
+                        'values': ['192.168.0.1'],
+                    }],
+                ),
+                'apply',
+            )
+        ))
+
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
+
+        # There is a matching rrset but
+        zone.add_list_resource_record_sets([{
+            'Name': 'example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'ResourceRecords': [{'Value': '127.0.0.1'}],
+        }])
+
+        zone.add_change_resource_record_sets_upsert({
+            'Name': 'example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'ResourceRecords': [{'Value': '192.168.0.1'}],
+        })
+
+        goal.execute()
+
+    def test_delete_rrset(self):
+        goal = self.create_goal('apply')
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                    records=[],
+                ),
+                'apply',
+            )
+        ))
+
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
+
+        # There is a matching rrset but
+        zone.add_list_resource_record_sets([{
+            'Name': 'example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'ResourceRecords': [{'Value': '127.0.0.1'}],
+        }])
+
+        zone.add_change_resource_record_sets_delete({
+            'Name': 'example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'ResourceRecords': [{'Value': '127.0.0.1'}],
+        })
+
+        goal.execute()
+
+
+class TestHostedZoneDeletion(StubberTestCase):
+
+    def test_delete_hosted_zone(self):
+        goal = self.create_goal('destroy')
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                ),
+                'destroy',
+            )
+        ))
+
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
+
+        # Delete it
+        zone.add_delete_hosted_zone()
+
+        goal.execute()
+
+    def test_delete_hosted_zone_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                ),
+                'destroy',
+            )
+        ))
+
+        # There is already no such zone
+        zone.add_list_hosted_zones_empty_response()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(zone.resource)), 0)
