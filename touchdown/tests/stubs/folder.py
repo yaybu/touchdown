@@ -12,8 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .folder import TemporaryFolder
+import shutil
+import tempfile
 
-__all__ = [
-    'TemporaryFolder',
-]
+
+class TemporaryFolder(object):
+
+    def __enter__(self):
+        self.folder = tempfile.mkdtemp()
+        return self
+
+    def __exit__(self, *args):
+        shutil.rmtree(self.folder)
