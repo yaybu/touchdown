@@ -12,15 +12,92 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws
+from .aws import StubberTestCase
+from .stubs.aws import VpcStubber
 
 
-class TestVpc(aws.RecordedBotoCoreTest):
+class TestVpcCreation(StubberTestCase):
 
-    def test_create_and_delete_role(self):
-        self.aws.add_vpc(
-            name='test-vpc',
-            cidr_block='192.168.0.0/25',
-        )
-        self.apply()
-        self.destroy()
+    def test_create_vpc(self):
+        goal = self.create_goal('apply')
+
+        vpc = self.fixtures.enter_context(VpcStubber(
+            goal.get_service(
+                self.aws.add_vpc(
+                    name='test-vpc',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'apply',
+            )
+        ))
+
+        vpc.add_describe_vpcs_empty_response_by_name()
+        vpc.add_create_vpc()
+        vpc.add_create_tags(Name='test-vpc')
+
+        # Wait for VPC to exist
+        vpc.add_describe_vpcs_empty_response_by_name()
+        vpc.add_describe_vpcs_one_response_by_name(state='pending')
+        vpc.add_describe_vpcs_one_response_by_name()
+
+        # Check it really does exist, gather more info about it and carry on
+        vpc.add_describe_vpcs_one_response_by_name()
+
+        goal.execute()
+
+    def test_create_vpc_idempotent(self):
+        goal = self.create_goal('apply')
+
+        vpc = self.fixtures.enter_context(VpcStubber(
+            goal.get_service(
+                self.aws.add_vpc(
+                    name='test-vpc',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'apply',
+            )
+        ))
+
+        vpc.add_describe_vpcs_one_response_by_name()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(vpc.resource)), 0)
+
+
+class TestVpcDestroy(StubberTestCase):
+
+    def test_destroy_vpc(self):
+        goal = self.create_goal('destroy')
+
+        vpc = self.fixtures.enter_context(VpcStubber(
+            goal.get_service(
+                self.aws.add_vpc(
+                    name='test-vpc',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'destroy',
+            )
+        ))
+
+        vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_delete_vpc()
+
+        goal.execute()
+
+    def test_destroy_vpc_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        vpc = self.fixtures.enter_context(VpcStubber(
+            goal.get_service(
+                self.aws.add_vpc(
+                    name='test-vpc',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'destroy',
+            )
+        ))
+
+        vpc.add_describe_vpcs_empty_response_by_name()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(vpc.resource)), 0)

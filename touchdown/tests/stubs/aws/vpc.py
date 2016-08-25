@@ -22,17 +22,68 @@ class VpcStubber(ServiceStubber):
     def make_id(self, name):
         return 'vpc-' + super(VpcStubber, self).make_id(name)[:8]
 
-    def add_describe_vpcs_one_response_by_name(self):
+    def add_describe_vpcs_empty_response_by_name(self):
+        return self.add_response(
+            'describe_vpcs',
+            service_response={
+                'Vpcs': [],
+            },
+            expected_params={
+                'Filters': [
+                    {'Name': 'tag:Name', 'Values': [self.resource.name]}
+                ],
+            },
+        )
+
+    def add_describe_vpcs_one_response_by_name(self, state='available'):
         return self.add_response(
             'describe_vpcs',
             service_response={
                 'Vpcs': [{
                     'VpcId': self.make_id(self.resource.name),
+                    'State': state,
                 }],
             },
             expected_params={
                 'Filters': [
                     {'Name': 'tag:Name', 'Values': [self.resource.name]}
                 ],
+            },
+        )
+
+    def add_create_vpc(self):
+        return self.add_response(
+            'create_vpc',
+            service_response={
+                'Vpc': {
+                    'VpcId': self.make_id(self.resource.name),
+                    'State': 'pending',
+                },
+            },
+            expected_params={
+                'CidrBlock': '192.168.0.0/25',
+                'InstanceTenancy': 'default',
+            },
+        )
+
+    def add_create_tags(self, **tags):
+        tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
+        self.add_response(
+            'create_tags',
+            service_response={
+            },
+            expected_params={
+                'Resources': [self.make_id(self.resource.name)],
+                'Tags': tag_list,
+            },
+        )
+
+    def add_delete_vpc(self):
+        return self.add_response(
+            'delete_vpc',
+            service_response={
+            },
+            expected_params={
+                'VpcId': self.make_id(self.resource.name),
             },
         )
