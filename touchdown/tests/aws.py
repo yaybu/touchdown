@@ -19,7 +19,6 @@ import unittest
 import mock
 import six
 import vcr
-from botocore.endpoint import Endpoint as OldEndpoint
 from botocore.stub import Stubber as BaseStubber
 from botocore.vendored.requests.adapters import HTTPAdapter
 from botocore.vendored.requests.exceptions import ConnectionError
