@@ -4,7 +4,8 @@ Changelog for Touchdown
 0.15.6 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- VPC: Support VPC Endpoints. These allow private network interfaces to access
+  S3 without needing NAT etc.
 
 
 0.15.5 (2016-08-24)
