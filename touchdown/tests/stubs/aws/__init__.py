@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .bucket import BucketStubber
+from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
 from .event_rule import EventRuleStubber
 from .volume_attachment import VolumeAttachmentStubber
@@ -21,6 +22,7 @@ from .volume import VolumeStubber
 
 __all__ = [
     'BucketStubber',
+    'DistributionStubber',
     'EC2InstanceStubber',
     'EventRuleStubber',
     'VolumeAttachmentStubber',
