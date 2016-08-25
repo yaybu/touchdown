@@ -16,8 +16,9 @@ import os
 import unittest
 
 from touchdown.aws.ec2.keypair import PublicKeyFromPrivateKey
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import KeyPairStubber
 
-from . import aws
 
 PUBLIC_KEY_PATH = os.path.join(
     os.path.dirname(__file__),
@@ -39,15 +40,84 @@ public_key = (
     )
 
 
-class TestKeyPair(aws.RecordedBotoCoreTest):
+class TestCreateKeyPair(StubberTestCase):
 
-    def test_create_and_delete_keypair(self):
-        self.aws.add_keypair(
-            name="test-keypair",
-            public_key=public_key,
-        )
-        self.apply()
-        self.destroy()
+    def test_create_keypair(self):
+        goal = self.create_goal('apply')
+
+        keypair = self.fixtures.enter_context(KeyPairStubber(
+            goal.get_service(
+                self.aws.add_keypair(
+                    name="test-keypair",
+                    public_key=public_key,
+                ),
+                'apply',
+            )
+        ))
+
+        keypair.add_describe_keypairs_empty_response_by_name()
+        keypair.add_import_key_pair(public_key)
+        keypair.add_describe_keypairs_one_response_by_name()
+        keypair.add_describe_keypairs_one_response_by_name()
+
+        goal.execute()
+
+    def test_create_keypair_idempotent(self):
+        goal = self.create_goal('apply')
+
+        keypair = self.fixtures.enter_context(KeyPairStubber(
+            goal.get_service(
+                self.aws.add_keypair(
+                    name="test-keypair",
+                    public_key=public_key,
+                ),
+                'apply',
+            )
+        ))
+
+        keypair.add_describe_keypairs_one_response_by_name()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(keypair.resource)), 0)
+
+
+class TestDestroyKeyPair(StubberTestCase):
+
+    def test_destroy_keypair(self):
+        goal = self.create_goal('destroy')
+
+        keypair = self.fixtures.enter_context(KeyPairStubber(
+            goal.get_service(
+                self.aws.add_keypair(
+                    name="test-keypair",
+                    public_key=public_key,
+                ),
+                'destroy',
+            )
+        ))
+
+        keypair.add_describe_keypairs_one_response_by_name()
+        keypair.add_delete_key_pair()
+
+        goal.execute()
+
+    def test_destroy_keypair_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        keypair = self.fixtures.enter_context(KeyPairStubber(
+            goal.get_service(
+                self.aws.add_keypair(
+                    name="test-keypair",
+                    public_key=public_key,
+                ),
+                'destroy',
+            )
+        ))
+
+        keypair.add_describe_keypairs_empty_response_by_name()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(keypair.resource)), 0)
 
 
 class TestPublicKeyFromPrivateKey(unittest.TestCase):

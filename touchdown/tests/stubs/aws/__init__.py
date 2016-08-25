@@ -15,9 +15,10 @@
 from .bucket import BucketStubber
 from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
+from .endpoint import VpcEndpointStubber
 from .event_rule import EventRuleStubber
 from .hosted_zone import HostedZoneStubber
-from .endpoint import VpcEndpointStubber
+from .keypair import KeyPairStubber
 from .route_table import RouteTableStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
@@ -30,6 +31,7 @@ __all__ = [
     'EC2InstanceStubber',
     'EventRuleStubber',
     'HostedZoneStubber',
+    'KeyPairStubber',
     'RouteTableStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',
