@@ -13,44 +13,32 @@
 # limitations under the License.
 
 import datetime
-import unittest
 
 import mock
+
 from botocore.stub import Stubber
 
-from touchdown import frontends
-from touchdown.core import goals, workspace
-from touchdown.core.map import SerialMap
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import RoleStubber
 
 from . import aws
 
 
-class TestGetCredentials(aws.StubberTestCase):
+class TestGetCredentials(StubberTestCase):
 
     def test_get_temporary_credentials(self):
         goal = self.create_goal('get-credentials')
 
-        role = self.aws.get_role(name='read-only')
-        cred_service = goal.get_service(role, 'get-credentials')
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.get_role(name='read-only'),
+                'get-credentials',
+            )
+        ))
 
-        stub = self.fixtures.enter_context(Stubber(cred_service.client))
-        stub.add_response(
-            'list_roles',
-            service_response={
-                'Roles': [
-                    {
-                        'RoleName': 'read-only',
-                        'Path': '/iam/myrole',
-                        'RoleId': '1234567890123456',
-                        'Arn': '12345678901234567890',
-                        'CreateDate': datetime.datetime.now(),
-                    }
-                ]
-            },
-            expected_params={},
-        )
+        role.add_list_roles_one_response_by_name()
 
-        stub = self.fixtures.enter_context(Stubber(cred_service.sts))
+        stub = self.fixtures.enter_context(Stubber(role.service.sts))
         stub.add_response(
             'assume_role',
             service_response={
