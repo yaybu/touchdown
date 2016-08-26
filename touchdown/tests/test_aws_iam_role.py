@@ -33,46 +33,49 @@ class TestGetCredentials(aws.StubberTestCase):
         role = self.aws.get_role(name='read-only')
         cred_service = goal.get_service(role, 'get-credentials')
 
-        with Stubber(cred_service.client) as stub:
-            stub.add_response(
-                'list_roles',
-                service_response={
-                    'Roles': [
-                        {
-                            'RoleName': 'read-only',
-                            'Path': '/iam/myrole',
-                            'RoleId': '1234567890123456',
-                            'Arn': '12345678901234567890',
-                            'CreateDate': datetime.datetime.now(),
-                        }
-                    ]
-                },
-                expected_params={},
-            )
-            with Stubber(cred_service.sts) as stub:
-                stub.add_response(
-                    'assume_role',
-                    service_response={
-                        'Credentials': {
-                            'AccessKeyId': 'AK12345678901234',
-                            'SecretAccessKey': 'AK1234567890',
-                            'SessionToken': '01234567890',
-                            'Expiration': datetime.datetime.now(),
-                        }
-                    },
-                    expected_params={
-                        'RoleArn': '12345678901234567890',
-                        'RoleSessionName': 'touchdown-get-credentials'
-                    },
-                )
-                with mock.patch.object(goal.ui, 'echo') as m:
-                    goal.execute('read-only')
-                    m.assert_called_with(
-                        'AWS_ACCESS_KEY_ID=\'AK12345678901234\'; export AWS_ACCESS_KEY_ID;\n'
-                        'AWS_SECRET_ACCESS_KEY=\'AK1234567890\'; export AWS_SECRET_ACCESS_KEY;\n'
-                        'AWS_SESSION_TOKEN=\'01234567890\'; export AWS_SESSION_TOKEN;\n'
-                        'PS1="(read-only) $PS1"; export PS1;\n'
-                    )
+        stub = self.fixtures.enter_context(Stubber(cred_service.client))
+        stub.add_response(
+            'list_roles',
+            service_response={
+                'Roles': [
+                    {
+                        'RoleName': 'read-only',
+                        'Path': '/iam/myrole',
+                        'RoleId': '1234567890123456',
+                        'Arn': '12345678901234567890',
+                        'CreateDate': datetime.datetime.now(),
+                    }
+                ]
+            },
+            expected_params={},
+        )
+
+        stub = self.fixtures.enter_context(Stubber(cred_service.sts))
+        stub.add_response(
+            'assume_role',
+            service_response={
+                'Credentials': {
+                    'AccessKeyId': 'AK12345678901234',
+                    'SecretAccessKey': 'AK1234567890',
+                    'SessionToken': '01234567890',
+                    'Expiration': datetime.datetime.now(),
+                }
+            },
+            expected_params={
+                'RoleArn': '12345678901234567890',
+                'RoleSessionName': 'touchdown-get-credentials'
+            },
+        )
+
+        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
+
+        goal.execute('read-only')
+        echo.assert_called_with(
+            'AWS_ACCESS_KEY_ID=\'AK12345678901234\'; export AWS_ACCESS_KEY_ID;\n'
+            'AWS_SECRET_ACCESS_KEY=\'AK1234567890\'; export AWS_SECRET_ACCESS_KEY;\n'
+            'AWS_SESSION_TOKEN=\'01234567890\'; export AWS_SESSION_TOKEN;\n'
+            'PS1="(read-only) $PS1"; export PS1;\n'
+        )
 
 
 class TestRole(aws.RecordedBotoCoreTest):
