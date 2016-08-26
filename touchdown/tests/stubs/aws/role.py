@@ -50,14 +50,28 @@ class RoleStubber(ServiceStubber):
             expected_params={},
         )
 
-    def add_list_role_policies(self):
+    def add_list_role_policies(self, *policies):
         return self.add_response(
             'list_role_policies',
             service_response={
-                'PolicyNames': [],
+                'PolicyNames': list(policies),
             },
             expected_params={
                 'RoleName': self.resource.name,
+            }
+        )
+
+    def add_get_role_policy(self, name, policy):
+        return self.add_response(
+            'get_role_policy',
+            service_response={
+                'RoleName': self.resource.name,
+                'PolicyName': name,
+                'PolicyDocument': policy,
+            },
+            expected_params={
+                'RoleName': self.resource.name,
+                'PolicyName': name,
             }
         )
 
@@ -76,6 +90,27 @@ class RoleStubber(ServiceStubber):
             expected_params={
                 'RoleName': self.resource.name,
                 'AssumeRolePolicyDocument': assume_role_policy_document,
+            }
+        )
+
+    def add_put_role_policy(self, name, policy):
+        return self.add_response(
+            'put_role_policy',
+            service_response={},
+            expected_params={
+                'RoleName': self.resource.name,
+                'PolicyName': name,
+                'PolicyDocument': policy,
+            }
+        )
+
+    def add_delete_role_policy(self, name):
+        return self.add_response(
+            'delete_role_policy',
+            service_response={},
+            expected_params={
+                'RoleName': self.resource.name,
+                'PolicyName': name,
             }
         )
 

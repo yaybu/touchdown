@@ -86,6 +86,101 @@ class TestCreateRole(StubberTestCase):
         self.assertEqual(len(goal.get_changes(role.resource)), 0)
 
 
+class TestUpdateRole(StubberTestCase):
+
+    def test_add_policy(self):
+        goal = self.create_goal('apply')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    policies={
+                        'logs': {
+                            'Version': '2012-10-17',
+                            'Statement': [{
+                                'Effect': 'Allow',
+                                'Action': [
+                                    'logs:PutLogEvents',
+                                    'logs:CreateLogStream',
+                                ],
+                                'Resource': '*',
+                            }],
+                        },
+                    },
+                ),
+                'apply',
+            )
+        ))
+
+        role.add_list_roles_one_response_by_name()
+        role.add_list_role_policies()
+        role.add_put_role_policy('logs', (
+            '{"Version": "2012-10-17", "Statement": [{"Action": ['
+            '"logs:PutLogEvents", "logs:CreateLogStream"], '
+            '"Resource": "*", "Effect": "Allow"}]}'
+            )
+        )
+        goal.execute()
+
+    def test_update_policy(self):
+        goal = self.create_goal('apply')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    policies={
+                        'logs': {
+                            'Version': '2012-10-17',
+                            'Statement': [{
+                                'Effect': 'Allow',
+                                'Action': [
+                                    'logs:PutLogEvents',
+                                ],
+                                'Resource': '*',
+                            }],
+                        },
+                    },
+                ),
+                'apply',
+            )
+        ))
+
+        role.add_list_roles_one_response_by_name()
+        role.add_list_role_policies('logs')
+        role.add_get_role_policy('logs', (
+            '{"Version": "2012-10-17", "Statement": [{"Action": ['
+            '"logs:PutLogEvents", "logs:CreateLogStream"], '
+            '"Resource": "*", "Effect": "Allow"}]}'
+        ))
+        role.add_put_role_policy('logs', (
+            '{"Version": "2012-10-17", "Statement": [{"Action": ['
+            '"logs:PutLogEvents"], "Resource": "*", "Effect": "Allow"}]}'
+            )
+        )
+
+        goal.execute()
+
+    def test_remove_policy(self):
+        goal = self.create_goal('apply')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    policies={},
+                ),
+                'apply',
+            )
+        ))
+
+        role.add_list_roles_one_response_by_name()
+        role.add_list_role_policies('logs')
+        role.add_delete_role_policy('logs')
+        goal.execute()
+
+
 class TestDestroyRole(StubberTestCase):
 
     def test_destroy_role(self):
