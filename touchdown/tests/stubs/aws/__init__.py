@@ -21,6 +21,7 @@ from .hosted_zone import HostedZoneStubber
 from .keypair import KeyPairStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
+from .topic import TopicStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
 from .vpc import VpcStubber
@@ -35,6 +36,7 @@ __all__ = [
     'KeyPairStubber',
     'RoleStubber',
     'RouteTableStubber',
+    'TopicStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',
     'VpcEndpointStubber',

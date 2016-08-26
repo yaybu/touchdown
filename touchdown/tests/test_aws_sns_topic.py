@@ -12,14 +12,83 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import TopicStubber
 
 
-class TestTopic(aws.RecordedBotoCoreTest):
+class TestTopicCreation(StubberTestCase):
 
-    def test_create_and_delete_topic(self):
-        self.aws.add_topic(
-            name='test-topic',
-        )
-        self.apply()
-        self.destroy()
+    def test_create_topic(self):
+        goal = self.create_goal('apply')
+
+        topic = self.fixtures.enter_context(TopicStubber(
+            goal.get_service(
+                self.aws.add_topic(
+                    name='test-topic',
+                ),
+                'apply',
+            )
+        ))
+
+        topic.add_list_topics_empty_response()
+        topic.add_create_topic()
+        topic.add_list_topics_one_response()
+        topic.add_list_topics_one_response()
+
+        goal.execute()
+
+    def test_create_topic_idempotent(self):
+        goal = self.create_goal('apply')
+
+        topic = self.fixtures.enter_context(TopicStubber(
+            goal.get_service(
+                self.aws.add_topic(
+                    name='test-topic',
+                ),
+                'apply',
+            )
+        ))
+
+        topic.add_list_topics_one_response()
+        topic.add_list_subscriptions_by_topic()
+        topic.add_get_topic_attributes()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(topic.resource)), 0)
+
+
+class TestTopicDestroy(StubberTestCase):
+
+    def test_destroy_topic(self):
+        goal = self.create_goal('destroy')
+
+        topic = self.fixtures.enter_context(TopicStubber(
+            goal.get_service(
+                self.aws.add_topic(
+                    name='test-topic',
+                ),
+                'destroy',
+            )
+        ))
+
+        topic.add_list_topics_one_response()
+        topic.add_delete_topic()
+
+        goal.execute()
+
+    def test_destroy_topic_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        topic = self.fixtures.enter_context(TopicStubber(
+            goal.get_service(
+                self.aws.add_topic(
+                    name='test-topic',
+                ),
+                'destroy',
+            )
+        ))
+
+        topic.add_list_topics_empty_response()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(topic.resource)), 0)
