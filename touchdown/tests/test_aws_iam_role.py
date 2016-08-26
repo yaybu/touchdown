@@ -21,7 +21,120 @@ from botocore.stub import Stubber
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import RoleStubber
 
-from . import aws
+
+class TestCreateRole(StubberTestCase):
+
+    def test_create_role(self):
+        goal = self.create_goal('apply')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    assume_role_policy={
+                        'Statement': [{
+                            'Effect': 'Allow',
+                            'Principal': {'Service': 'ec2.amazonaws.com'},
+                            'Action': 'sts:AssumeRole',
+                        }],
+                    },
+                ),
+                'apply',
+            )
+        ))
+
+        role.add_list_roles_empty_response_by_name()
+        role.add_create_role(
+            assume_role_policy_document=(
+                '{"Statement": [{"Action": "sts:AssumeRole", "Effect": "Allow", '
+                '"Principal": {"Service": "ec2.amazonaws.com"}, "Sid": ""}], '
+                '"Version": "2012-10-17"}'
+            )
+        )
+
+        goal.execute()
+
+    def test_create_role_idempotent(self):
+        goal = self.create_goal('apply')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    assume_role_policy={
+                        'Statement': [{
+                            'Effect': 'Allow',
+                            'Principal': {'Service': 'ec2.amazonaws.com'},
+                            'Action': 'sts:AssumeRole',
+                        }],
+                    },
+                ),
+                'apply',
+            )
+        ))
+
+        role.add_list_roles_one_response_by_name(
+            assume_role_policy_document=(
+                '{"Statement": [{"Action": "sts:AssumeRole", "Effect": "Allow",'
+                '"Principal": {"Service": "ec2.amazonaws.com"}, "Sid": ""}],'
+                '"Version": "2012-10-17"}'
+            )
+        )
+        role.add_list_role_policies()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(role.resource)), 0)
+
+
+class TestDestroyRole(StubberTestCase):
+
+    def test_destroy_role(self):
+        goal = self.create_goal('destroy')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    assume_role_policy={
+                        'Statement': [{
+                            'Effect': 'Allow',
+                            'Principal': {'Service': 'ec2.amazonaws.com'},
+                            'Action': 'sts:AssumeRole',
+                        }],
+                    },
+                ),
+                'destroy',
+            )
+        ))
+
+        role.add_list_roles_one_response_by_name()
+        role.add_list_role_policies()
+        role.add_delete_role()
+        goal.execute()
+
+    def test_destroy_role_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.add_role(
+                    name='my-test-role',
+                    assume_role_policy={
+                        'Statement': [{
+                            'Effect': 'Allow',
+                            'Principal': {'Service': 'ec2.amazonaws.com'},
+                            'Action': 'sts:AssumeRole',
+                        }],
+                    },
+                ),
+                'destroy',
+            )
+        ))
+
+        role.add_list_roles_empty_response_by_name()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(role.resource)), 0)
 
 
 class TestGetCredentials(StubberTestCase):
@@ -64,20 +177,3 @@ class TestGetCredentials(StubberTestCase):
             'AWS_SESSION_TOKEN=\'01234567890\'; export AWS_SESSION_TOKEN;\n'
             'PS1="(read-only) $PS1"; export PS1;\n'
         )
-
-
-class TestRole(aws.RecordedBotoCoreTest):
-
-    def test_create_and_delete_role(self):
-        self.aws.add_role(
-            name='my-test-role',
-            assume_role_policy={
-                'Statement': [{
-                    'Effect': 'Allow',
-                    'Principal': {'Service': 'ec2.amazonaws.com'},
-                    'Action': 'sts:AssumeRole',
-                }],
-            },
-        )
-        self.apply()
-        self.destroy()

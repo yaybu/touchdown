@@ -21,19 +21,69 @@ class RoleStubber(ServiceStubber):
 
     client_service = 'iam'
 
-    def add_list_roles_one_response_by_name(self):
+    def add_list_roles_one_response_by_name(self, assume_role_policy_document=None):
+        role = {
+            'RoleName': self.resource.name,
+            'Path': '/iam/myrole',
+            'RoleId': '1234567890123456',
+            'Arn': '12345678901234567890',
+            'CreateDate': datetime.datetime.now(),
+        }
+
+        if assume_role_policy_document:
+            role['AssumeRolePolicyDocument'] = assume_role_policy_document
+
         return self.add_response(
             'list_roles',
             service_response={
-                'Roles': [
-                    {
-                        'RoleName': self.resource.name,
-                        'Path': '/iam/myrole',
-                        'RoleId': '1234567890123456',
-                        'Arn': '12345678901234567890',
-                        'CreateDate': datetime.datetime.now(),
-                    }
-                ]
+                'Roles': [role],
             },
             expected_params={},
+        )
+
+    def add_list_roles_empty_response_by_name(self):
+        return self.add_response(
+            'list_roles',
+            service_response={
+                'Roles': [],
+            },
+            expected_params={},
+        )
+
+    def add_list_role_policies(self):
+        return self.add_response(
+            'list_role_policies',
+            service_response={
+                'PolicyNames': [],
+            },
+            expected_params={
+                'RoleName': self.resource.name,
+            }
+        )
+
+    def add_create_role(self, assume_role_policy_document):
+        return self.add_response(
+            'create_role',
+            service_response={
+                'Role': {
+                    'RoleName': self.resource.name,
+                    'Path': '/iam/myrole',
+                    'RoleId': '1234567890123456',
+                    'Arn': '12345678901234567890',
+                    'CreateDate': datetime.datetime.now(),
+                },
+            },
+            expected_params={
+                'RoleName': self.resource.name,
+                'AssumeRolePolicyDocument': assume_role_policy_document,
+            }
+        )
+
+    def add_delete_role(self):
+        return self.add_response(
+            'delete_role',
+            service_response={},
+            expected_params={
+                'RoleName': self.resource.name,
+            }
         )
