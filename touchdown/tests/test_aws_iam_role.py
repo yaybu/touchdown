@@ -116,9 +116,9 @@ class TestUpdateRole(StubberTestCase):
         role.add_list_roles_one_response_by_name()
         role.add_list_role_policies()
         role.add_put_role_policy('logs', (
-            '{"Version": "2012-10-17", "Statement": [{"Action": ['
-            '"logs:PutLogEvents", "logs:CreateLogStream"], '
-            '"Resource": "*", "Effect": "Allow"}]}'
+            '{"Statement": [{"Action": ["logs:PutLogEvents", '
+            '"logs:CreateLogStream"], "Effect": "Allow", "Resource": "*"}], '
+            '"Version": "2012-10-17"}'
             )
         )
         goal.execute()
@@ -155,10 +155,9 @@ class TestUpdateRole(StubberTestCase):
             '"Resource": "*", "Effect": "Allow"}]}'
         ))
         role.add_put_role_policy('logs', (
-            '{"Version": "2012-10-17", "Statement": [{"Action": ['
-            '"logs:PutLogEvents"], "Resource": "*", "Effect": "Allow"}]}'
-            )
-        )
+            '{"Statement": [{"Action": ["logs:PutLogEvents"], '
+            '"Effect": "Allow", "Resource": "*"}], "Version": "2012-10-17"}'
+        ))
 
         goal.execute()
 

@@ -132,7 +132,7 @@ class Apply(SimpleApply, Describe):
                     self.client.put_role_policy,
                     RoleName=self.resource.name,
                     PolicyName=name,
-                    PolicyDocument=json.dumps(document),
+                    PolicyDocument=json.dumps(document, sort_keys=True),
                 )
 
         for name in policy_names:
