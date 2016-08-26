@@ -25,21 +25,13 @@ from touchdown.core.map import SerialMap
 from . import aws
 
 
-class TestGetCredentials(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            "get-credentials",
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
+class TestGetCredentials(aws.StubberTestCase):
 
     def test_get_temporary_credentials(self):
-        role = self.aws.get_role(name="read-only")
-        cred_service = self.goal.get_service(role, "get-credentials")
+        goal = self.create_goal('get-credentials')
+
+        role = self.aws.get_role(name='read-only')
+        cred_service = goal.get_service(role, 'get-credentials')
 
         with Stubber(cred_service.client) as stub:
             stub.add_response(
@@ -61,11 +53,11 @@ class TestGetCredentials(unittest.TestCase):
                 stub.add_response(
                     'assume_role',
                     service_response={
-                        "Credentials": {
-                            "AccessKeyId": "AK12345678901234",
-                            "SecretAccessKey": "AK1234567890",
-                            "SessionToken": "01234567890",
-                            "Expiration": datetime.datetime.now(),
+                        'Credentials': {
+                            'AccessKeyId': 'AK12345678901234',
+                            'SecretAccessKey': 'AK1234567890',
+                            'SessionToken': '01234567890',
+                            'Expiration': datetime.datetime.now(),
                         }
                     },
                     expected_params={
@@ -73,8 +65,8 @@ class TestGetCredentials(unittest.TestCase):
                         'RoleSessionName': 'touchdown-get-credentials'
                     },
                 )
-                with mock.patch.object(self.goal.ui, "echo") as m:
-                    self.goal.execute("read-only")
+                with mock.patch.object(goal.ui, 'echo') as m:
+                    goal.execute('read-only')
                     m.assert_called_with(
                         'AWS_ACCESS_KEY_ID=\'AK12345678901234\'; export AWS_ACCESS_KEY_ID;\n'
                         'AWS_SECRET_ACCESS_KEY=\'AK1234567890\'; export AWS_SECRET_ACCESS_KEY;\n'
@@ -87,12 +79,12 @@ class TestRole(aws.RecordedBotoCoreTest):
 
     def test_create_and_delete_role(self):
         self.aws.add_role(
-            name="my-test-role",
+            name='my-test-role',
             assume_role_policy={
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Principal": {"Service": "ec2.amazonaws.com"},
-                    "Action": "sts:AssumeRole",
+                'Statement': [{
+                    'Effect': 'Allow',
+                    'Principal': {'Service': 'ec2.amazonaws.com'},
+                    'Action': 'sts:AssumeRole',
                 }],
             },
         )
