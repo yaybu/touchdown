@@ -18,6 +18,7 @@ from .ec2_instance import EC2InstanceStubber
 from .endpoint import VpcEndpointStubber
 from .event_rule import EventRuleStubber
 from .hosted_zone import HostedZoneStubber
+from .internet_gateway import InternetGatewayStubber
 from .keypair import KeyPairStubber
 from .launch_configuration import LaunchConfigurationStubber
 from .queue import QueueStubber
@@ -35,6 +36,7 @@ __all__ = [
     'EC2InstanceStubber',
     'EventRuleStubber',
     'HostedZoneStubber',
+    'InternetGatewayStubber',
     'KeyPairStubber',
     'LaunchConfigurationStubber',
     'QueueStubber',

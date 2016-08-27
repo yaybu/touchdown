@@ -12,18 +12,88 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws
+from .aws import StubberTestCase
+from .fixtures.aws import VpcFixture
+from .stubs.aws import InternetGatewayStubber
 
 
-class TestInternetGateway(aws.RecordedBotoCoreTest):
+class TestInternetGatewayCreation(StubberTestCase):
 
-    def test_create_and_delete_igw(self):
-        vpc = self.aws.add_vpc(
-            name='test-vpc',
-            cidr_block='192.168.0.0/25',
+    def test_create_internet_gateway(self):
+        goal = self.create_goal('apply')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
+            goal.get_service(
+                vpc.add_internet_gateway(
+                    name='test-internet_gateway',
+                ),
+                'apply',
+            )
+        ))
+
+        internet_gateway.add_describe_internet_gateways_empty_response()
+        internet_gateway.add_create_internet_gateway()
+        internet_gateway.add_create_tags(Name='test-internet_gateway')
+        internet_gateway.add_attach_internet_gateway(vpc_id='vpc-f96b65a5')
+
+        goal.execute()
+
+    def test_create_internet_gateway_idempotent(self):
+        goal = self.create_goal('apply')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
+            goal.get_service(
+                vpc.add_internet_gateway(
+                    name='test-internet_gateway',
+                ),
+                'apply',
+            )
+        ))
+
+        internet_gateway.add_describe_internet_gateways_one_response(
+            vpc_ids=['vpc-f96b65a5'],
         )
-        vpc.add_internet_gateway(
-            name='test-igw',
-        )
-        self.apply()
-        self.destroy()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(internet_gateway.resource)), 0)
+
+
+class TestInternetGatewayDestroy(StubberTestCase):
+
+    def test_destroy_internet_gateway(self):
+        goal = self.create_goal('destroy')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
+            goal.get_service(
+                vpc.add_internet_gateway(
+                    name='test-internet_gateway',
+                ),
+                'destroy',
+            )
+        ))
+
+        internet_gateway.add_describe_internet_gateways_one_response()
+        internet_gateway.add_delete_internet_gateway()
+
+        goal.execute()
+
+    def test_destroy_internet_gateway_idempotent(self):
+        goal = self.create_goal('destroy')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
+            goal.get_service(
+                vpc.add_internet_gateway(
+                    name='test-internet_gateway',
+                ),
+                'destroy',
+            )
+        ))
+
+        internet_gateway.add_describe_internet_gateways_empty_response()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(internet_gateway.resource)), 0)
