@@ -17,7 +17,7 @@ from .service import ServiceStubber
 
 class QueueStubber(ServiceStubber):
 
-    client_service = 'sns'
+    client_service = 'sqs'
 
     def add_get_queue_url(self):
         return self.add_response(

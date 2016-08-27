@@ -12,16 +12,94 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.stubs.aws import LaunchConfigurationStubber
 
 
-class TestRole(aws.RecordedBotoCoreTest):
+class TestCreateLaunchConfiguration(StubberTestCase):
 
-    def test_create_and_delete_launch_configuration(self):
-        self.aws.add_launch_configuration(
-            name='my-test-lc',
-            image='ami-cba130bc',
-            instance_type='t2.micro',
-        )
-        self.apply()
-        self.destroy()
+    def test_create_launch_config(self):
+        goal = self.create_goal('apply')
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
+            goal.get_service(
+                self.aws.add_launch_configuration(
+                    name='my-test-lc',
+                    image='ami-cba130bc',
+                    instance_type='t2.micro',
+                ),
+                'apply',
+            )
+        ))
+
+        launch_config.add_describe_launch_configurations_empty_response()
+        launch_config.add_describe_launch_configurations_empty_response()
+        launch_config.add_create_launch_configuration()
+        launch_config.add_describe_launch_configurations_one_response()
+        launch_config.add_describe_launch_configurations_one_response()
+        launch_config.add_describe_launch_configurations_one_response()
+        goal.execute()
+
+    def test_create_launch_config_idempotent(self):
+        goal = self.create_goal('apply')
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
+            goal.get_service(
+                self.aws.add_launch_configuration(
+                    name='my-test-lc',
+                    image='ami-cba130bc',
+                    instance_type='t2.micro',
+                ),
+                'apply',
+            )
+        ))
+
+        launch_config.add_describe_launch_configurations_one_response()
+        launch_config.add_describe_launch_configurations_one_response()
+        launch_config.add_describe_auto_scaling_groups()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(launch_config.resource)), 0)
+
+
+class TestDestroyLaunchConfiguration(StubberTestCase):
+
+    def test_destroy_launch_config(self):
+        goal = self.create_goal('destroy')
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
+            goal.get_service(
+                self.aws.add_launch_configuration(
+                    name='my-test-lc',
+                    image='ami-cba130bc',
+                    instance_type='t2.micro',
+                ),
+                'destroy',
+            )
+        ))
+
+        launch_config.add_describe_launch_configurations_one_response()
+        launch_config.add_describe_launch_configurations_one_response()
+        launch_config.add_delete_launch_configuration()
+
+        goal.execute()
+
+    def test_destroy_launch_config_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
+            goal.get_service(
+                self.aws.add_launch_configuration(
+                    name='my-test-lc',
+                    image='ami-cba130bc',
+                    instance_type='t2.micro',
+                ),
+                'destroy',
+            )
+        ))
+
+        launch_config.add_describe_launch_configurations_empty_response()
+        launch_config.add_describe_launch_configurations_empty_response()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(launch_config.resource)), 0)

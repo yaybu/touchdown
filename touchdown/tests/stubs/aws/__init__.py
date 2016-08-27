@@ -19,6 +19,7 @@ from .endpoint import VpcEndpointStubber
 from .event_rule import EventRuleStubber
 from .hosted_zone import HostedZoneStubber
 from .keypair import KeyPairStubber
+from .launch_configuration import LaunchConfigurationStubber
 from .queue import QueueStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
@@ -35,6 +36,7 @@ __all__ = [
     'EventRuleStubber',
     'HostedZoneStubber',
     'KeyPairStubber',
+    'LaunchConfigurationStubber',
     'QueueStubber',
     'RoleStubber',
     'RouteTableStubber',
