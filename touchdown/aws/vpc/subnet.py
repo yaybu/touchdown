@@ -51,6 +51,12 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = "Subnets"
     key = 'SubnetId'
 
+    signature = (
+        Present('name'),
+        Present('vpc'),
+        Present('cidr_block'),
+    )
+
     def get_describe_filters(self):
         vpc = self.runner.get_plan(self.resource.vpc)
         if not vpc.resource_id:
@@ -99,12 +105,6 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = "create_subnet"
     waiter = "subnet_available"
-
-    signature = (
-        Present('name'),
-        Present('vpc'),
-        Present('cidr_block'),
-    )
 
     def update_object(self):
         if self.resource.route_table:

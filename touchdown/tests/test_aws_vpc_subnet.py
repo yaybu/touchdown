@@ -12,52 +12,155 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws
+from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.fixtures.aws import (
+    NetworkAclFixture,
+    RouteTableFixture,
+    VpcFixture,
+)
+from touchdown.tests.stubs.aws import SubnetStubber
 
 
-class TestSubnet(aws.RecordedBotoCoreTest):
+class TestSubnetCreation(StubberTestCase):
 
-    def test_create_and_delete_subnet(self):
-        vpc = self.aws.add_vpc(
-            name='test-vpc',
-            cidr_block='192.168.0.0/25',
-        )
-        vpc.add_subnet(
-            name='test-subnet',
-            cidr_block='192.168.0.0/25',
-        )
-        self.apply()
-        self.destroy()
+    def test_create_subnet(self):
+        goal = self.create_goal('apply')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-    def test_adding_and_removing_route_table_to_subnet(self):
-        vpc = self.aws.add_vpc(
-            name='test-vpc',
-            cidr_block='192.168.0.0/25',
-        )
-        subnet = vpc.add_subnet(
-            name='test-subnet',
-            cidr_block='192.168.0.0/25',
-            route_table=vpc.add_route_table(
-                name='test-subnet',
-            ),
-        )
-        self.apply()
-        subnet.route_table = None
-        self.apply()
-        self.destroy()
+        subnet = self.fixtures.enter_context(SubnetStubber(
+            goal.get_service(
+                vpc.add_subnet(
+                    name='test-subnet',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'apply',
+            )
+        ))
 
-    def test_adding_and_removing_acls_to_subnet(self):
-        vpc = self.aws.add_vpc(
-            name='test-vpc',
-            cidr_block='192.168.0.0/25',
-        )
-        subnet = vpc.add_subnet(
-            name='test-subnet',
-            cidr_block='192.168.0.0/25',
-        )
-        self.apply()
-        subnet.network_acl = vpc.add_network_acl(
-            name='test-subnet',
-        )
-        self.apply()
-        self.destroy()
+        subnet.add_describe_subnets_empty_response()
+        subnet.add_create_subnet()
+        subnet.add_create_tags(Name='test-subnet')
+
+        # Wait for the subnet to exist
+        subnet.add_describe_subnets_empty_response()
+        subnet.add_describe_subnets_empty_response()
+        subnet.add_describe_subnets_one_response()
+
+        # Call describe_object again to make sure remote state is correctly cached
+        subnet.add_describe_subnets_one_response()
+        subnet.add_describe_network_acls()
+        subnet.add_describe_route_tables()
+
+        goal.execute()
+
+    def test_adding_route_table_to_subnet(self):
+        goal = self.create_goal('apply')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        route_table = self.fixtures.enter_context(RouteTableFixture(goal, self.aws, vpc))
+
+        subnet = self.fixtures.enter_context(SubnetStubber(
+            goal.get_service(
+                vpc.add_subnet(
+                    name='test-subnet',
+                    cidr_block='192.168.0.0/25',
+                    route_table=route_table,
+                ),
+                'apply',
+            )
+        ))
+
+        subnet.add_describe_subnets_one_response()
+        subnet.add_describe_network_acls()
+        subnet.add_describe_route_tables()
+
+        subnet.add_associate_route_table('rt-52f2381b')
+
+        goal.execute()
+
+    def test_adding_nacl_table_to_subnet(self):
+        goal = self.create_goal('apply')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        nacl = self.fixtures.enter_context(NetworkAclFixture(goal, self.aws, vpc))
+
+        subnet = self.fixtures.enter_context(SubnetStubber(
+            goal.get_service(
+                vpc.add_subnet(
+                    name='test-subnet',
+                    cidr_block='192.168.0.0/25',
+                    network_acl=nacl,
+                ),
+                'apply',
+            )
+        ))
+
+        subnet.add_describe_subnets_one_response()
+        subnet.add_describe_network_acls()
+        subnet.add_describe_route_tables()
+
+        subnet.add_replace_network_acl_association()
+
+        goal.execute()
+
+    def test_create_subnet_idempotent(self):
+        goal = self.create_goal('apply')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        subnet = self.fixtures.enter_context(SubnetStubber(
+            goal.get_service(
+                vpc.add_subnet(
+                    name='test-subnet',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'apply',
+            )
+        ))
+
+        subnet.add_describe_subnets_one_response()
+        subnet.add_describe_network_acls()
+        subnet.add_describe_route_tables()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(subnet.resource)), 0)
+
+
+class TestSubnetDestroy(StubberTestCase):
+
+    def test_destroy_subnet(self):
+        goal = self.create_goal('destroy')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        subnet = self.fixtures.enter_context(SubnetStubber(
+            goal.get_service(
+                vpc.add_subnet(
+                    name='test-subnet',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'destroy',
+            )
+        ))
+
+        subnet.add_describe_subnets_one_response()
+        subnet.add_describe_network_acls()
+        subnet.add_describe_route_tables()
+        subnet.add_delete_subnet()
+
+        goal.execute()
+
+    def test_destroy_subnet_idempotent(self):
+        goal = self.create_goal('destroy')
+        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+
+        subnet = self.fixtures.enter_context(SubnetStubber(
+            goal.get_service(
+                vpc.add_subnet(
+                    name='test-subnet',
+                    cidr_block='192.168.0.0/25',
+                ),
+                'destroy',
+            )
+        ))
+
+        subnet.add_describe_subnets_empty_response()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(subnet.resource)), 0)

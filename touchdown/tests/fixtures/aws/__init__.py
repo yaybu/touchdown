@@ -12,8 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .network_acl import NetworkAclFixture
+from .route_table import RouteTableFixture
 from .vpc import VpcFixture
 
+
 __all__ = [
+    'NetworkAclFixture',
+    'RouteTableFixture',
     'VpcFixture',
 ]

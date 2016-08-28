@@ -21,10 +21,12 @@ from .hosted_zone import HostedZoneStubber
 from .internet_gateway import InternetGatewayStubber
 from .keypair import KeyPairStubber
 from .launch_configuration import LaunchConfigurationStubber
+from .network_acl import NetworkAclStubber
 from .queue import QueueStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
 from .security_group import SecurityGroupStubber
+from .subnet import SubnetStubber
 from .topic import TopicStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
@@ -40,10 +42,12 @@ __all__ = [
     'InternetGatewayStubber',
     'KeyPairStubber',
     'LaunchConfigurationStubber',
+    'NetworkAclStubber',
     'QueueStubber',
     'RoleStubber',
     'RouteTableStubber',
     'SecurityGroupStubber',
+    'SubnetStubber',
     'TopicStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',
