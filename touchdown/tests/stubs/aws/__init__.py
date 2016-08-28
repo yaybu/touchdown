@@ -24,6 +24,7 @@ from .launch_configuration import LaunchConfigurationStubber
 from .queue import QueueStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
+from .security_group import SecurityGroupStubber
 from .topic import TopicStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
@@ -42,6 +43,7 @@ __all__ = [
     'QueueStubber',
     'RoleStubber',
     'RouteTableStubber',
+    'SecurityGroupStubber',
     'TopicStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',
