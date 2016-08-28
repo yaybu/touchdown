@@ -22,6 +22,19 @@ class NetworkAclStubber(ServiceStubber):
     def make_id(self, name):
         return 'nacl-' + super(NetworkAclStubber, self).make_id(name)[:8]
 
+    def add_describe_network_acls_empty_response_by_name(self):
+        return self.add_response(
+            'describe_network_acls',
+            service_response={
+                'NetworkAcls': [],
+            },
+            expected_params={
+                'Filters': [
+                    {'Name': 'vpc-id', 'Values': ['vpc-f96b65a5']}
+                ]
+            },
+        )
+
     def add_describe_network_acls_one_response_by_name(self):
         return self.add_response(
             'describe_network_acls',
@@ -29,15 +42,53 @@ class NetworkAclStubber(ServiceStubber):
                 'NetworkAcls': [{
                     'NetworkAclId': self.make_id(self.resource.name),
                     'Tags': [
-                        {"Key": "Name", "Value": self.resource.name}
+                        {'Key': 'Name', 'Value': self.resource.name + '.1'}
                     ],
                     'Entries': [],
+                    'Associations': [],
                     'IsDefault': False,
                 }],
+                'ResponseMetadata': {
+                    'HTTPStatusCode': 200,
+                },
             },
             expected_params={
                 'Filters': [
                     {'Name': 'vpc-id', 'Values': ['vpc-f96b65a5']}
                 ]
+            },
+        )
+
+    def add_create_network_acl(self):
+        return self.add_response(
+            'create_network_acl',
+            service_response={
+                'NetworkAcl': {
+                    'NetworkAclId': self.make_id(self.resource.name),
+                },
+            },
+            expected_params={
+                'VpcId': 'vpc-f96b65a5',
+            },
+        )
+
+    def add_create_tags(self, **tags):
+        tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
+        self.add_response(
+            'create_tags',
+            service_response={
+            },
+            expected_params={
+                'Resources': [self.make_id(self.resource.name)],
+                'Tags': tag_list,
+            },
+        )
+
+    def add_delete_network_acl(self):
+        return self.add_response(
+            'delete_network_acl',
+            service_response={},
+            expected_params={
+                'NetworkAclId': self.make_id(self.resource.name),
             },
         )

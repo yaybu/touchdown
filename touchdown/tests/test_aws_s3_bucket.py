@@ -16,8 +16,6 @@ from touchdown.core.errors import InvalidParameter
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import BucketStubber
 
-from . import aws
-
 
 class TestBucketDescribe(StubberTestCase):
 
@@ -44,7 +42,7 @@ class TestBucketDescribe(StubberTestCase):
         self.assertEqual(obj['Name'], 'ZzZzZz')
 
 
-class TestBucketValidation(aws.RecordedBotoCoreTest):
+class TestBucketValidation(StubberTestCase):
 
     def test_starts_with_period(self):
         self.assertRaises(InvalidParameter, self.aws.add_bucket, name='.foo')
