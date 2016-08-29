@@ -102,6 +102,9 @@ class Set(Plan):
     resource = File
     name = "set"
 
+    def from_string(self, value):
+        return value
+
     def execute(self, value):
         f = self.runner.get_service(self.resource, "fileio")
         f.write(value)
@@ -112,9 +115,12 @@ class Get(Plan):
     resource = File
     name = "get"
 
+    def to_string(self, value):
+        return value
+
     def execute(self):
         f = self.runner.get_service(self.resource, "fileio")
-        return f.read().read()
+        return f.read().read(), True
 
 
 # class Refresh(Plan):

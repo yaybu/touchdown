@@ -46,8 +46,8 @@ class Get(Goal):
         val = settings[name].to_string(val)
 
         if user_set:
-            print("{} (overriden by user)".format(val))
+            self.ui.echo("{} (overriden by user)".format(val))
         else:
-            print("{} (default value)".format(val))
+            self.ui.echo("{} (default value)".format(val))
 
 register(Get)
