@@ -183,7 +183,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
         bundle.add_file(
             name=os.path.join(self.test_dir, "lambda.zip"),
             source=lambda_zip,
@@ -272,7 +272,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
         bundle.add_file(
             name=os.path.join(self.test_dir, "lambda.zip"),
             source=lambda_zip,
@@ -347,7 +347,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
         bundle.add_execute(
             command="echo HELLO EVERYONE",
             creates=lambda_zip,
@@ -420,7 +420,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "fixtures/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
         bundle.add_execute(
             command="echo HELLO EVERYONE",
             creates=lambda_zip,
