@@ -12,39 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-
 import mock
 from botocore.stub import Stubber as BaseStubber
 
-from touchdown.core import goals, workspace
-from touchdown.core.map import SerialMap
-from touchdown.frontends import ConsoleFrontend, MultiFrontend
-
-try:
-    from contextlib import ExitStack
-except ImportError:
-    from contextlib2 import ExitStack
+from touchdown.tests.testcases import WorkspaceTestCase
 
 
-class StubberTestCase(unittest.TestCase):
+class StubberTestCase(WorkspaceTestCase):
 
     def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.fixtures = ExitStack()
-        self.addCleanup(self.fixtures.close)
-        self.fixtures.enter_context(mock.patch('time.sleep'))
-
-    def create_goal(self, goal_name):
-        return goals.create(
-            goal_name,
-            self.workspace,
-            MultiFrontend([
-                ConsoleFrontend(interactive=False),
-            ]),
-            map=SerialMap
+        super(StubberTestCase, self).setUp()
+        self.aws = self.workspace.add_aws(
+            access_key_id='dummy',
+            secret_access_key='dummy',
+            region='eu-west-1',
         )
+        self.fixtures.enter_context(mock.patch('time.sleep'))
 
 
 class Stubber(BaseStubber):

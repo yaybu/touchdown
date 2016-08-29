@@ -14,36 +14,21 @@
 
 import os
 import tempfile
-import unittest
 
-from touchdown.core import errors, goals, serializers, workspace
-from touchdown.core.map import SerialMap
-from touchdown.frontends import ConsoleFrontend
+from touchdown.core import errors, serializers
+from touchdown.tests.testcases import WorkspaceTestCase
 
 
-class TestCase(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
+class TestCase(WorkspaceTestCase):
 
     def apply(self):
-        self.apply_runner = goals.create(
-            "apply",
-            self.workspace,
-            ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
-        self.apply_runner.execute()
-        return self.apply_runner
+        goal = self.create_goal('apply')
+        goal.execute()
+        return goal
 
     def test_destroy(self):
-        self.destroy_runner = goals.create(
-            "destroy",
-            self.workspace,
-            ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
-        self.assertRaises(errors.NothingChanged, self.destroy_runner.execute)
+        goal = self.create_goal('destroy')
+        self.assertRaises(errors.NothingChanged, goal.execute)
 
     def test_file_apply(self):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
@@ -116,10 +101,5 @@ class TestCase(unittest.TestCase):
             name="ZZZZ__FILE_DOES_NOT_EXIST__ZZZZ",
             policy="remove",
         )
-        apply_service = goals.create(
-            "apply",
-            self.workspace,
-            ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
+        apply_service = self.create_goal('apply')
         self.assertEqual(len(list(apply_service.plan())), 0)

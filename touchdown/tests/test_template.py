@@ -12,27 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-
-from touchdown.core import goals, serializers, workspace
-from touchdown.core.map import SerialMap
-from touchdown.frontends import ConsoleFrontend
+from touchdown.core import serializers
+from touchdown.tests.testcases import WorkspaceTestCase
 
 
-class TestTemplate(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
+class TestTemplate(WorkspaceTestCase):
 
     def apply(self):
-        self.apply_runner = goals.create(
-            "apply",
-            self.workspace,
-            ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
-        self.apply_runner.execute()
-        return self.apply_runner
+        goal = self.create_goal('apply')
+        goal.execute()
+        return goal
 
     def test_static_template(self):
         template = self.workspace.add_jinja2_template(
