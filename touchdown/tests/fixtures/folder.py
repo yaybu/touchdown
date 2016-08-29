@@ -12,11 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import shutil
+import tempfile
+
 from touchdown.tests.fixtures.fixture import Fixture
 
 
-class AwsFixture(Fixture):
+class TemporaryFolder(object):
 
-    def __init__(self, goal, aws):
-        super(AwsFixture, self).__init__(goal, aws.workspace)
-        self.aws = aws
+    def __enter__(self):
+        self.folder = tempfile.mkdtemp()
+        return self
+
+    def __exit__(self, *args):
+        shutil.rmtree(self.folder)
+
+
+class TemporaryFolderFixture(Fixture):
+
+    def __enter__(self):
+        return self.workspace.add_local_folder(
+            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+        )

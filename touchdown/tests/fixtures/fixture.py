@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.tests.fixtures.fixture import Fixture
+try:
+    from contextlib import ExitStack
+except ImportError:
+    from contextlib2 import ExitStack
 
 
-class AwsFixture(Fixture):
+class Fixture(object):
 
-    def __init__(self, goal, aws):
-        super(AwsFixture, self).__init__(goal, aws.workspace)
-        self.aws = aws
+    def __init__(self, goal, workspace):
+        self.fixtures = ExitStack()
+        self.goal = goal
+        self.workspace = workspace
+
+    def __exit__(self, *args):
+        self.fixtures.close()
