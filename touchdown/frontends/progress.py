@@ -16,8 +16,6 @@ from __future__ import absolute_import, print_function
 
 import datetime
 
-from .base import BaseFrontend
-
 
 class ProgressBar(object):
 
@@ -37,18 +35,3 @@ class ProgressBar(object):
         duration = datetime.datetime.now() - self.start_time
         self.frontend.echo("{} tasks executed out of {}".format(self.current, self.max_value))
         self.frontend.echo("Tasks executed in {}".format(duration))
-
-
-class NonInteractiveFrontend(BaseFrontend):
-
-    def _echo(self, text, nl=True, **kwargs):
-        print(text)
-
-    def progressbar(self, **kwargs):
-        return ProgressBar(self, **kwargs)
-
-    def prompt(self, message, key=None, default=None):
-        return default
-
-    def confirm(self, message):
-        return True

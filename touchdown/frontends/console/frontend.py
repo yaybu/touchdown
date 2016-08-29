@@ -14,13 +14,10 @@
 
 from __future__ import absolute_import, print_function
 
-import signal
-
 import six
 
 from ..base import BaseFrontend
-from ..noninteractive import ProgressBar as NonInteractiveProgressBar
-from .progress import ProgressBar
+from ..progress import ProgressBar
 
 
 class ConsoleFrontend(BaseFrontend):
@@ -32,9 +29,7 @@ class ConsoleFrontend(BaseFrontend):
         print(text, end='')
 
     def progressbar(self, **kwargs):
-        if hasattr(signal, "SIGWINCH"):
-            return ProgressBar(**kwargs)
-        return NonInteractiveProgressBar(self, **kwargs)
+        return ProgressBar(self, **kwargs)
 
     def prompt(self, message, key=None, default=None):
         response = six.moves.input('{}: '.format(message))

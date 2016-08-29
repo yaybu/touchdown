@@ -33,7 +33,6 @@ setup(
         'netaddr',
 	'fuselage>=1.0.0',
         'botocore>=1.4.28',
-        'progressbar2>=3.6.0',
         'requests',
         'python-gnupg',
     ],
