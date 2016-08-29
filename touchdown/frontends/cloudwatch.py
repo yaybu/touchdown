@@ -21,10 +21,11 @@ from botocore.exceptions import ClientError
 
 from six.moves import queue
 
-from .noninteractive import NonInteractiveFrontend
+from .base import BaseFrontend
+from .progress import ProgressBar
 
 
-class CloudWatchFrontend(NonInteractiveFrontend):
+class CloudWatchFrontend(BaseFrontend):
 
     def __init__(self, group, stream):
         self.group = group
@@ -102,3 +103,12 @@ class CloudWatchFrontend(NonInteractiveFrontend):
             self._send()
             time.sleep(1)
         self._send()
+
+    def progressbar(self, **kwargs):
+        return ProgressBar(self, **kwargs)
+
+    def prompt(self, message, key=None, default=None):
+        return default
+
+    def confirm(self, message):
+        return True

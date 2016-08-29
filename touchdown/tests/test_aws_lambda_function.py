@@ -17,13 +17,10 @@ import os
 import shutil
 import sys
 import tempfile
-import unittest
 
 from botocore.stub import ANY, Stubber
 
-from touchdown import frontends
-from touchdown.core import goals, workspace
-from touchdown.core.map import SerialMap
+from touchdown.tests.aws import StubberTestCase
 
 
 def dummy_function(a, b):
@@ -31,26 +28,18 @@ def dummy_function(a, b):
     pass
 
 
-class TestLambdaFunction(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            "apply",
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
+class TestLambdaFunction(StubberTestCase):
 
     def test_get_all_unaliased_versions(self):
+        goal = self.create_goal('apply')
+
         self.fn = self.aws.add_lambda_function(
             name="myfunction",
             role=self.aws.get_role(name="myrole"),
             handler="mymodule.myfunction",
             code=dummy_function,
         )
-        apply_service = self.goal.get_service(self.fn, "apply")
+        apply_service = goal.get_service(self.fn, "apply")
 
         with Stubber(apply_service.client) as stub:
             stub.add_response(
@@ -101,13 +90,15 @@ class TestLambdaFunction(unittest.TestCase):
         }])
 
     def test_dont_update_code(self):
+        goal = self.create_goal('apply')
+
         self.fn = self.aws.add_lambda_function(
             name="myfunction",
             role=self.aws.get_role(name="myrole"),
             handler="mymodule.myfunction",
             code=dummy_function,
         )
-        self.apply_service = self.goal.get_service(self.fn, "apply")
+        self.apply_service = goal.get_service(self.fn, "apply")
         self.apply_service.object = {
             "FunctionName": "myfunction",
             "CodeSha256": "QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8="
@@ -124,13 +115,15 @@ class TestLambdaFunction(unittest.TestCase):
                 action.run()
 
     def test_update_code(self):
+        goal = self.create_goal('apply')
+
         self.fn = self.aws.add_lambda_function(
             name="myfunction",
             role=self.aws.get_role(name="myrole"),
             handler="mymodule.myfunction",
             code=dummy_function,
         )
-        self.apply_service = self.goal.get_service(self.fn, "apply")
+        self.apply_service = goal.get_service(self.fn, "apply")
         self.apply_service.object = {
             "FunctionName": "myfunction",
             "CodeSha256": ""
@@ -151,13 +144,14 @@ class TestLambdaFunction(unittest.TestCase):
                 action.run()
 
     def test_update_code_via_s3(self):
+        goal = self.create_goal('apply')
         self.fn = self.aws.add_lambda_function(
             name="myfunction",
             role=self.aws.get_role(name="myrole"),
             handler="mymodule.myfunction",
             s3_file=self.aws.get_bucket(name="mybucket").get_file(name="myfile"),
         )
-        self.apply_service = self.goal.get_service(self.fn, "apply")
+        self.apply_service = goal.get_service(self.fn, "apply")
         self.apply_service.object = {
             "FunctionName": "myfunction",
         }
@@ -178,21 +172,11 @@ class TestLambdaFunction(unittest.TestCase):
                 action.run()
 
 
-class TestLambdaFunctionIntegration(unittest.TestCase):
-
-    def setUp(self):
-        self.workspace = workspace.Workspace()
-        self.aws = self.workspace.add_aws(access_key_id='dummy', secret_access_key='dummy', region='eu-west-1')
-        self.goal = goals.create(
-            "apply",
-            self.workspace,
-            frontends.ConsoleFrontend(interactive=False),
-            map=SerialMap
-        )
-        self.test_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.test_dir)
+class TestLambdaFunctionIntegration(StubberTestCase):
 
     def test_bundle_ran_and_output_different(self):
+        goal = self.create_goal('apply')
+
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
@@ -211,8 +195,8 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
             code=bundle.add_output(name=os.path.join(self.test_dir, "lambda.zip")),
         )
 
-        role_service = self.goal.get_service(self.fn.role, "describe")
-        fn_service = self.goal.get_service(self.fn, "apply")
+        role_service = goal.get_service(self.fn.role, "describe")
+        fn_service = goal.get_service(self.fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -274,9 +258,11 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
 
         with role_stubber:
             with fn_stubber:
-                self.goal.execute()
+                goal.execute()
 
     def test_bundle_ran_and_output_same(self):
+        goal = self.create_goal('apply')
+
         # The local bundle has a payload that will *always* do something
         # It's an execute - there is no way for fuselage to skip running it
         # So we expect the lambda
@@ -298,8 +284,8 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = self.goal.get_service(fn.role, "describe")
-        fn_service = self.goal.get_service(fn, "apply")
+        role_service = goal.get_service(fn.role, "describe")
+        fn_service = goal.get_service(fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -350,12 +336,14 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
 
         with role_stubber:
             with fn_stubber:
-                self.goal.execute()
-                self.assertEqual(len(self.goal.get_changes(bundle)), 1)
-                self.assertEqual(len(self.goal.get_changes(fn)), 1)
+                goal.execute()
+                self.assertEqual(len(goal.get_changes(bundle)), 1)
+                self.assertEqual(len(goal.get_changes(fn)), 1)
                 fn_stubber.assert_no_pending_responses()
 
     def test_bundle_skipped_but_output_same(self):
+        goal = self.create_goal('apply')
+
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
@@ -371,8 +359,8 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = self.goal.get_service(self.fn.role, "describe")
-        fn_service = self.goal.get_service(self.fn, "apply")
+        role_service = goal.get_service(self.fn.role, "describe")
+        fn_service = goal.get_service(self.fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -423,10 +411,12 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
 
         with role_stubber:
             with fn_stubber:
-                self.assertEqual(len(list(self.goal.plan())), 0)
-                self.assertEqual(len(self.goal.get_changes(bundle)), 0)
+                self.assertEqual(len(list(goal.plan())), 0)
+                self.assertEqual(len(goal.get_changes(bundle)), 0)
 
     def test_bundle_skipped_but_output_different(self):
+        goal = self.create_goal('apply')
+
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
@@ -442,8 +432,8 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = self.goal.get_service(self.fn.role, "describe")
-        fn_service = self.goal.get_service(self.fn, "apply")
+        role_service = goal.get_service(self.fn.role, "describe")
+        fn_service = goal.get_service(self.fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -505,5 +495,5 @@ class TestLambdaFunctionIntegration(unittest.TestCase):
 
         with role_stubber:
             with fn_stubber:
-                self.goal.execute()
-                self.assertEqual(len(self.goal.get_changes(bundle)), 0)
+                goal.execute()
+                self.assertEqual(len(goal.get_changes(bundle)), 0)

@@ -15,12 +15,10 @@
 from .cloudwatch import CloudWatchFrontend
 from .console import ConsoleFrontend
 from .multi import MultiFrontend
-from .noninteractive import NonInteractiveFrontend
 
 
 __all__ = [
     "CloudWatchFrontend",
     "ConsoleFrontend",
     "MultiFrontend",
-    "NonInteractiveFrontend",
 ]
