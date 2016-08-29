@@ -19,7 +19,7 @@ from botocore.stub import Stubber as BaseStubber
 
 from touchdown.core import goals, workspace
 from touchdown.core.map import SerialMap
-from touchdown.frontends import ConsoleFrontend
+from touchdown.frontends import ConsoleFrontend, MultiFrontend
 
 try:
     from contextlib import ExitStack
@@ -40,7 +40,9 @@ class StubberTestCase(unittest.TestCase):
         return goals.create(
             goal_name,
             self.workspace,
-            ConsoleFrontend(interactive=False),
+            MultiFrontend([
+                ConsoleFrontend(interactive=False),
+            ]),
             map=SerialMap
         )
 
