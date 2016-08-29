@@ -24,8 +24,8 @@ class TestDotGraphGeneration(WorkspaceTestCase):
 
         aws = self.workspace.add_aws()
         vpc = aws.add_vpc(name='test-vpc')
-        subneta = vpc.add_subnet(name='subnet-a')
-        subnetb = vpc.add_subnet(name='subnet-b')
+        vpc.add_subnet(name='subnet-a')
+        vpc.add_subnet(name='subnet-b')
 
         echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
         goal.execute()
