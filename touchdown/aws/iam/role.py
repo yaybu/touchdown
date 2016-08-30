@@ -199,12 +199,18 @@ class Plan(Describe):
     name = "get-signin-url"
     resource = Role
     service_name = "iam"
+    _sts = None
+
+    @property
+    def sts(self):
+        if not self._sts:
+            self._sts = self.runner.get_plan(self.resource.account).session.create_client("sts")
+        return self._sts
 
     def get_signin_url(self):
         role = self.describe_object()
 
-        sts = self.runner.get_plan(self.resource.account).session.create_client("sts")
-        creds = sts.assume_role(
+        creds = self.sts.assume_role(
             RoleArn=role['Arn'],
             RoleSessionName="touchdown-get-signin-url",
         )['Credentials']

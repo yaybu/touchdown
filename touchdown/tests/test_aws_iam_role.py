@@ -231,6 +231,63 @@ class TestDestroyRole(StubberTestCase):
         self.assertEqual(len(goal.get_changes(role.resource)), 0)
 
 
+class TestGetSigninUrl(StubberTestCase):
+
+    def test_get_signin_url(self):
+        goal = self.create_goal('get-signin-url')
+
+        role = self.fixtures.enter_context(RoleStubber(
+            goal.get_service(
+                self.aws.get_role(name='read-only'),
+                'get-signin-url',
+            )
+        ))
+
+        role.add_list_roles_one_response_by_name()
+
+        stub = self.fixtures.enter_context(Stubber(role.service.sts))
+        stub.add_response(
+            'assume_role',
+            service_response={
+                'Credentials': {
+                    'AccessKeyId': 'AK12345678901234',
+                    'SecretAccessKey': 'AK1234567890',
+                    'SessionToken': '01234567890',
+                    'Expiration': datetime.datetime.now(),
+                }
+            },
+            expected_params={
+                'RoleArn': '12345678901234567890',
+                'RoleSessionName': 'touchdown-get-signin-url'
+            },
+        )
+
+        get = self.fixtures.enter_context(mock.patch('touchdown.aws.iam.role.requests.get'))
+        get.return_value.json.return_value = {
+            'SigninToken': 'abcdefghijklmnonpqrstuvwxyz',
+        }
+
+        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
+
+        goal.execute('read-only')
+
+        get.assert_called_with(
+            'https://signin.aws.amazon.com/federation',
+            params={
+                'Action': 'getSigninToken',
+                'Session': '{"sessionId": "AK12345678901234", "sessionKey": "AK1234567890", "sessionToken": "01234567890"}',
+            },
+        )
+
+        echo.assert_called_with((
+            'https://signin.aws.amazon.com/federation?'
+            'Action=login&'
+            'Destination=https%3A%2F%2Fconsole.aws.amazon.com%2F&'
+            'SigninToken=abcdefghijklmnonpqrstuvwxyz&'
+            'Issuer=touchdown'
+        ))
+
+
 class TestGetCredentials(StubberTestCase):
 
     def test_get_temporary_credentials(self):
