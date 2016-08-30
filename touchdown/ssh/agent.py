@@ -91,23 +91,35 @@ class PosixAgentHandler(AgentHandler, socketserver.BaseRequestHandler):
         self.request.sendall(data)
 
 
-class PosixAgentServer(socketserver.ThreadingUnixStreamServer):
+class BaseAgentServer(object):
 
-    def __init__(self, socket_file):
-        socketserver.ThreadingUnixStreamServer.__init__(self, socket_file, PosixAgentHandler)
+    def __init__(self):
         self.identities = {}
 
     def add(self, pkey, comment):
         self.identities[pkey.asbytes()] = (pkey, comment)
 
-    def serve_while_pid(self, pid):
-        t = threading.Thread(target=self.serve_forever)
-        t.daemon = True
-        t.start()
 
+class PosixAgentServer(BaseAgentServer, socketserver.ThreadingUnixStreamServer):
+
+    def __init__(self, socket_file):
+        socketserver.ThreadingUnixStreamServer.__init__(self, socket_file, PosixAgentHandler)
+        BaseAgentServer.__init__(self)
+
+    def serve_while_pid(self, pid):
+        self.listen_start()
         while os.waitpid(pid, 0)[0] != pid:
             pass
+        self.listen_stop()
 
+    def listen_start(self):
+        self.listen_thread = threading.Thread(target=self.serve_forever)
+        self.listen_thread.daemon = True
+        self.listen_thread.start()
+
+    def listen_stop(self):
+        if self.listen_thread:
+            self.listen_thread = None
         self.shutdown()
         self.server_close()
 
@@ -125,13 +137,7 @@ class ParamikoAgentHandler(AgentHandler):
         self.channel.send(data)
 
 
-class ParamikoAgentServer(object):
-
-    def __init__(self):
-        self.identities = {}
-
-    def add(self, pkey, comment):
-        self.identities[pkey.asbytes()] = (pkey, comment)
+class ParamikoAgentServer(BaseAgentServer):
 
     def handle(self, channel):
         handler = ParamikoAgentHandler(self, channel)
