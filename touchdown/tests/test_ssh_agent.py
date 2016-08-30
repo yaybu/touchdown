@@ -15,17 +15,23 @@
 import os
 import socket
 import struct
+import unittest
 
 from paramiko.common import asbytes
 from paramiko.message import Message
 from paramiko.py3compat import byte_chr
 
-from touchdown.ssh.agent import PosixAgentServer
 from touchdown.ssh.client import private_key_from_string
 from touchdown.tests.fixtures.folder import TemporaryFolder
 from touchdown.tests.testcases import WorkspaceTestCase
 
+try:
+    from touchdown.ssh.agent import PosixAgentServer
+except ImportError:
+    PosixAgentServer = None
 
+
+@unittest.skipUnless(PosixAgentServer, "requires unix")
 class TestPosixAgentHandler(WorkspaceTestCase):
 
     def setUp(self):
@@ -63,7 +69,7 @@ class TestPosixAgentHandler(WorkspaceTestCase):
         # There should be one identity in the list
         self.assertEqual(msg.get_int(), 1)
         # It should be our identity
-        pkey, comment = self.agent.identities.values()[0]
+        pkey, comment = list(self.agent.identities.values())[0]
         self.assertEqual(msg.get_binary(), pkey.asbytes())
         self.assertEqual(msg.get_string(), comment)
 
@@ -73,7 +79,7 @@ class TestPosixAgentHandler(WorkspaceTestCase):
         # Please sign some data
         msg.add_byte(byte_chr(13))
         # The id of the key to sign with
-        key = self.agent.identities.values()[0][0].asbytes()
+        key = list(self.agent.identities.values())[0][0].asbytes()
         msg.add_int(len(key))
         msg.add_bytes(bytes(key))
         # A blob of binary to sign
