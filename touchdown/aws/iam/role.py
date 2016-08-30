@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import json
 
 import requests
@@ -227,11 +228,13 @@ class Plan(Describe):
             },
         ).json()
 
+        # The motivation for the ordered dict here is to improve testability
+        params = collections.OrderedDict()
+        params['Action'] = 'login'
+        params['Destination'] = 'https://console.aws.amazon.com/'
+        params['SigninToken'] = token['SigninToken']
+        params['Issuer'] = 'touchdown'
+
         p = requests.PreparedRequest()
-        p.prepare_url("https://signin.aws.amazon.com/federation", {
-            "Action": "login",
-            "Issuer": "touchdown",
-            "Destination": "https://console.aws.amazon.com/",
-            "SigninToken": token['SigninToken'],
-        })
+        p.prepare_url("https://signin.aws.amazon.com/federation", params)
         return p.url
