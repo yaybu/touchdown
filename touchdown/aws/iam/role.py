@@ -223,7 +223,7 @@ class Plan(Describe):
                     "sessionId": creds['AccessKeyId'],
                     "sessionKey": creds['SecretAccessKey'],
                     "sessionToken": creds['SessionToken'],
-                }),
+                }, sort_keys=True),
             },
         ).json()
 
