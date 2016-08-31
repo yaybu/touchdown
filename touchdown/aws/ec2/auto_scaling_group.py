@@ -46,8 +46,8 @@ class AutoScalingGroup(Resource):
 
     name = argument.String(field='AutoScalingGroupName')
     launch_configuration = argument.Resource(LaunchConfiguration, field='LaunchConfigurationName')
-    min_size = argument.Integer(min=1, field='MinSize')
-    max_size = argument.Integer(field='MaxSize')
+    min_size = argument.Integer(min=0, field='MinSize')
+    max_size = argument.Integer(min=0, field='MaxSize')
     desired_capacity = argument.Integer(field='DesiredCapacity')
     default_cooldown = argument.Integer(default=300, field='DefaultCooldown')
 

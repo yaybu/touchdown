@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .launch_configuration import LaunchConfigurationFixture
 from .network_acl import NetworkAclFixture
 from .route_table import RouteTableFixture
 from .subnet import SubnetFixture
@@ -19,6 +20,7 @@ from .vpc import VpcFixture
 
 
 __all__ = [
+    'LaunchConfigurationFixture',
     'NetworkAclFixture',
     'RouteTableFixture',
     'SubnetFixture',

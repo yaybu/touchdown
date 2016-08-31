@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .account import AccountStubber
+from .auto_scaling_group import AutoScalingGroupStubber
 from .bucket import BucketStubber
 from .database import DatabaseStubber
 from .distribution import DistributionStubber
@@ -40,6 +41,7 @@ from .vpc import VpcStubber
 
 __all__ = [
     'AccountStubber',
+    'AutoScalingGroupStubber',
     'BucketStubber',
     'DatabaseStubber',
     'DistributionStubber',
