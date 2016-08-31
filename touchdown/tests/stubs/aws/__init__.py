@@ -17,6 +17,7 @@ from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
 from .endpoint import VpcEndpointStubber
 from .event_rule import EventRuleStubber
+from .external_account import ExternalAccountStubber
 from .hosted_zone import HostedZoneStubber
 from .internet_gateway import InternetGatewayStubber
 from .keypair import KeyPairStubber
@@ -38,6 +39,7 @@ __all__ = [
     'DistributionStubber',
     'EC2InstanceStubber',
     'EventRuleStubber',
+    'ExternalAccountStubber',
     'HostedZoneStubber',
     'InternetGatewayStubber',
     'KeyPairStubber',
