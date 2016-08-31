@@ -14,6 +14,7 @@
 
 from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
+from touchdown.core.utils import cached_property
 
 from .account import BaseAccount
 from .session import Session
@@ -43,33 +44,25 @@ class Describe(Plan):
     resource = ExternalRole
     default = True
     name = 'null'
-    _session = None
-    _client = None
 
-    @property
+    @cached_property
     def session(self):
-        if not self._session:
-            self.object = self.client.assume_role(
-                **serializers.Resource().render(self.runner, self.resource)
-            )
+        self.object = self.client.assume_role(
+            **serializers.Resource().render(self.runner, self.resource)
+        )
+        c = self.object['Credentials']
+        return Session(
+            access_key_id=c['AccessKeyId'],
+            secret_access_key=c['SecretAccessKey'],
+            session_token=c['SessionToken'],
+            expiration=c['Expiration'],
+            region=self.resource.region,
+        )
 
-            c = self.object['Credentials']
-            self._session = Session(
-                access_key_id=c['AccessKeyId'],
-                secret_access_key=c['SecretAccessKey'],
-                session_token=c['SessionToken'],
-                expiration=c['Expiration'],
-                region=self.resource.region,
-            )
-
-        return self._session
-
-    @property
+    @cached_property
     def client(self):
         session = self.runner.get_plan(self.resource.account).session
-        if not self._client:
-            self._client = session.create_client('sts')
-        return self._client
+        return session.create_client('sts')
 
     # def get_actions(self):
     #     response = self.session.create_client('iam').get_user()
