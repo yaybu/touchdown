@@ -23,6 +23,7 @@ from .internet_gateway import InternetGatewayStubber
 from .keypair import KeyPairStubber
 from .launch_configuration import LaunchConfigurationStubber
 from .network_acl import NetworkAclStubber
+from .password_policy import PasswordPolicyStubber
 from .queue import QueueStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
@@ -45,6 +46,7 @@ __all__ = [
     'KeyPairStubber',
     'LaunchConfigurationStubber',
     'NetworkAclStubber',
+    'PasswordPolicyStubber',
     'QueueStubber',
     'RoleStubber',
     'RouteTableStubber',
