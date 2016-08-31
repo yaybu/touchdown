@@ -22,6 +22,7 @@ from touchdown.aws import common
 from touchdown.aws.logs import LogGroup
 from touchdown.core import plan
 from touchdown.core.datetime import as_seconds
+from touchdown.core.utils import force_str
 
 
 class Plan(common.SimplePlan, plan.Plan):
@@ -54,7 +55,7 @@ class Plan(common.SimplePlan, plan.Plan):
                         continue
                     self.runner.ui.echo('[{timestamp}] [{logStreamName}] {message}'.format(**{
                         'logStreamName': event.get('logStreamName', ''),
-                        'message': event['message'].encode('utf-8', 'ignore'),
+                        'message': force_str(event['message'].encode('utf-8', 'ignore')),
                         'timestamp': datetime.datetime.utcfromtimestamp(int(event['timestamp']) / 1000.0),
                     }))
                     kwargs['startTime'] = event['timestamp']
