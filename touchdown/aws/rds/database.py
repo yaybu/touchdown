@@ -27,6 +27,7 @@ from .subnet_group import SubnetGroup
 class Database(Resource):
 
     resource_name = 'database'
+    field_order = ['name', 'instance_class', 'storage_encrypted']
 
     name = argument.String(field='DBInstanceIdentifier')
     db_name = argument.String(field='DBName')
