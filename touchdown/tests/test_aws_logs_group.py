@@ -38,6 +38,24 @@ class TestLogGroupCreation(StubberTestCase):
 
         goal.execute()
 
+    def test_update_log_group_retention(self):
+        goal = self.create_goal('apply')
+
+        log_group = self.fixtures.enter_context(LogGroupStubber(
+            goal.get_service(
+                self.aws.add_log_group(
+                    name='test-log_group',
+                    retention=7,
+                ),
+                'apply',
+            )
+        ))
+
+        log_group.add_describe_log_groups_one_response()
+        log_group.add_put_retention_policy(7)
+
+        goal.execute()
+
     def test_create_log_group_idempotent(self):
         goal = self.create_goal('apply')
 

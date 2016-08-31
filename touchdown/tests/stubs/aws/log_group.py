@@ -53,6 +53,16 @@ class LogGroupStubber(ServiceStubber):
             }
         )
 
+    def add_put_retention_policy(self, retention):
+        return self.add_response(
+            'put_retention_policy',
+            service_response={},
+            expected_params={
+                'logGroupName': self.resource.name,
+                'retentionInDays': retention,
+            }
+        )
+
     def add_delete_log_group(self):
         return self.add_response(
             'delete_log_group',
