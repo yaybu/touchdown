@@ -22,6 +22,7 @@ from paramiko.common import asbytes
 from paramiko.message import Message
 from paramiko.py3compat import byte_chr
 
+from touchdown.core.utils import force_bytes
 from touchdown.ssh.client import private_key_from_string
 from touchdown.tests.fixtures.folder import TemporaryFolder
 from touchdown.tests.testcases import WorkspaceTestCase
@@ -90,7 +91,7 @@ class TestPosixAgentHandler(WorkspaceTestCase):
         # Go go go
         mtype, msg = self.send(msg)
         self.assertEqual(mtype, 14)
-        self.assertEqual(binascii.hexlify(msg.get_binary()), (
+        self.assertEqual(binascii.hexlify(msg.get_binary()), force_bytes((
             '000000077373682d7273610000010031d4c2bfad183557a7055f005c3d0d838d5'
             '701bd7b8a09d6d7f06699c691842c18e2bb62504a4beba0fbf5aeaf62f8106352'
             'b99f60d1fdc2dac1f5ad29566022eff25f62fac38cb2db849ed6b862af5e6bd36'
@@ -100,7 +101,7 @@ class TestPosixAgentHandler(WorkspaceTestCase):
             'b9e53d8c1cb8b2a1551c22cbab9e747fcff79bf57373f7ec8cb2a0dc9b42a7264'
             'afa4b7913693b709c5418eda02175b0a183549643127be92e79936ffc91479629'
             'c2acdc6aa5c83250a8edfe'
-        ))
+        )))
 
     def test_handle_13_failure(self):
         # Test handling a SSH2_AGENTC_SIGN_REQUEST (where no identity)
