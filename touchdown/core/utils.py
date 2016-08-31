@@ -39,3 +39,16 @@ def force_bytes(s):
     elif isinstance(s, six.text_type):
         return s.encode('utf-8')
     raise ValueError('Not a string')
+
+
+class cached_property(object):
+
+    def __init__(self, func):
+        self.__doc__ = getattr(func, '__doc__')
+        self.func = func
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        retval = instance.__dict__[self.func.__name__] = self.func(instance)
+        return retval

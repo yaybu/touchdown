@@ -23,6 +23,7 @@ from ..progress import ProgressBar
 class ConsoleFrontend(BaseFrontend):
 
     def __init__(self, interactive=True):
+        super(ConsoleFrontend, self).__init__()
         self.interactive = interactive
 
     def _echo(self, text, nl=True, **kwargs):
@@ -32,6 +33,9 @@ class ConsoleFrontend(BaseFrontend):
         return ProgressBar(self, **kwargs)
 
     def prompt(self, message, key=None, default=None):
+        retval = super(ConsoleFrontend, self).prompt(message, key, default)
+        if retval:
+            return retval
         response = six.moves.input('{}: '.format(message))
         while not response:
             response = six.moves.input('{}: '.format(message))

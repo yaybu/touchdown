@@ -28,6 +28,7 @@ from .progress import ProgressBar
 class CloudWatchFrontend(BaseFrontend):
 
     def __init__(self, group, stream):
+        super(CloudWatchFrontend, self).__init__()
         self.group = group
         self.stream = stream
         self.finished = False
@@ -108,6 +109,9 @@ class CloudWatchFrontend(BaseFrontend):
         return ProgressBar(self, **kwargs)
 
     def prompt(self, message, key=None, default=None):
+        retval = super(CloudWatchFrontend, self).prompt(message, key, default)
+        if retval:
+            return retval
         return default
 
     def confirm(self, message):

@@ -18,6 +18,7 @@ from touchdown.core import argument
 from touchdown.core.datetime import now
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
+from touchdown.core.utils import cached_property
 from touchdown.core.workspace import Workspace
 
 from .session import Session
@@ -49,18 +50,25 @@ class Null(Plan):
 
     _acquire_session = Lock()
 
+    @cached_property
+    def base_session(self):
+        return Session(
+            access_key_id=self.resource.access_key_id or None,
+            secret_access_key=self.resource.secret_access_key or None,
+            session_token=None,
+            expiration=None,
+            region=self.resource.region,
+        )
+
+    @cached_property
+    def base_client(self):
+        return self.base_session.create_client('sts')
+
     @property
     def session(self):
         with self._acquire_session:
             if not self._session:
                 session = None
-                base_session = Session(
-                    access_key_id=self.resource.access_key_id or None,
-                    secret_access_key=self.resource.secret_access_key or None,
-                    session_token=None,
-                    expiration=None,
-                    region=self.resource.region,
-                )
 
                 if self.resource.mfa_serial:
                     cache_key = '_'.join((self.resource.access_key_id, self.resource.mfa_serial))
@@ -68,8 +76,7 @@ class Null(Plan):
                         session = Session.fromjson(self.cache[cache_key])
 
                     if not session or session.expiration <= now():
-                        client = base_session.create_client('sts')
-                        creds = client.get_session_token(
+                        creds = self.base_client.get_session_token(
                             SerialNumber=self.resource.mfa_serial,
                             TokenCode=self.ui.prompt(
                                 'Please enter a token for MFA device {}'.format(self.resource.mfa_serial),
@@ -85,7 +92,7 @@ class Null(Plan):
                         )
                         self.cache[cache_key] = session.tojson()
                 else:
-                    session = base_session
+                    session = self.base_session
 
                 self._session = session
                 self._session.region = self.resource.region

@@ -20,6 +20,7 @@ from .base import BaseFrontend
 class MultiFrontend(BaseFrontend):
 
     def __init__(self, frontends):
+        super(MultiFrontend, self).__init__()
         self.frontends = frontends
 
     def failure(self, text):
@@ -34,6 +35,9 @@ class MultiFrontend(BaseFrontend):
         return self.frontends[0].progressbar(**kwargs)
 
     def prompt(self, message, key=None, default=None):
+        retval = super(MultiFrontend, self).prompt(message, key, default)
+        if retval:
+            return retval
         return self.frontends[0].prompt(message, key, default)
 
     def confirm(self, message):

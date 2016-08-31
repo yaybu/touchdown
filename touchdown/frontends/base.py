@@ -21,6 +21,12 @@ from touchdown.core.utils import force_str
 
 class BaseFrontend(object):
 
+    def __init__(self):
+        self.preseeds = {}
+
+    def preseed(self, question, response):
+        self.preseeds[question] = response
+
     def failure(self, text):
         self.echo(text)
 
@@ -72,7 +78,9 @@ class BaseFrontend(object):
         raise NotImplementedError(self.progressbar)
 
     def prompt(self, message, key=None, default=None):
-        raise NotImplementedError(self.prompt)
+        if key in self.preseeds:
+            return self.preseeds[key]
+        return None
 
     def confirm(self, message):
         raise NotImplementedError(self.confirm)

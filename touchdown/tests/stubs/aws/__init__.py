@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .account import AccountStubber
 from .bucket import BucketStubber
 from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
@@ -36,6 +37,7 @@ from .vpc import VpcStubber
 
 
 __all__ = [
+    'AccountStubber',
     'BucketStubber',
     'DistributionStubber',
     'EC2InstanceStubber',
