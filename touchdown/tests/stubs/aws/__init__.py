@@ -14,6 +14,7 @@
 
 from .account import AccountStubber
 from .bucket import BucketStubber
+from .database import DatabaseStubber
 from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
 from .endpoint import VpcEndpointStubber
@@ -40,6 +41,7 @@ from .vpc import VpcStubber
 __all__ = [
     'AccountStubber',
     'BucketStubber',
+    'DatabaseStubber',
     'DistributionStubber',
     'EC2InstanceStubber',
     'EventRuleStubber',
