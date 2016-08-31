@@ -13,7 +13,6 @@ they physical servers, virtual subnets or private dns records.
    cli/touchdown
    tutorial/index
    config/index
-   framework
 
 
 Getting started
@@ -94,3 +93,7 @@ Getting help
 
 Contributing
 ============
+
+Writing your first PR? Checkout out the :doc:`style guide <developers/styleguide>`
+
+If you are hacking on the AWS code check out our walkthrough of all the lovely helper classes :doc:`here <framework>`
