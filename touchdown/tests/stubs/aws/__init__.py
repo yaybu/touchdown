@@ -26,6 +26,7 @@ from .launch_configuration import LaunchConfigurationStubber
 from .network_acl import NetworkAclStubber
 from .password_policy import PasswordPolicyStubber
 from .queue import QueueStubber
+from .rds_subnet_group import RdsSubnetGroupStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
 from .security_group import SecurityGroupStubber
@@ -50,6 +51,7 @@ __all__ = [
     'NetworkAclStubber',
     'PasswordPolicyStubber',
     'QueueStubber',
+    'RdsSubnetGroupStubber',
     'RoleStubber',
     'RouteTableStubber',
     'SecurityGroupStubber',

@@ -14,11 +14,13 @@
 
 from .network_acl import NetworkAclFixture
 from .route_table import RouteTableFixture
+from .subnet import SubnetFixture
 from .vpc import VpcFixture
 
 
 __all__ = [
     'NetworkAclFixture',
     'RouteTableFixture',
+    'SubnetFixture',
     'VpcFixture',
 ]
