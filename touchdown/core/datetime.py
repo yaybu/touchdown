@@ -99,4 +99,4 @@ def as_seconds(value):
             value.hour, value.minute, value.second,
             -1, -1, -1)))
     else:
-        return int(value - _EPOCH).total_seconds()
+        return int((value - _EPOCH).total_seconds())
