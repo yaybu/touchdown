@@ -50,7 +50,7 @@ class Skip(action.Action):
         arguments = self.inner.action.get_arguments()
         if 'ZipFile' in arguments:
             if get_code_sha256(arguments['ZipFile']) == self.plan.object['CodeSha256']:
-                self.plan.echo("Not uploading new zip as sha unchanged")
+                self.plan.echo('Not uploading new zip as sha unchanged')
                 return
         return self.inner.run()
 
@@ -75,7 +75,7 @@ class FunctionSerializer(serializers.Serializer):
             mode='w',
             compression=zipfile.ZIP_DEFLATED
         )
-        zf.writestr(self.mkinfo("main.py"), inspect.getsource(self.function))
+        zf.writestr(self.mkinfo('main.py'), inspect.getsource(self.function))
         zf.close()
         return buf.getvalue()
 
@@ -84,27 +84,27 @@ argument.Bytes.register_adapter(types.FunctionType, lambda r: FunctionSerializer
 
 class Function(Resource):
 
-    resource_name = "lambda_function"
+    resource_name = 'lambda_function'
 
-    arn = argument.Output("FunctionArn")
+    arn = argument.Output('FunctionArn')
 
-    name = argument.String(field="FunctionName", min=1, max=140)
-    description = argument.String(field="Description", max=256)
-    timeout = argument.Integer(field="Timeout", default=3)
+    name = argument.String(field='FunctionName', min=1, max=140)
+    description = argument.String(field='Description', max=256)
+    timeout = argument.Integer(field='Timeout', default=3)
     runtime = argument.String(
-        field="Runtime",
+        field='Runtime',
         default='python2.7',
         choices=['nodejs', 'java8', 'python2.7'],
     )
-    handler = argument.String(field="Handler", min=0, max=128)
+    handler = argument.String(field='Handler', min=0, max=128)
     role = argument.Resource(
         Role,
-        field="Role",
-        serializer=serializers.Property("Arn"),
+        field='Role',
+        serializer=serializers.Property('Arn'),
     )
 
     code = argument.Bytes(
-        field="Code",
+        field='Code',
         update=False,
         serializer=serializers.Dict(
             ZipFile=serializers.Bytes(),
@@ -112,24 +112,24 @@ class Function(Resource):
     )
 
     s3_file = argument.Resource(
-        "touchdown.aws.s3.file.File",
-        field="Code",
+        'touchdown.aws.s3.file.File',
+        field='Code',
         update=False,
         serializer=serializers.Dict(
-            S3Bucket=serializers.Property("Bucket"),
-            S3Key=serializers.Property("Key"),
+            S3Bucket=serializers.Property('Bucket'),
+            S3Key=serializers.Property('Key'),
             # S3ObjectionVersion=,
         )
     )
 
-    memory = argument.Integer(field="MemorySize", default=128, min=128, max=1536)
-    publish = argument.Boolean(field="Publish", default=True, update=False)
+    memory = argument.Integer(field='MemorySize', default=128, min=128, max=1536)
+    publish = argument.Boolean(field='Publish', default=True, update=False)
 
-    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds", group="vpc_config")
-    subnets = argument.ResourceList(Subnet, field="SubnetIds", group="vpc_config")
+    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds', group='vpc_config')
+    subnets = argument.ResourceList(Subnet, field='SubnetIds', group='vpc_config')
     vpc_config = argument.Serializer(
-        serializer=serializers.Resource(group="vpc_config"),
-        field="VpcConfig",
+        serializer=serializers.Resource(group='vpc_config'),
+        field='VpcConfig',
     )
 
     account = argument.Resource(BaseAccount)
@@ -140,21 +140,21 @@ class Describe(SimpleDescribe, Plan):
     resource = Function
     service_name = 'lambda'
     api_version = '2015-03-31'
-    describe_action = "get_function_configuration"
-    describe_notfound_exception = "ResourceNotFoundException"
-    describe_envelope = "[@]"
+    describe_action = 'get_function_configuration'
+    describe_notfound_exception = 'ResourceNotFoundException'
+    describe_envelope = '[@]'
     key = 'FunctionName'
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_function"
-    create_envelope = "@"
-    update_action = "update_function_configuration"
+    create_action = 'create_function'
+    create_envelope = '@'
+    update_action = 'update_function_configuration'
 
     retryable = {
-        "InvalidParameterValueException": [
-            "The role defined for the function cannot be assumed by Lambda.",
+        'InvalidParameterValueException': [
+            'The role defined for the function cannot be assumed by Lambda.',
         ],
     }
 
@@ -192,7 +192,7 @@ class Apply(SimpleApply, Describe):
     def remove_orphaned_versions(self):
         for version in self.get_all_unaliased_versions():
             yield self.generic_action(
-                "Delete old version {Version}".format(**version),
+                'Delete old version {Version}'.format(**version),
                 self.client.delete_function,
                 FunctionName=self.resource.name,
                 Qualifier=version['Version'],
@@ -203,7 +203,7 @@ class Apply(SimpleApply, Describe):
             return
 
         update_code = False
-        arg = serializers.Argument("code", self.resource.meta.fields["code"])
+        arg = serializers.Argument('code', self.resource.meta.fields['code'])
         if arg.pending(self.runner, self.resource):
             digest = '<...>'
             update_code = True
@@ -215,7 +215,7 @@ class Apply(SimpleApply, Describe):
 
         if update_code:
             yield Skip(self.generic_action(
-                ["Update function code", "{} => {}".format(self.object['CodeSha256'], digest)],
+                ['Update function code', '{} => {}'.format(self.object['CodeSha256'], digest)],
                 self.client.update_function_code,
                 FunctionName=self.resource.name,
                 ZipFile=self.resource.code,
@@ -227,7 +227,7 @@ class Apply(SimpleApply, Describe):
             return
 
         update_code = False
-        arg = serializers.Argument("code", self.resource.meta.fields["code"])
+        arg = serializers.Argument('code', self.resource.meta.fields['code'])
         if arg.pending(self.runner, self.resource):
             update_code = True
 
@@ -239,7 +239,7 @@ class Apply(SimpleApply, Describe):
 
         if update_code:
             yield self.generic_action(
-                "Update function code",
+                'Update function code',
                 self.client.update_function_code,
                 FunctionName=self.resource.name,
                 S3Bucket=self.resource.s3_file.bucket.name,
@@ -261,4 +261,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_function"
+    destroy_action = 'delete_function'

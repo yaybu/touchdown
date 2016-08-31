@@ -18,36 +18,36 @@ from touchdown.core.goals import Goal, register
 
 class Get(Goal):
 
-    """ Get a configuration variable """
+    ''' Get a configuration variable '''
 
-    name = "get"
+    name = 'get'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("get")
+        plan_class = resource.meta.get_plan('get')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "name",
-            metavar="NAME",
+            'name',
+            metavar='NAME',
             type=str,
-            help="The setting to set",
+            help='The setting to set',
         )
 
     def execute(self, name):
-        settings = self.collect_as_dict("get")
+        settings = self.collect_as_dict('get')
         if name not in settings:
-            raise errors.Error("No such setting '{}'".format(name))
+            raise errors.Error('No such setting "{}"'.format(name))
         val, user_set = settings[name].execute()
         val = settings[name].to_string(val)
 
         if user_set:
-            self.ui.echo("{} (overriden by user)".format(val))
+            self.ui.echo('{} (overriden by user)'.format(val))
         else:
-            self.ui.echo("{} (default value)".format(val))
+            self.ui.echo('{} (default value)'.format(val))
 
 register(Get)

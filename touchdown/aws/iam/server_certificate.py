@@ -31,31 +31,31 @@ from ..replacement import (
 
 def split_cert_chain(chain):
     lines = []
-    for line in chain.split("\n"):
+    for line in chain.split('\n'):
         if not line:
             continue
         lines.append(line)
-        if line == "-----END CERTIFICATE-----":
-            yield "\n".join(lines).encode("utf-8")
+        if line == '-----END CERTIFICATE-----':
+            yield '\n'.join(lines).encode('utf-8')
             lines = []
     if lines:
-        yield "\n".join(lines).encode("utf-8")
+        yield '\n'.join(lines).encode('utf-8')
 
 
 class ServerCertificate(Resource):
 
-    resource_name = "server_certificate"
+    resource_name = 'server_certificate'
     field_order = [
-        "private_key",
-        "certificate_body",
-        "certificate_chain",
+        'private_key',
+        'certificate_body',
+        'certificate_chain',
     ]
 
-    name = argument.String(field="ServerCertificateName", update=False)
+    name = argument.String(field='ServerCertificateName', update=False)
     path = argument.String(field='Path')
-    private_key = argument.String(field="PrivateKey", secret=True, update=False)
-    certificate_body = argument.String(field="CertificateBody")
-    certificate_chain = argument.String(field="CertificateChain")
+    private_key = argument.String(field='PrivateKey', secret=True, update=False)
+    certificate_body = argument.String(field='CertificateBody')
+    certificate_chain = argument.String(field='CertificateChain')
 
     account = argument.Resource(BaseAccount)
 
@@ -63,14 +63,14 @@ class ServerCertificate(Resource):
         backend = default_backend()
         cert = load_pem_x509_certificate(value, backend)
         private_key = serialization.load_pem_private_key(
-            self.private_key.encode("utf-8"),
+            self.private_key.encode('utf-8'),
             password=None,
             backend=backend,
         )
 
         if cert.public_key().public_numbers() != private_key.public_key().public_numbers():
             raise errors.Error(
-                "Certificate does not match private_key",
+                'Certificate does not match private_key',
             )
 
         return value.strip()
@@ -95,18 +95,18 @@ class ServerCertificate(Resource):
             try:
                 verifier.verify()
             except:
-                error_message = "\n".join([
-                    "Invalid chain for  {} at position {}.",
-                    "Expected cert with subject '{}' and subject key identifier '{}'.",
-                    "Got cert with subject '{}' and subject key identifier '{}'.",
+                error_message = '\n'.join([
+                    'Invalid chain for  {} at position {}.',
+                    'Expected cert with subject "{}" and subject key identifier "{}".',
+                    'Got cert with subject "{}" and subject key identifier "{}".',
                 ])
                 cert_name = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 cert_issuer = cert.issuer.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 akib = cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-                aki = ":".join("{:02x}".format(ord(c)) for c in akib)
+                aki = ':'.join('{:02x}'.format(ord(c)) for c in akib)
                 issuer_name = issuer.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 skib = issuer.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER).value.digest
-                ski = ":".join("{:02x}".format(ord(c)) for c in skib)
+                ski = ':'.join('{:02x}'.format(ord(c)) for c in skib)
                 raise errors.Error(
                     error_message.format(
                         cert_name,
@@ -125,8 +125,8 @@ class Describe(ReplacementDescribe, Plan):
     resource = ServerCertificate
     service_name = 'iam'
     api_version = '2010-05-08'
-    describe_action = "list_server_certificates"
-    describe_envelope = "ServerCertificateMetadataList"
+    describe_action = 'list_server_certificates'
+    describe_envelope = 'ServerCertificateMetadataList'
     describe_filters = {}
     key = 'ServerCertificateName'
     biggest_serial = 0
@@ -146,9 +146,9 @@ class Describe(ReplacementDescribe, Plan):
 
 class Apply(ReplacementApply, Describe):
 
-    create_action = "upload_server_certificate"
-    create_response = "not-that-useful"
-    destroy_action = "delete_server_certificate"
+    create_action = 'upload_server_certificate'
+    create_response = 'not-that-useful'
+    destroy_action = 'delete_server_certificate'
 
     def is_stale(self, server_certificate):
         if server_certificate['Expiration'] >= datetime.now():
@@ -159,4 +159,4 @@ class Apply(ReplacementApply, Describe):
 
 class Destroy(ReplacementDestroy, Describe):
 
-    destroy_action = "delete_server_certificate"
+    destroy_action = 'delete_server_certificate'

@@ -38,7 +38,7 @@ class MultiFrontend(BaseFrontend):
 
     def confirm(self, message):
         result = self.frontends[0].confirm(message)
-        self.echo("Primary frontend chose {}".format(result))
+        self.echo('Primary frontend chose {}'.format(result))
         return result
 
     def start(self, subcommand, goal):

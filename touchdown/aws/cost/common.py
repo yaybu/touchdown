@@ -34,16 +34,16 @@ except ImportError:
 class PricingData(object):
 
     REGIONS = {
-        "ap-northeast-1": "apac-tokyo",
-        "ap-southeast-1": "apac-sin",
-        "ap-southeast-2": "apac-syd",
-        "eu-central-1": "eu-central-1",
-        "eu-west-1": "eu-ireland",
-        "us-east-1": "us-east",
-        "us-gov-west-1": "us-gov-west-1",
-        "us-west-1": "us-west",
-        "us-west-2": "us-west-2",
-        "sa-east-1": "sa-east-1",
+        'ap-northeast-1': 'apac-tokyo',
+        'ap-southeast-1': 'apac-sin',
+        'ap-southeast-2': 'apac-syd',
+        'eu-central-1': 'eu-central-1',
+        'eu-west-1': 'eu-ireland',
+        'us-east-1': 'us-east',
+        'us-gov-west-1': 'us-gov-west-1',
+        'us-west-1': 'us-west',
+        'us-west-2': 'us-west-2',
+        'sa-east-1': 'sa-east-1',
     }
 
     def __init__(self, url, **tags):
@@ -81,17 +81,17 @@ class PricingData(object):
 
 class CostEstimator(common.SimplePlan):
 
-    name = "cost"
+    name = 'cost'
 
     def get_pricing_data(self):
         for data in self.pricing_data:
             if data.matches(self.resource):
                 return data
-        raise ValueError("Cannot find pricing file for {}".format(self.resource))
+        raise ValueError('Cannot find pricing file for {}'.format(self.resource))
 
     def cost(self):
         if not demjson:
-            raise errors.Error("Need to install 'demjson' to get pricing data for AWS resources")
+            raise errors.Error('Need to install \'demjson\' to get pricing data for AWS resources')
         if not jmespath:
-            raise errors.Error("Need to install 'jmespath' to get pricing data for AWS resource")
+            raise errors.Error('Need to install \'jmespath\' to get pricing data for AWS resource')
         return self.get_pricing_data().get(self.resource)

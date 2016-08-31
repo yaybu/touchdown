@@ -26,9 +26,9 @@ from touchdown.core.datetime import as_seconds
 
 class Plan(common.SimplePlan, plan.Plan):
 
-    name = "tail"
+    name = 'tail'
     resource = LogGroup
-    service_name = "logs"
+    service_name = 'logs'
 
     def get_log_group_name(self):
         return self.resource.name
@@ -52,10 +52,10 @@ class Plan(common.SimplePlan, plan.Plan):
                     seen.add(event['eventId'])
                     if event['eventId'] in previous_events:
                         continue
-                    print("[{timestamp}] [{logStreamName}] {message}".format(**{
-                        "logStreamName": event.get('logStreamName', ''),
-                        "message": event['message'].encode("utf-8", "ignore"),
-                        "timestamp": datetime.datetime.utcfromtimestamp(int(event['timestamp']) / 1000.0),
+                    print('[{timestamp}] [{logStreamName}] {message}'.format(**{
+                        'logStreamName': event.get('logStreamName', ''),
+                        'message': event['message'].encode('utf-8', 'ignore'),
+                        'timestamp': datetime.datetime.utcfromtimestamp(int(event['timestamp']) / 1000.0),
                     }))
                     kwargs['startTime'] = event['timestamp']
                 if 'nextToken' not in results:

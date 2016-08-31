@@ -28,45 +28,45 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class CorsRule(Resource):
 
-    resource_name = "cors_rule"
+    resource_name = 'cors_rule'
 
-    allowed_headers = argument.List(argument.String(), field="AllowedHeaders")
-    allowed_methods = argument.List(argument.String(), field="AllowedMethods")
-    allowed_origins = argument.List(argument.String(), field="AllowedOrigins")
-    expose_headers = argument.List(argument.String(), field="ExposeHeaders")
-    max_age_seconds = argument.Integer(field="MaxAgeSeconds")
+    allowed_headers = argument.List(argument.String(), field='AllowedHeaders')
+    allowed_methods = argument.List(argument.String(), field='AllowedMethods')
+    allowed_origins = argument.List(argument.String(), field='AllowedOrigins')
+    expose_headers = argument.List(argument.String(), field='ExposeHeaders')
+    max_age_seconds = argument.Integer(field='MaxAgeSeconds')
 
 
 class Bucket(Resource):
 
-    resource_name = "bucket"
+    resource_name = 'bucket'
 
     arn = argument.Callable(
-        lambda instance: "arn:aws:s3:::{}".format(instance.name),
+        lambda instance: 'arn:aws:s3:::{}'.format(instance.name),
     )
 
-    name = argument.String(field="Bucket")
+    name = argument.String(field='Bucket')
 
     def clean_name(self, value):
         # This could be enforced with a regex:
         #     ^([a-z0-9]{1})([a-z0-9\-]*[a-z0-9])(\.([a-z0-9]{1})([a-z0-9\-]*[a-z0-9]))*$
         # But we can give better error messages with this
-        if value.startswith("."):
-            raise InvalidParameter("Cannot start with a period")
-        if value.endswith("."):
-            raise InvalidParameter("Cannot end with a period")
+        if value.startswith('.'):
+            raise InvalidParameter('Cannot start with a period')
+        if value.endswith('.'):
+            raise InvalidParameter('Cannot end with a period')
         if value.lower() != value:
-            raise InvalidParameter("Cannot have uppercase letters")
-        for section in value.split("."):
+            raise InvalidParameter('Cannot have uppercase letters')
+        for section in value.split('.'):
             if len(section) == 0:
-                raise InvalidParameter("There can be only one period between labels")
-            if not re.search(r"^([a-z0-9]{1})([a-z0-9\-]*[a-z0-9])$", value):
-                raise InvalidParameter("Value must start and end with a number or letter and can only contain numbers, letters and hyphens")
+                raise InvalidParameter('There can be only one period between labels')
+            if not re.search(r'^([a-z0-9]{1})([a-z0-9\-]*[a-z0-9])$', value):
+                raise InvalidParameter('Value must start and end with a number or letter and can only contain numbers, letters and hyphens')
         return value
 
     region = argument.String(
         default=lambda instance: instance.account.region,
-        field="CreateBucketConfiguration",
+        field='CreateBucketConfiguration',
         serializer=serializers.Dict(
             LocationConstraint=serializers.Identity(),
         ),
@@ -77,9 +77,9 @@ class Bucket(Resource):
 
     notify_lambda = argument.ResourceList(
         'touchdown.aws.lambda_.s3.S3LambdaNotification',
-        field="LambdaFunctionConfigurations",
+        field='LambdaFunctionConfigurations',
         serializer=serializers.List(serializers.Resource()),
-        group="notifications",
+        group='notifications',
     )
 
     accelerate = argument.String(
@@ -97,8 +97,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Bucket
     service_name = 's3'
     api_version = '2006-03-01'
-    describe_action = "list_buckets"
-    describe_envelope = "Buckets"
+    describe_action = 'list_buckets'
+    describe_envelope = 'Buckets'
     describe_filters = {}
     key = 'Name'
 
@@ -118,17 +118,17 @@ class Describe(SimpleDescribe, Plan):
 
     def get_cors_rules(self):
         try:
-            return self.client.get_bucket_cors(Bucket=self.resource.name)["CORSRules"]
+            return self.client.get_bucket_cors(Bucket=self.resource.name)['CORSRules']
         except ClientError as e:
-            if e.response['Error']['Code'] != "NoSuchCORSConfiguration":
+            if e.response['Error']['Code'] != 'NoSuchCORSConfiguration':
                 raise
         return []
 
     def get_bucket_policy(self):
         try:
-            remote = self.client.get_bucket_policy(Bucket=self.resource.name)["Policy"]
+            remote = self.client.get_bucket_policy(Bucket=self.resource.name)['Policy']
         except ClientError as e:
-            if e.response['Error']['Code'] != "NoSuchBucketPolicy":
+            if e.response['Error']['Code'] != 'NoSuchBucketPolicy':
                 raise
             return {}
         return json.loads(remote)
@@ -154,27 +154,27 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_bucket"
-    create_response = "not-that-useful"
-    # waiter = "bucket_exists"
+    create_action = 'create_bucket'
+    create_response = 'not-that-useful'
+    # waiter = 'bucket_exists'
 
     def update_accelerate_config(self):
         if self.object.get('Status', 'Suspended') != self.resource.accelerate:
             yield self.generic_action(
-                "Update acceleration configuration",
+                'Update acceleration configuration',
                 self.client.put_bucket_accelerate_configuration,
                 Bucket=self.resource.name,
                 AccelerateConfiguration={
-                    "Status": self.resource.accelerate,
+                    'Status': self.resource.accelerate,
                 }
             )
 
     def update_notification_config(self):
         local_s = serializers.Default(
-            serializers.Resource(group="notifications"),
+            serializers.Resource(group='notifications'),
             serializers.Const({}),
         )
-        d = serializers.Resource(group="notifications").diff(
+        d = serializers.Resource(group='notifications').diff(
             self.runner,
             self.resource,
             self.object.get('NotificationConfiguration', {}),
@@ -182,7 +182,7 @@ class Apply(SimpleApply, Describe):
 
         if d.matches():
             yield self.generic_action(
-                ["Update notification configuration"] + list(d.lines()),
+                ['Update notification configuration'] + list(d.lines()),
                 self.client.put_bucket_notification_configuration,
                 Bucket=self.resource.name,
                 NotificationConfiguration=local_s,
@@ -199,7 +199,7 @@ class Apply(SimpleApply, Describe):
 
         if update_cors:
             yield self.generic_action(
-                "Update CORS rules",
+                'Update CORS rules',
                 self.client.put_bucket_cors,
                 Bucket=self.resource.name,
                 CORSConfiguration=dict(
@@ -218,7 +218,7 @@ class Apply(SimpleApply, Describe):
 
         if update_policy:
             yield self.generic_action(
-                "Update bucket policy",
+                'Update bucket policy',
                 self.client.put_bucket_policy,
                 Bucket=self.resource.name,
                 Policy=self.resource.policy,
@@ -233,8 +233,8 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_bucket"
-    # waiter = "bucket_not_exists"
+    destroy_action = 'delete_bucket'
+    # waiter = 'bucket_not_exists'
 
     def get_destroy_serializer(self):
         return serializers.Dict(
@@ -243,17 +243,17 @@ class Destroy(SimpleDestroy, Describe):
 
     def destroy_object(self):
         keys = []
-        for page in self.client.get_paginator("list_objects").paginate(Bucket=self.resource.name):
-            keys.extend(o['Key'] for o in page.get("Contents", []))
+        for page in self.client.get_paginator('list_objects').paginate(Bucket=self.resource.name):
+            keys.extend(o['Key'] for o in page.get('Contents', []))
         keys.sort()
 
         for i in range(0, len(keys), 1000):
             chunk = keys[i:i+1000]
             yield self.generic_action(
-                "Delete items '{}' through '{}'".format(chunk[0], chunk[-1]),
+                'Delete items "{}" through "{}"'.format(chunk[0], chunk[-1]),
                 self.client.delete_objects,
                 Bucket=self.resource.name,
-                Delete={"Objects": [{"Key": k} for k in chunk], "Quiet": True},
+                Delete={'Objects': [{'Key': k} for k in chunk], 'Quiet': True},
             )
 
         for action in super(Destroy, self).destroy_object():

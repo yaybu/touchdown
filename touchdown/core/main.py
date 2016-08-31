@@ -63,13 +63,13 @@ class SubCommand(object):
 
 
 def configure_parser(parser, workspace, console):
-    parser.add_argument("--debug", default=False, action="store_true")
-    parser.add_argument("--serial", default=False, action="store_true")
-    parser.add_argument("--unattended", default=False, action="store_true")
+    parser.add_argument('--debug', default=False, action='store_true')
+    parser.add_argument('--serial', default=False, action='store_true')
+    parser.add_argument('--unattended', default=False, action='store_true')
 
     sub = parser.add_subparsers()
     for name, goal in goals.registered():
-        p = sub.add_parser(name, help=getattr(goal, "__doc__", ""))
+        p = sub.add_parser(name, help=getattr(goal, '__doc__', ''))
         goal.setup_argparse(p)
         p.set_defaults(func=SubCommand(
             goal,
@@ -79,18 +79,18 @@ def configure_parser(parser, workspace, console):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Manage your infrastructure")
+    parser = argparse.ArgumentParser(description='Manage your infrastructure')
     console = ConsoleFrontend()
     configure_parser(parser, Touchdownfile(), console)
     args = parser.parse_args(argv or sys.argv[1:])
 
     if args.debug:
-        logging.basicConfig(level=logging.DEBUG, format="%(name)s: %(message)s")
+        logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
 
     console.interactive = not args.unattended
 
     args.func(args)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

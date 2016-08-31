@@ -20,9 +20,9 @@ from .common import CostEstimator, PricingData
 
 class LoadBalancerPerHour(PricingData):
 
-    description = "Load Balancer instance"
-    expression = "config.regions[?region=='{region}'].types[].values[?rate=='perELBHour'].prices.USD[]"
-    rate = "hourly"
+    description = 'Load Balancer instance'
+    expression = 'config.regions[?region==\'{region}\'].types[].values[?rate==\'perELBHour\'].prices.USD[]'
+    rate = 'hourly'
 
     def format_expression(self, resource):
         return self.expression.format(
@@ -33,10 +33,10 @@ class LoadBalancerPerHour(PricingData):
 class Plan(CostEstimator, plan.Plan):
 
     resource = LoadBalancer
-    service_name = "elb"
+    service_name = 'elb'
 
     pricing_data = [
         LoadBalancerPerHour(
-            "https://a0.awsstatic.com/pricing/1/ec2/pricing-elb.min.js",
+            'https://a0.awsstatic.com/pricing/1/ec2/pricing-elb.min.js',
         )
     ]

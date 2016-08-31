@@ -17,14 +17,14 @@ from . import errors
 
 class DependencyMap(object):
 
-    """ If ``tips_first`` is set then the least dependended up nodes will be
+    ''' If ``tips_first`` is set then the least dependended up nodes will be
     visited first. This is useful if you are deleting all nodes - for example,
     you need to delete subnets before you can delete the VPC they are in.
 
     If ``tips_first`` is False then the most dependended upon nodes will be
     visited first. This is the default, and is used when creating and apply
     changes - a VPC needs to exist before you can create a subnet in it.
-    """
+    '''
 
     def __init__(self, node, tips_first=False):
         self.node = node
@@ -65,19 +65,19 @@ class DependencyMap(object):
         return self.map.items()
 
     def get_ready(self):
-        """ Yields resources that are ready to be applied """
+        ''' Yields resources that are ready to be applied '''
         for node, deps in self.map.items():
             if not deps:
                 yield node
 
     def complete(self, node):
-        """ Marks a node as complete - it's dependents may proceed """
+        ''' Marks a node as complete - it's dependents may proceed '''
         del self.map[node]
         for deps in self.map.values():
             deps.difference_update((node,))
 
     def all(self):
-        """ Visits all remaining nodes in order immediately """
+        ''' Visits all remaining nodes in order immediately '''
         while self.map:
             ready = sorted(list(self.get_ready()))
             if not ready:

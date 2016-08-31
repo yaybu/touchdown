@@ -24,7 +24,7 @@ from touchdown.core import (
 
 class EchoNotification(resource.Resource):
 
-    resource_name = "echo"
+    resource_name = 'echo'
 
     text = argument.String(field='text')
     root = argument.Resource(workspace.Workspace)
@@ -34,17 +34,17 @@ class NotificationAction(action.Action):
 
     @property
     def description(self):
-        yield "Echo to console"
+        yield 'Echo to console'
 
     def run(self):
         text = serializers.Resource().render(self.runner, self.resource)['text']
-        self.plan.object = {"Text": text}
+        self.plan.object = {'Text': text}
         self.plan.echo(text)
 
 
 class Apply(plan.Plan):
 
-    name = "apply"
+    name = 'apply'
     resource = EchoNotification
 
     def get_actions(self):

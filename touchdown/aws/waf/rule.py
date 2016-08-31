@@ -24,37 +24,37 @@ from .waf import WafApply, WafDescribe, WafDestroy
 
 class Match(Resource):
 
-    """A match gives some context to a set. This class is expected to be
+    '''A match gives some context to a set. This class is expected to be
     subclassed for each type of match.
 
-    """
+    '''
 
-    resource_name = "match"
+    resource_name = 'match'
 
-    match_type = argument.Serializer(serializers=serializers.Const("UnknownType"), field="Type")
+    match_type = argument.Serializer(serializers=serializers.Const('UnknownType'), field='Type')
     negated = argument.Boolean(field='Negated', default=False)
     data_id = argument.String(field='DataId')
 
 
 class ByteMatch(Match):
 
-    resource_name = "byte_match"
+    resource_name = 'byte_match'
 
-    match_type = argument.Serializer(serializer=serializers.Const("ByteMatch"), field="Type")
+    match_type = argument.Serializer(serializer=serializers.Const('ByteMatch'), field='Type')
     byte_match_set = argument.Resource(ByteMatchSet, field='DataId')
 
 
 class IPMatch(Match):
 
-    resource_name = "ip_match"
+    resource_name = 'ip_match'
 
-    match_type = argument.Serializer(serializer=serializers.Const("IPMatch"), field="Type")
+    match_type = argument.Serializer(serializer=serializers.Const('IPMatch'), field='Type')
     ip_set = argument.Resource(IpSet, field='DataId')
 
 
 class Rule(Resource):
 
-    resource_name = "rule"
+    resource_name = 'rule'
 
     name = argument.String(field='Name')
     metric_name = argument.String(field='MetricName')
@@ -72,11 +72,11 @@ class Describe(WafDescribe, Plan):
     resource = Rule
     service_name = 'waf'
     api_version = '2015-08-24'
-    describe_action = "list_rules"
-    describe_envelope = "Rules"
-    annotate_action = "get_rule"
+    describe_action = 'list_rules'
+    describe_envelope = 'Rules'
+    annotate_action = 'get_rule'
     key = 'RuleId'
-    local_container = "predicates"
+    local_container = 'predicates'
     container_update_action = 'update_rule'
     container = 'Predicates'
     container_member = 'Predicate'
@@ -84,14 +84,14 @@ class Describe(WafDescribe, Plan):
 
 class Apply(WafApply, Describe):
 
-    create_action = "create_rule"
+    create_action = 'create_rule'
 
     signature = (
-        Present("name"),
-        Present("metric_name"),
+        Present('name'),
+        Present('metric_name'),
     )
 
 
 class Destroy(WafDestroy, Describe):
 
-    destroy_action = "delete_rule"
+    destroy_action = 'delete_rule'

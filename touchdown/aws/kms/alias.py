@@ -23,10 +23,10 @@ from .key import Key
 
 class Alias(Resource):
 
-    resource_name = "alias"
+    resource_name = 'alias'
 
-    name = argument.String(max=256, field="Name")
-    key = argument.Resource(Key, field="TargetKeyId")
+    name = argument.String(max=256, field='Name')
+    key = argument.Resource(Key, field='TargetKeyId')
 
     account = argument.Resource(BaseAccount)
 
@@ -36,8 +36,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Alias
     service_name = 'kms'
     api_version = '2014-11-01'
-    describe_action = "list_aliases"
-    describe_envelope = "Aliases"
+    describe_action = 'list_aliases'
+    describe_envelope = 'Aliases'
     describe_filters = {}
     key = 'AliasName'
 
@@ -47,7 +47,7 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_alias"
+    create_action = 'create_alias'
 
     def update_object(self):
         # FIXME: Can't update an Alias so need to Delete it and then recreate it
@@ -56,4 +56,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_alias"
+    destroy_action = 'delete_alias'

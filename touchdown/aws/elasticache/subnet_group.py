@@ -23,11 +23,11 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class SubnetGroup(Resource):
 
-    resource_name = "cache_subnet_group"
+    resource_name = 'cache_subnet_group'
 
-    name = argument.String(field="CacheSubnetGroupName")
-    description = argument.String(field="CacheSubnetGroupDescription")
-    subnets = argument.ResourceList(Subnet, field="SubnetIds", update=False)
+    name = argument.String(field='CacheSubnetGroupName')
+    description = argument.String(field='CacheSubnetGroupDescription')
+    subnets = argument.ResourceList(Subnet, field='SubnetIds', update=False)
     # tags = argument.Dict()
 
     account = argument.Resource(BaseAccount)
@@ -38,18 +38,18 @@ class Describe(SimpleDescribe, Plan):
     resource = SubnetGroup
     service_name = 'elasticache'
     api_version = '2015-02-02'
-    describe_action = "describe_cache_subnet_groups"
-    describe_envelope = "CacheSubnetGroups"
-    describe_notfound_exception = "CacheSubnetGroupNotFoundFault"
+    describe_action = 'describe_cache_subnet_groups'
+    describe_envelope = 'CacheSubnetGroups'
+    describe_notfound_exception = 'CacheSubnetGroupNotFoundFault'
     key = 'CacheSubnetGroupName'
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_cache_subnet_group"
-    update_action = "modify_cache_subnet_group"
+    create_action = 'create_cache_subnet_group'
+    update_action = 'modify_cache_subnet_group'
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_cache_subnet_group"
+    destroy_action = 'delete_cache_subnet_group'

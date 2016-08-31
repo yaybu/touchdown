@@ -20,7 +20,7 @@ from . import ip_allocations, variable
 
 class Allocation(resource.Resource):
 
-    resource_name = "ip_allocation"
+    resource_name = 'ip_allocation'
     field_order = ['network', 'name']
 
     name = argument.String()
@@ -28,32 +28,32 @@ class Allocation(resource.Resource):
     network = argument.Resource(ip_allocations.Allocations)
 
     def clean_name(self, name):
-        return self.network.name + "." + name
+        return self.network.name + '.' + name
 
 
 class ApplyAction(Action):
 
     @property
     def description(self):
-        yield "Allocate a /{} within {}".format(
+        yield 'Allocate a /{} within {}'.format(
             self.resource.size,
             self.resource.network.network,
         )
 
     def run(self):
-        allocator = self.runner.get_service(self.resource.network, "ip_allocator")
+        allocator = self.runner.get_service(self.resource.network, 'ip_allocator')
         allocation = allocator.allocate(self.resource.name, self.resource.size)
-        self.runner.get_service(self.resource, "set").execute(str(allocation))
+        self.runner.get_service(self.resource, 'set').execute(str(allocation))
 
 
 class Apply(plan.Plan):
 
     resource = Allocation
-    name = "apply"
+    name = 'apply'
 
     def get_actions(self):
         try:
-            self.runner.get_service(self.resource, "get").execute()
+            self.runner.get_service(self.resource, 'get').execute()
         except KeyError:
             yield ApplyAction(self)
 
@@ -61,12 +61,12 @@ class Apply(plan.Plan):
 class Get(plan.Plan):
 
     resource = Allocation
-    name = "get"
+    name = 'get'
 
     def execute(self):
         conf = self.runner.get_service(
             self.resource.network.config,
-            "describe",
+            'describe',
         )
         return conf.get(self.resource.name)
 
@@ -74,7 +74,7 @@ class Get(plan.Plan):
 class Set(plan.Plan):
 
     resource = Allocation
-    name = "set"
+    name = 'set'
 
     def from_string(self, value):
         return value
@@ -82,7 +82,7 @@ class Set(plan.Plan):
     def execute(self, value):
         conf = self.runner.get_service(
             self.resource.network.config,
-            "describe",
+            'describe',
         )
         return conf.set(self.resource.name, value)
 

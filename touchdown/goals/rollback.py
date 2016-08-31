@@ -18,30 +18,30 @@ from touchdown.core.goals import Goal, register
 
 class Rollback(Goal):
 
-    """ Rollback a database to a point in time or a backup """
+    ''' Rollback a database to a point in time or a backup '''
 
-    name = "rollback"
+    name = 'rollback'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("rollback")
+        plan_class = resource.meta.get_plan('rollback')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "target",
-            metavar="TARGET",
+            'target',
+            metavar='TARGET',
             type=str,
-            help="The resource to rollback",
+            help='The resource to rollback',
         )
         parser.add_argument(
-            "from_backup",
-            metavar="FROM",
+            'from_backup',
+            metavar='FROM',
             type=str,
-            help="When or what to rollback to",
+            help='When or what to rollback to',
         )
 
     def pre_restore(self):
@@ -51,9 +51,9 @@ class Rollback(Goal):
         pass
 
     def execute(self, target, from_backup):
-        restorable = self.collect_as_dict("rollback")
+        restorable = self.collect_as_dict('rollback')
         if target not in restorable:
-            raise errors.Error("No such resource '{}'".format(target))
+            raise errors.Error('No such resource "{}"'.format(target))
         restorable[target].check(from_backup)
         self.pre_restore()
         restorable[target].rollback(from_backup)

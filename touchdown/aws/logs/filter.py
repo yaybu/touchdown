@@ -21,7 +21,7 @@ from .group import LogGroup
 
 class Transformation(Resource):
 
-    resource_name = "transformation"
+    resource_name = 'transformation'
 
     name = argument.String(field='metricName')
     namespace = argument.String(field='metricNamespace')
@@ -30,16 +30,16 @@ class Transformation(Resource):
 
 class Filter(Resource):
 
-    resource_name = "filter"
+    resource_name = 'filter'
 
-    name = argument.String(min=1, max=512, field="filterName")
-    log_group = argument.Resource(LogGroup, field="logGroupName", update=False)
-    pattern = argument.String(min=1, max=512, field="filterPattern")
+    name = argument.String(min=1, max=512, field='filterName')
+    log_group = argument.Resource(LogGroup, field='logGroupName', update=False)
+    pattern = argument.String(min=1, max=512, field='filterPattern')
 
     transformations = argument.ResourceList(
         Transformation,
         min=1,
-        field="metricTransformations",
+        field='metricTransformations',
         serializer=serializers.List(serializers.Resource()),
     )
 
@@ -51,26 +51,26 @@ class Describe(SimpleDescribe, Plan):
     api_version = '2014-03-28'
     describe_action = 'describe_metric_filters'
     describe_notfound_exception = 'ResourceNotFoundException'
-    describe_envelope = "metricFilters"
-    key = "filterName"
+    describe_envelope = 'metricFilters'
+    key = 'filterName'
 
     def get_describe_filters(self):
         return {
-            "logGroupName": self.resource.log_group.name,
-            "filterNamePrefix": self.resource.name
+            'logGroupName': self.resource.log_group.name,
+            'filterNamePrefix': self.resource.name
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_metric_filter"
-    update_action = "put_metric_filter"
-    create_response = "nothing-useful"
+    create_action = 'put_metric_filter'
+    update_action = 'put_metric_filter'
+    create_response = 'nothing-useful'
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_metric_filter"
+    destroy_action = 'delete_metric_filter'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

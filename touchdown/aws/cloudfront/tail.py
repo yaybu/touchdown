@@ -22,46 +22,46 @@ from touchdown.core import plan
 
 class Plan(common.SimplePlan, plan.Plan):
 
-    name = "tail"
+    name = 'tail'
     resource = Distribution
-    service_name = "s3"
+    service_name = 's3'
 
     fields = [
-        "date",
-        "time",
-        "x-edge-location",
-        "sc-bytes",
-        "c-ip",
-        "cs-method",
-        "cs(Host)",
-        "cs-uri-stem",
-        "sc-status",
-        "cs(Referer)",
-        "cs(User-Agent)",
-        "cs-uri-query",
-        "cs(Cookie)",
-        "x-edge-result-type",
-        "x-edge-request-id",
-        "x-host-header",
-        "cs-protocol",
-        "cs-bytes",
-        "time-taken",
-        "x-forwarded-for",
-        "ssl-protocol",
-        "ssl-cipher",
-        "x-edge-response-result-type",
+        'date',
+        'time',
+        'x-edge-location',
+        'sc-bytes',
+        'c-ip',
+        'cs-method',
+        'cs(Host)',
+        'cs-uri-stem',
+        'sc-status',
+        'cs(Referer)',
+        'cs(User-Agent)',
+        'cs-uri-query',
+        'cs(Cookie)',
+        'x-edge-result-type',
+        'x-edge-request-id',
+        'x-host-header',
+        'cs-protocol',
+        'cs-bytes',
+        'time-taken',
+        'x-forwarded-for',
+        'ssl-protocol',
+        'ssl-cipher',
+        'x-edge-response-result-type',
     ]
 
     def tail(self, start, end, follow):
         if follow:
-            print("Following is not supported for this stream")
+            print('Following is not supported for this stream')
             return
 
         if not self.resource.logging.enabled:
-            print("Logging is not enabled for this CloudFront distribution")
+            print('Logging is not enabled for this CloudFront distribution')
             return
 
-        pages = self.client.get_paginator("list_objects").paginate(
+        pages = self.client.get_paginator('list_objects').paginate(
             Bucket=self.resource.logging.bucket.name,
             Prefix=self.resource.logging.prefix,
         )
@@ -76,8 +76,8 @@ class Plan(common.SimplePlan, plan.Plan):
         if end:
             contents = filter(lambda c: c['LastModified'] <= end, contents)
 
-        print("#Version: 1.0")
-        print("#Fields: {}".format(" ".join(self.fields)))
+        print('#Version: 1.0')
+        print('#Fields: {}'.format(' '.join(self.fields)))
 
         for log in contents:
             response = self.client.get_object(
@@ -94,6 +94,6 @@ class Plan(common.SimplePlan, plan.Plan):
                 fileobj=body,
             )
 
-            lines = blob.read().split("\n")
+            lines = blob.read().split('\n')
             for line in lines[2:]:
                 print(line)

@@ -22,11 +22,11 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 
 class VPC(Resource):
 
-    resource_name = "vpc"
+    resource_name = 'vpc'
 
-    name = argument.String(field="Name", group="tags")
+    name = argument.String(field='Name', group='tags')
     cidr_block = argument.IPNetwork(field='CidrBlock')
-    tenancy = argument.String(default="default", choices=["default", "dedicated"], field="InstanceTenancy")
+    tenancy = argument.String(default='default', choices=['default', 'dedicated'], field='InstanceTenancy')
 
     tags = argument.Dict()
 
@@ -38,13 +38,13 @@ class Describe(SimpleDescribe, Plan):
     resource = VPC
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_vpcs"
-    describe_envelope = "Vpcs"
+    describe_action = 'describe_vpcs'
+    describe_envelope = 'Vpcs'
     key = 'VpcId'
 
     def get_describe_filters(self):
         return {
-            "Filters": [
+            'Filters': [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
@@ -52,11 +52,11 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = "create_vpc"
+    create_action = 'create_vpc'
     waiter = 'vpc_available'
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_vpc"
+    destroy_action = 'delete_vpc'
     # waiter = 'vpc_terminated'

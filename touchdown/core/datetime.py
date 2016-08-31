@@ -45,13 +45,13 @@ if not pytz:
     class UTC(tzinfo):
 
         def __repr__(self):
-            return "<UTC>"
+            return '<UTC>'
 
         def utcoffset(self, value):
             return timedelta(0)
 
         def tzname(self, value):
-            return "UTC"
+            return 'UTC'
 
         def dst(self, value):
             return timedelta(0)
@@ -81,13 +81,13 @@ def parse_datetime(value):
             return parser.parse(value)
         except Exception:
             raise errors.Error(
-                "Unable to parse {} as a date or time".format(value)
+                'Unable to parse {} as a date or time'.format(value)
             )
 
     raise errors.Error(
-        "Unable to parse {} as a date or time".format(value)
+        'Unable to parse {} as a date or time'.format(value)
     )
 
 
 def as_seconds(value):
-    return int(value.strftime("%s")) * 1000
+    return int(value.strftime('%s')) * 1000

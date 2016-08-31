@@ -90,8 +90,8 @@ EXAMPLE_DISTRIBUTION_CONFIG = {
 class TestMetadata(unittest.TestCase):
 
     def test_waiter_waity_enough(self):
-        waiter = session.get_waiter_model("cloudfront", api_version=Describe.api_version)
-        self.assertEqual(waiter.get_waiter("DistributionDeployed").max_attempts, 50)
+        waiter = session.get_waiter_model('cloudfront', api_version=Describe.api_version)
+        self.assertEqual(waiter.get_waiter('DistributionDeployed').max_attempts, 50)
 
 
 class TestDistributionCreation(aws.StubberTestCase):
@@ -107,11 +107,11 @@ class TestDistributionCreation(aws.StubberTestCase):
                 self.aws.add_distribution(
                     name='www.example.com',
                     origins=[{
-                        "name": "fred",
-                        "domain_name": "backend.example.com",
+                        'name': 'fred',
+                        'domain_name': 'backend.example.com',
                     }],
                     default_cache_behavior={
-                        "target_origin": "fred",
+                        'target_origin': 'fred',
                     },
                 ),
                 'apply',
@@ -141,11 +141,11 @@ class TestDistributionCreation(aws.StubberTestCase):
                 self.aws.add_distribution(
                     name='www.example.com',
                     origins=[{
-                        "name": "fred",
-                        "domain_name": "backend.example.com",
+                        'name': 'fred',
+                        'domain_name': 'backend.example.com',
                     }],
                     default_cache_behavior={
-                        "target_origin": "fred",
+                        'target_origin': 'fred',
                     },
                 ),
                 'apply',
@@ -172,11 +172,11 @@ class TestDistributionDeletion(aws.StubberTestCase):
                 self.aws.add_distribution(
                     name='www.example.com',
                     origins=[{
-                        "name": "fred",
-                        "domain_name": "backend.example.com",
+                        'name': 'fred',
+                        'domain_name': 'backend.example.com',
                     }],
                     default_cache_behavior={
-                        "target_origin": "fred",
+                        'target_origin': 'fred',
                     },
                 ),
                 'destroy',
@@ -212,11 +212,11 @@ class TestDistributionDeletion(aws.StubberTestCase):
                 self.aws.add_distribution(
                     name='www.example.com',
                     origins=[{
-                        "name": "fred",
-                        "domain_name": "backend.example.com",
+                        'name': 'fred',
+                        'domain_name': 'backend.example.com',
                     }],
                     default_cache_behavior={
-                        "target_origin": "fred",
+                        'target_origin': 'fred',
                     },
                 ),
                 'destroy',

@@ -20,9 +20,9 @@ from .common import CostEstimator, PricingData
 
 class DatabasePerHour(PricingData):
 
-    description = "Database instance"
-    expression = "config.regions[?region=='{region}'].types[].tiers[?name=='{instance_class}'].prices.USD[]"
-    rate = "hourly"
+    description = 'Database instance'
+    expression = 'config.regions[?region==\'{region}\'].types[].tiers[?name==\'{instance_class}\'].prices.USD[]'
+    rate = 'hourly'
 
     def format_expression(self, resource):
         return self.expression.format(
@@ -33,9 +33,9 @@ class DatabasePerHour(PricingData):
 
 class DatabasePerGb(PricingData):
 
-    description = "Database storage"
-    expression = "config.regions[?region='{region}']"
-    rate = "billing-period"
+    description = 'Database storage'
+    expression = 'config.regions[?region=\'{region}\']'
+    rate = 'billing-period'
 
     def format_expression(self, resource):
         return self.expression.format(
@@ -46,31 +46,31 @@ class DatabasePerGb(PricingData):
 
 class Plan(CostEstimator, plan.Plan):
 
-    name = "cost"
+    name = 'cost'
     resource = Database
-    service_name = "rds"
+    service_name = 'rds'
 
     pricing_data = [
         # MySQL
         DatabasePerHour(
-            "https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-standard-deployments.min.js",
-            engine="mysql",
+            'https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-standard-deployments.min.js',
+            engine='mysql',
             multi_az=False,
         ),
         DatabasePerHour(
-            "https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-multiAZ-deployments.min.js",
-            engine="mysql",
+            'https://a0.awsstatic.com/pricing/1/rds/mysql/pricing-multiAZ-deployments.min.js',
+            engine='mysql',
             multi_az=True,
         ),
         # Postgres
         DatabasePerHour(
-            "https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-standard-deployments.min.js",
-            engine="postgres",
+            'https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-standard-deployments.min.js',
+            engine='postgres',
             multi_az=False,
         ),
         DatabasePerHour(
-            "https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-multiAZ-deployments.min.js",
-            engine="postgres",
+            'https://a0.awsstatic.com/pricing/1/rds/postgresql/pricing-multiAZ-deployments.min.js',
+            engine='postgres',
             multi_az=True,
         ),
     ]

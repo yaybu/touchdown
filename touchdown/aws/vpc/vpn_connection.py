@@ -24,16 +24,16 @@ from .vpn_gateway import VpnGateway
 
 class VpnConnection(Resource):
 
-    resource_name = "vpn_connection"
+    resource_name = 'vpn_connection'
 
-    name = argument.String(field="Name", group="tags")
-    customer_gateway = argument.Resource(CustomerGateway, field="CustomerGatewayId")
-    vpn_gateway = argument.Resource(VpnGateway, field="VpnGatewayId")
-    type = argument.String(default="ipsec.1", choices=["ipsec.1"], field="Type")
+    name = argument.String(field='Name', group='tags')
+    customer_gateway = argument.Resource(CustomerGateway, field='CustomerGatewayId')
+    vpn_gateway = argument.Resource(VpnGateway, field='VpnGatewayId')
+    type = argument.String(default='ipsec.1', choices=['ipsec.1'], field='Type')
 
     static_routes_only = argument.Boolean(
         default=True,
-        field="Options",
+        field='Options',
         serializer=serializers.Dict(StaticRoutesOnly=serializers.Boolean()),
     )
 
@@ -49,9 +49,9 @@ class Describe(SimpleDescribe, Plan):
     resource = VpnConnection
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_vpn_connections"
-    describe_envelope = "VpnConnections"
-    key = "VpnConnectionId"
+    describe_action = 'describe_vpn_connections'
+    describe_envelope = 'VpnConnections'
+    key = 'VpnConnectionId'
 
     def get_describe_filters(self):
         vpc = self.runner.get_plan(self.resource.vpc)
@@ -59,7 +59,7 @@ class Describe(SimpleDescribe, Plan):
             return None
 
         return {
-            "Filters": [
+            'Filters': [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
@@ -67,8 +67,8 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = "create_vpn_connection"
-    waiter = "vpn_connection_available"
+    create_action = 'create_vpn_connection'
+    waiter = 'vpn_connection_available'
 
     def update_object(self):
         remote_routes = set(r['DestinationCidrBlock'] for r in self.object.get('Routes', []) if r['State'] != 'deleted')
@@ -76,7 +76,7 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
         for route in local_routes.difference(remote_routes):
             yield self.generic_action(
-                "Add missing route {}".format(route),
+                'Add missing route {}'.format(route),
                 self.client.create_vpn_connection_route,
                 VpnConnectionId=serializers.Identifier(),
                 DestinationCidrBlock=route,
@@ -84,7 +84,7 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
         for route in remote_routes.difference(local_routes):
             yield self.generic_action(
-                "Remove stale route {}".format(route),
+                'Remove stale route {}'.format(route),
                 self.client.create_vpn_connection_route,
                 VpnConnectionId=serializers.Identifier(),
                 DestinationCidrBlock=route,
@@ -93,5 +93,5 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_vpn_connection"
-    waiter = "vpn_connection_deleted"
+    destroy_action = 'delete_vpn_connection'
+    waiter = 'vpn_connection_deleted'

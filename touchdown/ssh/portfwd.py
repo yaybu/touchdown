@@ -25,7 +25,7 @@ except ImportError:
 
 class PortForward(resource.Resource):
 
-    resource_name = "port_forward"
+    resource_name = 'port_forward'
 
     name = argument.String()
 
@@ -51,7 +51,7 @@ class Handler (SocketServer.BaseRequestHandler):
             )
         except Exception as e:
             raise errors.Error(
-                "Failed to connect to {}:{} ({})".format(
+                'Failed to connect to {}:{} ({})'.format(
                     self.chain_host,
                     self.chain_port,
                     repr(e),
@@ -60,13 +60,13 @@ class Handler (SocketServer.BaseRequestHandler):
 
         if chan is None:
             raise errors.Error(
-                "Connect to {}:{} rejected by remote SSH server".format(
+                'Connect to {}:{} rejected by remote SSH server'.format(
                     self.chain_host,
                     self.chain_port,
                 ),
             )
 
-        self.plan.echo("Tunnel {} -> {} -> {} established".format(
+        self.plan.echo('Tunnel {} -> {} -> {} established'.format(
             self.request.getpeername(),
             chan.getpeername(),
             (self.chain_host, self.chain_port),
@@ -93,11 +93,11 @@ class Handler (SocketServer.BaseRequestHandler):
 
 class ConnectionPlan(plan.Plan):
 
-    name = "portfwd"
+    name = 'portfwd'
     resource = PortForward
 
     def start(self, local_port):
-        via = self.runner.get_service(self.resource.via, "describe")
+        via = self.runner.get_service(self.resource.via, 'describe')
         transport = via.get_client().get_transport()
 
         params = serializers.Resource().render(self.runner, self.resource)
@@ -109,7 +109,7 @@ class ConnectionPlan(plan.Plan):
             plan = self
 
         server = ForwardServer(('', local_port), SubHandler)
-        self.echo("Opening port *:{} -> {}:{}".format(
+        self.echo('Opening port *:{} -> {}:{}'.format(
             server.server_address[1],
             params['host'],
             params['port'],

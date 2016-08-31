@@ -18,7 +18,7 @@ from touchdown.tests.aws import Stubber, StubberTestCase
 class TestWafByteMatch(StubberTestCase):
 
     def test_annotate_byte_match(self):
-        """Test that when we annotate an , we gain the expected data."""
+        '''Test that when we annotate an , we gain the expected data.'''
 
         goal = self.create_goal('get')
         # TODO: standardise naming - eg 'byte_match.py' vs
@@ -56,10 +56,10 @@ class TestWafByteMatch(StubberTestCase):
         }
 
     def test_create_byte_match_set(self):
-        """Test that when we create an bytematch set, we perform the expected client
+        '''Test that when we create an bytematch set, we perform the expected client
         calls.
 
-        """
+        '''
         goal = self.create_goal('apply')
         byte_match_set = self.aws.add_byte_match_set(name='my-byte-match-set')
         apply = goal.get_service(byte_match_set, 'apply')
@@ -86,10 +86,10 @@ class TestWafByteMatch(StubberTestCase):
             action.run()
 
     def test_update_byte_match_set_with_tuple(self):
-        """Test that when we update a byte_match_set to have a tuple, we pass
+        '''Test that when we update a byte_match_set to have a tuple, we pass
         the information to link the tuple to the byte match set.
 
-        """
+        '''
         goal = self.create_goal('apply')
 
         byte_match_set = self.aws.add_byte_match_set(
@@ -140,10 +140,10 @@ class TestWafByteMatch(StubberTestCase):
                 action.run()
 
     def test_delete_byte_match_set(self):
-        """Test that the plan for deleting an byte_match_set performs the right
+        '''Test that the plan for deleting an byte_match_set performs the right
         actions.
 
-        """
+        '''
         goal = self.create_goal('destroy')
         byte_match_set = self.aws.add_byte_match_set(name='my-byte-match-set')
         destroy = goal.get_service(byte_match_set, 'destroy')

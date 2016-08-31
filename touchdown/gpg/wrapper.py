@@ -24,7 +24,7 @@ from .gpg import Gpg
 
 class Wrapper(File):
 
-    resource_name = "cipher"
+    resource_name = 'cipher'
 
     name = argument.String()
     file = argument.Resource(File)
@@ -35,11 +35,11 @@ class Wrapper(File):
 class FileIo(Plan):
 
     resource = Wrapper
-    name = "fileio"
+    name = 'fileio'
 
     def read(self):
-        fp = self.runner.get_service(self.resource.file, "fileio")
-        gpg = self.runner.get_service(self.resource.gpg, "describe").get_gnupg()
+        fp = self.runner.get_service(self.resource.file, 'fileio')
+        gpg = self.runner.get_service(self.resource.gpg, 'describe').get_gnupg()
         result = str(gpg.decrypt(
             force_bytes(fp.read().read()),
             passphrase=self.resource.gpg.passphrase,
@@ -47,8 +47,8 @@ class FileIo(Plan):
         return StringIO(result)
 
     def write(self, c):
-        fp = self.runner.get_service(self.resource.file, "fileio")
-        gpg = self.runner.get_service(self.resource.gpg, "describe").get_gnupg()
+        fp = self.runner.get_service(self.resource.file, 'fileio')
+        gpg = self.runner.get_service(self.resource.gpg, 'describe').get_gnupg()
         fp.write(str(gpg.encrypt(
             force_bytes(c),
             recipients=self.resource.gpg.recipients,

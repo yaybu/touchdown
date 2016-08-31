@@ -33,8 +33,8 @@ class SshMixin(object):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = [
             '/usr/bin/ssh',
-            '-o', 'User="{username}"'.format(**kwargs),
-            '-o', 'Port="{port}"'.format(**kwargs),
+            '-o', 'User=\'{username}\''.format(**kwargs),
+            '-o', 'Port=\'{port}\''.format(**kwargs),
             '-W', '%h:%p',
             kwargs['hostname'],
         ]
@@ -44,7 +44,7 @@ class SshMixin(object):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = [
             self.get_command(),
-            '-o', 'User="{username}"'.format(**kwargs),
+            '-o', 'User=\'{username}\''.format(**kwargs),
             '-o', 'Port={port}'.format(**kwargs),
             '-o', 'HostName={hostname}'.format(**kwargs),
         ]
@@ -69,7 +69,7 @@ class SshMixin(object):
             child_pid = os.fork()
             if child_pid:
                 a = PosixAgentServer(socket_file)
-                a.add(self.resource.private_key, "touchdown.pem")
+                a.add(self.resource.private_key, 'touchdown.pem')
                 try:
                     a.serve_while_pid(child_pid)
                 finally:
@@ -84,7 +84,7 @@ class SshMixin(object):
 
 class SshPlan(plan.Plan, SshMixin):
 
-    name = "ssh"
+    name = 'ssh'
     resource = Connection
 
     def get_command(self):
@@ -92,7 +92,7 @@ class SshPlan(plan.Plan, SshMixin):
 
     def get_command_and_args(self):
         cmd = super(SshPlan, self).get_command_and_args()
-        cmd.append("remote")
+        cmd.append('remote')
         return cmd
 
     def execute(self, args):
@@ -101,7 +101,7 @@ class SshPlan(plan.Plan, SshMixin):
 
 class ScpPlan(plan.Plan, SshMixin):
 
-    name = "scp"
+    name = 'scp'
     resource = Connection
 
     def get_command(self):

@@ -23,11 +23,11 @@ from touchdown.core.datetime import parse_datetime, utc
 class TestDateTime(unittest.TestCase):
 
     def test_5m_ago(self):
-        with mock.patch("touchdown.core.datetime.datetime") as mock_dt:
+        with mock.patch('touchdown.core.datetime.datetime') as mock_dt:
             mock_dt.utcnow.return_value = datetime.datetime(2015, 5, 25, 14, 23, 46, 890132)
             mock_dt.side_effect = datetime.datetime.now()
 
             self.assertEqual(
-                parse_datetime("5m ago"),
+                parse_datetime('5m ago'),
                 datetime.datetime(2015, 5, 25, 14, 18, 46, 890132, tzinfo=utc)
             )

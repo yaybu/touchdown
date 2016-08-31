@@ -50,7 +50,7 @@ class TestSecurityGroupCreation(StubberTestCase):
                     name='test-security-group',
                     description='test-security-group',
                     ingress=[
-                        {"port": 80, "network": "0.0.0.0/0"},
+                        {'port': 80, 'network': '0.0.0.0/0'},
                     ]
                 ),
                 'apply',

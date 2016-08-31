@@ -20,33 +20,33 @@ from touchdown.core.goals import Goal, register
 
 class Ssh(Goal):
 
-    """ SSH into infrastructure managed by touchdown """
+    ''' SSH into infrastructure managed by touchdown '''
 
-    name = "ssh"
+    name = 'ssh'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("ssh")
+        plan_class = resource.meta.get_plan('ssh')
         if not plan_class:
-            plan_class = resource.meta.get_plan("describe")
+            plan_class = resource.meta.get_plan('describe')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "box",
-            metavar="BOX",
+            'box',
+            metavar='BOX',
             type=str,
-            help="The resource to ssh to",
+            help='The resource to ssh to',
         )
         parser.add_argument('args', nargs=argparse.REMAINDER)
 
     def execute(self, box, args):
-        boxes = self.collect_as_dict("ssh")
+        boxes = self.collect_as_dict('ssh')
         if box not in boxes:
-            raise errors.Error("No such host '{}'".format(box))
+            raise errors.Error('No such host "{}"'.format(box))
         boxes[box].execute(args)
 
 register(Ssh)

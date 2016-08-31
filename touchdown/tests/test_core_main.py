@@ -20,4 +20,4 @@ from touchdown.core.main import main
 class TestStringHelpers(unittest.TestCase):
 
     def test_main_help(self):
-        self.assertRaises(SystemExit, main, ["--help"])
+        self.assertRaises(SystemExit, main, ['--help'])

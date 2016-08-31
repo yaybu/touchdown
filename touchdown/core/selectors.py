@@ -69,16 +69,16 @@ class Outgoing(Traversal):
         self.expression = expression
 
     def matches(self, node):
-        """ Returns True if a given node matches a selection expression """
-        if ":" in self.expression:
-            resource_class, resource_name = self.expression.split(":", 1)
+        ''' Returns True if a given node matches a selection expression '''
+        if ':' in self.expression:
+            resource_class, resource_name = self.expression.split(':', 1)
         else:
             resource_class, resource_name = '', self.expression
 
         if resource_class and resource_class != node.resource_name:
             return False
 
-        if resource_name and resource_name != getattr(node, "name", None):
+        if resource_name and resource_name != getattr(node, 'name', None):
             return False
 
         return True

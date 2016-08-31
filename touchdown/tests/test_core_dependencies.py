@@ -21,24 +21,24 @@ from touchdown.core import dependencies
 class TestDependencies(unittest.TestCase):
 
     def test_consistent_order_forward(self):
-        a = SecurityGroup(None, name="test", description="test")
-        b = SecurityGroup(None, name="test", description="test")
+        a = SecurityGroup(None, name='test', description='test')
+        b = SecurityGroup(None, name='test', description='test')
         b.add_dependency(a)
-        c = SecurityGroup(None, name="test", description="test")
+        c = SecurityGroup(None, name='test', description='test')
         c.add_dependency(b)
-        d = SecurityGroup(None, name="test", description="test")
+        d = SecurityGroup(None, name='test', description='test')
         d.add_dependency(c)
 
         dw = dependencies.DependencyMap(d)
         self.assertEqual(list(dw.all()), [a, b, c, d])
 
     def test_consistent_order_backward(self):
-        a = SecurityGroup(None, name="test", description="test")
-        b = SecurityGroup(None, name="test", description="test")
+        a = SecurityGroup(None, name='test', description='test')
+        b = SecurityGroup(None, name='test', description='test')
         b.add_dependency(a)
-        c = SecurityGroup(None, name="test", description="test")
+        c = SecurityGroup(None, name='test', description='test')
         c.add_dependency(b)
-        d = SecurityGroup(None, name="test", description="test")
+        d = SecurityGroup(None, name='test', description='test')
         d.add_dependency(c)
 
         dw = dependencies.DependencyMap(d, tips_first=True)

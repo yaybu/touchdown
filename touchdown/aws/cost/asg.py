@@ -20,9 +20,9 @@ from .common import CostEstimator, PricingData
 
 class Ec2PerHour(PricingData):
 
-    description = "Elastic Compute instance"
-    expression = "config.regions[?region=='{region}'].instanceTypes[].sizes[?size=='{instance_type}'].valueColumns[0].prices.USD[]"
-    rate = "hourly"
+    description = 'Elastic Compute instance'
+    expression = 'config.regions[?region==\'{region}\'].instanceTypes[].sizes[?size==\'{instance_type}\'].valueColumns[0].prices.USD[]'
+    rate = 'hourly'
 
     def format_expression(self, resource):
         return self.expression.format(
@@ -33,12 +33,12 @@ class Ec2PerHour(PricingData):
 
 class Plan(CostEstimator, plan.Plan):
 
-    name = "cost"
+    name = 'cost'
     resource = AutoScalingGroup
-    service_name = "ec2"
+    service_name = 'ec2'
 
     pricing_data = [
         Ec2PerHour(
-            "https://a0.awsstatic.com/pricing/1/ec2/linux-od.min.js",
+            'https://a0.awsstatic.com/pricing/1/ec2/linux-od.min.js',
         )
     ]

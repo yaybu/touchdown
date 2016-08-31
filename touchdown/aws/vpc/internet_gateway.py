@@ -22,9 +22,9 @@ from .vpc import VPC
 
 class InternetGateway(Resource):
 
-    resource_name = "internet_gateway"
+    resource_name = 'internet_gateway'
 
-    name = argument.String(field="Name", group="tags")
+    name = argument.String(field='Name', group='tags')
     tags = argument.Dict()
     vpc = argument.Resource(VPC)
 
@@ -34,9 +34,9 @@ class Describe(SimpleDescribe, Plan):
     resource = InternetGateway
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_internet_gateways"
-    describe_envelope = "InternetGateways"
-    key = "InternetGatewayId"
+    describe_action = 'describe_internet_gateways'
+    describe_envelope = 'InternetGateways'
+    key = 'InternetGatewayId'
 
     def get_describe_filters(self):
         vpc = self.runner.get_plan(self.resource.vpc)
@@ -44,7 +44,7 @@ class Describe(SimpleDescribe, Plan):
             return None
 
         return {
-            "Filters": [
+            'Filters': [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
             ],
         }
@@ -52,23 +52,23 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = "create_internet_gateway"
+    create_action = 'create_internet_gateway'
 
     def get_create_serializer(self):
         # As the create call takes *0* parameters, the serializers consider it
-        # a "FieldNotPresent" and break out.
+        # a 'FieldNotPresent' and break out.
         return serializers.Const({})
 
     def update_object(self):
         for change in super(Apply, self).update_object():
             yield change
 
-        for attachment in self.object.get("Attachments", []):
+        for attachment in self.object.get('Attachments', []):
             if attachment['VpcId'] == self.runner.get_plan(self.resource.vpc).resource_id:
                 return
 
         yield self.generic_action(
-            "Attach to vpc {}".format(self.resource.vpc),
+            'Attach to vpc {}'.format(self.resource.vpc),
             self.client.attach_internet_gateway,
             InternetGatewayId=self.resource.identifier(),
             VpcId=self.resource.vpc.identifier(),
@@ -77,12 +77,12 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_internet_gateway"
+    destroy_action = 'delete_internet_gateway'
 
     def destroy_object(self):
-        for attachment in self.object.get("Attachments", []):
+        for attachment in self.object.get('Attachments', []):
             yield self.generic_action(
-                "Detach from vpc {}".format(attachment['VpcId']),
+                'Detach from vpc {}'.format(attachment['VpcId']),
                 self.client.detach_internet_gateway,
                 InternetGatewayId=self.resource_id,
                 VpcId=attachment['VpcId'],

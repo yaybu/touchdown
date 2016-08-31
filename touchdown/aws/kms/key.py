@@ -24,11 +24,11 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class Key(Resource):
 
-    resource_name = "key"
+    resource_name = 'key'
 
-    name = argument.String(max=8192, field="Description")
+    name = argument.String(max=8192, field='Description')
     usage = argument.String(choices=['ENCRYPT_DECRYPT'], default='ENCRYPT_DECRYPT', field='KeyUsage')
-    policy = argument.Dict(field="Policy", serializer=serializers.Json())
+    policy = argument.Dict(field='Policy', serializer=serializers.Json())
 
     account = argument.Resource(BaseAccount)
 
@@ -38,8 +38,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Key
     service_name = 'kms'
     api_version = '2014-11-01'
-    describe_action = "list_keys"
-    describe_envelope = "Keys"
+    describe_action = 'list_keys'
+    describe_envelope = 'Keys'
     describe_filters = {}
     key = 'KeyId'
 
@@ -59,7 +59,7 @@ class Describe(SimpleDescribe, Plan):
                 EncryptionContext=context or {},
             )
         except Exception as e:
-            raise errors.Error("Key decryption failed: {}".format(e))
+            raise errors.Error('Key decryption failed: {}'.format(e))
         return response['Plaintext']
 
     def describe_object_matches(self, key):
@@ -78,8 +78,8 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_key"
-    create_envelope = "KeyMetadata"
+    create_action = 'create_key'
+    create_envelope = 'KeyMetadata'
 
     def update_object(self):
         for change in super(Apply, self).update_object():
@@ -88,13 +88,13 @@ class Apply(SimpleApply, Describe):
         remote_policy = self.object.get('Policy', None)
         if remote_policy and remote_policy != self.resource.policy:
             yield self.generic_action(
-                "Update policy",
+                'Update policy',
                 self.client.update_assume_role_policy,
                 RoleName=serializers.Identifier(),
-                PolicyDocument=serializers.Json(serializers.Argument("policy")),
+                PolicyDocument=serializers.Json(serializers.Argument('policy')),
             )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_key"
+    destroy_action = 'delete_key'

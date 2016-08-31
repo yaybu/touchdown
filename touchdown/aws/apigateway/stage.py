@@ -21,19 +21,19 @@ from .deployment import Deployment
 
 class Stage(resource.Resource):
 
-    resource_name = "stage"
+    resource_name = 'stage'
 
-    name = argument.String(field="stageName")
-    description = argument.String(field="description")
+    name = argument.String(field='stageName')
+    description = argument.String(field='description')
 
-    cache_cluster_enabled = argument.Boolean(field="cacheClusterEnabled")
-    cache_cluster_size = argument.String(field="cacheClusterSize")
+    cache_cluster_enabled = argument.Boolean(field='cacheClusterEnabled')
+    cache_cluster_size = argument.String(field='cacheClusterSize')
 
-    variables = argument.Dict(field="variables")
+    variables = argument.Dict(field='variables')
 
     deployment = argument.Resource(
         Deployment,
-        field="deploymentId",
+        field='deploymentId',
     )
 
 
@@ -42,8 +42,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Stage
     service_name = 'apigateway'
     api_version = '2015-07-09'
-    describe_action = "get_stages"
-    describe_envelope = "item"  # This is not a typo
+    describe_action = 'get_stages'
+    describe_envelope = 'item'  # This is not a typo
     key = 'id'
 
     def get_describe_filters(self):
@@ -61,8 +61,8 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_resource"
-    create_envelope = "@"
+    create_action = 'create_resource'
+    create_envelope = '@'
 
     def get_create_serializer(self):
         return serializers.Resource(
@@ -72,7 +72,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_resource"
+    destroy_action = 'delete_resource'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

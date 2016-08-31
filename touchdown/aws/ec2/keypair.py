@@ -47,13 +47,13 @@ class PublicKeyFromPrivateKey(serializers.Formatter):
 
 class KeyPair(Resource):
 
-    resource_name = "keypair"
+    resource_name = 'keypair'
 
-    name = argument.String(field="KeyName")
+    name = argument.String(field='KeyName')
 
-    public_key = argument.String(field="PublicKeyMaterial")
+    public_key = argument.String(field='PublicKeyMaterial')
     private_key = argument.String(
-        field="PublicKeyMaterial",
+        field='PublicKeyMaterial',
         serializer=PublicKeyFromPrivateKey(),
     )
 
@@ -65,29 +65,29 @@ class Describe(SimpleDescribe, Plan):
     resource = KeyPair
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_key_pairs"
-    describe_envelope = "KeyPairs"
-    describe_notfound_exception = "InvalidKeyPair.NotFound"
+    describe_action = 'describe_key_pairs'
+    describe_envelope = 'KeyPairs'
+    describe_notfound_exception = 'InvalidKeyPair.NotFound'
     key = 'KeyName'
 
     def get_describe_filters(self):
-        return {"KeyNames": [self.resource.name]}
+        return {'KeyNames': [self.resource.name]}
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "import_key_pair"
-    create_response = "id-only"
+    create_action = 'import_key_pair'
+    create_response = 'id-only'
 
     signature = (
-        Present("name"),
+        Present('name'),
         XOR(
-            Present("public_key"),
-            Present("private_key"),
+            Present('public_key'),
+            Present('private_key'),
         ),
     )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_key_pair"
+    destroy_action = 'delete_key_pair'

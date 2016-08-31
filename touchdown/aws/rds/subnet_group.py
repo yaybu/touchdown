@@ -23,11 +23,11 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class SubnetGroup(Resource):
 
-    resource_name = "db_subnet_group"
+    resource_name = 'db_subnet_group'
 
-    name = argument.String(field="DBSubnetGroupName")
-    description = argument.String(field="DBSubnetGroupDescription")
-    subnets = argument.ResourceList(Subnet, field="SubnetIds", update=False)
+    name = argument.String(field='DBSubnetGroupName')
+    description = argument.String(field='DBSubnetGroupDescription')
+    subnets = argument.ResourceList(Subnet, field='SubnetIds', update=False)
     # tags = argument.Dict()
 
     account = argument.Resource(BaseAccount)
@@ -38,18 +38,18 @@ class Describe(SimpleDescribe, Plan):
     resource = SubnetGroup
     service_name = 'rds'
     api_version = '2014-10-31'
-    describe_action = "describe_db_subnet_groups"
-    describe_notfound_exception = "DBSubnetGroupNotFoundFault"
-    describe_envelope = "DBSubnetGroups"
+    describe_action = 'describe_db_subnet_groups'
+    describe_notfound_exception = 'DBSubnetGroupNotFoundFault'
+    describe_envelope = 'DBSubnetGroups'
     key = 'DBSubnetGroupName'
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_db_subnet_group"
-    update_action = "modify_db_subnet_group"
+    create_action = 'create_db_subnet_group'
+    update_action = 'modify_db_subnet_group'
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_db_subnet_group"
+    destroy_action = 'delete_db_subnet_group'

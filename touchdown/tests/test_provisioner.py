@@ -39,11 +39,11 @@ class TestCase(WorkspaceTestCase):
             )
             bundle.add_file(
                 name=fp.name,
-                contents="hello",
+                contents='hello',
             )
             self.apply()
             self.assertTrue(os.path.exists(fp.name))
-            self.assertEquals(open(fp.name, "r").read(), "hello")
+            self.assertEquals(open(fp.name, 'r').read(), 'hello')
 
     def test_file_apply_serializers(self):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
@@ -54,21 +54,21 @@ class TestCase(WorkspaceTestCase):
             )
             bundle.add_file(
                 name=fp.name,
-                contents=serializers.Const("hello"),
+                contents=serializers.Const('hello'),
             )
             self.apply()
-            self.assertEquals(open(fp.name, "r").read(), "hello")
+            self.assertEquals(open(fp.name, 'r').read(), 'hello')
 
     def test_file_remove(self):
         with tempfile.NamedTemporaryFile(delete=False) as fp:
-            fp.write(b"HELLO")
+            fp.write(b'HELLO')
 
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local(),
         )
         bundle.add_file(
             name=fp.name,
-            policy="remove",
+            policy='remove',
         )
         self.apply()
         self.assertFalse(os.path.exists(fp.name))
@@ -82,15 +82,15 @@ class TestCase(WorkspaceTestCase):
             )
             bundle.add_file(
                 name=fp.name,
-                contents=serializers.Const("hello"),
+                contents=serializers.Const('hello'),
             )
 
             output = bundle.add_output(name=fp.name)
             echo = self.workspace.add_echo(text=output)
 
             self.assertEqual(
-                self.apply().get_service(echo, "apply").object["Text"],
-                "hello",
+                self.apply().get_service(echo, 'apply').object['Text'],
+                'hello',
             )
 
     def test_no_changes(self):
@@ -98,8 +98,8 @@ class TestCase(WorkspaceTestCase):
             target=self.workspace.add_local(),
         )
         bundle.add_file(
-            name="ZZZZ__FILE_DOES_NOT_EXIST__ZZZZ",
-            policy="remove",
+            name='ZZZZ__FILE_DOES_NOT_EXIST__ZZZZ',
+            policy='remove',
         )
         apply_service = self.create_goal('apply')
         self.assertEqual(len(list(apply_service.plan())), 0)

@@ -45,10 +45,10 @@ class Field(object):
     def clean_value(self, instance, value):
         try:
             value = self.argument.clean(instance, value)
-            if hasattr(instance, "clean_{}".format(self.name)):
-                value = getattr(instance, "clean_{}".format(self.name))(value)
+            if hasattr(instance, 'clean_{}'.format(self.name)):
+                value = getattr(instance, 'clean_{}'.format(self.name))(value)
         except errors.InvalidParameter as e:
-            raise errors.InvalidParameter("{}: {}".format(self.name, e.args[0]))
+            raise errors.InvalidParameter('{}: {}'.format(self.name, e.args[0]))
         return value
 
     def __set__(self, instance, value):
@@ -80,7 +80,7 @@ class Meta(object):
 
     def get_plan(self, plan):
         for cls in self.mro:
-            if hasattr(cls, "meta") and plan in cls.meta.plans:
+            if hasattr(cls, 'meta') and plan in cls.meta.plans:
                 return cls.meta.plans[plan]
 
     def iter_fields_in_order(self):
@@ -98,7 +98,7 @@ class ResourceType(type):
 
         # FIXME: What order to process the bases in?
         for base in bases:
-            if hasattr(base, "meta") and isinstance(base.meta, Meta):
+            if hasattr(base, 'meta') and isinstance(base.meta, Meta):
                 meta.fields.update(base.meta.fields)
                 meta.field_order.extend(base.meta.field_order)
 
@@ -112,7 +112,7 @@ class ResourceType(type):
             del new_attrs['field_order']
 
         # Replace all Argument instances with Field instances. The Field type
-        # handles the "clean" stage of input processing and the storage of
+        # handles the 'clean' stage of input processing and the storage of
         # data passed in.
         for name, value in new_attrs.items():
             if isinstance(value, argument.Argument):
@@ -137,7 +137,7 @@ class ResourceType(type):
             field.argument.contribute_to_class(cls)
 
         # Fire any signals.
-        name = ".".join((cls.__module__, cls.__name__))
+        name = '.'.join((cls.__module__, cls.__name__))
         meta_cls.__all_resources__[name] = cls
 
         for callable, args, kwargs in meta_cls.__lazy_lookups__.get(name, []):
@@ -171,14 +171,14 @@ class Resource(six.with_metaclass(ResourceType)):
     def clean(cls, value):
         if not isinstance(value, dict):
             raise errors.InvalidParameter(
-                "{!r} cannot be adapted into a {}".format(value, cls.resource_name)
+                '{!r} cannot be adapted into a {}'.format(value, cls.resource_name)
             )
 
         params = {}
         compound_params = {}
         for key, subvalue in value.items():
-            if "__" in key:
-                key, subkey = key.split("__", 1)
+            if '__' in key:
+                key, subkey = key.split('__', 1)
                 compound_params.setdefault(key, {})[subkey] = subvalue
                 continue
             params[key] = subvalue
@@ -186,7 +186,7 @@ class Resource(six.with_metaclass(ResourceType)):
         for key, val in compound_params.items():
             if key in params:
                 raise errors.InvalidParameter(
-                    "Cannot set '{}' and '{}__{}'".format(
+                    'Cannot set "{}" and "{}__{}"'.format(
                         key,
                         key,
                         next(iter(val.keys())),
@@ -197,20 +197,20 @@ class Resource(six.with_metaclass(ResourceType)):
         for key in params.keys():
             if key not in cls.meta.fields:
                 raise errors.InvalidParameter(
-                    "{!r} is not a valid option for a {}".format(key, cls.resource_name)
+                    '{!r} is not a valid option for a {}'.format(key, cls.resource_name)
                 )
 
         return params
 
     def identifier(self):
-        """ Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' """
+        ''' Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' '''
         return serializers.Context(
             serializers.Const(self),
             serializers.Identifier(),
         )
 
     def get_property(self, property_name):
-        """ Returns a serializer that renders a property fetched by describing a remote resource """
+        ''' Returns a serializer that renders a property fetched by describing a remote resource '''
         return serializers.Property(
             property_name,
             serializers.Const(self),
@@ -243,8 +243,8 @@ class Resource(six.with_metaclass(ResourceType)):
             self.dependencies.add(dependency)
 
     def __str__(self):
-        if hasattr(self, "name"):
-            return "{} '{}'".format(self.resource_name, self.name)
+        if hasattr(self, 'name'):
+            return '{} \'{}\''.format(self.resource_name, self.name)
         return self.resource_name
 
     def __lt__(self, other):

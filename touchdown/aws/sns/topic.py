@@ -22,21 +22,21 @@ from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class Subscription(Adapter):
-    resource_name = "subscription"
+    resource_name = 'subscription'
 
 
 class Topic(Resource):
 
-    resource_name = "topic"
+    resource_name = 'topic'
 
-    arn = argument.Output("TopicArn")
+    arn = argument.Output('TopicArn')
 
-    name = argument.String(field="Name", min=1, max=256, regex='[A-Za-z0-9-_]*')
+    name = argument.String(field='Name', min=1, max=256, regex='[A-Za-z0-9-_]*')
     notify = argument.ResourceList(Subscription)
 
-    display_name = argument.String(field="DisplayName", group="attributes")
-    policy = argument.String(field="Policy", group="attributes")
-    delivery_policy = argument.String(field="DeliveryPolicy", group="attributes")
+    display_name = argument.String(field='DisplayName', group='attributes')
+    policy = argument.String(field='Policy', group='attributes')
+    delivery_policy = argument.String(field='DeliveryPolicy', group='attributes')
 
     account = argument.Resource(BaseAccount)
 
@@ -46,8 +46,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Topic
     service_name = 'sns'
     api_version = '2010-03-31'
-    describe_action = "list_topics"
-    describe_envelope = "Topics"
+    describe_action = 'list_topics'
+    describe_envelope = 'Topics'
     describe_filters = {}
     key = 'TopicArn'
 
@@ -57,8 +57,8 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_topic"
-    create_response = "id-only"
+    create_action = 'create_topic'
+    create_response = 'id-only'
 
     def update_object(self):
         remote_subscriptions = []
@@ -73,7 +73,7 @@ class Apply(SimpleApply, Describe):
                     break
             else:
                 yield self.generic_action(
-                    "Subscribe to {}".format(local),
+                    'Subscribe to {}'.format(local),
                     self.client.subscribe,
                     local.serializer_with_kwargs(
                         TopicArn=self.resource.arn,
@@ -86,7 +86,7 @@ class Apply(SimpleApply, Describe):
                     break
             else:
                 yield self.generic_action(
-                    "Unsubscribe from protocol {}, endpoint {}".format(remote["Protocol"], remote["Endpoint"]),
+                    'Unsubscribe from protocol {}, endpoint {}'.format(remote['Protocol'], remote['Endpoint']),
                     self.client.unsubscribe,
                     SubscriptionArn=serializers.Const(remote['SubscriptionArn']),
                 )
@@ -97,10 +97,10 @@ class Apply(SimpleApply, Describe):
                 TopicArn=self.resource_id,
             )['Attributes']
 
-        d = serializers.Resource(group="attributes").diff(self.runner, self.resource, attributes)
+        d = serializers.Resource(group='attributes').diff(self.runner, self.resource, attributes)
         for field, diff in d.diffs:
             yield self.generic_action(
-                "Update {}".format(diff),
+                'Update {}'.format(diff),
                 self.client.set_topic_attributes,
                 TopicArn=serializers.Identifier(),
                 AttributeName=field.field,
@@ -110,12 +110,12 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_topic"
+    destroy_action = 'delete_topic'
 
 
 class AlarmDestination(cloudwatch.AlarmDestination):
 
-    """ Adapts a sns Topic into an AlarmDestination """
+    ''' Adapts a sns Topic into an AlarmDestination '''
 
     input = Topic
 

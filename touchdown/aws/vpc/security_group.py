@@ -22,28 +22,28 @@ from .vpc import VPC
 
 class Rule(Resource):
 
-    resource_name = "rule"
+    resource_name = 'rule'
 
     @property
     def dot_ignore(self):
         return self.security_group is None
 
-    protocol = argument.String(default='tcp', choices=['tcp', 'udp', 'icmp'], field="IpProtocol")
+    protocol = argument.String(default='tcp', choices=['tcp', 'udp', 'icmp'], field='IpProtocol')
     port = argument.Integer(min=-1, max=32768)
-    from_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="FromPort")
-    to_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field="ToPort")
+    from_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field='FromPort')
+    to_port = argument.Integer(default=lambda r: r.port, min=-1, max=32768, field='ToPort')
 
     security_group = argument.Resource(
-        "touchdown.aws.vpc.security_group.SecurityGroup",
-        field="UserIdGroupPairs",
+        'touchdown.aws.vpc.security_group.SecurityGroup',
+        field='UserIdGroupPairs',
         serializer=serializers.ListOfOne(serializers.Dict(
-            UserId=serializers.Property("OwnerId"),
+            UserId=serializers.Property('OwnerId'),
             GroupId=serializers.Identifier(),
         )),
     )
 
     network = argument.IPNetwork(
-        field="IpRanges",
+        field='IpRanges',
         serializer=serializers.ListOfOne(serializers.Dict(
             CidrIp=serializers.String(),
         )),
@@ -88,18 +88,18 @@ class Rule(Resource):
     def __str__(self):
         name = super(Rule, self).__str__()
         if self.from_port == self.to_port:
-            ports = "port {}".format(self.from_port)
+            ports = 'port {}'.format(self.from_port)
         else:
-            ports = "ports {} to {}".format(self.from_port, self.to_port)
-        return "{}: {} {} from {}".format(name, self.protocol, ports, self.network if self.network else self.security_group)
+            ports = 'ports {} to {}'.format(self.from_port, self.to_port)
+        return '{}: {} {} from {}'.format(name, self.protocol, ports, self.network if self.network else self.security_group)
 
 
 class SecurityGroup(Resource):
 
-    resource_name = "security_group"
+    resource_name = 'security_group'
 
-    name = argument.String(field="GroupName")
-    description = argument.String(field="Description")
+    name = argument.String(field='GroupName')
+    description = argument.String(field='Description')
 
     ingress = argument.ResourceList(Rule)
     egress = argument.ResourceList(
@@ -108,7 +108,7 @@ class SecurityGroup(Resource):
     )
 
     tags = argument.Dict()
-    vpc = argument.Resource(VPC, field="VpcId")
+    vpc = argument.Resource(VPC, field='VpcId')
 
 
 class Describe(SimpleDescribe, Plan):
@@ -116,8 +116,8 @@ class Describe(SimpleDescribe, Plan):
     resource = SecurityGroup
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_security_groups"
-    describe_envelope = "SecurityGroups"
+    describe_action = 'describe_security_groups'
+    describe_envelope = 'SecurityGroups'
     key = 'GroupId'
 
     def get_describe_filters(self):
@@ -127,7 +127,7 @@ class Describe(SimpleDescribe, Plan):
 
         vpc = self.runner.get_plan(self.resource.vpc)
         return {
-            "Filters": [
+            'Filters': [
                 {'Name': 'group-name', 'Values': [self.resource.name]},
                 {'Name': 'vpc-id', 'Values': [vpc.resource_id or '']}
             ],
@@ -136,22 +136,22 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = "create_security_group"
-    create_response = "id-only"
+    create_action = 'create_security_group'
+    create_response = 'id-only'
 
     signature = (
-        Present("name"),
-        Present("description"),
+        Present('name'),
+        Present('description'),
     )
 
     def update_object(self):
         for local_rule in self.resource.ingress:
-            for remote_rule in self.object.get("IpPermissions", []):
+            for remote_rule in self.object.get('IpPermissions', []):
                 if local_rule.matches(self.runner, remote_rule):
                     break
             else:
                 yield self.generic_action(
-                    "Authorize ingress {}".format(local_rule),
+                    'Authorize ingress {}'.format(local_rule),
                     self.client.authorize_security_group_ingress,
                     GroupId=serializers.Identifier(),
                     IpPermissions=serializers.ListOfOne(local_rule.serializer_with_kwargs()),
@@ -160,12 +160,12 @@ class Apply(TagsMixin, SimpleApply, Describe):
         return
 
         for local_rule in self.resource.egress:
-            for remote_rule in self.object.get("IpPermissionsEgress", []):
+            for remote_rule in self.object.get('IpPermissionsEgress', []):
                 if local_rule.matches(self.runner, remote_rule):
                     break
             else:
                 yield self.generic_action(
-                    "Authorize egress {}".format(local_rule),
+                    'Authorize egress {}'.format(local_rule),
                     self.client.authorize_security_group_egress,
                     GroupId=serializers.Identifier(),
                     IpPermissions=serializers.ListOfOne(local_rule.serializer_with_kwargs()),
@@ -174,4 +174,4 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_security_group"
+    destroy_action = 'delete_security_group'

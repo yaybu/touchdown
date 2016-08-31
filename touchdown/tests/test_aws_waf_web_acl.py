@@ -16,17 +16,17 @@ from touchdown.tests.aws import Stubber, StubberTestCase
 
 
 class TestWafWebACL(StubberTestCase):
-    """Test that WAF WebACLs can be created, updated and deleted.
+    '''Test that WAF WebACLs can be created, updated and deleted.
 
-    Note: Because WAF uses a change token, every "real" request is
+    Note: Because WAF uses a change token, every 'real' request is
     preceded by a call to `get_change_token`. The change token this
     gives us should then be included in the request we actually want
     to make, and it is also returned to us.
 
-    """
+    '''
 
     def test_annotate_web_acl(self):
-        """Test that when we annotate a web acl, we gain the expected data."""
+        '''Test that when we annotate a web acl, we gain the expected data.'''
         goal = self.create_goal('get')
         web_acl = self.aws.add_web_acl(name='my-web-acl')
         describe = goal.get_service(web_acl, 'describe')
@@ -72,10 +72,10 @@ class TestWafWebACL(StubberTestCase):
         }
 
     def test_create_web_acl(self):
-        """Test that when we create a web_acl, we perform the expected client
+        '''Test that when we create a web_acl, we perform the expected client
         calls.
 
-        """
+        '''
         goal = self.create_goal('apply')
         web_acl = self.aws.add_web_acl(name='my-web-acl', metric_name='mymetric', default_action='BLOCK')
         apply = goal.get_service(web_acl, 'apply')
@@ -106,10 +106,10 @@ class TestWafWebACL(StubberTestCase):
             action.run()
 
     def test_update_web_acl_with_active_rules(self):
-        """Test that when we update a web_acl to have a rule, we pass the
+        '''Test that when we update a web_acl to have a rule, we pass the
         information to link the web_acl to the match.
 
-        """
+        '''
         goal = self.create_goal('apply')
 
         rule = self.aws.add_rule(
@@ -165,7 +165,7 @@ class TestWafWebACL(StubberTestCase):
                 action.run()
 
     def test_delete_web_acl(self):
-        """Test that the plan for deleting a web_acl has expected actions."""
+        '''Test that the plan for deleting a web_acl has expected actions.'''
         goal = self.create_goal('destroy')
         web_acl = self.aws.add_web_acl(name='my-web-acl', metric_name='mymetric')
         destroy = goal.get_service(web_acl, 'destroy')

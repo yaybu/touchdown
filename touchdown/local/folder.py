@@ -22,7 +22,7 @@ from touchdown.core.workspace import Workspace
 
 class LocalFolder(Resource):
 
-    resource_name = "local_folder"
+    resource_name = 'local_folder'
 
     name = argument.String()
     root = argument.Resource(Workspace)
@@ -34,9 +34,9 @@ class LocalFolder(Resource):
 class Describe(Plan):
 
     resource = LocalFolder
-    name = "describe"
+    name = 'describe'
 
     def get_actions(self):
         if not os.path.isdir(self.resource.name):
-            raise errors.NotFound("'{}' could not be found, or is not a folder".format(self.resource))
+            raise errors.NotFound('"{}" could not be found, or is not a folder'.format(self.resource))
         return []

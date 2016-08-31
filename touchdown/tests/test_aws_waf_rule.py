@@ -16,17 +16,17 @@ from touchdown.tests.aws import Stubber, StubberTestCase
 
 
 class TestWafRule(StubberTestCase):
-    """Test that WAF rules can be created, updated and deleted.
+    '''Test that WAF rules can be created, updated and deleted.
 
-    Note: Because WAF uses a change token, every "real" request is
+    Note: Because WAF uses a change token, every 'real' request is
     preceded by a call to `get_change_token`. The change token this
     gives us should then be included in the request we actually want
     to make, and it is also returned to us.
 
-    """
+    '''
 
     def test_annotate_rule(self):
-        """Test that when we annotate a rule, we gain the expected data."""
+        '''Test that when we annotate a rule, we gain the expected data.'''
         goal = self.create_goal('get')
         rule = self.aws.add_rule(name='myrule')
         describe = goal.get_service(rule, 'describe')
@@ -62,10 +62,10 @@ class TestWafRule(StubberTestCase):
         }
 
     def test_create_rule(self):
-        """Test that when we create a rule, we perform the expected client
+        '''Test that when we create a rule, we perform the expected client
         calls.
 
-        """
+        '''
         goal = self.create_goal('apply')
         rule = self.aws.add_rule(name='myrule', metric_name='mymetric')
         apply = goal.get_service(rule, 'apply')
@@ -92,10 +92,10 @@ class TestWafRule(StubberTestCase):
             action.run()
 
     def test_update_rule_with_predicates(self):
-        """Test that when we update a rule to have a predicate, we pass the
+        '''Test that when we update a rule to have a predicate, we pass the
         information to link the rule to the match.
 
-        """
+        '''
         goal = self.create_goal('apply')
 
         ip_set = self.aws.add_ip_set(
@@ -144,7 +144,7 @@ class TestWafRule(StubberTestCase):
                 action.run()
 
     def test_delete_rule(self):
-        """Test that the plan for deleting a rule has expected actions."""
+        '''Test that the plan for deleting a rule has expected actions.'''
         goal = self.create_goal('destroy')
         rule = self.aws.add_rule(name='myrule', metric_name='mymetric')
         destroy = goal.get_service(rule, 'destroy')

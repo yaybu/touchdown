@@ -63,46 +63,46 @@ class _Mixins(object):
         return self.get_goal(command).execute(*args, **kwargs)
 
     def get(self, name):
-        return self.get_goal("get").collect_as_dict("get")[name].execute()
+        return self.get_goal('get').collect_as_dict('get')[name].execute()
 
     def test_apply(self):
         self.assertRaises(
             errors.NothingChanged,
-            self.call, "apply"
+            self.call, 'apply'
         )
 
     def test_destroy(self):
         self.assertRaises(
             errors.NothingChanged,
-            self.call, "destroy"
+            self.call, 'destroy'
         )
 
     def test_get_string(self):
-        self.call("get", "strings.variable1")
-        self.assertEqual(self.get("strings.variable1"), ("value1", False))
+        self.call('get', 'strings.variable1')
+        self.assertEqual(self.get('strings.variable1'), ('value1', False))
 
     def test_set_string(self):
-        self.call("set", "strings.variable1", "value2")
-        self.call("get", "strings.variable1")
-        self.assertEqual(self.get("strings.variable1"), ("value2", True))
+        self.call('set', 'strings.variable1', 'value2')
+        self.call('get', 'strings.variable1')
+        self.assertEqual(self.get('strings.variable1'), ('value2', True))
 
     def test_get_integer(self):
-        self.call("get", "integers.variable1")
-        self.assertEqual(self.get("integers.variable1"), (1, False))
+        self.call('get', 'integers.variable1')
+        self.assertEqual(self.get('integers.variable1'), (1, False))
 
     def test_set_integer(self):
-        self.call("set", "integers.variable1", 2)
-        self.call("get", "integers.variable1")
-        self.assertEqual(self.get("integers.variable1"), (2, True))
+        self.call('set', 'integers.variable1', 2)
+        self.call('get', 'integers.variable1')
+        self.assertEqual(self.get('integers.variable1'), (2, True))
 
     def test_get_list(self):
-        self.call("get", "lists.variable1")
-        self.assertEqual(self.get("lists.variable1"), (["foo", "bar", "baz"], False))
+        self.call('get', 'lists.variable1')
+        self.assertEqual(self.get('lists.variable1'), (['foo', 'bar', 'baz'], False))
 
     def test_set_list(self):
-        self.call("set", "lists.variable1", "foo,bar")
-        self.call("get", "lists.variable1")
-        self.assertEqual(self.get("lists.variable1"), (["foo", "bar"], True))
+        self.call('set', 'lists.variable1', 'foo,bar')
+        self.call('get', 'lists.variable1')
+        self.assertEqual(self.get('lists.variable1'), (['foo', 'bar'], True))
 
     def test_retain_list(self):
         self.config.add_list(
@@ -110,14 +110,14 @@ class _Mixins(object):
             default=serializers.Expression(lambda ctx, value: [str(next(self.counter))]),
             retain_default=True,
         )
-        assert self.get("lists.variable2") != self.get("lists.variable2")
-        self.call("apply")
-        self.assertRaises(errors.NothingChanged, self.call, "apply")
-        assert self.get("lists.variable2") == self.get("lists.variable2")
+        assert self.get('lists.variable2') != self.get('lists.variable2')
+        self.call('apply')
+        self.assertRaises(errors.NothingChanged, self.call, 'apply')
+        assert self.get('lists.variable2') == self.get('lists.variable2')
 
     def test_retain_ips(self):
         net = self.config.add_ip_allocations(
-            name="subnets",
+            name='subnets',
             network='10.30.0.0/20',
         )
         net.add_ip_allocation(
@@ -128,16 +128,16 @@ class _Mixins(object):
             name='app-b',
             size=25,
         )
-        self.call("apply")
-        self.assertRaises(errors.NothingChanged, self.call, "apply")
-        assert self.get("subnets.app-a") == '10.30.0.0/25'
-        assert self.get("subnets.app-b") == '10.30.0.128/25'
+        self.call('apply')
+        self.assertRaises(errors.NothingChanged, self.call, 'apply')
+        assert self.get('subnets.app-a') == '10.30.0.0/25'
+        assert self.get('subnets.app-b') == '10.30.0.128/25'
 
     def test_echo_string(self):
         self.workspace.add_echo(
             text=self.strings_variable1,
         )
-        self.call("apply")
+        self.call('apply')
 
 
 class LocalFileTestCase(_Mixins, unittest.TestCase):
@@ -162,9 +162,9 @@ class TestIpNetwork(_Mixins, unittest.TestCase):
         return folder.add_file(name='test.cfg')
 
     def test_ensure_allocator_state_preserved(self):
-        network = self.config.add_ip_network(name="environment.network")
+        network = self.config.add_ip_network(name='environment.network')
         net = self.config.add_ip_allocations(
-            name="subnets",
+            name='subnets',
             network=network,
         )
         net.add_ip_allocation(
@@ -175,9 +175,9 @@ class TestIpNetwork(_Mixins, unittest.TestCase):
             name='app-b',
             size=25,
         )
-        self.call("set", "environment.network", "10.30.0.0/20")
-        self.call("set", "subnets.app-a", "10.30.0.0/25")
-        self.call("apply")
-        self.assertRaises(errors.NothingChanged, self.call, "apply")
-        assert self.get("subnets.app-a") == '10.30.0.0/25'
-        assert self.get("subnets.app-b") == '10.30.0.128/25'
+        self.call('set', 'environment.network', '10.30.0.0/20')
+        self.call('set', 'subnets.app-a', '10.30.0.0/25')
+        self.call('apply')
+        self.assertRaises(errors.NothingChanged, self.call, 'apply')
+        assert self.get('subnets.app-a') == '10.30.0.0/25'
+        assert self.get('subnets.app-b') == '10.30.0.128/25'

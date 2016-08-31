@@ -22,40 +22,40 @@ from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
 
 class Queue(Resource):
 
-    resource_name = "queue"
+    resource_name = 'queue'
 
-    name = argument.String(field="QueueName")
+    name = argument.String(field='QueueName')
 
-    delay_seconds = argument.Integer(min=0, max=900, field="DelaySeconds", serializer=serializers.String(), group="attributes")
+    delay_seconds = argument.Integer(min=0, max=900, field='DelaySeconds', serializer=serializers.String(), group='attributes')
     maximum_message_size = argument.Integer(
         min=1024,
         max=262144,
-        field="MaximumMessageSize",
+        field='MaximumMessageSize',
         serializer=serializers.String(),
-        group="attributes"
+        group='attributes'
     )
     message_retention_period = argument.Integer(
         min=60,
         max=1209600,
-        field="MessageRetentionPeriod",
+        field='MessageRetentionPeriod',
         serializer=serializers.String(),
-        group="attributes"
+        group='attributes'
     )
-    policy = argument.String(field="Policy", group="attributes")
+    policy = argument.String(field='Policy', group='attributes')
     receive_message_wait_time_seconds = argument.Integer(
         min=0,
         max=20,
-        field="ReceiveMessageWaitTimeSeconds",
+        field='ReceiveMessageWaitTimeSeconds',
         serializer=serializers.String(),
-        group="attributes"
+        group='attributes'
     )
     visibility_timeout = argument.Integer(
         default=30,
         min=0,
         max=43200,
-        field="VisibilityTimeout",
+        field='VisibilityTimeout',
         serializer=serializers.String(),
-        group="attributes"
+        group='attributes'
     )
 
     account = argument.Resource(BaseAccount)
@@ -67,12 +67,12 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'sqs'
     api_version = '2012-11-05'
     describe_action = 'get_queue_url'
-    describe_envelope = "[@]"
-    describe_notfound_exception = "AWS.SimpleQueueService.NonExistentQueue"
-    key = "QueueUrl"
+    describe_envelope = '[@]'
+    describe_notfound_exception = 'AWS.SimpleQueueService.NonExistentQueue'
+    key = 'QueueUrl'
 
     def get_describe_filters(self):
-        return {"QueueName": self.resource.name}
+        return {'QueueName': self.resource.name}
 
     def annotate_object(self, queue):
         queue.update(self.client.get_queue_attributes(
@@ -84,24 +84,24 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_queue"
-    create_response = "id-only"
+    create_action = 'create_queue'
+    create_response = 'id-only'
 
     def update_object(self):
-        d = serializers.Resource(group="attributes").diff(self.runner, self.resource, self.object)
+        d = serializers.Resource(group='attributes').diff(self.runner, self.resource, self.object)
         if not d.matches():
             yield self.generic_action(
-                ["Updating queue attributes"] + list(d.lines()),
+                ['Updating queue attributes'] + list(d.lines()),
                 self.client.set_queue_attributes,
                 QueueUrl=serializers.Identifier(),
-                Attributes=serializers.Resource(group="attributes")
+                Attributes=serializers.Resource(group='attributes')
             )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_queue"
-    # waiter = "bucket_not_exists"
+    destroy_action = 'delete_queue'
+    # waiter = 'bucket_not_exists'
 
     def get_destroy_serializer(self):
         return serializers.Dict(
@@ -111,23 +111,23 @@ class Destroy(SimpleDestroy, Describe):
 
 class Subscription(sns.Subscription):
 
-    """ Adapts a Queue into a Subscription """
+    ''' Adapts a Queue into a Subscription '''
 
     input = Queue
 
     def get_serializer(self, runner, **kwargs):
         return serializers.Dict(
-            Protocol=serializers.Const("sqs"),
-            Endpoint=self.adapts.get_property("QueueArn"),
+            Protocol=serializers.Const('sqs'),
+            Endpoint=self.adapts.get_property('QueueArn'),
             TopicArn=kwargs['TopicArn'],
         )
 
 
 class AlarmDestination(cloudwatch.AlarmDestination):
 
-    """ Adapts a Queue into an AlarmDestination """
+    ''' Adapts a Queue into an AlarmDestination '''
 
     input = Queue
 
     def get_serializer(self, runner, **kwargs):
-        return self.adapts.get_property("QueueArn")
+        return self.adapts.get_property('QueueArn')

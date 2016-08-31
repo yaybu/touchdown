@@ -20,9 +20,9 @@ from .common import CostEstimator, PricingData
 
 class ElastiCachePerHour(PricingData):
 
-    description = "ElastiCache instance"
-    expression = "config.regions[?region=='{region}'].types[].tiers[?name=='{instance_type}'].prices.USD[]"
-    rate = "hourly"
+    description = 'ElastiCache instance'
+    expression = 'config.regions[?region==\'{region}\'].types[].tiers[?name==\'{instance_type}\'].prices.USD[]'
+    rate = 'hourly'
 
     def format_expression(self, resource):
         return self.expression.format(
@@ -34,14 +34,14 @@ class ElastiCachePerHour(PricingData):
 class CacheClusterPlan(CostEstimator, plan.Plan):
 
     resource = CacheCluster
-    service_name = "elasticache"
+    service_name = 'elasticache'
 
     def get_scale(self, resource):
         return resource.num_cache_nodes
 
     pricing_data = [
         ElastiCachePerHour(
-            "https://a0.awsstatic.com/pricing/1/elasticache/pricing-standard-deployments-elasticache.min.js",
+            'https://a0.awsstatic.com/pricing/1/elasticache/pricing-standard-deployments-elasticache.min.js',
         )
     ]
 
@@ -49,10 +49,10 @@ class CacheClusterPlan(CostEstimator, plan.Plan):
 class ReplicationGroupPlan(CostEstimator, plan.Plan):
 
     resource = ReplicationGroup
-    service_name = "elasticache"
+    service_name = 'elasticache'
 
     pricing_data = [
         ElastiCachePerHour(
-            "https://a0.awsstatic.com/pricing/1/elasticache/pricing-standard-deployments-elasticache.min.js",
+            'https://a0.awsstatic.com/pricing/1/elasticache/pricing-standard-deployments-elasticache.min.js',
         )
     ]

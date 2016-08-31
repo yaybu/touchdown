@@ -37,8 +37,8 @@ class CloudWatchFrontend(BaseFrontend):
         text = text.rstrip('\r\n')
         if text:
             self.queue.put({
-                "message": text,
-                "timestamp": calendar.timegm(datetime.datetime.utcnow().timetuple()) * 1000,
+                'message': text,
+                'timestamp': calendar.timegm(datetime.datetime.utcnow().timetuple()) * 1000,
             })
 
     def start(self, subcommand, goal):
@@ -50,7 +50,7 @@ class CloudWatchFrontend(BaseFrontend):
                 logGroupName=self.group.name,
             )
         except ClientError as e:
-            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
+            if e.response.get('Error', {}).get('Code') != 'ResourceAlreadyExistsException':
                 raise
 
         try:
@@ -59,7 +59,7 @@ class CloudWatchFrontend(BaseFrontend):
                 logStreamName=self.stream,
             )
         except ClientError as e:
-            if e.response.get("Error", {}).get("Code") != "ResourceAlreadyExistsException":
+            if e.response.get('Error', {}).get('Code') != 'ResourceAlreadyExistsException':
                 raise
 
         self.thread = threading.Thread(target=self._sender)

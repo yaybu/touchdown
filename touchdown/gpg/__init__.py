@@ -17,6 +17,6 @@ from .wrapper import Wrapper
 
 
 __all__ = [
-    "Gpg",
-    "Wrapper",
+    'Gpg',
+    'Wrapper',
 ]

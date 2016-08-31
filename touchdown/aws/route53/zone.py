@@ -24,60 +24,60 @@ from .alias_target import AliasTarget
 
 
 def _normalize(dns_name):
-    """
+    '''
     The Amazon Route53 API silently accepts 'foo.com' as a dns record, but
     internally that becomes 'foo.com.'. In order to match records we need to do
     the same.
-    """
-    return dns_name.rstrip('.') + "."
+    '''
+    return dns_name.rstrip('.') + '.'
 
 
 class Record(Resource):
 
-    resource_name = "record"
+    resource_name = 'record'
 
-    name = argument.String(field="Name")
-    type = argument.String(field="Type")
+    name = argument.String(field='Name')
+    type = argument.String(field='Type')
     values = argument.List(
-        field="ResourceRecords",
+        field='ResourceRecords',
         serializer=serializers.List(serializers.Dict(
             Value=serializers.Identity(),
         ), skip_empty=True)
     )
-    ttl = argument.Integer(min=0, field="TTL")
+    ttl = argument.Integer(min=0, field='TTL')
 
-    set_identifier = argument.Integer(min=1, max=128, field="SetIdentifier")
+    set_identifier = argument.Integer(min=1, max=128, field='SetIdentifier')
 
     alias = argument.Resource(
         AliasTarget,
-        field="AliasTarget",
+        field='AliasTarget',
         serializer=serializers.Resource(),
     )
 
     def clean_name(self, name):
         return _normalize(name)
 
-    # weight = argument.Integer(min=1, max=255, field="Weight")
-    # region = argument.String(field="Region")
-    # geo_location = argument.String(field="GeoLocation")
-    # failover = argument.String(choices=["PRIMARY", "SECONDARY"], field="Failover")
-    # health_check = argument.Resource(field="HealthCheckId")
+    # weight = argument.Integer(min=1, max=255, field='Weight')
+    # region = argument.String(field='Region')
+    # geo_location = argument.String(field='GeoLocation')
+    # failover = argument.String(choices=['PRIMARY', 'SECONDARY'], field='Failover')
+    # health_check = argument.Resource(field='HealthCheckId')
 
 
 class HostedZone(Resource):
 
-    """ A DNS zone hosted at Amazon Route53 """
+    ''' A DNS zone hosted at Amazon Route53 '''
 
-    resource_name = "hosted_zone"
+    resource_name = 'hosted_zone'
 
     extra_serializers = {
-        "CallerReference": serializers.Expression(lambda x, y: str(uuid.uuid4())),
+        'CallerReference': serializers.Expression(lambda x, y: str(uuid.uuid4())),
     }
 
-    name = argument.String(field="Name")
-    vpc = argument.Resource(VPC, field="VPC")
+    name = argument.String(field='Name')
+    vpc = argument.Resource(VPC, field='VPC')
     comment = argument.String(
-        field="HostedZoneConfig",
+        field='HostedZoneConfig',
         serializer=serializers.Dict(
             Comment=serializers.Identity(),
         ),
@@ -86,7 +86,7 @@ class HostedZone(Resource):
     records = argument.ResourceList(Record)
 
     shared = argument.Boolean()
-    """ If a hosted zone is shared then it won't be destroyed and DNS records will never be deleted """
+    ''' If a hosted zone is shared then it won't be destroyed and DNS records will never be deleted '''
 
     account = argument.Resource(BaseAccount)
 
@@ -99,8 +99,8 @@ class Describe(SimpleDescribe, Plan):
     resource = HostedZone
     service_name = 'route53'
     api_version = '2013-04-01'
-    describe_action = "list_hosted_zones"
-    describe_envelope = "HostedZones"
+    describe_action = 'list_hosted_zones'
+    describe_envelope = 'HostedZones'
     describe_filters = {}
     key = 'Id'
 
@@ -110,9 +110,9 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_hosted_zone"
-    create_response = "not-that-useful"
-    # update_action = "update_hosted_zone_comment"
+    create_action = 'create_hosted_zone'
+    create_response = 'not-that-useful'
+    # update_action = 'update_hosted_zone_comment'
 
     def get_remote_records(self):
         if not self.resource_id:
@@ -127,7 +127,7 @@ class Apply(SimpleApply, Describe):
 
     def update_object(self):
         changes = []
-        description = ["Update hosted zone records"]
+        description = ['Update hosted zone records']
 
         remote_records = list(self.get_remote_records())
         for local in self.resource.records:
@@ -136,24 +136,24 @@ class Apply(SimpleApply, Describe):
                     break
             else:
                 changes.append(serializers.Dict(
-                    Action="UPSERT",
+                    Action='UPSERT',
                     ResourceRecordSet=local.serializer_with_kwargs(),
                 ))
-                description.append("Name => {}, Type={}, Action=UPSERT".format(local.name, local.type))
+                description.append('Name => {}, Type={}, Action=UPSERT'.format(local.name, local.type))
 
         if not self.resource.shared:
             for remote in remote_records:
                 for local in self.resource.records:
-                    if remote["Name"] != local.name:
+                    if remote['Name'] != local.name:
                         continue
-                    if remote["Type"] != local.type:
+                    if remote['Type'] != local.type:
                         continue
-                    if remote.get("SetIdentifier", None) != local.set_identifier:
+                    if remote.get('SetIdentifier', None) != local.set_identifier:
                         continue
                     break
                 else:
-                    changes.append(serializers.Const({"Action": "DELETE", "ResourceRecordSet": remote}))
-                    description.append("Name => {}, Type={}, Action=DELETE".format(remote["Name"], remote["Type"]))
+                    changes.append(serializers.Const({'Action': 'DELETE', 'ResourceRecordSet': remote}))
+                    description.append('Name => {}, Type={}, Action=DELETE'.format(remote['Name'], remote['Type']))
 
         if changes:
             yield self.generic_action(
@@ -170,7 +170,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_hosted_zone"
+    destroy_action = 'delete_hosted_zone'
 
     def destroy_object(self):
         if not self.resource.shared:

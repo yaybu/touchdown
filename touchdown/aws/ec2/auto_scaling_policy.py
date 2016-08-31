@@ -23,21 +23,21 @@ from .auto_scaling_group import AutoScalingGroup
 
 class Policy(Resource):
 
-    resource_name = "policy"
+    resource_name = 'policy'
 
-    name = argument.String(field="PolicyName")
-    auto_scaling_group = argument.Resource(AutoScalingGroup, field="AutoScalingGroupName")
+    name = argument.String(field='PolicyName')
+    auto_scaling_group = argument.Resource(AutoScalingGroup, field='AutoScalingGroupName')
 
-    min_adjustment_step = argument.Integer(field="MinAdjustmentStep")
+    min_adjustment_step = argument.Integer(field='MinAdjustmentStep')
     adjustment_type = argument.String(
-        choices=["ChangeInCapacity", "ExactCapacity", "PercentChangeInCapacity"],
-        default="ChangeInCapacity",
-        field="AdjustmentType"
+        choices=['ChangeInCapacity', 'ExactCapacity', 'PercentChangeInCapacity'],
+        default='ChangeInCapacity',
+        field='AdjustmentType'
     )
-    scaling_adjustment = argument.Integer(default=1, field="ScalingAdjustment")
-    cooldown = argument.Integer(default=30, field="Cooldown")
+    scaling_adjustment = argument.Integer(default=1, field='ScalingAdjustment')
+    cooldown = argument.Integer(default=30, field='Cooldown')
 
-    # alarms = argument.ResourceList("touchdown.aws.cloudwatch.Alarm", field="Alarms")
+    # alarms = argument.ResourceList('touchdown.aws.cloudwatch.Alarm', field='Alarms')
 
 
 class Describe(SimpleDescribe, Plan):
@@ -45,8 +45,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Policy
     service_name = 'autoscaling'
     api_version = '2011-01-01'
-    describe_action = "describe_policies"
-    describe_envelope = "ScalingPolicies"
+    describe_action = 'describe_policies'
+    describe_envelope = 'ScalingPolicies'
     key = 'PolicyName'
 
     def get_describe_filters(self):
@@ -55,25 +55,25 @@ class Describe(SimpleDescribe, Plan):
             return None
 
         return {
-            "AutoScalingGroupName": self.resource.auto_scaling_group.name,
-            "PolicyNames": [self.resource.name]
+            'AutoScalingGroupName': self.resource.auto_scaling_group.name,
+            'PolicyNames': [self.resource.name]
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_scaling_policy"
-    create_response = "not-that-useful"
+    create_action = 'put_scaling_policy'
+    create_response = 'not-that-useful'
 
     signature = (
-        Present("name"),
-        Present("auto_scaling_group"),
+        Present('name'),
+        Present('auto_scaling_group'),
     )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_policy"
+    destroy_action = 'delete_policy'
 
     def get_destroy_serializer(self):
         return serializers.Dict(
@@ -84,8 +84,8 @@ class Destroy(SimpleDestroy, Describe):
 
 class AlarmDestination(cloudwatch.AlarmDestination):
 
-    resource_name = "alarm_destination"
+    resource_name = 'alarm_destination'
     input = Policy
 
     def get_serializer(self, runner, **kwargs):
-        return self.adapts.get_property("PolicyARN")
+        return self.adapts.get_property('PolicyARN')

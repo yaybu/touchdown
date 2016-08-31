@@ -27,15 +27,15 @@ from touchdown.core import (
 
 class NewRelicDeploymentNotification(resource.Resource):
 
-    resource_name = "newrelic_deployment_notification"
+    resource_name = 'newrelic_deployment_notification'
 
     apikey = argument.String()
-    name = argument.String(field="deployment[app_name]")
-    application_id = argument.String(field="deployment[application_id]")
-    description = argument.String(field="deployment[description]")
-    changelog = argument.String(field="deployment[changelog]")
-    user = argument.String(field="deployment[user]")
-    revision = argument.String(field="deployment[revision]")
+    name = argument.String(field='deployment[app_name]')
+    application_id = argument.String(field='deployment[application_id]')
+    description = argument.String(field='deployment[description]')
+    changelog = argument.String(field='deployment[changelog]')
+    user = argument.String(field='deployment[user]')
+    revision = argument.String(field='deployment[revision]')
 
     root = argument.Resource(workspace.Workspace)
 
@@ -44,31 +44,31 @@ class NotificationAction(action.Action):
 
     @property
     def description(self):
-        yield "Post deployment notification to NewRelic app {}".format(self.resource.name)
+        yield 'Post deployment notification to NewRelic app {}'.format(self.resource.name)
 
     def run(self):
         data = serializers.Resource().render(self.runner, self.resource)
         headers = {
-            "X-API-Key": self.resource.apikey,
+            'X-API-Key': self.resource.apikey,
         }
         response = requests.post(
-            "https://api.newrelic.com/deployments.xml",
+            'https://api.newrelic.com/deployments.xml',
             data=data,
             headers=headers,
         )
         if response.status_code != 201:
-            raise errors.Error("Error submitting notification: {}".format(response.text))
+            raise errors.Error('Error submitting notification: {}'.format(response.text))
 
 
 class Apply(plan.Plan):
 
-    name = "apply"
+    name = 'apply'
     resource = NewRelicDeploymentNotification
 
     signature = (
-        plan.Present("name"),
-        plan.Present("revision"),
-        plan.Present("apikey"),
+        plan.Present('name'),
+        plan.Present('revision'),
+        plan.Present('apikey'),
     )
 
     def get_actions(self):

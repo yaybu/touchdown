@@ -18,30 +18,30 @@ from touchdown.core.goals import Goal, register
 
 class GetSigninUrl(Goal):
 
-    """ Generate short-lived access urls """
+    ''' Generate short-lived access urls '''
 
-    name = "get-signin-url"
+    name = 'get-signin-url'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("get-signin-url")
+        plan_class = resource.meta.get_plan('get-signin-url')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "resource",
-            metavar="RESOURCE",
+            'resource',
+            metavar='RESOURCE',
             type=str,
-            help="The resource to create a signin url for"
+            help='The resource to create a signin url for'
         )
 
     def execute(self, resource):
-        resources = self.collect_as_dict("get-signin-url")
+        resources = self.collect_as_dict('get-signin-url')
         if resource not in resources:
-            raise errors.Error("No such resource '{}'".format(resource))
+            raise errors.Error('No such resource "{}"'.format(resource))
         self.ui.echo(resources[resource].get_signin_url())
 
 register(GetSigninUrl)

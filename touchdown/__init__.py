@@ -25,5 +25,5 @@ import touchdown.notifications  # noqa
 from touchdown.core import Workspace
 
 __all__ = [
-    "Workspace",
+    'Workspace',
 ]

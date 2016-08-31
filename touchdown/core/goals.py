@@ -35,7 +35,7 @@ class GoalFactory(object):
         try:
             goal_class = self.goals[name]
         except KeyError:
-            raise errors.Error("No such goal '{}'".format(name))
+            raise errors.Error('No such goal "{}"'.format(name))
         return goal_class(workspace, ui, map=map)
 
 
@@ -92,7 +92,7 @@ class Goal(object):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected.append(plan)
-        self.visit("Building plan...", self.get_plan_order(), _)
+        self.visit('Building plan...', self.get_plan_order(), _)
         return collected
 
     def collect_as_dict(self, plan_name):
@@ -102,7 +102,7 @@ class Goal(object):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected[plan.resource.name] = plan
-        self.visit("Building plan...", self.get_plan_order(), _)
+        self.visit('Building plan...', self.get_plan_order(), _)
         return collected
 
 

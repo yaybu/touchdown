@@ -23,12 +23,12 @@ from .ip_allocation import Allocation
 
 
 __all__ = [
-    "IniFile",
-    "Integer",
-    "List",
-    "String",
-    "Variable",
-    "IPNetwork",
-    "Allocations",
-    "Allocation",
+    'IniFile',
+    'Integer',
+    'List',
+    'String',
+    'Variable',
+    'IPNetwork',
+    'Allocations',
+    'Allocation',
 ]

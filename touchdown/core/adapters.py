@@ -29,4 +29,4 @@ class Adapter(Resource):
         for adapter in cls.__subclasses__():
             if adapter.input and isinstance(resource, adapter.input):
                 return adapter(parent, adapts=resource)
-        raise errors.Error("Cannot turn {} into a {}".format(resource, cls))
+        raise errors.Error('Cannot turn {} into a {}'.format(resource, cls))

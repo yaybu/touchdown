@@ -23,12 +23,12 @@ from .ami import Image
 
 class ImageCopy(Resource):
 
-    resource_name = "image_copy"
+    resource_name = 'image_copy'
     immutable_tags = True
 
-    name = argument.String(min=3, max=128, field="Name")
-    description = argument.String(field="Description")
-    source = argument.Resource(Image, field="SourceImageId")
+    name = argument.String(min=3, max=128, field='Name')
+    description = argument.String(field='Description')
+    source = argument.Resource(Image, field='SourceImageId')
 
     launch_permissions = argument.List()
     tags = argument.Dict()
@@ -36,11 +36,11 @@ class ImageCopy(Resource):
     account = argument.Resource(BaseAccount)
 
     extra_serializers = {
-        "SourceRegion": serializers.Expression(lambda runner, obj: obj.source.account.region),
+        'SourceRegion': serializers.Expression(lambda runner, obj: obj.source.account.region),
     }
 
     def __str__(self):
-        return "image_copy '{}' (copy from {} to {})".format(self.name, self.source.account.region, self.account.region)
+        return 'image_copy "{}" (copy from {} to {})'.format(self.name, self.source.account.region, self.account.region)
 
 
 class Describe(SimpleDescribe, Plan):
@@ -48,56 +48,56 @@ class Describe(SimpleDescribe, Plan):
     resource = ImageCopy
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_images"
-    describe_envelope = "Images"
+    describe_action = 'describe_images'
+    describe_envelope = 'Images'
     key = 'ImageId'
 
     def get_describe_filters(self):
-        return {"Filters": [{"Name": "name", "Values": [self.resource.name]}]}
+        return {'Filters': [{'Name': 'name', 'Values': [self.resource.name]}]}
 
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = "copy_image"
-    create_response = "id-only"
-    waiter = "image_available"
+    create_action = 'copy_image'
+    create_response = 'id-only'
+    waiter = 'image_available'
 
     signature = (
-        Present("name"),
+        Present('name'),
     )
 
     def update_object(self):
         for change in super(Apply, self).update_object():
             yield change
 
-        description = ["Update who can launch this image"]
+        description = ['Update who can launch this image']
 
         remote_userids = []
         if self.object:
             results = self.client.describe_image_attribute(
                 ImageId=self.object['ImageId'],
-                Attribute="launchPermission",
-            ).get("LaunchPermissions", [])
+                Attribute='launchPermission',
+            ).get('LaunchPermissions', [])
             remote_userids = [r['UserId'] for r in results]
 
         add = []
         for userid in self.resource.launch_permissions:
             if userid not in remote_userids:
-                description.append("Add launch permission for '{}'".format(userid))
-                add.append({"UserId": userid})
+                description.append('Add launch permission for "{}"'.format(userid))
+                add.append({'UserId': userid})
 
         remove = []
         for userid in remote_userids:
             if userid not in self.resource.launch_permissions:
-                description.append("Remove launch permission for '{}'".format(userid))
-                remove.append({"UserId": userid})
+                description.append('Remove launch permission for "{}"'.format(userid))
+                remove.append({'UserId': userid})
 
         if add or remove:
             yield self.generic_action(
                 description,
                 self.client.modify_image_attribute,
                 ImageId=serializers.Identifier(),
-                Attribute="launchPermission",
+                Attribute='launchPermission',
                 LaunchPermission=dict(
                     Add=add,
                     Remove=remove,
@@ -107,4 +107,4 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "deregister_image"
+    destroy_action = 'deregister_image'

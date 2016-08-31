@@ -18,7 +18,7 @@ from .multi import MultiFrontend
 
 
 __all__ = [
-    "CloudWatchFrontend",
-    "ConsoleFrontend",
-    "MultiFrontend",
+    'CloudWatchFrontend',
+    'ConsoleFrontend',
+    'MultiFrontend',
 ]

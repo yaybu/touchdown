@@ -24,18 +24,18 @@ from .bucket import Bucket
 
 class File(File):
 
-    resource_name = "file"
+    resource_name = 'file'
 
-    name = argument.String(field="Key")
-    contents = argument.String(field="Body")
+    name = argument.String(field='Key')
+    contents = argument.String(field='Body')
 
     acl = argument.String(
-        default="private",
-        choices=["private", "public-read", "public-read-write", "authenticated-read", "bucket-owner-read", "bucket-owner-full-control"],
-        field="ACL",
+        default='private',
+        choices=['private', 'public-read', 'public-read-write', 'authenticated-read', 'bucket-owner-read', 'bucket-owner-full-control'],
+        field='ACL',
     )
 
-    bucket = argument.Resource(Bucket, field="Bucket")
+    bucket = argument.Resource(Bucket, field='Bucket')
 
 
 class Describe(SimpleDescribe, Plan):
@@ -43,8 +43,8 @@ class Describe(SimpleDescribe, Plan):
     resource = File
     service_name = 's3'
     api_version = '2006-03-01'
-    describe_action = "list_objects"
-    describe_envelope = "Contents"
+    describe_action = 'list_objects'
+    describe_envelope = 'Contents'
     key = 'Name'
 
     def get_describe_filters(self):
@@ -53,7 +53,7 @@ class Describe(SimpleDescribe, Plan):
             return
 
         return {
-            "Bucket": self.resource.bucket.name,
+            'Bucket': self.resource.bucket.name,
         }
 
     def describe_object_matches(self, obj):
@@ -63,8 +63,8 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_object"
-    create_response = "not-that-useful"
+    create_action = 'put_object'
+    create_response = 'not-that-useful'
 
     def get_actions(self):
         if self.resource.contents:
@@ -74,7 +74,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_object"
+    destroy_action = 'delete_object'
 
     def get_destroy_serializer(self):
         return serializers.Dict(
@@ -86,14 +86,14 @@ class Destroy(SimpleDestroy, Describe):
 class FileIo(Plan):
 
     resource = File
-    name = "fileio"
+    name = 'fileio'
 
     def read(self):
-        bucket = self.runner.get_service(self.resource.bucket, "describe")
+        bucket = self.runner.get_service(self.resource.bucket, 'describe')
         if not bucket.describe_object():
-            raise FileNotFound("s3://{}/".format(self.resource.bucket.name))
+            raise FileNotFound('s3://{}/'.format(self.resource.bucket.name))
 
-        describe = self.runner.get_service(self.resource, "describe")
+        describe = self.runner.get_service(self.resource, 'describe')
         try:
             obj = describe.client.get_object(
                 Bucket=self.resource.bucket.name,
@@ -101,7 +101,7 @@ class FileIo(Plan):
             )
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchKey':
-                raise FileNotFound("s3://{}/{}".format(
+                raise FileNotFound('s3://{}/{}'.format(
                     self.resource.bucket.name,
                     self.resource.name,
                 ))
@@ -110,7 +110,7 @@ class FileIo(Plan):
         return obj['Body']
 
     def write(self, contents):
-        describe = self.runner.get_service(self.resource, "describe")
+        describe = self.runner.get_service(self.resource, 'describe')
         describe.client.put_object(
             Bucket=self.resource.bucket.name,
             Key=self.resource.name,

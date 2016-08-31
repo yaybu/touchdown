@@ -21,14 +21,14 @@ from .cache import BaseCacheCluster
 
 class ReplicationGroup(BaseCacheCluster):
 
-    resource_name = "replication_group"
+    resource_name = 'replication_group'
 
-    name = argument.String(max=16, regex=r"[a-z1-9\-]{1,20}", field="ReplicationGroupId")
-    description = argument.String(default=lambda resource: resource.name, field="ReplicationGroupDescription")
+    name = argument.String(max=16, regex=r'[a-z1-9\-]{1,20}', field='ReplicationGroupId')
+    description = argument.String(default=lambda resource: resource.name, field='ReplicationGroupDescription')
 
-    primary_cluster = argument.Resource("touchdown.aws.elasticache.cache.CacheCluster", field="PrimaryClusterId")
-    automatic_failover = argument.Boolean(field="AutomaticFailoverEnabled")
-    num_cache_clusters = argument.Integer(field="NumCacheClusters", update=False)
+    primary_cluster = argument.Resource('touchdown.aws.elasticache.cache.CacheCluster', field='PrimaryClusterId')
+    automatic_failover = argument.Boolean(field='AutomaticFailoverEnabled')
+    num_cache_clusters = argument.Integer(field='NumCacheClusters', update=False)
 
 
 class Describe(SimpleDescribe, Plan):
@@ -36,23 +36,23 @@ class Describe(SimpleDescribe, Plan):
     resource = ReplicationGroup
     service_name = 'elasticache'
     api_version = '2015-02-02'
-    describe_action = "describe_replication_groups"
-    describe_envelope = "ReplicationGroups"
-    describe_notfound_exception = "ReplicationGroupNotFoundFault"
+    describe_action = 'describe_replication_groups'
+    describe_envelope = 'ReplicationGroups'
+    describe_notfound_exception = 'ReplicationGroupNotFoundFault'
     key = 'ReplicationGroupId'
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_replication_group"
-    update_action = "modify_replication_group"
-    waiter = "replication_group_available"
+    create_action = 'create_replication_group'
+    update_action = 'modify_replication_group'
+    waiter = 'replication_group_available'
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_replication_group"
-    waiter = "replication_group_deleted"
+    destroy_action = 'delete_replication_group'
+    waiter = 'replication_group_deleted'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

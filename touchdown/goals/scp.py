@@ -18,45 +18,45 @@ from touchdown.core.goals import Goal, register
 
 class Scp(Goal):
 
-    """ SCP files to and from infrastructure managed by touchdown """
+    ''' SCP files to and from infrastructure managed by touchdown '''
 
-    name = "scp"
+    name = 'scp'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("scp")
+        plan_class = resource.meta.get_plan('scp')
         if not plan_class:
-            plan_class = resource.meta.get_plan("describe")
+            plan_class = resource.meta.get_plan('describe')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "source",
-            metavar="SOURCE",
+            'source',
+            metavar='SOURCE',
             type=str,
-            help="What to copy",
+            help='What to copy',
         )
         parser.add_argument(
-            "destination",
-            metavar="DESTINATION",
+            'destination',
+            metavar='DESTINATION',
             type=str,
-            help="Where to copy it",
+            help='Where to copy it',
         )
 
     def execute(self, source, destination):
         for path in (source, destination):
-            if ":" in path:
-                server = path.split(":", 1)[0]
+            if ':' in path:
+                server = path.split(':', 1)[0]
                 break
         else:
-            raise errors.Error("Either source or destination must contain a target server that touchdown knows about")
+            raise errors.Error('Either source or destination must contain a target server that touchdown knows about')
 
-        boxes = self.collect_as_dict("scp")
+        boxes = self.collect_as_dict('scp')
         if server not in boxes:
-            raise errors.Error("No such host '{}'".format(server))
+            raise errors.Error('No such host "{}"'.format(server))
 
         boxes[server].execute(source, destination)
 

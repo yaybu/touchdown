@@ -34,12 +34,12 @@ class TestLambdaFunction(StubberTestCase):
         goal = self.create_goal('apply')
 
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
             code=dummy_function,
         )
-        apply_service = goal.get_service(self.fn, "apply")
+        apply_service = goal.get_service(self.fn, 'apply')
 
         with Stubber(apply_service.client) as stub:
             stub.add_response(
@@ -85,29 +85,29 @@ class TestLambdaFunction(StubberTestCase):
             versions = apply_service.get_all_unaliased_versions()
 
         self.assertEqual(versions, [{
-            "FunctionName": "myfunction",
-            "Version": "2",
+            'FunctionName': 'myfunction',
+            'Version': '2',
         }])
 
     def test_dont_update_code(self):
         goal = self.create_goal('apply')
 
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
             code=dummy_function,
         )
-        self.apply_service = goal.get_service(self.fn, "apply")
+        self.apply_service = goal.get_service(self.fn, 'apply')
         self.apply_service.object = {
-            "FunctionName": "myfunction",
-            "CodeSha256": "QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8="
+            'FunctionName': 'myfunction',
+            'CodeSha256': 'QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8='
         }
 
         # FIXME: Zip's produced on Windows have stables hashes (zipping the
         # same thing repeatedly yields the same result)
         # But the hashes are different from posix zips.
-        if sys.platform == "win32":
+        if sys.platform == 'win32':
             self.apply_service.object['CodeSha256'] = 'kI3Czz0As/qAcnAq0JzbVG/NzSPUS4khRcbHuKivW0k='
 
         with Stubber(self.apply_service.client):
@@ -118,15 +118,15 @@ class TestLambdaFunction(StubberTestCase):
         goal = self.create_goal('apply')
 
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
             code=dummy_function,
         )
-        self.apply_service = goal.get_service(self.fn, "apply")
+        self.apply_service = goal.get_service(self.fn, 'apply')
         self.apply_service.object = {
-            "FunctionName": "myfunction",
-            "CodeSha256": ""
+            'FunctionName': 'myfunction',
+            'CodeSha256': ''
         }
         with Stubber(self.apply_service.client) as stub:
             stub.add_response(
@@ -146,14 +146,14 @@ class TestLambdaFunction(StubberTestCase):
     def test_update_code_via_s3(self):
         goal = self.create_goal('apply')
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
-            s3_file=self.aws.get_bucket(name="mybucket").get_file(name="myfile"),
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
+            s3_file=self.aws.get_bucket(name='mybucket').get_file(name='myfile'),
         )
-        self.apply_service = goal.get_service(self.fn, "apply")
+        self.apply_service = goal.get_service(self.fn, 'apply')
         self.apply_service.object = {
-            "FunctionName": "myfunction",
+            'FunctionName': 'myfunction',
         }
         with Stubber(self.apply_service.client) as stub:
             stub.add_response(
@@ -183,20 +183,20 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_file(
-            name=os.path.join(self.test_dir, "lambda.zip"),
+            name=os.path.join(self.test_dir, 'lambda.zip'),
             source=lambda_zip,
         )
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
-            code=bundle.add_output(name=os.path.join(self.test_dir, "lambda.zip")),
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
+            code=bundle.add_output(name=os.path.join(self.test_dir, 'lambda.zip')),
         )
 
-        role_service = goal.get_service(self.fn.role, "describe")
-        fn_service = goal.get_service(self.fn, "apply")
+        role_service = goal.get_service(self.fn.role, 'describe')
+        fn_service = goal.get_service(self.fn, 'apply')
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -272,20 +272,20 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_file(
-            name=os.path.join(self.test_dir, "lambda.zip"),
+            name=os.path.join(self.test_dir, 'lambda.zip'),
             source=lambda_zip,
         )
         fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = goal.get_service(fn.role, "describe")
-        fn_service = goal.get_service(fn, "apply")
+        role_service = goal.get_service(fn.role, 'describe')
+        fn_service = goal.get_service(fn, 'apply')
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -347,20 +347,20 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_execute(
-            command="echo HELLO EVERYONE",
+            command='echo HELLO EVERYONE',
             creates=lambda_zip,
         )
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = goal.get_service(self.fn.role, "describe")
-        fn_service = goal.get_service(self.fn, "apply")
+        role_service = goal.get_service(self.fn.role, 'describe')
+        fn_service = goal.get_service(self.fn, 'apply')
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
@@ -420,20 +420,20 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         bundle = self.workspace.add_fuselage_bundle(
             target=self.workspace.add_local()
         )
-        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
+        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
         bundle.add_execute(
-            command="echo HELLO EVERYONE",
+            command='echo HELLO EVERYONE',
             creates=lambda_zip,
         )
         self.fn = self.aws.add_lambda_function(
-            name="myfunction",
-            role=self.aws.get_role(name="myrole"),
-            handler="mymodule.myfunction",
+            name='myfunction',
+            role=self.aws.get_role(name='myrole'),
+            handler='mymodule.myfunction',
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = goal.get_service(self.fn.role, "describe")
-        fn_service = goal.get_service(self.fn, "apply")
+        role_service = goal.get_service(self.fn.role, 'describe')
+        fn_service = goal.get_service(self.fn, 'apply')
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(

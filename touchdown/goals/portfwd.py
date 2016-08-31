@@ -30,50 +30,50 @@ def _eintr_retry(func, *args):
 
 class PortForward(Goal):
 
-    """ Forward remote ports to local computer """
+    ''' Forward remote ports to local computer '''
 
-    name = "portfwd"
+    name = 'portfwd'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("portfwd")
+        plan_class = resource.meta.get_plan('portfwd')
         if not plan_class:
-            plan_class = resource.meta.get_plan("describe")
+            plan_class = resource.meta.get_plan('describe')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            dest="ports",
-            metavar="PORT",
-            nargs="+",
+            dest='ports',
+            metavar='PORT',
+            nargs='+',
             type=str,
-            help="Remote port to forward to local port (e.g. db=8093)",
+            help='Remote port to forward to local port (e.g. db=8093)',
         )
 
     def get_services(self, ports):
-        services = self.collect_as_dict("portfwd")
+        services = self.collect_as_dict('portfwd')
         if not services:
-            raise errors.Error("No port-forwardable resources are defined")
+            raise errors.Error('No port-forwardable resources are defined')
 
         for p in ports:
-            if "=" not in p:
-                raise errors.Error("Invalid port specification '{}'".format(p))
+            if '=' not in p:
+                raise errors.Error('Invalid port specification "{}"'.format(p))
 
-            service, local_port = p.split("=", 1)
+            service, local_port = p.split('=', 1)
 
             if service not in services:
-                raise errors.Error("Not a valid service: '{}'. Must be one of: {}".format(
+                raise errors.Error('Not a valid service: "{}". Must be one of: {}'.format(
                     service,
-                    ", ".join(sorted(services.keys())),
+                    ', '.join(sorted(services.keys())),
                 ))
 
             try:
                 local_port = int(local_port)
             except ValueError:
-                raise errors.Error("Not a valid port number: '{}'".format(p))
+                raise errors.Error('Not a valid port number: "{}"'.format(p))
 
             yield (services[service], local_port)
 
@@ -86,13 +86,13 @@ class PortForward(Goal):
                 for server in r:
                     server._handle_request_noblock()
         except KeyboardInterrupt:
-            self.ui.echo("Interupted. Exiting...")
+            self.ui.echo('Interupted. Exiting...')
 
     def execute(self, *ports):
         mappings = self.get_services(ports)
         servers = [s.start(lp) for s, lp in mappings]
 
-        self.ui.echo("All requested port forwards started. Waiting for connections...")
+        self.ui.echo('All requested port forwards started. Waiting for connections...')
         self.process_incoming_forever(servers)
 
 register(PortForward)

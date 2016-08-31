@@ -31,8 +31,8 @@ class TestGenericAction(unittest.TestCase):
 
         plan.resource = CacheCluster(None, name='freddy')
 
-        g = common.GenericAction(plan, "I am an action", api, serializer=serializers.Resource())
-        self.assertEqual(tuple(g.description), ("I am an action", ))
+        g = common.GenericAction(plan, 'I am an action', api, serializer=serializers.Resource())
+        self.assertEqual(tuple(g.description), ('I am an action', ))
         g.run()
 
         api.assert_called_with(
@@ -54,7 +54,7 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             if issubclass(impl, self.ignore):
                 continue
 
-            if getattr(impl, "describe_action", None) is None:
+            if getattr(impl, 'describe_action', None) is None:
                 continue
 
             assert len(impl.api_version or '') == 10, '{} is not versioned'.format(impl)
@@ -63,11 +63,11 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             methods = {xform_name(s): s for s in service.operation_names}
             operation = service.operation_model(methods[impl.describe_action])
 
-            if impl.describe_envelope in ["@", "[@]"]:
+            if impl.describe_envelope in ['@', '[@]']:
                 continue
 
-            if impl.describe_envelope.startswith("["):
+            if impl.describe_envelope.startswith('['):
                 continue
 
-            if "." not in impl.describe_envelope and ":" not in impl.describe_envelope:
+            if '.' not in impl.describe_envelope and ':' not in impl.describe_envelope:
                 assert impl.describe_envelope in operation.output_shape.members

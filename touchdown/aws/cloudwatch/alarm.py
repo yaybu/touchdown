@@ -27,71 +27,71 @@ class AlarmDestination(Adapter):
 
 class Dimension(Resource):
 
-    resource_name = "dimension"
+    resource_name = 'dimension'
 
-    name = argument.String(field="Name", min=1, max=255)
-    value = argument.String(field="Value", min=1, max=255)
+    name = argument.String(field='Name', min=1, max=255)
+    value = argument.String(field='Value', min=1, max=255)
 
 
 class Alarm(Resource):
 
-    resource_name = "alarm"
+    resource_name = 'alarm'
 
-    name = argument.String(field="AlarmName")
-    description = argument.String(field="AlarmDescription")
-    actions_enabled = argument.Boolean(field="ActionsEnabled")
-    ok_actions = argument.ResourceList(AlarmDestination, field="OKActions", serializer=serializers.List(serializers.Resource()))
-    alarm_actions = argument.ResourceList(AlarmDestination, field="AlarmActions", serializer=serializers.List(serializers.Resource()))
+    name = argument.String(field='AlarmName')
+    description = argument.String(field='AlarmDescription')
+    actions_enabled = argument.Boolean(field='ActionsEnabled')
+    ok_actions = argument.ResourceList(AlarmDestination, field='OKActions', serializer=serializers.List(serializers.Resource()))
+    alarm_actions = argument.ResourceList(AlarmDestination, field='AlarmActions', serializer=serializers.List(serializers.Resource()))
 
     insufficient_data_actions = argument.ResourceList(
         AlarmDestination,
-        field="InsufficientDataActions",
+        field='InsufficientDataActions',
         serializer=serializers.List(serializers.Resource()),
     )
 
-    namespace = argument.String(field="Namespace")
-    metric = argument.String(field="MetricName")
-    dimensions = argument.ResourceList(Dimension, max=10, field="Dimensions", serializer=serializers.List(serializers.Resource()))
+    namespace = argument.String(field='Namespace')
+    metric = argument.String(field='MetricName')
+    dimensions = argument.ResourceList(Dimension, max=10, field='Dimensions', serializer=serializers.List(serializers.Resource()))
 
-    statistic = argument.String(choice=["SampleCount", "Average", "Sum", "Minimum", "Maximum"], field="Statistic")
-    period = argument.Integer(min=60, field="Period")
-    unit = argument.String(field="Unit", choices=[
-        "Seconds",
-        "Microseconds",
-        "Milliseconds",
-        "Bytes",
-        "Kilobytes",
-        "Megabytes",
-        "Gigabytes",
-        "Terabytes",
-        "Bits",
-        "Kilobits",
-        "Megabits",
-        "Gigabits",
-        "Terabits",
-        "Percent",
-        "Count",
-        "Bytes/Second",
-        "Kilobytes/Second",
-        "Megabytes/Second",
-        "Gigabytes/Second",
-        "Terabytes/Second",
-        "Bits/Second",
-        "Kilobits/Second",
-        "Megabits/Second",
-        "Gigabits/Second",
-        "Terabits/Second",
-        "Count/Second",
-        "None",
+    statistic = argument.String(choice=['SampleCount', 'Average', 'Sum', 'Minimum', 'Maximum'], field='Statistic')
+    period = argument.Integer(min=60, field='Period')
+    unit = argument.String(field='Unit', choices=[
+        'Seconds',
+        'Microseconds',
+        'Milliseconds',
+        'Bytes',
+        'Kilobytes',
+        'Megabytes',
+        'Gigabytes',
+        'Terabytes',
+        'Bits',
+        'Kilobits',
+        'Megabits',
+        'Gigabits',
+        'Terabits',
+        'Percent',
+        'Count',
+        'Bytes/Second',
+        'Kilobytes/Second',
+        'Megabytes/Second',
+        'Gigabytes/Second',
+        'Terabytes/Second',
+        'Bits/Second',
+        'Kilobits/Second',
+        'Megabits/Second',
+        'Gigabits/Second',
+        'Terabits/Second',
+        'Count/Second',
+        'None',
     ])
-    evaluation_periods = argument.Integer(min=1, field="EvaluationPeriods")
-    threshold = argument.Integer(field="Threshold")
+    evaluation_periods = argument.Integer(min=1, field='EvaluationPeriods')
+    threshold = argument.Integer(field='Threshold')
     comparison_operator = argument.String(choices=[
-        "GreaterThanOrEqualToThreshold",
-        "GreaterThanThreshold",
-        "LessThanThreshold",
-        "LessThanOrEqualToThreshold",
-    ], field="ComparisonOperator")
+        'GreaterThanOrEqualToThreshold',
+        'GreaterThanThreshold',
+        'LessThanThreshold',
+        'LessThanOrEqualToThreshold',
+    ], field='ComparisonOperator')
 
     account = argument.Resource(BaseAccount)
 
@@ -101,37 +101,37 @@ class Describe(SimpleDescribe, Plan):
     resource = Alarm
     service_name = 'cloudwatch'
     api_version = '2010-08-01'
-    describe_action = "describe_alarms"
-    describe_envelope = "MetricAlarms"
+    describe_action = 'describe_alarms'
+    describe_envelope = 'MetricAlarms'
     key = 'AlarmName'
 
     def get_describe_filters(self):
         return {
-            "AlarmNames": [self.resource.name],
+            'AlarmNames': [self.resource.name],
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_metric_alarm"
-    update_action = "put_metric_alarm"
-    create_response = "not-that-useful"
+    create_action = 'put_metric_alarm'
+    update_action = 'put_metric_alarm'
+    create_response = 'not-that-useful'
 
     signature = [
-        Present("name"),
-        Present("namespace"),
-        Present("metric"),
-        Present("statistic"),
-        Present("period"),
-        Present("evaluation_periods"),
-        Present("threshold"),
-        Present("comparison_operator"),
+        Present('name'),
+        Present('namespace'),
+        Present('metric'),
+        Present('statistic'),
+        Present('period'),
+        Present('evaluation_periods'),
+        Present('threshold'),
+        Present('comparison_operator'),
     ]
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_alarms"
+    destroy_action = 'delete_alarms'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

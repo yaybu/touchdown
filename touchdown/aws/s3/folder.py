@@ -26,18 +26,18 @@ from .bucket import Bucket
 
 class Folder(Resource):
 
-    resource_name = "folder"
+    resource_name = 'folder'
 
     name = argument.String()
     source = argument.String()
 
     acl = argument.String(
-        default="private",
-        choices=["private", "public-read", "public-read-write", "authenticated-read", "bucket-owner-read", "bucket-owner-full-control"],
-        field="ACL",
+        default='private',
+        choices=['private', 'public-read', 'public-read-write', 'authenticated-read', 'bucket-owner-read', 'bucket-owner-full-control'],
+        field='ACL',
     )
 
-    bucket = argument.Resource(Bucket, field="Bucket")
+    bucket = argument.Resource(Bucket, field='Bucket')
 
 
 class Describe(SimpleDescribe, Plan):
@@ -49,7 +49,7 @@ class Describe(SimpleDescribe, Plan):
     describe_action = None
 
     def get_folder_contents(self):
-        paginator = self.client.get_paginator("list_objects")
+        paginator = self.client.get_paginator('list_objects')
         pages = paginator.paginate(
             Bucket=self.resource.bucket.name,
             Prefix=self.resource.name
@@ -57,12 +57,12 @@ class Describe(SimpleDescribe, Plan):
 
         for page in pages:
             for key in page.get('Contents', []):
-                if key["Key"].startswith(self.resource.name):
-                    yield key["Key"][len(self.resource.name):].lstrip("/"), {
-                        "LastModified": key['LastModified'],
-                        "ETag": key['ETag'],
-                        "Md5": key['ETag'].strip('"'),
-                        "Size": key['Size'],
+                if key['Key'].startswith(self.resource.name):
+                    yield key['Key'][len(self.resource.name):].lstrip('/'), {
+                        'LastModified': key['LastModified'],
+                        'ETag': key['ETag'],
+                        'Md5': key['ETag'].strip('\''),
+                        'Size': key['Size'],
                     }
 
     def describe_object(self):
@@ -77,8 +77,8 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_object"
-    create_response = "not-that-useful"
+    create_action = 'put_object'
+    create_response = 'not-that-useful'
 
     default_content_type = 'application/octet-stream'
 
@@ -93,7 +93,7 @@ class Apply(SimpleApply, Describe):
                 with open(path) as fp:
                     h = hashlib.md5(fp.read())
                 local[os.path.relpath(path, base)] = {
-                    "Md5": h.hexdigest(),
+                    'Md5': h.hexdigest(),
                 }
 
         if self.runner.get_plan(self.resource.bucket).resource_id:
@@ -104,31 +104,31 @@ class Apply(SimpleApply, Describe):
 
             if path not in remote:
                 yield self.generic_action(
-                    "Add {} ({})".format(path, contenttype),
+                    'Add {} ({})'.format(path, contenttype),
                     self.client.put_object,
                     Key=os.path.join(self.resource.name, path),
                     Body=open(os.path.join(base, path)).read(),
                     ACL=self.resource.acl,
                     Bucket=self.resource.bucket.name,
-                    CacheControl="max-age=0",
+                    CacheControl='max-age=0',
                     ContentType=contenttype,
                 )
             elif local[path]['Md5'] != remote[path]['Md5']:
                 yield self.generic_action(
-                    "Update {} ({})".format(path, contenttype),
+                    'Update {} ({})'.format(path, contenttype),
                     self.client.put_object,
                     Key=os.path.join(self.resource.name, path),
                     Body=open(os.path.join(base, path)).read(),
                     ACL=self.resource.acl,
                     Bucket=self.resource.bucket.name,
-                    CacheControl="max-age=0",
+                    CacheControl='max-age=0',
                     ContentType=contenttype,
                 )
 
         for path in remote:
             if path not in local:
                 yield self.generic_action(
-                    "Remove {}".format(path),
+                    'Remove {}'.format(path),
                     self.client.delete_object,
                     Bucket=self.resource.bucket.name,
                     Key=os.path.join(self.resource.name, path),

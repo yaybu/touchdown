@@ -32,18 +32,18 @@ class File(Resource):
 class Edit(Plan):
 
     resource = File
-    name = "edit"
+    name = 'edit'
 
     def get_editor(self):
-        for var in ("VISUAL", "EDITOR"):
+        for var in ('VISUAL', 'EDITOR'):
             if var in os.environ:
                 return os.environ[var]
 
         # if is_windows():
-        #     return "notepad.exe"
+        #     return 'notepad.exe'
 
-        for editor in ("vim", "nano"):
-            for path in os.environ.get("PATH", "/usr/bin").split(os.path.pathsep):
+        for editor in ('vim', 'nano'):
+            for path in os.environ.get('PATH', '/usr/bin').split(os.path.pathsep):
                 e = os.path.join(path, editor)
                 if os.path.exists(e):
                     return e
@@ -84,7 +84,7 @@ class Edit(Plan):
             os.unlink(name)
 
     def execute(self):
-        f = self.runner.get_service(self.resource, "fileio")
+        f = self.runner.get_service(self.resource, 'fileio')
 
         try:
             contents = f.read().read()
@@ -100,36 +100,36 @@ class Edit(Plan):
 class Set(Plan):
 
     resource = File
-    name = "set"
+    name = 'set'
 
     def from_string(self, value):
         return value
 
     def execute(self, value):
-        f = self.runner.get_service(self.resource, "fileio")
+        f = self.runner.get_service(self.resource, 'fileio')
         f.write(value)
 
 
 class Get(Plan):
 
     resource = File
-    name = "get"
+    name = 'get'
 
     def to_string(self, value):
         return value
 
     def execute(self):
-        f = self.runner.get_service(self.resource, "fileio")
+        f = self.runner.get_service(self.resource, 'fileio')
         return f.read().read(), True
 
 
 # class Refresh(Plan):
 #
 #    resource = File
-#    name = "refresh"
+#    name = 'refresh'
 #
 #    def execute(self):
-#        setter = self.runner.get_service(self.resource, "set")
+#        setter = self.runner.get_service(self.resource, 'set')
 #        setter.execute(self.resource.default)
 
 
@@ -139,7 +139,7 @@ class FileAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, "fileio").read().read()
+        return runner.get_service(self.resource, 'fileio').read().read()
 
     def dependencies(self, object):
         return frozenset((self.resource, ))

@@ -31,51 +31,51 @@ from .keypair import KeyPair
 
 class LaunchConfiguration(resource.Resource):
 
-    resource_name = "launch_configuration"
+    resource_name = 'launch_configuration'
 
-    name = argument.String(max=255, field="LaunchConfigurationName", update=False)
+    name = argument.String(max=255, field='LaunchConfigurationName', update=False)
 
-    image = argument.String(max=255, field="ImageId")
+    image = argument.String(max=255, field='ImageId')
 
-    key_pair = argument.Resource(KeyPair, field="KeyName")
+    key_pair = argument.Resource(KeyPair, field='KeyName')
 
-    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
+    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroups')
 
-    user_data = argument.String(field="UserData")
+    user_data = argument.String(field='UserData')
 
-    instance_type = argument.String(max=255, field="InstanceType")
+    instance_type = argument.String(max=255, field='InstanceType')
 
-    kernel = argument.String(max=255, field="KernelId")
+    kernel = argument.String(max=255, field='KernelId')
 
-    ramdisk = argument.String(max=255, field="RamdiskId")
+    ramdisk = argument.String(max=255, field='RamdiskId')
 
-    # block_devices = argument.Dict(field="BlockDeviceMappings")
+    # block_devices = argument.Dict(field='BlockDeviceMappings')
 
     instance_monitoring = argument.Boolean(
         default=False,
-        field="InstanceMonitoring",
+        field='InstanceMonitoring',
         serializer=serializers.Dict(Enabled=serializers.Identity()),
     )
 
-    spot_price = argument.String(field="SpotPrice")
+    spot_price = argument.String(field='SpotPrice')
 
     instance_profile = argument.Resource(
         InstanceProfile,
-        field="IamInstanceProfile",
-        serializers=serializers.Property("Arn"),
+        field='IamInstanceProfile',
+        serializers=serializers.Property('Arn'),
     )
 
-    ebs_optimized = argument.Boolean(field="EbsOptimized")
+    ebs_optimized = argument.Boolean(field='EbsOptimized')
 
-    associate_public_ip_address = argument.Boolean(field="AssociatePublicIpAddress")
+    associate_public_ip_address = argument.Boolean(field='AssociatePublicIpAddress')
 
     placement_tenancy = argument.String(
         max=64,
         choices=[
-            "default",
-            "dedicated",
+            'default',
+            'dedicated',
         ],
-        field="PlacementTenancy",
+        field='PlacementTenancy',
     )
 
     account = argument.Resource(BaseAccount)
@@ -86,8 +86,8 @@ class Describe(ReplacementDescribe, Plan):
     resource = LaunchConfiguration
     service_name = 'autoscaling'
     api_version = '2011-01-01'
-    describe_action = "describe_launch_configurations"
-    describe_envelope = "LaunchConfigurations"
+    describe_action = 'describe_launch_configurations'
+    describe_envelope = 'LaunchConfigurations'
     describe_filters = {}
     key = 'LaunchConfigurationName'
 
@@ -97,7 +97,7 @@ class Describe(ReplacementDescribe, Plan):
     def active_launch_configs(self):
         if not self._active_launch_configs:
             active = self._active_launch_configs = set()
-            dasg = self.client.get_paginator("describe_auto_scaling_groups")
+            dasg = self.client.get_paginator('describe_auto_scaling_groups')
             for page in dasg.paginate():
                 for asg in page.get('AutoScalingGroups', []):
                     active.add(asg['LaunchConfigurationName'])
@@ -105,20 +105,20 @@ class Describe(ReplacementDescribe, Plan):
 
     def get_possible_objects(self):
         for obj in super(Describe, self).get_possible_objects():
-            if "UserData" in obj and obj["UserData"]:
-                obj["UserData"] = force_str(base64.b64decode(obj["UserData"]))
+            if 'UserData' in obj and obj['UserData']:
+                obj['UserData'] = force_str(base64.b64decode(obj['UserData']))
             yield obj
 
 
 class Apply(ReplacementApply, Describe):
 
-    create_action = "create_launch_configuration"
-    create_response = "not-that-useful"
-    destroy_action = "delete_launch_configuration"
+    create_action = 'create_launch_configuration'
+    create_response = 'not-that-useful'
+    destroy_action = 'delete_launch_configuration'
 
     signature = (
-        Present("image"),
-        Present("instance_type"),
+        Present('image'),
+        Present('instance_type'),
     )
 
     def is_stale(self, launch_config):
@@ -130,4 +130,4 @@ class Apply(ReplacementApply, Describe):
 
 class Destroy(ReplacementDestroy, Describe):
 
-    destroy_action = "delete_launch_configuration"
+    destroy_action = 'delete_launch_configuration'

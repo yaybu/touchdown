@@ -21,17 +21,17 @@ from .resource import Resource
 
 class MethodResponse(resource.Resource):
 
-    resource_name = "method_response"
+    resource_name = 'method_response'
 
-    name = argument.String(field="httpMethod")
-    status_code = argument.String(field="statusCode")
+    name = argument.String(field='httpMethod')
+    status_code = argument.String(field='statusCode')
 
-    response_parameters = argument.Dict(field="responseParameters")
-    response_models = argument.Dict(field="responseModels")
+    response_parameters = argument.Dict(field='responseParameters')
+    response_models = argument.Dict(field='responseModels')
 
     resource = argument.Resource(
         Resource,
-        field="resourceId",
+        field='resourceId',
     )
 
 
@@ -40,9 +40,9 @@ class Describe(SimpleDescribe, Plan):
     resource = MethodResponse
     service_name = 'apigateway'
     api_version = '2015-07-09'
-    describe_action = "get_method_response"
-    describe_notfound_exception = "NotFoundException"
-    describe_envelope = "[@]"
+    describe_action = 'get_method_response'
+    describe_notfound_exception = 'NotFoundException'
+    describe_envelope = '[@]'
     key = 'httpMethod'
 
     def get_describe_filters(self):
@@ -53,17 +53,17 @@ class Describe(SimpleDescribe, Plan):
         if not resource.resource_id:
             return None
         return {
-            "restApiId": api.resource_id,
-            "resourceId": resource.resource_id,
-            "httpMethod": self.resource.name,
-            "statusCode": self.resource.status_code,
+            'restApiId': api.resource_id,
+            'resourceId': resource.resource_id,
+            'httpMethod': self.resource.name,
+            'statusCode': self.resource.status_code,
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_method_response"
-    create_envelope = "@"
+    create_action = 'put_method_response'
+    create_envelope = '@'
 
     def get_create_serializer(self):
         return serializers.Resource(
@@ -73,7 +73,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_method_response"
+    destroy_action = 'delete_method_response'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

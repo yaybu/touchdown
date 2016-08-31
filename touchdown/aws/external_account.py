@@ -21,17 +21,17 @@ from .session import Session
 
 class ExternalRole(BaseAccount):
 
-    resource_name = "external_role"
+    resource_name = 'external_role'
 
-    name = argument.String(field="RoleSessionName")
-    arn = argument.String(field="RoleArn")
-    policy = argument.String(field="Policy")
-    duration = argument.Integer(min=900, max=3600, field="DurationSeconds")
+    name = argument.String(field='RoleSessionName')
+    arn = argument.String(field='RoleArn')
+    policy = argument.String(field='Policy')
+    duration = argument.Integer(min=900, max=3600, field='DurationSeconds')
 
-    external_id = argument.String(field="ExternalId")
+    external_id = argument.String(field='ExternalId')
 
-    mfa_device = argument.String(field="SerialNumber")
-    mfa_token = argument.String(field="TokenCode")
+    mfa_device = argument.String(field='SerialNumber')
+    mfa_token = argument.String(field='TokenCode')
 
     region = argument.String(default=lambda r: r.account.region)
 
@@ -42,7 +42,7 @@ class Describe(Plan):
 
     resource = ExternalRole
     default = True
-    name = "null"
+    name = 'null'
     _session = None
     _client = None
 
@@ -68,14 +68,14 @@ class Describe(Plan):
     def client(self):
         session = self.runner.get_plan(self.resource.account).session
         if not self._client:
-            self._client = session.create_client("sts")
+            self._client = session.create_client('sts')
         return self._client
 
     # def get_actions(self):
-    #     response = self.session.create_client("iam").get_user()
-    #     if not "User" in response:
-    #         raise error.Error("Unable to call GetUser on self")
+    #     response = self.session.create_client('iam').get_user()
+    #     if not 'User' in response:
+    #         raise error.Error('Unable to call GetUser on self')
     #     self.object = {
-    #         "AccountNumber": response["User"]["Arn"].split(":")[4]
+    #         'AccountNumber': response['User']['Arn'].split(':')[4]
     #     }
     #     return []

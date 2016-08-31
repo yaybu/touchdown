@@ -44,11 +44,11 @@ class TestExpressions(unittest.TestCase):
         rendered = serializer.render(None, None).splitlines()
         self.assertEqual(
             rendered[0],
-            "-----BEGIN RSA PRIVATE KEY-----",
+            '-----BEGIN RSA PRIVATE KEY-----',
         )
         self.assertEqual(
             rendered[-1],
-            "-----END RSA PRIVATE KEY-----",
+            '-----END RSA PRIVATE KEY-----',
         )
 
     def test_dsa_private_key(self):
@@ -57,9 +57,9 @@ class TestExpressions(unittest.TestCase):
         rendered = serializer.render(None, None).splitlines()
         self.assertEqual(
             rendered[0],
-            "-----BEGIN RSA PRIVATE KEY-----",
+            '-----BEGIN RSA PRIVATE KEY-----',
         )
         self.assertEqual(
             rendered[-1],
-            "-----END RSA PRIVATE KEY-----",
+            '-----END RSA PRIVATE KEY-----',
         )

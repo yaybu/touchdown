@@ -20,9 +20,9 @@ from . import terminal  # noqa
 
 
 __all__ = [
-    "Client",
-    "Connection",
-    "Instance",
-    "PortForward",
-    "private_key_from_string",
+    'Client',
+    'Connection',
+    'Instance',
+    'PortForward',
+    'private_key_from_string',
 ]

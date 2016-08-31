@@ -21,16 +21,16 @@ from .rest_api import RestApi
 
 class Model(resource.Resource):
 
-    resource_name = "model"
+    resource_name = 'model'
 
-    name = argument.String(field="name")
-    description = argument.String(field="description")
-    schema = argument.String(field="schema")
-    content_type = argument.String(field="contentType", default='application/json')
+    name = argument.String(field='name')
+    description = argument.String(field='description')
+    schema = argument.String(field='schema')
+    content_type = argument.String(field='contentType', default='application/json')
 
     api = argument.Resource(
         RestApi,
-        field="restApiId"
+        field='restApiId'
     )
 
 
@@ -39,8 +39,8 @@ class Describe(SimpleDescribe, Plan):
     resource = Model
     service_name = 'apigateway'
     api_version = '2015-07-09'
-    describe_action = "get_models"
-    describe_envelope = "items"
+    describe_action = 'get_models'
+    describe_envelope = 'items'
     key = 'id'
 
     def get_describe_filters(self):
@@ -57,13 +57,13 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_model"
-    create_envelope = "@"
+    create_action = 'create_model'
+    create_envelope = '@'
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_model"
+    destroy_action = 'delete_model'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

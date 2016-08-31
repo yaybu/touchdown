@@ -25,7 +25,7 @@ from .provisioner import Target
 
 class Local(Target):
 
-    resource_name = "local"
+    resource_name = 'local'
 
     user = argument.String()
     state = argument.String(default=os.path.abspath('.fuselage'))
@@ -44,7 +44,7 @@ class Connection(object):
             return fp.read()
 
     def get_path_bytes(self, path):
-        with open(path, "rb") as fp:
+        with open(path, 'rb') as fp:
             return fp.read()
 
     def run_script(self, script, args=None, sudo=False):
@@ -78,7 +78,7 @@ class Connection(object):
 
 class LocalPlan(plan.Plan):
 
-    name = "describe"
+    name = 'describe'
     resource = Local
 
     def get_client(self):

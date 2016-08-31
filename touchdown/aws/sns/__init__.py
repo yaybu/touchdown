@@ -15,6 +15,6 @@
 from .topic import Topic, Subscription
 
 __all__ = [
-    "Subscription",
-    "Topic",
+    'Subscription',
+    'Topic',
 ]

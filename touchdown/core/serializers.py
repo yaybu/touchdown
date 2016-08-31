@@ -45,7 +45,7 @@ class Pending(object):
         return str(self.value)
 
     def __repr__(self):
-        return "(pending {})".format(self.value)
+        return '(pending {})'.format(self.value)
 
 
 class Serializer(object):
@@ -124,7 +124,7 @@ class Const(Serializer):
         return isinstance(object, Pending)
 
     def dependencies(self, object):
-        if hasattr(self.const, "add_dependency"):
+        if hasattr(self.const, 'add_dependency'):
             return frozenset((self.const, ))
         return frozenset()
 
@@ -153,7 +153,7 @@ class Identifier(Serializer):
             resource,
             describe.get_object_by_id(value),
         )
-        d.diffs.insert(0, ("name", diff.ValueDiff(value, rendered)))
+        d.diffs.insert(0, ('name', diff.ValueDiff(value, rendered)))
         return d
 
     def pending(self, runner, object):
@@ -177,7 +177,7 @@ class Property(Serializer):
             return Pending(target)
         result = self.property.search(target_plan.object)
         if not result:
-            raise errors.Error("{} not available".format(self.selector))
+            raise errors.Error('{} not available'.format(self.selector))
         return result
 
     def pending(self, runner, object):
@@ -268,7 +268,7 @@ class Expression(Serializer):
 
 class Annotation(Serializer):
 
-    """ An annotation node does not change the output, but records some metadata about it """
+    ''' An annotation node does not change the output, but records some metadata about it '''
 
     def __init__(self, inner):
         self.inner = inner
@@ -381,10 +381,10 @@ class ListOfOne(Formatter):
 
 class CommaSeperatedList(Formatter):
     def render(self, runner, object):
-        return ",".join(self.inner.render(runner, object))
+        return ','.join(self.inner.render(runner, object))
 
     def diff(self, runner, object, value):
-        v = value.split(",") if value else []
+        v = value.split(',') if value else []
         return self.inner.diff(runner, object, v)
 
 
@@ -406,7 +406,7 @@ class Append(Formatter):
         inner = self.inner.render(runner, object)
         if isinstance(inner, Pending):
             return inner
-        return "{}{}".format(inner, self.post_string)
+        return '{}{}'.format(inner, self.post_string)
 
 
 class Format(Formatter):
@@ -416,13 +416,13 @@ class Format(Formatter):
 
     def render(self, runner, object):
         if not object:
-            return ""
-        if hasattr(object, "resource_name") and not runner.get_plan(object).object:
-            return ""
+            return ''
+        if hasattr(object, 'resource_name') and not runner.get_plan(object).object:
+            return ''
         try:
             return self.format_string.format(self.inner.render(runner, object))
         except:
-            return ""
+            return ''
 
 
 class Dict(Serializer):
@@ -512,39 +512,39 @@ class Map(Dict):
 
 class Resource(Dict):
 
-    """ Automatically generate a Dict definition by inspect the 'field'
-    paramters of a resource """
+    ''' Automatically generate a Dict definition by inspect the 'field'
+    paramters of a resource '''
 
-    def __init__(self, mode="create", group="", **kwargs):
+    def __init__(self, mode='create', group='', **kwargs):
         self.mode = mode
         self.group = group
         super(Resource, self).__init__(**kwargs)
 
     def should_ignore_field(self, object, field, value):
         arg = field.argument
-        if not hasattr(arg, "field"):
+        if not hasattr(arg, 'field'):
             return True
         if not arg.empty_serializer and not field.present(object):
             if value is None:
                 return True
         if arg.field in self.kwargs:
             return True
-        if self.mode == "create" and not getattr(arg, "create", True):
+        if self.mode == 'create' and not getattr(arg, 'create', True):
             return True
-        if self.mode == "update" and not getattr(arg, "update", True):
+        if self.mode == 'update' and not getattr(arg, 'update', True):
             return True
-        if self.group != getattr(arg, "group", ""):
+        if self.group != getattr(arg, 'group', ''):
             return True
         return False
 
     def render(self, runner, object):
-        if hasattr(object, "get_serializer"):
+        if hasattr(object, 'get_serializer'):
             return object.get_serializer(runner, **self.kwargs).render(runner, object)
 
         kwargs = dict(self.kwargs)
 
         if not self.group:
-            for name, serializer in getattr(object, "extra_serializers", {}).items():
+            for name, serializer in getattr(object, 'extra_serializers', {}).items():
                 kwargs[name] = serializer
 
         for field in object.meta.iter_fields_in_order():
@@ -565,11 +565,11 @@ class Resource(Dict):
             arg = field.argument
             if not field.present(obj):
                 continue
-            if not getattr(arg, "field", ""):
+            if not getattr(arg, 'field', ''):
                 continue
-            if not getattr(arg, "update", True):
+            if not getattr(arg, 'update', True):
                 continue
-            if getattr(arg, "group", "") != self.group:
+            if getattr(arg, 'group', '') != self.group:
                 continue
 
             # If a field is present in the remote, then diff against that
@@ -669,13 +669,13 @@ class List(Serializer):
             [('*', [])],
         )
         for op, vals in intersections:
-            if op == "-":
+            if op == '-':
                 pending = vals
-            elif op == "+":
+            elif op == '+':
                 for i, (old, new) in enumerate(zip_longest(pending, vals), idx):
                     diffs.add(i, self.child.diff(runner, new, old))
                 pending = []
-            elif pending and op in ("=", "*"):
+            elif pending and op in ('=', '*'):
                 for i, old in enumerate(pending, idx):
                     diffs.add(i, self.child.diff(runner, None, old))
                 pending = []

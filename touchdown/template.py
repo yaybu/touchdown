@@ -30,11 +30,11 @@ except ImportError:
 
 class JinjaTemplate(resource.Resource):
 
-    resource_name = "jinja2_template"
+    resource_name = 'jinja2_template'
 
     name = argument.String()
-    source = argument.String(field="source")
-    context = argument.Dict(field="context")
+    source = argument.String(field='source')
+    context = argument.Dict(field='context')
     root = argument.Resource(workspace.Workspace)
 
 
@@ -42,25 +42,25 @@ class JinjaRenderAction(action.Action):
 
     @property
     def description(self):
-        yield "Render Jinja2 template '{}'".format(self.resource.name)
+        yield 'Render Jinja2 template "{}"'.format(self.resource.name)
 
     def run(self):
         output = serializers.Resource().render(self.runner, self.resource)
         env = jinja2.Environment()
-        template = env.from_string(output["source"])
+        template = env.from_string(output['source'])
         self.plan.object = {
-            'Rendered': template.render(**output["context"]),
+            'Rendered': template.render(**output['context']),
         }
 
 
 class Apply(plan.Plan):
 
-    name = "apply"
+    name = 'apply'
     resource = JinjaTemplate
 
     def get_actions(self):
         if not jinja2:
-            raise errors.Error("Jinja2 templates are not available. Please install 'jinja2'.")
+            raise errors.Error('Jinja2 templates are not available. Please install \'jinja2\'.')
         yield JinjaRenderAction(self)
 
 
@@ -70,7 +70,7 @@ class TemplateAsString(serializers.Serializer):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, "apply").object["Rendered"]
+        return runner.get_service(self.resource, 'apply').object['Rendered']
 
     def dependencies(self, object):
         return frozenset((self.resource, ))

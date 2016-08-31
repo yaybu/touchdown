@@ -26,10 +26,10 @@ class BaseFrontend(object):
 
     def echo(self, text, nl=True, **kwargs):
         text = force_str(text)
-        if threading.current_thread().name != "MainThread":
-            text = "[{}] {}".format(threading.current_thread().name, text)
+        if threading.current_thread().name != 'MainThread':
+            text = '[{}] {}'.format(threading.current_thread().name, text)
         if nl:
-            self._echo("{}\n".format(text))
+            self._echo('{}\n'.format(text))
         else:
             self._echo(text)
 
@@ -39,11 +39,11 @@ class BaseFrontend(object):
             for i, column in enumerate(row):
                 widths[i] = max(len(column), widths.get(i, 0))
 
-        line = "| " + " | ".join(
-            "{{:<{}}}".format(widths[i]) for i in range(len(widths))
-        ) + " |"
+        line = '| ' + ' | '.join(
+            '{{:<{}}}'.format(widths[i]) for i in range(len(widths))
+        ) + ' |'
 
-        sep = "+-" + "-+-".join("-" * widths[i] for i in range(len(widths))) + "-+"
+        sep = '+-' + '-+-'.join('-' * widths[i] for i in range(len(widths))) + '-+'
 
         self.echo(sep)
         self.echo(line.format(*data[0]))
@@ -54,19 +54,19 @@ class BaseFrontend(object):
 
     def render_plan(self, plan):
         for resource, actions in plan:
-            self.echo("%s:" % resource)
+            self.echo('%s:' % resource)
             for action in actions:
                 description = list(action.description)
-                self.echo("  * %s" % description[0])
+                self.echo('  * %s' % description[0])
                 for line in description[1:]:
-                    self.echo("      %s" % line)
-            self.echo("")
+                    self.echo('      %s' % line)
+            self.echo('')
 
     def confirm_plan(self, plan):
-        self.echo("Generated a plan to update infrastructure configuration:")
-        self.echo("")
+        self.echo('Generated a plan to update infrastructure configuration:')
+        self.echo('')
         self.render_plan(plan)
-        return self.confirm("Do you want to continue?")
+        return self.confirm('Do you want to continue?')
 
     def progressbar(self, **kwargs):
         raise NotImplementedError(self.progressbar)

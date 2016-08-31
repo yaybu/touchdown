@@ -33,10 +33,10 @@ class TestDotGraphGeneration(WorkspaceTestCase):
         # This should generate something like this:
 
         # digraph ast {
-        #    4432359760 [label="vpc 'test-vpc'"];
-        #    4432359824 [label="subnet 'subnet-a'"];
+        #    4432359760 [label='vpc 'test-vpc''];
+        #    4432359824 [label='subnet 'subnet-a''];
         #    4432359824 -> 4432359760;
-        #    4432359888 [label="subnet 'subnet-b'"];
+        #    4432359888 [label='subnet 'subnet-b''];
         #    4432359888 -> 4432359760;
         # }
 

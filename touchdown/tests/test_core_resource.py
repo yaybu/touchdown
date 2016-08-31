@@ -21,7 +21,7 @@ from touchdown.core import serializers
 class TestResource(unittest.TestCase):
 
     def setUp(self):
-        self.resource = SecurityGroup(None, name="test")
+        self.resource = SecurityGroup(None, name='test')
 
     def test_identifier(self):
         self.assertTrue(isinstance(
@@ -31,6 +31,6 @@ class TestResource(unittest.TestCase):
 
     def test_properties(self):
         self.assertTrue(isinstance(
-            self.resource.get_property("Foo"),
+            self.resource.get_property('Foo'),
             serializers.Property,
         ))

@@ -20,11 +20,11 @@ from dateutil import parser
 session = session.get_session()
 
 # Provide our own botocore json to override (and increase) various timeouts
-session.get_component('data_loader')._search_paths[1:1] = [os.path.join(os.path.dirname(__file__), "data")]
+session.get_component('data_loader')._search_paths[1:1] = [os.path.join(os.path.dirname(__file__), 'data')]
 
 # Force botocore to initialise - this avoids race conditions around
 # get_component
-session.create_client("ec2", "eu-west-1")
+session.create_client('ec2', 'eu-west-1')
 
 
 class Session(object):
@@ -48,11 +48,11 @@ class Session(object):
 
     def tojson(self):
         return {
-            "access_key_id": self.access_key_id,
-            "secret_access_key": self.secret_access_key,
-            "session_token": self.session_token,
-            "expiration": self.expiration.isoformat(),
-            "region": self.region,
+            'access_key_id': self.access_key_id,
+            'secret_access_key': self.secret_access_key,
+            'session_token': self.session_token,
+            'expiration': self.expiration.isoformat(),
+            'region': self.region,
         }
 
     @classmethod

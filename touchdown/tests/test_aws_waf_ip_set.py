@@ -18,7 +18,7 @@ from touchdown.tests.aws import Stubber, StubberTestCase
 class TestWafIpSet(StubberTestCase):
 
     def test_annotate_ip_set(self):
-        """Test that when we annotate an ipset, we gain the expected data."""
+        '''Test that when we annotate an ipset, we gain the expected data.'''
 
         goal = self.create_goal('get')
         ip_set = self.aws.add_ip_set(name='my-ip-set')
@@ -48,10 +48,10 @@ class TestWafIpSet(StubberTestCase):
         }
 
     def test_create_ip_set(self):
-        """Test that when we create an IP set, we perform the expected client
+        '''Test that when we create an IP set, we perform the expected client
         calls.
 
-        """
+        '''
         goal = self.create_goal('apply')
         ip_set = self.aws.add_ip_set(name='my-ip-set')
         apply = goal.get_service(ip_set, 'apply')
@@ -78,10 +78,10 @@ class TestWafIpSet(StubberTestCase):
             action.run()
 
     def test_update_ip_set_with_descriptors(self):
-        """Test that when we update a ip_set to have a descriptor, we pass the
+        '''Test that when we update a ip_set to have a descriptor, we pass the
         information to link the ip set to the descriptor.
 
-        """
+        '''
         goal = self.create_goal('apply')
 
         ip_set = self.aws.add_ip_set(
@@ -122,10 +122,10 @@ class TestWafIpSet(StubberTestCase):
                 action.run()
 
     def test_delete_ip_set(self):
-        """Test that the plan for deleting an ip_set performs the right
+        '''Test that the plan for deleting an ip_set performs the right
         actions.
 
-        """
+        '''
         goal = self.create_goal('destroy')
         ip_set = self.aws.add_ip_set(name='my-ip-set')
         destroy = goal.get_service(ip_set, 'destroy')

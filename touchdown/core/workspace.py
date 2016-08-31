@@ -18,7 +18,7 @@ from .selectors import Walker
 
 class Workspace(Resource):
 
-    resource_name = "workspace"
+    resource_name = 'workspace'
     dot_ignore = True
 
     def __init__(self):
@@ -34,11 +34,11 @@ class Workspace(Resource):
 
 class Touchdownfile(Workspace):
 
-    resource_name = "touchdown_file"
+    resource_name = 'touchdown_file'
 
     def load(self):
-        g = {"workspace": self}
-        with open("Touchdownfile") as f:
-            code = compile(f.read(), "Touchdownfile", "exec")
+        g = {'workspace': self}
+        with open('Touchdownfile') as f:
+            code = compile(f.read(), 'Touchdownfile', 'exec')
             exec(code, g)
         return super(Touchdownfile, self).load()

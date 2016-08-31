@@ -326,5 +326,5 @@ class TestGetCredentials(StubberTestCase):
             'AWS_ACCESS_KEY_ID=\'AK12345678901234\'; export AWS_ACCESS_KEY_ID;\n'
             'AWS_SECRET_ACCESS_KEY=\'AK1234567890\'; export AWS_SECRET_ACCESS_KEY;\n'
             'AWS_SESSION_TOKEN=\'01234567890\'; export AWS_SESSION_TOKEN;\n'
-            'PS1="(read-only) $PS1"; export PS1;\n'
+            'PS1=\'(read-only) $PS1\'; export PS1;\n'
         )

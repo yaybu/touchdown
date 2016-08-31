@@ -22,15 +22,15 @@ class S3LambdaNotification(NotificationConfiguration):
 
     function = argument.Resource(
         Function,
-        field="LambdaFunctionArn",
-        serializer=serializers.Property("FunctionArn"),
+        field='LambdaFunctionArn',
+        serializer=serializers.Property('FunctionArn'),
     )
 
     def __init__(self, parent, **kwargs):
         super(S3LambdaNotification, self).__init__(parent, **kwargs)
         self.function.add_permission(
-            name="s3-{}-lambda-{}".format(parent.name, self.function.name),
-            action="lambda:InvokeFunction",
-            principal="s3.amazonaws.com",
+            name='s3-{}-lambda-{}'.format(parent.name, self.function.name),
+            action='lambda:InvokeFunction',
+            principal='s3.amazonaws.com',
             source_arn=parent.arn,
         )

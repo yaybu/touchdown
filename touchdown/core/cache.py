@@ -43,7 +43,7 @@ class FileCache(Cache):
             os.makedirs(self.cache_directory)
 
     def _cache_key_to_path(self, cache_key):
-        valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+        valid_chars = '-_.() %s%s' % (string.ascii_letters, string.digits)
         cache_key = ''.join(c for c in cache_key if c in valid_chars)
         cache_key = cache_key.replace(' ', '_')
         return os.path.join(self.cache_directory, cache_key + self.extension)
@@ -81,11 +81,10 @@ class JSONFileCache(FileCache):
         try:
             return json.dumps(contents)
         except (TypeError, ValueError):
-            raise errors.Error("''%s' cannot be serialised" % contents)
+            raise errors.Error('\'%s\' cannot be serialised' % contents)
 
     def _deserialize(self, contents):
         try:
             return json.loads(contents)
         except (ValueError,):
-            raise
-            raise errors.Error("''%s' cannot be deserialised" % contents)
+            raise errors.Error('\'%s\' cannot be deserialised' % contents)

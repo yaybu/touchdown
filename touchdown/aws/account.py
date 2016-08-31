@@ -30,12 +30,12 @@ class BaseAccount(Resource):
     region = argument.String()
     access_key_id = argument.String()
     secret_access_key = argument.String()
-    mfa_serial = argument.String(field="SerialNumber")
+    mfa_serial = argument.String(field='SerialNumber')
 
 
 class Account(BaseAccount):
 
-    resource_name = "aws"
+    resource_name = 'aws'
 
     root = argument.Resource(Workspace)
 
@@ -44,7 +44,7 @@ class Null(Plan):
 
     resource = Account
     default = True
-    name = "null"
+    name = 'null'
     _session = None
 
     _acquire_session = Lock()
@@ -63,16 +63,16 @@ class Null(Plan):
                 )
 
                 if self.resource.mfa_serial:
-                    cache_key = "_".join((self.resource.access_key_id, self.resource.mfa_serial))
+                    cache_key = '_'.join((self.resource.access_key_id, self.resource.mfa_serial))
                     if cache_key in self.cache:
                         session = Session.fromjson(self.cache[cache_key])
 
                     if not session or session.expiration <= now():
-                        client = base_session.create_client("sts")
+                        client = base_session.create_client('sts')
                         creds = client.get_session_token(
                             SerialNumber=self.resource.mfa_serial,
                             TokenCode=self.ui.prompt(
-                                "Please enter a token for MFA device {}".format(self.resource.mfa_serial),
+                                'Please enter a token for MFA device {}'.format(self.resource.mfa_serial),
                                 key=self.resource.mfa_serial,
                             ),
                         )['Credentials']
@@ -93,10 +93,10 @@ class Null(Plan):
         return self._session
 
     # def get_actions(self):
-    #     response = self.session.create_client("iam").get_user()
-    #     if not "User" in response:
-    #         raise error.Error("Unable to call GetUser on self")
+    #     response = self.session.create_client('iam').get_user()
+    #     if not 'User' in response:
+    #         raise error.Error('Unable to call GetUser on self')
     #     self.object = {
-    #         "AccountNumber": response["User"]["Arn"].split(":")[4]
+    #         'AccountNumber': response['User']['Arn'].split(':')[4]
     #     }
     #     return []

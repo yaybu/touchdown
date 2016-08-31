@@ -19,7 +19,7 @@ from . import variable
 
 class List(variable.Variable):
 
-    resource_name = "list"
+    resource_name = 'list'
 
     default = argument.List()
     min = argument.Integer()
@@ -30,7 +30,7 @@ class Set(variable.Set):
     resource = List
 
     def from_string(self, value):
-        return value.split(",")
+        return value.split(',')
 
     def to_lines(self, value):
         return value
@@ -40,7 +40,7 @@ class Get(variable.Get):
     resource = List
 
     def to_string(self, value):
-        return ",".join(value)
+        return ','.join(value)
 
     def from_lines(self, value):
         return value

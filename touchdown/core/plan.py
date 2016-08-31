@@ -19,11 +19,11 @@ from . import errors, resource
 
 class PlanType(type):
 
-    """ Registers the plan on the resource """
+    ''' Registers the plan on the resource '''
 
     def __new__(meta, class_name, bases, new_attrs):
         cls = type.__new__(meta, class_name, bases, new_attrs)
-        if getattr(cls, "resource", None) is not None:
+        if getattr(cls, 'resource', None) is not None:
             cls.resource.meta.plans[cls.name] = cls
             if cls.default:
                 cls.resource.default_plan = cls
@@ -32,10 +32,10 @@ class PlanType(type):
 
 class Plan(six.with_metaclass(PlanType)):
 
-    """
+    '''
     A goal state for infrastructure based on a resource. For example, a plan
     to move a resource towards existing or not existing.
-    """
+    '''
 
     # specify true if you wish this plan to be the default
     default = False
@@ -61,31 +61,31 @@ class Plan(six.with_metaclass(PlanType)):
             self.parent = None
 
     def echo(self, text):
-        self.runner.ui.echo("[{}] {}".format(self.resource, text))
+        self.runner.ui.echo('[{}] {}'.format(self.resource, text))
 
     def validate(self):
         a = AND(*self.signature)
         if a.test(self.resource):
             return
 
-        msg = ["{} doesn't confirm to the plan {}".format(self.resource, self.name)]
+        msg = ['{} doesn\'t confirm to the plan {}'.format(self.resource, self.name)]
         msg.extend(a.describe(self.resource))
-        raise errors.NonConformingPolicy("\n".join(msg))
+        raise errors.NonConformingPolicy('\n'.join(msg))
 
     def get_actions(self):
         return []
 
 
 class NullPlan(Plan):
-    """ A plan that doesn't do anything """
+    ''' A plan that doesn't do anything '''
 
     resource = resource.Resource
-    name = "null"
+    name = 'null'
 
 
 class ArgumentAssertion(object):
 
-    """ An assertion of the state of an argument """
+    ''' An assertion of the state of an argument '''
 
     def __init__(self, name):
         self.name = name
@@ -93,27 +93,27 @@ class ArgumentAssertion(object):
 
 class Present(ArgumentAssertion):
 
-    """ The argument has been specified, or has a default value. """
+    ''' The argument has been specified, or has a default value. '''
 
     def test(self, resource):
-        """ Test that the argument this asserts for is present in the
-        resource. """
+        ''' Test that the argument this asserts for is present in the
+        resource. '''
         return resource.meta.fields[self.name].present(resource)
 
     def describe(self, resource):
-        yield "'%s' must be present (%s)" % (self.name, self.test(resource))
+        yield '"%s" must be present (%s)' % (self.name, self.test(resource))
 
 
 class Absent(Present):
 
-    """ The argument has not been specified by the user and has no default
-    value. An argument with a default value is always defined. """
+    ''' The argument has not been specified by the user and has no default
+    value. An argument with a default value is always defined. '''
 
     def test(self, resource):
         return not super(Absent, self).test(resource)
 
     def describe(self, resource):
-        yield "'%s' must be absent (%s)" % (self.name, self.test(resource))
+        yield '"%s" must be absent (%s)' % (self.name, self.test(resource))
 
 
 class AND(ArgumentAssertion):
@@ -128,11 +128,11 @@ class AND(ArgumentAssertion):
         return True
 
     def describe(self, resource):
-        yield "The follow conditions must all be met:"
+        yield 'The follow conditions must all be met:'
         for a in self.args:
             for msg in a.describe(resource):
-                yield "  " + msg
-        yield ""
+                yield '  ' + msg
+        yield ''
 
 
 class NAND(ArgumentAssertion):
@@ -147,11 +147,11 @@ class NAND(ArgumentAssertion):
         return True
 
     def describe(self, resource):
-        yield "No more than 1 of the following conditions should be true:"
+        yield 'No more than 1 of the following conditions should be true:'
         for a in self.args:
             for msg in a.describe(resource):
-                yield "  " + msg
-        yield ""
+                yield '  ' + msg
+        yield ''
 
 
 class XOR(ArgumentAssertion):
@@ -169,11 +169,11 @@ class XOR(ArgumentAssertion):
             return False
 
     def describe(self, resource):
-        yield "Only one of the following conditions should be true:"
+        yield 'Only one of the following conditions should be true:'
         for a in self.args:
             for msg in a.describe(resource):
-                yield "  " + msg
-        yield ""
+                yield '  ' + msg
+        yield ''
 
 
 class OR(ArgumentAssertion):
@@ -189,8 +189,8 @@ class OR(ArgumentAssertion):
             return True
 
     def describe(self, resource):
-        yield "At least one of the following conditions should be true:"
+        yield 'At least one of the following conditions should be true:'
         for a in self.args:
             for msg in a.describe(resource):
-                yield "  " + msg
-        yield ""
+                yield '  ' + msg
+        yield ''

@@ -23,7 +23,7 @@ from .waf import WafApply, WafDescribe, WafDestroy
 
 class ActivatedRule(Resource):
 
-    resource_name = "activated_rule"
+    resource_name = 'activated_rule'
 
     action = argument.String(
         field='Action',
@@ -38,7 +38,7 @@ class ActivatedRule(Resource):
 
 class WebACL(Resource):
 
-    resource_name = "web_acl"
+    resource_name = 'web_acl'
 
     name = argument.String(field='Name')
     metric_name = argument.String(field='MetricName')
@@ -62,27 +62,27 @@ class Describe(WafDescribe, Plan):
     resource = WebACL
     service_name = 'waf'
     api_version = '2015-08-24'
-    describe_action = "list_web_acls"
-    describe_envelope = "WebACLs"
-    annotate_action = "get_web_acl"
+    describe_action = 'list_web_acls'
+    describe_envelope = 'WebACLs'
+    annotate_action = 'get_web_acl'
     key = 'WebACLId'
     container_update_action = 'update_web_acl'
     container = 'Rules'
     container_member = 'ActivatedRule'
-    local_container = "activated_rules"
+    local_container = 'activated_rules'
 
 
 class Apply(WafApply, Describe):
 
-    create_action = "create_web_acl"
+    create_action = 'create_web_acl'
 
     signature = (
-        Present("name"),
-        Present("metric_name"),
-        Present("default_action"),
+        Present('name'),
+        Present('metric_name'),
+        Present('default_action'),
     )
 
 
 class Destroy(WafDestroy, Describe):
 
-    destroy_action = "delete_web_acl"
+    destroy_action = 'delete_web_acl'

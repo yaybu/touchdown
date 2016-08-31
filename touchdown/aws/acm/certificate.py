@@ -22,25 +22,25 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class DomainValidationOption(Resource):
 
-    resource_name = "domain_validation_option"
+    resource_name = 'domain_validation_option'
 
-    domain = argument.String(field="DomainName")
-    validation_domain = argument.String(field="ValidationDomain")
+    domain = argument.String(field='DomainName')
+    validation_domain = argument.String(field='ValidationDomain')
 
 
 class Certificate(Resource):
 
-    resource_name = "acm_certificate"
+    resource_name = 'acm_certificate'
 
-    name = argument.String(field="DomainName")
-    arn = argument.Output("CertificateArn")
+    name = argument.String(field='DomainName')
+    arn = argument.Output('CertificateArn')
     alternate_names = argument.List(
         argument.String(),
-        field="SubjectAlternativeNames",
+        field='SubjectAlternativeNames',
     )
     validation_options = argument.ResourceList(
         DomainValidationOption,
-        field="DomainValidationOptions",
+        field='DomainValidationOptions',
     )
     account = argument.Resource(BaseAccount)
 
@@ -48,31 +48,31 @@ class Certificate(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = Certificate
-    service_name = "acm"
+    service_name = 'acm'
     api_version = '2015-12-08'
-    describe_action = "list_certificates"
-    describe_envelope = "CertificateSummaryList"
+    describe_action = 'list_certificates'
+    describe_envelope = 'CertificateSummaryList'
     describe_filters = {}
-    key = "CertificateArn"
+    key = 'CertificateArn'
 
     def describe_object_matches(self, obj):
-        return obj["DomainName"] == self.resource.name
+        return obj['DomainName'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "request_certificate"
-    create_response = "id-only"
-    waiter = "certificate_issued"
+    create_action = 'request_certificate'
+    create_response = 'id-only'
+    waiter = 'certificate_issued'
 
     signature = [
-        Present("name"),
+        Present('name'),
     ]
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_certificate"
+    destroy_action = 'delete_certificate'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

@@ -21,19 +21,19 @@ from .resource import Resource
 
 class IntegrationResponse(resource.Resource):
 
-    resource_name = "integration_response"
+    resource_name = 'integration_response'
 
-    name = argument.String(field="httpMethod")
-    status_code = argument.String(field="statusCode")
+    name = argument.String(field='httpMethod')
+    status_code = argument.String(field='statusCode')
 
-    selection_pattern = argument.String(field="selectionPattern")
+    selection_pattern = argument.String(field='selectionPattern')
 
-    response_parameters = argument.Dict(field="responseParameters")
-    response_templates = argument.Dict(field="responseTemplates")
+    response_parameters = argument.Dict(field='responseParameters')
+    response_templates = argument.Dict(field='responseTemplates')
 
     resource = argument.Resource(
         Resource,
-        field="resourceId",
+        field='resourceId',
     )
 
 
@@ -42,9 +42,9 @@ class Describe(SimpleDescribe, Plan):
     resource = IntegrationResponse
     service_name = 'apigateway'
     api_version = '2015-07-09'
-    describe_action = "get_integration_response"
-    describe_notfound_exception = "NotFoundException"
-    describe_envelope = "[@]"
+    describe_action = 'get_integration_response'
+    describe_notfound_exception = 'NotFoundException'
+    describe_envelope = '[@]'
     key = 'httpMethod'
 
     def get_describe_filters(self):
@@ -55,17 +55,17 @@ class Describe(SimpleDescribe, Plan):
         if not resource.resource_id:
             return None
         return {
-            "restApiId": api.resource_id,
-            "resourceId": resource.resource_id,
-            "httpMethod": self.resource.name,
-            "statusCode": self.resource.status_code,
+            'restApiId': api.resource_id,
+            'resourceId': resource.resource_id,
+            'httpMethod': self.resource.name,
+            'statusCode': self.resource.status_code,
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_integration_response"
-    create_envelope = "@"
+    create_action = 'put_integration_response'
+    create_envelope = '@'
 
     def get_create_serializer(self):
         return serializers.Resource(
@@ -75,7 +75,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_integration_response"
+    destroy_action = 'delete_integration_response'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

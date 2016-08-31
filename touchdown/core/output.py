@@ -21,7 +21,7 @@ class Output(object):
         self.serializer = serializer
 
     def __set__(self, instance, value):
-        raise errors.Error("This attribute is read-only!")
+        raise errors.Error('This attribute is read-only!')
 
     def __get__(self, instance, owner):
         if instance is None:

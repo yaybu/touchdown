@@ -36,11 +36,11 @@ from .common import CloudFrontList, CloudFrontResourceList, S3Origin
 
 class CustomOrigin(Resource):
 
-    resource_name = "custom_origin"
+    resource_name = 'custom_origin'
     dot_ignore = True
 
     extra_serializers = {
-        "CustomHeaders": serializers.Dict(
+        'CustomHeaders': serializers.Dict(
             Quantity=0,
             Items=[],
         ),
@@ -61,24 +61,24 @@ class CustomOrigin(Resource):
     ssl_policy = argument.List(
         choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
         default=['SSLv3', 'TLSv1'],
-        field="OriginSslProtocols",
-        group="custom-origin-config",
+        field='OriginSslProtocols',
+        group='custom-origin-config',
         serializer=CloudFrontList(serializers.List()),
     )
 
     _custom_origin_config = argument.Serializer(
-        serializer=serializers.Resource(group="custom-origin-config"),
-        field="CustomOriginConfig",
+        serializer=serializers.Resource(group='custom-origin-config'),
+        field='CustomOriginConfig',
     )
 
 
 class LoadBalancerOrigin(Resource):
 
-    resource_name = "elb_origin"
+    resource_name = 'elb_origin'
     dot_ignore = True
 
     extra_serializers = {
-        "CustomHeaders": serializers.Dict(
+        'CustomHeaders': serializers.Dict(
             Quantity=0,
             Items=[],
         ),
@@ -88,7 +88,7 @@ class LoadBalancerOrigin(Resource):
     load_balancer = argument.Resource(
         LoadBalancer,
         field='DomainName',
-        serializer=serializers.Property("DNSName"),
+        serializer=serializers.Property('DNSName'),
     )
     origin_path = argument.String(default='', field='OriginPath')
 
@@ -103,38 +103,38 @@ class LoadBalancerOrigin(Resource):
     ssl_policy = argument.List(
         choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
         default=['SSLv3', 'TLSv1'],
-        field="OriginSslProtocols",
-        group="custom-origin-config",
+        field='OriginSslProtocols',
+        group='custom-origin-config',
         serializer=CloudFrontList(serializers.List()),
     )
 
     _custom_origin_config = argument.Serializer(
-        serializer=serializers.Resource(group="custom-origin-config"),
-        field="CustomOriginConfig",
+        serializer=serializers.Resource(group='custom-origin-config'),
+        field='CustomOriginConfig',
     )
 
 
 class DefaultCacheBehavior(Resource):
 
-    resource_name = "default_cache_behaviour"
+    resource_name = 'default_cache_behaviour'
     dot_ignore = True
 
     extra_serializers = {
         # TrustedSigners are not supported yet, so include stub in serialized form
-        "TrustedSigners": serializers.Const({
-            "Enabled": False,
-            "Quantity": 0,
+        'TrustedSigners': serializers.Const({
+            'Enabled': False,
+            'Quantity': 0,
         }),
-        "AllowedMethods": CloudFrontList(
-            inner=serializers.Argument("allowed_methods"),
-            CachedMethods=serializers.Argument("cached_methods"),
+        'AllowedMethods': CloudFrontList(
+            inner=serializers.Argument('allowed_methods'),
+            CachedMethods=serializers.Argument('cached_methods'),
         ),
-        "ForwardedValues": serializers.Resource(
-            group="forwarded-values",
+        'ForwardedValues': serializers.Resource(
+            group='forwarded-values',
             Cookies=serializers.Resource(
-                group="cookies",
+                group='cookies',
                 Forward=serializers.Expression(
-                    lambda r, o: "all" if o.forward_cookies == ["*"] else "none" if len(o.forward_cookies) == 0 else "whitelist"
+                    lambda r, o: 'all' if o.forward_cookies == ['*'] else 'none' if len(o.forward_cookies) == 0 else 'whitelist'
                 ),
             )
         )
@@ -142,86 +142,86 @@ class DefaultCacheBehavior(Resource):
 
     target_origin = argument.String(field='TargetOriginId')
 
-    forward_query_string = argument.Boolean(default=True, field="QueryString", group="forwarded-values")
-    forward_headers = argument.List(field="Headers", serializer=CloudFrontList(serializers.List()), group="forwarded-values")
-    forward_cookies = argument.List(field="WhitelistedNames", serializer=CloudFrontList(
-        serializers.Expression(lambda r, o: [] if o == ['*'] else o)), group="cookies"
+    forward_query_string = argument.Boolean(default=True, field='QueryString', group='forwarded-values')
+    forward_headers = argument.List(field='Headers', serializer=CloudFrontList(serializers.List()), group='forwarded-values')
+    forward_cookies = argument.List(field='WhitelistedNames', serializer=CloudFrontList(
+        serializers.Expression(lambda r, o: [] if o == ['*'] else o)), group='cookies'
     )
 
-    allowed_methods = argument.List(default=lambda x: ["GET", "HEAD"],)
-    cached_methods = argument.List(default=lambda x: ["GET", "HEAD"], serializer=CloudFrontList())
+    allowed_methods = argument.List(default=lambda x: ['GET', 'HEAD'],)
+    cached_methods = argument.List(default=lambda x: ['GET', 'HEAD'], serializer=CloudFrontList())
 
-    default_ttl = argument.Integer(default=86400, field="DefaultTTL")
-    min_ttl = argument.Integer(default=0, field="MinTTL")
-    max_ttl = argument.Integer(default=31536000, field="MaxTTL")
-    compress = argument.Boolean(default=False, field="Compress")
+    default_ttl = argument.Integer(default=86400, field='DefaultTTL')
+    min_ttl = argument.Integer(default=0, field='MinTTL')
+    max_ttl = argument.Integer(default=31536000, field='MaxTTL')
+    compress = argument.Boolean(default=False, field='Compress')
 
     viewer_protocol_policy = argument.String(
         choices=['allow-all', 'https-only', 'redirect-to-https'],
         default='allow-all',
-        field="ViewerProtocolPolicy"
+        field='ViewerProtocolPolicy'
     )
     smooth_streaming = argument.Boolean(default=False, field='SmoothStreaming')
 
 
 class CacheBehavior(DefaultCacheBehavior):
 
-    resource_name = "cache_behaviour"
+    resource_name = 'cache_behaviour'
     path_pattern = argument.String(field='PathPattern')
 
 
 class ErrorResponse(Resource):
 
-    resource_name = "error_response"
+    resource_name = 'error_response'
     dot_ignore = True
 
-    error_code = argument.Integer(field="ErrorCode", choices=[
-        "400", "403", "404", "405", "414",
-        "500", "501", "502", "503", "504",
+    error_code = argument.Integer(field='ErrorCode', choices=[
+        '400', '403', '404', '405', '414',
+        '500', '501', '502', '503', '504',
     ])
-    response_page_path = argument.String(field="ResponsePagePath")
-    response_code = argument.String(field="ResponseCode", choices=[
-        "200",
-        "400", "403", "404", "405", "414",
-        "500", "501", "502", "503", "504",
+    response_page_path = argument.String(field='ResponsePagePath')
+    response_code = argument.String(field='ResponseCode', choices=[
+        '200',
+        '400', '403', '404', '405', '414',
+        '500', '501', '502', '503', '504',
     ])
-    min_ttl = argument.Integer(field="ErrorCachingMinTTL")
+    min_ttl = argument.Integer(field='ErrorCachingMinTTL')
 
 
 class LoggingConfig(Resource):
 
-    resource_name = "logging_config"
+    resource_name = 'logging_config'
     dot_ignore = True
 
-    enabled = argument.Boolean(field="Enabled", default=False)
-    include_cookies = argument.Boolean(field="IncludeCookies", default=False)
+    enabled = argument.Boolean(field='Enabled', default=False)
+    include_cookies = argument.Boolean(field='IncludeCookies', default=False)
     bucket = argument.Resource(
         Bucket,
-        field="Bucket",
-        serializer=serializers.Append(".s3.amazonaws.com", serializers.Property("Name")),
-        empty_serializer=serializers.Const(""),
+        field='Bucket',
+        serializer=serializers.Append('.s3.amazonaws.com', serializers.Property('Name')),
+        empty_serializer=serializers.Const(''),
     )
-    prefix = argument.String(field="Prefix", default="")
+    prefix = argument.String(field='Prefix', default='')
 
 
 class Distribution(Resource):
 
-    resource_name = "distribution"
+    resource_name = 'distribution'
 
     extra_serializers = {
-        "CallerReference": serializers.Expression(
+        'CallerReference': serializers.Expression(
             lambda runner, object: runner.get_plan(object).object.get('CallerReference', str(uuid.uuid4()))
         ),
-        "Aliases": CloudFrontList(serializers.Chain(
-            serializers.Argument("cname"),
-            serializers.Argument("aliases"),
+        'Aliases': CloudFrontList(serializers.Chain(
+            serializers.Argument('cname'),
+            serializers.Argument('aliases'),
         )),
         # We don't support GeoRestrictions yet - so include a stubbed default
         # when serializing
-        "Restrictions": serializers.Const({
-            "GeoRestriction": {
-                "RestrictionType": "none",
-                "Quantity": 0,
+        'Restrictions': serializers.Const({
+            'GeoRestriction': {
+                'RestrictionType': 'none',
+                'Quantity': 0,
             },
         }),
     }
@@ -230,82 +230,82 @@ class Distribution(Resource):
     cname = argument.String(default=lambda instance: instance.name, serializer=serializers.ListOfOne(maybe_empty=True))
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
     aliases = argument.List()
-    root_object = argument.String(default='/', field="DefaultRootObject")
-    enabled = argument.Boolean(default=True, field="Enabled")
+    root_object = argument.String(default='/', field='DefaultRootObject')
+    enabled = argument.Boolean(default=True, field='Enabled')
     origins = argument.ResourceList(
         (S3Origin, CustomOrigin, LoadBalancerOrigin),
-        field="Origins",
+        field='Origins',
         serializer=CloudFrontResourceList(),
     )
     default_cache_behavior = argument.Resource(
         DefaultCacheBehavior,
-        field="DefaultCacheBehavior",
+        field='DefaultCacheBehavior',
         serializer=serializers.Resource(),
     )
     behaviors = argument.ResourceList(
         CacheBehavior,
-        field="CacheBehaviors",
+        field='CacheBehaviors',
         serializer=CloudFrontResourceList(),
     )
     error_responses = argument.ResourceList(
         ErrorResponse,
-        field="CustomErrorResponses",
+        field='CustomErrorResponses',
         serializer=CloudFrontResourceList(),
     )
     logging = argument.Resource(
         LoggingConfig,
         default=lambda instance: dict(enabled=False),
-        field="Logging",
+        field='Logging',
         serializer=serializers.Resource(),
     )
     price_class = argument.String(
-        default="PriceClass_100",
+        default='PriceClass_100',
         choices=['PriceClass_100', 'PriceClass_200', 'PriceClass_All'],
-        field="PriceClass",
+        field='PriceClass',
     )
 
     ssl_certificate = argument.Resource(
         ServerCertificate,
-        field="Certificate",
-        group="viewer-certificate",
-        serializer=serializers.Property("ServerCertificateId"),
+        field='Certificate',
+        group='viewer-certificate',
+        serializer=serializers.Property('ServerCertificateId'),
     )
 
     acm_certificate = argument.Resource(
         Certificate,
-        field="Certificate",
-        group="viewer-certificate",
-        serializer=serializers.Property("CertificateArn"),
+        field='Certificate',
+        group='viewer-certificate',
+        serializer=serializers.Property('CertificateArn'),
     )
 
     ssl_support_method = argument.String(
-        default="sni-only",
-        choices=["sni-only", "vip"],
-        field="SSLSupportMethod",
-        group="viewer-certificate",
+        default='sni-only',
+        choices=['sni-only', 'vip'],
+        field='SSLSupportMethod',
+        group='viewer-certificate',
     )
 
     ssl_minimum_protocol_version = argument.String(
-        default="TLSv1",
-        choices=["TLSv1", "SSLv3"],
-        field="MinimumProtocolVersion",
-        group="viewer-certificate",
+        default='TLSv1',
+        choices=['TLSv1', 'SSLv3'],
+        field='MinimumProtocolVersion',
+        group='viewer-certificate',
     )
 
     viewer_certificate = argument.Serializer(
-        field="ViewerCertificate",
+        field='ViewerCertificate',
         serializer=serializers.Resource(
-            group="viewer-certificate",
+            group='viewer-certificate',
             CertificateSource=serializers.Expression(
-                lambda r, o: "acm" if o.acm_certificate else "iam" if o.ssl_certificate else "cloudfront"
+                lambda r, o: 'acm' if o.acm_certificate else 'iam' if o.ssl_certificate else 'cloudfront'
             ),
         ),
     )
 
     web_acl = argument.Resource(
         WebACL,
-        field="WebACLId",
-        empty_serializer=serializers.Const(""),
+        field='WebACLId',
+        empty_serializer=serializers.Const(''),
     )
 
     account = argument.Resource(BaseAccount)
@@ -317,12 +317,12 @@ class Describe(SimpleDescribe, Plan):
     service_name = 'cloudfront'
     api_version = '2016-01-28'
     describe_filters = {}
-    describe_action = "list_distributions"
+    describe_action = 'list_distributions'
     describe_envelope = 'DistributionList.Items'
     key = 'Id'
 
     def get_describe_filters(self):
-        return {"Id": self.object['Id']}
+        return {'Id': self.object['Id']}
 
     def describe_object_matches(self, d):
         return self.resource.name == d['Comment'] or self.resource.name in d['Aliases'].get('Items', [])
@@ -330,10 +330,10 @@ class Describe(SimpleDescribe, Plan):
     def annotate_object(self, obj):
         result = self.client.get_distribution(Id=obj['Id'])
         distribution = {
-            "ETag": result["ETag"],
-            "Id": obj["Id"],
-            "DomainName": result["Distribution"]["DomainName"],
-            "Status": result["Distribution"]["Status"],
+            'ETag': result['ETag'],
+            'Id': obj['Id'],
+            'DomainName': result['Distribution']['DomainName'],
+            'Status': result['Distribution']['Status'],
         }
         distribution.update(result['Distribution']['DistributionConfig'])
         return distribution
@@ -341,15 +341,15 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_distribution"
-    update_action = "update_distribution"
-    create_response = "not-that-useful"
-    waiter = "distribution_deployed"
+    create_action = 'create_distribution'
+    update_action = 'update_distribution'
+    create_response = 'not-that-useful'
+    waiter = 'distribution_deployed'
 
     signature = (
-        Present("name"),
-        Present("origins"),
-        Present("default_cache_behavior"),
+        Present('name'),
+        Present('origins'),
+        Present('default_cache_behavior'),
     )
 
     def get_create_serializer(self):
@@ -361,13 +361,13 @@ class Apply(SimpleApply, Describe):
         return serializers.Dict(
             Id=serializers.Identifier(),
             DistributionConfig=serializers.Resource(),
-            IfMatch=serializers.Property("ETag"),
+            IfMatch=serializers.Property('ETag'),
         )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_distribution"
+    destroy_action = 'delete_distribution'
 
     def get_destroy_serializer(self):
         return serializers.Dict(
@@ -381,7 +381,7 @@ class Destroy(SimpleDestroy, Describe):
 
         if self.object.get('Enabled', False):
             yield self.generic_action(
-                "Disable distribution",
+                'Disable distribution',
                 self.client.update_distribution,
                 Id=self.object['Id'],
                 IfMatch=self.object['ETag'],
@@ -390,10 +390,10 @@ class Destroy(SimpleDestroy, Describe):
                 ),
             )
 
-        if self.object.get('Enabled', False) or self.object.get('Status', '') == "InProgress":
+        if self.object.get('Enabled', False) or self.object.get('Status', '') == 'InProgress':
             yield self.get_waiter(
-                ["Waiting for distribution to be disabled and enter state 'Deployed'"],
-                "distribution_deployed",
+                ['Waiting for distribution to be disabled and enter state \'Deployed\''],
+                'distribution_deployed',
             )
 
         if self.object.get('Enabled', False):
@@ -405,29 +405,29 @@ class Destroy(SimpleDestroy, Describe):
 
 class AliasTarget(route53.AliasTarget):
 
-    """ Adapts a Distribution into a AliasTarget """
+    ''' Adapts a Distribution into a AliasTarget '''
 
     web_distribution = argument.Resource(
         Distribution,
-        field="DNSName",
+        field='DNSName',
         serializer=serializers.Context(
-            serializers.Property("DomainName"),
+            serializers.Property('DomainName'),
             serializers.Expression(lambda r, o: route53._normalize(o)),
         ),
     )
 
     hosted_zone_id = argument.String(
-        default="Z2FDTNDATAQYW2",
-        field="HostedZoneId",
+        default='Z2FDTNDATAQYW2',
+        field='HostedZoneId',
     )
 
     evaluate_target_health = argument.Boolean(
         default=False,
-        field="EvaluateTargetHealth",
+        field='EvaluateTargetHealth',
     )
 
     @classmethod
     def clean(cls, value):
         if isinstance(value, Distribution):
-            return super(AliasTarget, cls).clean({"web_distribution": value})
+            return super(AliasTarget, cls).clean({'web_distribution': value})
         return super(AliasTarget, cls).clean(value)

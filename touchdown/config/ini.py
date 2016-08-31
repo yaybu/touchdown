@@ -22,7 +22,7 @@ from touchdown.interfaces import File, FileNotFound
 
 class IniFile(resource.Resource):
 
-    resource_name = "ini_file"
+    resource_name = 'ini_file'
 
     name = argument.String()
     file = argument.Resource(File)
@@ -31,16 +31,16 @@ class IniFile(resource.Resource):
 class Describe(Plan):
 
     resource = IniFile
-    name = "describe"
+    name = 'describe'
 
     def write(self, c):
-        fp = self.runner.get_service(self.resource.file, "fileio")
+        fp = self.runner.get_service(self.resource.file, 'fileio')
         s = six.StringIO()
         c.write(s)
         fp.write(s.getvalue())
 
     def read(self):
-        fp = self.runner.get_service(self.resource.file, "fileio")
+        fp = self.runner.get_service(self.resource.file, 'fileio')
         config = configparser.ConfigParser()
         try:
             config.readfp(fp.read())
@@ -49,7 +49,7 @@ class Describe(Plan):
         return config
 
     def set(self, key, value):
-        section, name = key.rsplit(".", 1)
+        section, name = key.rsplit('.', 1)
         c = self.read()
         if not c.has_section(section):
             c.add_section(section)
@@ -57,7 +57,7 @@ class Describe(Plan):
         self.write(c)
 
     def get(self, key):
-        section, name = key.rsplit(".", 1)
+        section, name = key.rsplit('.', 1)
         c = self.read()
         try:
             return c.get(section, name)

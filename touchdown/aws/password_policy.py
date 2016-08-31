@@ -21,20 +21,20 @@ from .common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
 
 class PasswordPolicy(Resource):
 
-    resource_name = "password_policy"
+    resource_name = 'password_policy'
 
-    min_password_length = argument.Integer(field="MinimumPasswordLength")
-    require_symbols = argument.Boolean(field="RequireSymbols")
-    require_numbers = argument.Boolean(field="RequireNumbers")
-    require_uppercase = argument.Boolean(field="RequireUppercaseCharacters")
-    require_lowercase = argument.Boolean(field="RequireLowercaseCharacters")
+    min_password_length = argument.Integer(field='MinimumPasswordLength')
+    require_symbols = argument.Boolean(field='RequireSymbols')
+    require_numbers = argument.Boolean(field='RequireNumbers')
+    require_uppercase = argument.Boolean(field='RequireUppercaseCharacters')
+    require_lowercase = argument.Boolean(field='RequireLowercaseCharacters')
 
-    allow_users_to_change_password = argument.Boolean(field="AllowUsersToChangePassword")
+    allow_users_to_change_password = argument.Boolean(field='AllowUsersToChangePassword')
 
-    expire_passwords = argument.Boolean(field="ExpirePasswords")
-    max_password_age = argument.Integer(field="MaxPasswordAge")
-    password_reuse_prevention = argument.Integer(field="PasswordReusePrevention", min=1, max=24)
-    hard_expiry = argument.Boolean(field="HardExpiry")
+    expire_passwords = argument.Boolean(field='ExpirePasswords')
+    max_password_age = argument.Integer(field='MaxPasswordAge')
+    password_reuse_prevention = argument.Integer(field='PasswordReusePrevention', min=1, max=24)
+    hard_expiry = argument.Boolean(field='HardExpiry')
 
     account = argument.Resource(BaseAccount)
 
@@ -65,7 +65,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_account_password_policy"
+    destroy_action = 'delete_account_password_policy'
 
     def get_destroy_serializer(self):
         return serializers.Const({})

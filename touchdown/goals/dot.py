@@ -18,16 +18,16 @@ from touchdown.core.goals import Goal, register
 
 class Dot(Goal):
 
-    """ Generate a dot graph of all resources and their interconnections """
+    ''' Generate a dot graph of all resources and their interconnections '''
 
-    name = "dot"
+    name = 'dot'
     mutator = False
 
     def get_plan_class(self, resource):
         return plan.NullPlan
 
     def get_digraph(self):
-        graph = ["digraph ast {"]
+        graph = ['digraph ast {']
 
         for node, deps in self.get_plan_order().items():
             if node.dot_ignore:
@@ -36,10 +36,10 @@ class Dot(Goal):
             for dep in deps:
                 if dep.dot_ignore:
                     continue
-                graph.append("{} -> {};".format(id(node), id(dep)))
+                graph.append('{} -> {};'.format(id(node), id(dep)))
 
-        graph.append("}")
-        return "\n".join(graph)
+        graph.append('}')
+        return '\n'.join(graph)
 
     def execute(self):
         self.ui.echo(self.get_digraph())

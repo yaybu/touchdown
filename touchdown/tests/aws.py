@@ -31,7 +31,7 @@ class StubberTestCase(WorkspaceTestCase):
 
 
 class Stubber(BaseStubber):
-    """Extends the stubber from botocore so that it always asserts that
+    '''Extends the stubber from botocore so that it always asserts that
     there are no leftover responses.
 
     So, for eg:
@@ -45,7 +45,7 @@ class Stubber(BaseStubber):
     pending resquest. The botocore's stubber doesn't - you have to
     remember to call `stub.assert_no_pending_responses()`.
 
-    """
+    '''
 
     def __exit__(self, exc_type, exc_value, traceback):
         super(Stubber, self).__exit__(exc_type, exc_value, traceback)

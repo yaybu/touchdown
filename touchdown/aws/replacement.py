@@ -19,7 +19,7 @@ from .common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class ReplacementDescribe(SimpleDescribe):
 
-    name = "describe"
+    name = 'describe'
     biggest_serial = 0
 
     def name_for_remote(self, obj):
@@ -29,7 +29,7 @@ class ReplacementDescribe(SimpleDescribe):
         name = self.name_for_remote(obj)
         if name == self.resource.name:
             return True
-        if name.startswith(self.resource.name + "."):
+        if name.startswith(self.resource.name + '.'):
             return True
 
     def get_possible_objects(self):
@@ -39,7 +39,7 @@ class ReplacementDescribe(SimpleDescribe):
 
     def describe_object_matches(self, obj):
         try:
-            serial = self.name_for_remote(obj).rsplit(".", 1)[1]
+            serial = self.name_for_remote(obj).rsplit('.', 1)[1]
             self.biggest_serial = max(int(serial), self.biggest_serial)
         except (IndexError, TypeError, ValueError):
             pass
@@ -49,10 +49,10 @@ class ReplacementDescribe(SimpleDescribe):
 
 class ReplacementApply(SimpleApply):
 
-    name = "apply"
+    name = 'apply'
 
     def get_create_name(self):
-        return "{}.{}".format(
+        return '{}.{}'.format(
             self.resource.name,
             self.biggest_serial + 1,
         )
@@ -69,18 +69,18 @@ class ReplacementApply(SimpleApply):
         return True
 
     def prepare_to_create(self):
-        """
+        '''
         Find all versions of the named resource and if they are stale terminate them
 
         What it means to be stale varies between resources so this is delegated to `self.is_stale`.
-        """
+        '''
         # TODO: There is a considerable amount of overlap with the destroy action here...
         for obj in self.get_possible_objects():
             if not self.is_stale(obj):
                 continue
 
             yield self.generic_action(
-                "Destroy stale {} {}".format(self.resource.resource_name, obj[self.key]),
+                'Destroy stale {} {}'.format(self.resource.resource_name, obj[self.key]),
                 getattr(self.client, self.destroy_action),
                 serializers.Dict(**{self.key: obj[self.key]}),
             )
@@ -88,7 +88,7 @@ class ReplacementApply(SimpleApply):
 
 class ReplacementDestroy(SimpleDestroy):
 
-    name = "destroy"
+    name = 'destroy'
 
     def get_destroy_serializer(self, resource_id):
         return serializers.Dict(**{self.key: resource_id})
@@ -97,7 +97,7 @@ class ReplacementDestroy(SimpleDestroy):
         self.object = self.describe_object()
         for obj in self.get_possible_objects():
             yield self.generic_action(
-                "Destroy {} {}".format(self.resource.resource_name, obj[self.key]),
+                'Destroy {} {}'.format(self.resource.resource_name, obj[self.key]),
                 getattr(self.client, self.destroy_action),
                 self.get_destroy_serializer(obj[self.key]),
             )

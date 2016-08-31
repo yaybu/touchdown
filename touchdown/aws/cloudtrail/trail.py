@@ -26,16 +26,16 @@ from ..sns import Topic
 
 class Trail(Resource):
 
-    resource_name = "trail"
+    resource_name = 'trail'
 
-    name = argument.String(field="Name")
+    name = argument.String(field='Name')
     logging = argument.Boolean(default=True)
-    bucket = argument.Resource(Bucket, field="S3BucketName")
-    bucket_prefix = argument.String(field="S3KeyPrefix")
-    topic = argument.Resource(Topic, field="SnsTopicName")
-    include_global = argument.Boolean(field="IncludeGlobalServiceEvents")
-    cwlogs_group = argument.Resource(LogGroup, field="CloudWatchLogsLogGroupArn", serializer=serializers.Property("arn"))
-    cwlogs_role = argument.Resource(Role, field="CloudWatchLogsRoleArn", serializer=serializers.Property("Arn"))
+    bucket = argument.Resource(Bucket, field='S3BucketName')
+    bucket_prefix = argument.String(field='S3KeyPrefix')
+    topic = argument.Resource(Topic, field='SnsTopicName')
+    include_global = argument.Boolean(field='IncludeGlobalServiceEvents')
+    cwlogs_group = argument.Resource(LogGroup, field='CloudWatchLogsLogGroupArn', serializer=serializers.Property('arn'))
+    cwlogs_role = argument.Resource(Role, field='CloudWatchLogsRoleArn', serializer=serializers.Property('Arn'))
 
     account = argument.Resource(BaseAccount)
 
@@ -45,37 +45,37 @@ class Describe(SimpleDescribe, Plan):
     resource = Trail
     service_name = 'cloudtrail'
     api_version = '2013-11-01'
-    describe_action = "describe_trails"
-    describe_envelope = "trailList"
+    describe_action = 'describe_trails'
+    describe_envelope = 'trailList'
     key = 'Name'
 
     def get_describe_filters(self):
         return {
-            "trailNameList": [self.resource.name],
+            'trailNameList': [self.resource.name],
         }
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "create_trail"
-    update_action = "update_trail"
-    create_response = "not-that-useful"
+    create_action = 'create_trail'
+    update_action = 'update_trail'
+    create_response = 'not-that-useful'
 
     retryable = {
-        "InvalidCloudWatchLogsRoleArnException": [
-            "Access denied. Check the trust relationships for your role.",
+        'InvalidCloudWatchLogsRoleArnException': [
+            'Access denied. Check the trust relationships for your role.',
         ],
     }
 
     signature = [
-        Present("name"),
-        Present("bucket"),
+        Present('name'),
+        Present('bucket'),
     ]
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_trail"
+    destroy_action = 'delete_trail'
 
     def get_destroy_serializer(self):
         return serializers.Dict(

@@ -18,30 +18,30 @@ from touchdown.core.goals import Goal, register
 
 class GetCredentials(Goal):
 
-    """ Get bash-sourcable temporary access credentials for a role """
+    ''' Get bash-sourcable temporary access credentials for a role '''
 
-    name = "get-credentials"
+    name = 'get-credentials'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("get-credentials")
+        plan_class = resource.meta.get_plan('get-credentials')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            "resource",
-            metavar="RESOURCE",
+            'resource',
+            metavar='RESOURCE',
             type=str,
-            help="The resource to get credentials for",
+            help='The resource to get credentials for',
         )
 
     def execute(self, resource):
-        resources = self.collect_as_dict("get-credentials")
+        resources = self.collect_as_dict('get-credentials')
         if resource not in resources:
-            raise errors.Error("No such resource '{}'".format(resource))
+            raise errors.Error('No such resource "{}"'.format(resource))
         self.ui.echo(resources[resource].get_credentials())
 
 register(GetCredentials)

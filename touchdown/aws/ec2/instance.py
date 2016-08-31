@@ -26,49 +26,49 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class BlockDevice(Resource):
 
-    resource_name = "block_device"
+    resource_name = 'block_device'
 
-    virtual_name = argument.String(field="VirtualName")
-    device_name = argument.String(field="DeviceName")
+    virtual_name = argument.String(field='VirtualName')
+    device_name = argument.String(field='DeviceName')
     disabled = argument.Boolean(
-        field="NoDevice",
-        serializer=serializers.Const(""),
+        field='NoDevice',
+        serializer=serializers.Const(''),
     )
 
 
 class NetworkInterface(Resource):
 
-    resource_name = "network_interface"
+    resource_name = 'network_interface'
 
-    public = argument.Boolean(default=False, field="AssociatePublicIpAddress")
-    security_groups = argument.ResourceList(SecurityGroup, field="Groups")
+    public = argument.Boolean(default=False, field='AssociatePublicIpAddress')
+    security_groups = argument.ResourceList(SecurityGroup, field='Groups')
 
 
 class Instance(Resource):
 
-    resource_name = "ec2_instance"
+    resource_name = 'ec2_instance'
 
-    name = argument.String(min=3, max=128, field="Name", group="tags")
-    ami = argument.String(field="ImageId")
-    instance_type = argument.String(field="InstanceType")
-    key_pair = argument.Resource(KeyPair, field="KeyName")
-    subnet = argument.Resource(Subnet, field="SubnetId")
-    instance_profile = argument.Resource(InstanceProfile, field="IamInstanceProfile")
+    name = argument.String(min=3, max=128, field='Name', group='tags')
+    ami = argument.String(field='ImageId')
+    instance_type = argument.String(field='InstanceType')
+    key_pair = argument.Resource(KeyPair, field='KeyName')
+    subnet = argument.Resource(Subnet, field='SubnetId')
+    instance_profile = argument.Resource(InstanceProfile, field='IamInstanceProfile')
 
-    user_data = argument.String(field="UserData")
+    user_data = argument.String(field='UserData')
 
     network_interfaces = argument.ResourceList(
         NetworkInterface,
-        field="NetworkInterfaces",
+        field='NetworkInterfaces',
     )
 
     block_devices = argument.ResourceList(
         BlockDevice,
-        field="BlockDeviceMappings",
+        field='BlockDeviceMappings',
         serializer=serializers.List(serializers.Resource()),
     )
 
-    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroupIds")
+    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds')
 
     tags = argument.Dict()
 
@@ -80,15 +80,15 @@ class Describe(SimpleDescribe, Plan):
     resource = Instance
     service_name = 'ec2'
     api_version = '2015-10-01'
-    describe_action = "describe_instances"
-    describe_envelope = "Reservations[].Instances[]"
+    describe_action = 'describe_instances'
+    describe_envelope = 'Reservations[].Instances[]'
     key = 'InstanceId'
 
     def get_describe_filters(self):
         return {
-            "Filters": [
-                {"Name": "tag:Name", "Values": [self.resource.name]},
-                {"Name": "instance-state-name", "Values": [
+            'Filters': [
+                {'Name': 'tag:Name', 'Values': [self.resource.name]},
+                {'Name': 'instance-state-name', 'Values': [
                     'pending', 'running', 'shutting-down', ' stopping', 'stopped'
                 ]},
             ]
@@ -97,13 +97,13 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "run_instances"
-    create_envelope = "Instances[0]"
-    # create_response = "id-only"
-    waiter = "instance_running"
+    create_action = 'run_instances'
+    create_envelope = 'Instances[0]'
+    # create_response = 'id-only'
+    waiter = 'instance_running'
 
     signature = (
-        Present("name"),
+        Present('name'),
     )
 
     def get_create_serializer(self):
@@ -115,18 +115,18 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "terminate_instances"
-    waiter = "instance_terminated"
+    destroy_action = 'terminate_instances'
+    waiter = 'instance_terminated'
 
     def get_destroy_serializer(self):
         return serializers.Dict(
-            InstanceIds=serializers.ListOfOne(serializers.Property("InstanceId")),
+            InstanceIds=serializers.ListOfOne(serializers.Property('InstanceId')),
         )
 
 
 class SSHInstance(ssh.Instance):
 
-    resource_name = "ec2_instance"
+    resource_name = 'ec2_instance'
     input = Instance
 
     def get_network_id(self, runner):
@@ -137,8 +137,8 @@ class SSHInstance(ssh.Instance):
     def get_serializer(self, runner, **kwargs):
         obj = runner.get_plan(self.adapts).describe_object()
 
-        if getattr(self.parent, "proxy", None) and self.parent.proxy.instance:
-            if hasattr(self.parent.proxy.instance, "get_network_id"):
+        if getattr(self.parent, 'proxy', None) and self.parent.proxy.instance:
+            if hasattr(self.parent.proxy.instance, 'get_network_id'):
                 network = self.parent.proxy.instance.get_network_id(runner)
                 if network == self.get_network_id(runner):
                     return serializers.Const(obj['PrivateIpAddress'])
@@ -149,4 +149,4 @@ class SSHInstance(ssh.Instance):
         if obj.get('PublicIpAddress', ''):
             return serializers.Const(obj['PublicIpAddress'])
 
-        raise errors.Error("Instance {} not available".format(self.adapts))
+        raise errors.Error('Instance {} not available'.format(self.adapts))

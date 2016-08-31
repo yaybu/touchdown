@@ -21,9 +21,9 @@ from touchdown.core import errors, plan
 
 class Plan(common.SimplePlan, plan.Plan):
 
-    name = "snapshot"
+    name = 'snapshot'
     resource = Database
-    service_name = "rds"
+    service_name = 'rds'
     api_version = '2014-10-31'
 
     def db_exists(self, name):
@@ -46,20 +46,20 @@ class Plan(common.SimplePlan, plan.Plan):
 
     def snapshot(self, snapshot_name):
         if not self.db_exists(self.resource.name):
-            raise errors.Error("Database {} does not exist; Nothing to backup".format(self.resource.name))
+            raise errors.Error('Database {} does not exist; Nothing to backup'.format(self.resource.name))
 
         if self.snapshot_exists(self.resource.name, snapshot_name):
-            raise errors.Error("Snapshot {} already exists".format(snapshot_name))
+            raise errors.Error('Snapshot {} already exists'.format(snapshot_name))
 
-        self.echo("Starting snapshot of {} as {}".format(self.resource.name, snapshot_name))
+        self.echo('Starting snapshot of {} as {}'.format(self.resource.name, snapshot_name))
         self.client.create_db_snapshot(
             DBSnapshotIdentifier=snapshot_name,
             DBInstanceIdentifier=self.resource.name,
         )
 
-        self.echo("Waiting for snapshot to complete")
-        self.client.get_waiter("db_snapshot_completed").wait(
+        self.echo('Waiting for snapshot to complete')
+        self.client.get_waiter('db_snapshot_completed').wait(
             DBSnapshotIdentifier=snapshot_name,
         )
 
-        self.echo("Snapshot {} available".format(snapshot_name))
+        self.echo('Snapshot {} available'.format(snapshot_name))

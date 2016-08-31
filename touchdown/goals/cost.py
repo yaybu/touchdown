@@ -17,19 +17,19 @@ from touchdown.core.goals import Goal, register
 
 class Cost(Goal):
 
-    """ Estimate the cost of running this environment """
+    ''' Estimate the cost of running this environment '''
 
-    name = "cost"
+    name = 'cost'
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan("cost")
+        plan_class = resource.meta.get_plan('cost')
         if not plan_class:
-            plan_class = resource.meta.get_plan("null")
+            plan_class = resource.meta.get_plan('null')
         return plan_class
 
     def execute(self):
-        headers = [("Resource", "Cost (per hour)")]
+        headers = [('Resource', 'Cost (per hour)')]
         data = []
 
         def collect_costs(resource):
@@ -38,7 +38,7 @@ class Cost(Goal):
                 data.append((str(coster.resource), str(coster.cost())))
 
         self.visit(
-            "Collecting costs...",
+            'Collecting costs...',
             self.get_plan_order(),
             collect_costs,
         )
@@ -46,7 +46,7 @@ class Cost(Goal):
         data.sort()
 
         if len(data) == 0:
-            self.ui.echo("No costable items")
+            self.ui.echo('No costable items')
             return
 
         self.ui.table(headers + data)

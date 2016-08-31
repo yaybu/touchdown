@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import binascii
 import os
 import socket
 import struct
@@ -31,7 +32,7 @@ except ImportError:
     PosixAgentServer = None
 
 
-@unittest.skipUnless(PosixAgentServer, "requires unix")
+@unittest.skipUnless(PosixAgentServer, 'requires unix')
 class TestPosixAgentHandler(WorkspaceTestCase):
 
     def setUp(self):
@@ -89,20 +90,16 @@ class TestPosixAgentHandler(WorkspaceTestCase):
         # Go go go
         mtype, msg = self.send(msg)
         self.assertEqual(mtype, 14)
-        self.assertEqual(msg.get_binary(), (
-            b'\x00\x00\x00\x07ssh-rsa\x00\x00\x01\x001\xd4\xc2\xbf\xad\x185W\xa7'
-            b'\x05_\x00\\=\r\x83\x8dW\x01\xbd{\x8a\t\xd6\xd7\xf0f\x99\xc6\x91'
-            b'\x84,\x18\xe2\xbbbPJK\xeb\xa0\xfb\xf5\xae\xafb\xf8\x10cR\xb9\x9f`'
-            b'\xd1\xfd\xc2\xda\xc1\xf5\xad)V`"\xef\xf2_b\xfa\xc3\x8c\xb2\xdb'
-            b'\x84\x9e\xd6\xb8b\xaf^k\xd3`\x9b$\x9a\t\x98H\xaao\xcf\xdf\xe1'
-            b'\xd9=%8\xabNaN\xcc\x95\xa4(*\xbf\x87B\xc7\xbbY\x1d\xb9>\x04\x9ep'
-            b'\xa5Y\xd2\x914\xd2\x07\x01\x8ae\x0bw\xfd\x9a{k\xe8\xa2\xb1\xf7^'
-            b'\xfb\xd6o\xa5\xa1\xe9\xe9c\xa5$^\xbev)N\r\x15\r\xfa#H\xbcs\x03 2c'
-            b'\xb1\x19R\xf00\x0e{:\x9e\xfa\xb8\x18\'\xb9\xe5=\x8c\x1c\xb8\xb2'
-            b'\xa1U\x1c"\xcb\xab\x9et\x7f\xcf\xf7\x9b\xf5ss\xf7\xec\x8c\xb2\xa0'
-            b'\xdc\x9bB\xa7&J\xfaKy\x13i;p\x9cT\x18\xed\xa0!u\xb0\xa1\x83T'
-            b'\x96C\x12{\xe9.y\x93o\xfc\x91G\x96)\xc2\xac\xdcj\xa5\xc82P\xa8'
-            b'\xed\xfe'
+        self.assertEqual(binascii.hexlify(msg.get_binary()), (
+            '000000077373682d7273610000010031d4c2bfad183557a7055f005c3d0d838d5'
+            '701bd7b8a09d6d7f06699c691842c18e2bb62504a4beba0fbf5aeaf62f8106352'
+            'b99f60d1fdc2dac1f5ad29566022eff25f62fac38cb2db849ed6b862af5e6bd36'
+            '09b249a099848aa6fcfdfe1d93d2538ab4e614ecc95a4282abf8742c7bb591db9'
+            '3e049e70a559d29134d207018a650b77fd9a7b6be8a2b1f75efbd66fa5a1e9e96'
+            '3a5245ebe76294e0d150dfa2348bc7303203263b11952f0300e7b3a9efab81827'
+            'b9e53d8c1cb8b2a1551c22cbab9e747fcff79bf57373f7ec8cb2a0dc9b42a7264'
+            'afa4b7913693b709c5418eda02175b0a183549643127be92e79936ffc91479629'
+            'c2acdc6aa5c83250a8edfe'
         ))
 
     def test_handle_13_failure(self):

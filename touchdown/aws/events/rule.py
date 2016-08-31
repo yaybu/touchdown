@@ -23,50 +23,50 @@ from ..lambda_ import Function
 
 class EventTarget(Resource):
 
-    resource_name = "event_target"
+    resource_name = 'event_target'
 
-    name = argument.String(field="Id")
+    name = argument.String(field='Id')
 
     function = argument.Resource(
         Function,
-        field="Arn",
-        serializer=serializers.Property("FunctionArn"),
+        field='Arn',
+        serializer=serializers.Property('FunctionArn'),
     )
 
     @classmethod
     def clean(cls, obj):
         if isinstance(obj, Function):
-            return super(EventTarget, cls).clean({"name": obj.name, "function": obj})
+            return super(EventTarget, cls).clean({'name': obj.name, 'function': obj})
         return super(EventTarget, cls).clean(obj)
 
 
 class EventRule(Resource):
 
-    resource_name = "event_rule"
+    resource_name = 'event_rule'
 
-    arn = argument.Output("Arn")
+    arn = argument.Output('Arn')
 
-    name = argument.String(field="Name", min=1, max=140)
-    description = argument.String(field="Description", max=256)
-    schedule_expression = argument.String(field="ScheduleExpression")
+    name = argument.String(field='Name', min=1, max=140)
+    description = argument.String(field='Description', max=256)
+    schedule_expression = argument.String(field='ScheduleExpression')
     event_pattern = argument.Dict(
-        field="EventPattern",
+        field='EventPattern',
         serializer=serializers.Json(serializers.Dict()),
-        empty_serializer=serializers.Const(""),
+        empty_serializer=serializers.Const(''),
     )
 
     enabled = argument.Boolean(
-        field="State",
+        field='State',
         serializer=serializers.Boolean(
-            on_true="ENABLED",
-            on_false="DISABLED",
+            on_true='ENABLED',
+            on_false='DISABLED',
         ),
     )
 
     role = argument.Resource(
         Role,
-        field="RoleArn",
-        serializer=serializers.Property("Arn"),
+        field='RoleArn',
+        serializer=serializers.Property('Arn'),
     )
 
     targets = argument.ResourceList(
@@ -81,12 +81,12 @@ class Describe(SimpleDescribe, Plan):
     resource = EventRule
     service_name = 'events'
     api_version = '2015-10-07'
-    describe_action = "list_rules"
-    describe_envelope = "Rules"
+    describe_action = 'list_rules'
+    describe_envelope = 'Rules'
     key = 'Name'
 
     def get_describe_filters(self):
-        return {"NamePrefix": self.resource.name}
+        return {'NamePrefix': self.resource.name}
 
     def describe_object_matches(self, obj):
         return obj['Name'] == self.resource.name
@@ -101,22 +101,22 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = "put_rule"
-    create_envelope = "@"
+    create_action = 'put_rule'
+    create_envelope = '@'
     # Create response only gives us the `RuleArn`, and annoyingly
     # describe_object calls the same field `Arn`
-    create_response = "not-that-useful"
-    update_action = "put_rule"
+    create_response = 'not-that-useful'
+    update_action = 'put_rule'
 
     def update_object(self):
         removals = []
-        description = ["Remove old targets"]
-        for remote in self.object.get("Targets", []):
+        description = ['Remove old targets']
+        for remote in self.object.get('Targets', []):
             for local in self.resource.targets:
                 if local.matches(self.runner, remote):
                     break
             else:
-                description.append("Remove target: {}".format(remote['Id']))
+                description.append('Remove target: {}'.format(remote['Id']))
                 removals.append(remote['Id'])
 
         if removals:
@@ -128,15 +128,15 @@ class Apply(SimpleApply, Describe):
             )
 
         additions = []
-        description = ["Add new targets"]
+        description = ['Add new targets']
 
         for local in self.resource.targets:
-            for remote in self.object.get("Targets", []):
+            for remote in self.object.get('Targets', []):
                 if local.matches(self.runner, remote):
                     break
             else:
                 additions.append(local)
-                description.append("Add target: {}".format(local.name))
+                description.append('Add target: {}'.format(local.name))
 
         if additions:
             yield self.generic_action(
@@ -152,10 +152,10 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = "delete_rule"
+    destroy_action = 'delete_rule'
 
     def destroy_object(self):
-        for remote in self.object.get("Targets", []):
+        for remote in self.object.get('Targets', []):
             yield self.generic_action(
                 ['Remove old target {}'.format(remote['Id'])],
                 self.client.remove_targets,

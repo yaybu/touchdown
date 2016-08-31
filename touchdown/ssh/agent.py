@@ -8,7 +8,7 @@ from paramiko.py3compat import byte_chr
 
 from six.moves import socketserver
 
-if not hasattr(socketserver, "UnixStreamServer"):
+if not hasattr(socketserver, 'UnixStreamServer'):
     raise ImportError(__name__)
 
 
@@ -72,7 +72,7 @@ class AgentHandler(object):
             except ConnectionError:
                 return
 
-            handler = getattr(self, "handler_{}".format(mtype))
+            handler = getattr(self, 'handler_{}'.format(mtype))
             if not handler:
                 continue
 

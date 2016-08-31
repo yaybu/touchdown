@@ -21,10 +21,10 @@ from . import provisioner
 
 class Script(provisioner.Provisioner):
 
-    resource_name = "script"
+    resource_name = 'script'
 
     script = argument.String(
-        field="script",
+        field='script',
         serializer=serializers.Expression(lambda r, o: six.StringIO(o)),
     )
     sudo = argument.Boolean(field='sudo', default=True)
