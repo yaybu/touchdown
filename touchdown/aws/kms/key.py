@@ -97,4 +97,4 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_key'
+    destroy_action = 'schedule_key_deletion'

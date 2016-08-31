@@ -7,7 +7,11 @@ Changelog for Touchdown
 - VPC: Support VPC Endpoints. These allow private network interfaces to access
   S3 without needing NAT etc.
 
+- KMS: Fix key deletion.
+
 - Core: progressbar2 integration has been removed.
+
+- Windows: Fix unix epoch handling in AWS CloudWatch log tailing.
 
 
 0.15.5 (2016-08-24)
