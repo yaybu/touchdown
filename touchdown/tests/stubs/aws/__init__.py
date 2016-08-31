@@ -28,6 +28,7 @@ from .internet_gateway import InternetGatewayStubber
 from .keypair import KeyPairStubber
 from .launch_configuration import LaunchConfigurationStubber
 from .load_balancer import LoadBalancerStubber
+from .log_group import LogGroupStubber
 from .network_acl import NetworkAclStubber
 from .password_policy import PasswordPolicyStubber
 from .queue import QueueStubber
@@ -56,6 +57,7 @@ __all__ = [
     'KeyPairStubber',
     'LaunchConfigurationStubber',
     'LoadBalancerStubber',
+    'LogGroupStubber',
     'NetworkAclStubber',
     'PasswordPolicyStubber',
     'QueueStubber',
