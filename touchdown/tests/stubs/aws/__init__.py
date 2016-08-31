@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .service import Stubber, ServiceStubber
+
 from .account import AccountStubber
 from .auto_scaling_group import AutoScalingGroupStubber
 from .bucket import BucketStubber
@@ -25,6 +27,7 @@ from .hosted_zone import HostedZoneStubber
 from .internet_gateway import InternetGatewayStubber
 from .keypair import KeyPairStubber
 from .launch_configuration import LaunchConfigurationStubber
+from .load_balancer import LoadBalancerStubber
 from .network_acl import NetworkAclStubber
 from .password_policy import PasswordPolicyStubber
 from .queue import QueueStubber
@@ -52,6 +55,7 @@ __all__ = [
     'InternetGatewayStubber',
     'KeyPairStubber',
     'LaunchConfigurationStubber',
+    'LoadBalancerStubber',
     'NetworkAclStubber',
     'PasswordPolicyStubber',
     'QueueStubber',
@@ -59,6 +63,8 @@ __all__ = [
     'RoleStubber',
     'RouteTableStubber',
     'SecurityGroupStubber',
+    'ServiceStubber',
+    'Stubber',
     'SubnetStubber',
     'TopicStubber',
     'VolumeAttachmentStubber',

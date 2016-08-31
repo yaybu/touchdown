@@ -14,12 +14,12 @@
 
 from hashlib import sha1
 
-from botocore.stub import Stubber
+from botocore.stub import Stubber as BaseStubber
 
 from touchdown.core.utils import force_bytes
 
 
-class ServiceStubber(Stubber):
+class Stubber(BaseStubber):
 
     '''Extends the stubber from botocore so that it always asserts that
     there are no leftover responses.
@@ -36,18 +36,21 @@ class ServiceStubber(Stubber):
     remember to call `stub.assert_no_pending_responses()`.
     '''
 
+    def __exit__(self, exc_type, exc_value, traceback):
+        super(Stubber, self).__exit__(exc_type, exc_value, traceback)
+        # Only do this check if we are exiting cleanly, otherwise we
+        # mask the actual exception.
+        if exc_type is None:
+            self.assert_no_pending_responses()
+
+
+class ServiceStubber(Stubber):
+
     def __init__(self, service):
         self.resource = service.resource
         self.service = service
         # assert service.client.service == self.client_service
         super(ServiceStubber, self).__init__(service.client)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        super(ServiceStubber, self).__exit__(exc_type, exc_value, traceback)
-        # Only do this check if we are exiting cleanly, otherwise we
-        # mask the actual exception.
-        if exc_type is None:
-            self.assert_no_pending_responses()
 
     def make_id(self, name):
         ''' Return consistent 'id's' given a name. Subclasses will typically

@@ -18,6 +18,7 @@ from touchdown.core import argument, errors, serializers
 from touchdown.core.action import Action
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
+from touchdown.core.utils import cached_property
 
 from .. import route53
 from ..account import BaseAccount
@@ -192,12 +193,9 @@ class WaitForNetworkInterfaces(Action):
     description = ['Wait for network interfaces to be released']
 
     def run(self):
-        # We have to query ec2 and not elb api, so create a new client
-        client = self.plan.session.create_client('ec2')
-
         description = 'ELB {}'.format(self.plan.resource.name)
         for i in range(120):
-            interfaces = client.describe_network_interfaces(
+            interfaces = self.plan.ec2_client.describe_network_interfaces(
                 Filters=[
                     {'Name': 'description', 'Values': [description]},
                 ]
@@ -218,6 +216,10 @@ class WaitForNetworkInterfaces(Action):
 class Destroy(SimpleDestroy, Describe):
 
     destroy_action = 'delete_load_balancer'
+
+    @cached_property
+    def ec2_client(self):
+        return self.session.create_client('ec2')
 
     def destroy_object(self):
         for change in super(Destroy, self).destroy_object():
