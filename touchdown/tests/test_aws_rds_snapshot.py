@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core import errors
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import DatabaseStubber
 
@@ -90,3 +91,26 @@ class TestDatabaseSnapshots(StubberTestCase):
         )
 
         goal.execute('my-database', 'my-snapshot')
+
+    def test_snapshot_database_no_database(self):
+        goal = self.create_goal('snapshot')
+
+        database = self.fixtures.enter_context(DatabaseStubber(
+            goal.get_service(
+                self.aws.add_database(
+                    name='my-database',
+                    allocated_storage=5,
+                    instance_class='db.m3.medium',
+                    engine='postgres',
+                    master_username='root',
+                    master_password='password',
+                    storage_encrypted=True,
+                ),
+                'snapshot',
+            )
+        ))
+
+        # Database is not running
+        database.add_describe_db_instances_empty()
+
+        self.assertRaises(errors.Error, goal.execute, 'my-database', 'my-snapshot')
