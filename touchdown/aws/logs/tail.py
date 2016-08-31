@@ -52,7 +52,7 @@ class Plan(common.SimplePlan, plan.Plan):
                     seen.add(event['eventId'])
                     if event['eventId'] in previous_events:
                         continue
-                    print('[{timestamp}] [{logStreamName}] {message}'.format(**{
+                    self.runner.ui.echo('[{timestamp}] [{logStreamName}] {message}'.format(**{
                         'logStreamName': event.get('logStreamName', ''),
                         'message': event['message'].encode('utf-8', 'ignore'),
                         'timestamp': datetime.datetime.utcfromtimestamp(int(event['timestamp']) / 1000.0),
