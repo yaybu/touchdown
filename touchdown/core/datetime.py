@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 
 import re
+import time
 from datetime import datetime, timedelta, tzinfo
 
 from touchdown.core import errors
@@ -63,6 +64,8 @@ if not pytz:
 else:
     utc = pytz.utc
 
+_EPOCH = datetime(1970, 1, 1, tzinfo=utc)
+
 
 def now():
     return datetime.utcnow().replace(tzinfo=utc)
@@ -90,4 +93,10 @@ def parse_datetime(value):
 
 
 def as_seconds(value):
-    return int(value.strftime('%s')) * 1000
+    if value.tzinfo is None:
+        return int(time.mktime((
+            value.year, value.month, value.day,
+            value.hour, value.minute, value.second,
+            -1, -1, -1)))
+    else:
+        return int(value - _EPOCH).total_seconds()

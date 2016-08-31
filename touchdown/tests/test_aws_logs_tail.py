@@ -17,6 +17,7 @@ import mock
 
 from botocore.stub import ANY
 
+from touchdown.core.datetime import now
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import LogGroupStubber
 
@@ -77,10 +78,14 @@ class TestLogGroupTailing(StubberTestCase):
         )
 
         echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
+
+        # Call with both a naive and non-naive datetime
+        # The value is ignored but will at least trigger the dt handling
+        # codepaths
         goal.execute(
             'test-log_group',
             start=datetime.datetime.now(),
-            end=datetime.datetime.now(),
+            end=now(),
         )
 
         # Assert that pagination works and that de-duplication works
