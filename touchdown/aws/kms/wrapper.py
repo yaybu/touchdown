@@ -16,7 +16,7 @@ import base64
 import tarfile
 
 from cryptography.fernet import Fernet
-from six import StringIO
+from six import BytesIO
 
 from touchdown.core import argument
 from touchdown.core.plan import Plan
@@ -51,24 +51,24 @@ class FileIo(Plan):
             mode='r',
         )
         f = Fernet(base64.urlsafe_b64encode(kms.decrypt_data_key(tar.extractfile('key').read())))
-        return StringIO(f.decrypt(tar.extractfile('blob').read()))
+        return BytesIO(f.decrypt(tar.extractfile('blob').read()))
 
     def write(self, c):
         kms = self.runner.get_service(self.resource.key, 'describe')
         aes_key, aes_key_protected = kms.create_data_key()
-        io = StringIO()
+        io = BytesIO()
         tar = tarfile.open(name='xxxx', fileobj=io, mode='w')
 
         ti = tarfile.TarInfo('key')
         ti.size = len(aes_key_protected)
-        tar.addfile(ti, StringIO(aes_key_protected))
+        tar.addfile(ti, BytesIO(aes_key_protected))
 
         f = Fernet(base64.urlsafe_b64encode(aes_key))
         encrypted = f.encrypt(c)
 
         ti = tarfile.TarInfo('blob')
         ti.size = len(encrypted)
-        tar.addfile(ti, StringIO(encrypted))
+        tar.addfile(ti, BytesIO(encrypted))
 
         tar.close()
 
