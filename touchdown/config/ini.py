@@ -35,7 +35,7 @@ class Describe(Plan):
 
     def write(self, c):
         fp = self.runner.get_service(self.resource.file, 'fileio')
-        s = six.StringIO()
+        s = six.BytesIO()
         c.write(s)
         fp.write(s.getvalue())
 

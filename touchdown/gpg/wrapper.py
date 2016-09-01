@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six import StringIO
+from six import BytesIO
 
 from touchdown.core import argument
 from touchdown.core.plan import Plan
@@ -44,7 +44,7 @@ class FileIo(Plan):
             force_bytes(fp.read().read()),
             passphrase=self.resource.gpg.passphrase,
         ))
-        return StringIO(result)
+        return BytesIO(result)
 
     def write(self, c):
         fp = self.runner.get_service(self.resource.file, 'fileio')

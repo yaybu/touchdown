@@ -37,10 +37,10 @@ class FileIo(Plan):
 
     def read(self):
         try:
-            return open(self.resource.path, 'r')
+            return open(self.resource.path, 'rb')
         except IOError:
             raise FileNotFound(self.resource.path)
 
     def write(self, contents):
-        with open(self.resource.path, 'w') as fp:
+        with open(self.resource.path, 'wb') as fp:
             fp.write(contents)
