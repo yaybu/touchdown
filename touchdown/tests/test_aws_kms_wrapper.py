@@ -12,12 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.fixtures.folder import TemporaryFolderFixture
 from touchdown.tests.stubs.aws import KeyStubber
 
 
+DUMMY_EDITOR = (
+    '#! /usr/bin/python\n'
+    'import sys\n'
+    'import time\n'
+    'time.sleep(1)\n'
+    'with open(sys.argv[1], "w") as fp:\n'
+    '    fp.write("{message}")\n'
+)
+
+
 class TestKmsWrapper(StubberTestCase):
+
+    def test_edit_file_encrypted_with_kms(self):
+        goal = self.create_goal('edit')
+
+        folder = self.fixtures.enter_context(TemporaryFolderFixture(goal, self.workspace))
+
+        editor_path = os.path.join(folder.name, 'editor')
+        with open(editor_path, 'w') as fp:
+            fp.write(DUMMY_EDITOR.format(message='HEELOO'))
+        os.chmod(editor_path, 0755)
+
+        key = self.fixtures.enter_context(KeyStubber(
+            goal.get_service(
+                self.aws.add_key(
+                    name='test-key',
+                ),
+                'describe',
+            )
+        ))
+        key.add_list_keys_one()
+        key.add_describe_key()
+        key.add_generate_data_key()
+        key.add_decrypt()
+
+        wrapped_file = key.resource.add_cipher(name='test.txt', file=folder.add_file(name='test.txt.kms'))
+
+        os.environ['EDITOR'] = editor_path
+        goal.execute('test.txt')
+
+        reader = goal.get_service(wrapped_file, 'fileio')
+        self.assertEqual(reader.read().read(), b'HEELOO')
 
     def test_inifile_string_encrypted_with_kms(self):
         goal = self.create_goal('set')
