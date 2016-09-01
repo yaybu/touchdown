@@ -19,6 +19,7 @@ import tempfile
 from touchdown.core import argument, errors, serializers
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
+from touchdown.core.utils import force_bytes, force_str
 
 
 class FileNotFound(errors.Error):
@@ -107,7 +108,7 @@ class Set(Plan):
 
     def execute(self, value):
         f = self.runner.get_service(self.resource, 'fileio')
-        f.write(value)
+        f.write(force_bytes(value))
 
 
 class Get(Plan):
@@ -120,7 +121,7 @@ class Get(Plan):
 
     def execute(self):
         f = self.runner.get_service(self.resource, 'fileio')
-        return f.read().read(), True
+        return force_str(f.read().read()), True
 
 
 # class Refresh(Plan):

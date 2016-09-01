@@ -40,18 +40,18 @@ class FileIo(Plan):
     def read(self):
         fp = self.runner.get_service(self.resource.file, 'fileio')
         gpg = self.runner.get_service(self.resource.gpg, 'describe').get_gnupg()
-        result = str(gpg.decrypt(
+        result = force_bytes(str(gpg.decrypt(
             force_bytes(fp.read().read()),
             passphrase=self.resource.gpg.passphrase,
-        ))
+        )))
         return BytesIO(result)
 
     def write(self, c):
         fp = self.runner.get_service(self.resource.file, 'fileio')
         gpg = self.runner.get_service(self.resource.gpg, 'describe').get_gnupg()
-        fp.write(str(gpg.encrypt(
+        fp.write(force_bytes(str(gpg.encrypt(
             force_bytes(c),
             recipients=self.resource.gpg.recipients,
             symmetric=self.resource.gpg.symmetric,
             passphrase=self.resource.gpg.passphrase,
-        )))
+        ))))

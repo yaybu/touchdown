@@ -17,6 +17,7 @@ import six
 from six.moves import configparser
 from touchdown.core import argument, resource
 from touchdown.core.plan import Plan
+from touchdown.core.utils import force_bytes, force_str
 from touchdown.interfaces import File, FileNotFound
 
 
@@ -35,15 +36,15 @@ class Describe(Plan):
 
     def write(self, c):
         fp = self.runner.get_service(self.resource.file, 'fileio')
-        s = six.BytesIO()
+        s = six.StringIO()
         c.write(s)
-        fp.write(s.getvalue())
+        fp.write(force_bytes(s.getvalue()))
 
     def read(self):
         fp = self.runner.get_service(self.resource.file, 'fileio')
         config = configparser.ConfigParser()
         try:
-            config.readfp(fp.read())
+            config.readfp(six.StringIO(force_str(fp.read().read())))
         except FileNotFound:
             pass
         return config
