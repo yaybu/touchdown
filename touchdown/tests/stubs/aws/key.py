@@ -76,3 +76,29 @@ class KeyStubber(ServiceStubber):
                 'KeyId': self.make_id(self.resource.name),
             }
         )
+
+    def add_generate_data_key(self):
+        return self.add_response(
+            'generate_data_key',
+            service_response={
+                'CiphertextBlob': b'0' * 32,
+                'Plaintext': b'1' * 32,
+            },
+            expected_params={
+                'KeyId': self.make_id(self.resource.name),
+                'KeySpec': 'AES_256',
+                'EncryptionContext': {},
+            },
+        )
+
+    def add_decrypt(self):
+        return self.add_response(
+            'decrypt',
+            service_response={
+                'Plaintext': b'1' * 32,
+            },
+            expected_params={
+                'CiphertextBlob': b'0' * 32,
+                'EncryptionContext': {},
+            },
+        )
