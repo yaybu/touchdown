@@ -39,7 +39,7 @@ class TestKmsWrapper(StubberTestCase):
         editor_path = os.path.join(folder.name, 'editor')
         with open(editor_path, 'w') as fp:
             fp.write(DUMMY_EDITOR.format(message='HEELOO'))
-        os.chmod(editor_path, 0755)
+        os.chmod(editor_path, 0o755)
 
         key = self.fixtures.enter_context(KeyStubber(
             goal.get_service(
