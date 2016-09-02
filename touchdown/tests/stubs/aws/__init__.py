@@ -15,6 +15,7 @@
 from .service import Stubber, ServiceStubber
 
 from .account import AccountStubber
+from .ami_copy import ImageCopyStubber
 from .auto_scaling_group import AutoScalingGroupStubber
 from .bucket import BucketStubber
 from .database import DatabaseStubber
@@ -54,6 +55,7 @@ __all__ = [
     'EventRuleStubber',
     'ExternalAccountStubber',
     'HostedZoneStubber',
+    'ImageCopyStubber',
     'InternetGatewayStubber',
     'KeyPairStubber',
     'KeyStubber',

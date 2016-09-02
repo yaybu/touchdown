@@ -315,7 +315,7 @@ class SimpleDescribe(SimplePlan):
 
         if filters is None:
             logger.debug('Could not generate valid filters - this generally means we\'ve determined the object cant exist!')
-            return {}
+            return []
 
         logger.debug('Filters are: {}'.format(filters))
 
