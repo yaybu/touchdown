@@ -62,9 +62,9 @@ class Edit(Plan):
             raise errors.Error('Editing failed: Exit code' % exit_code)
 
     def edit(self, contents):
-        contents = contents or ''
-        if contents and not contents.endswith('\n'):
-            contents += '\n'
+        contents = contents or b''
+        if contents and not contents.endswith(b'\n'):
+            contents += b'\n'
 
         fd, name = tempfile.mkstemp(prefix='edit-')
         try:
@@ -90,7 +90,7 @@ class Edit(Plan):
         try:
             contents = f.read().read()
         except FileNotFound:
-            contents = ''
+            contents = b''
 
         contents, changed = self.edit(contents)
 
