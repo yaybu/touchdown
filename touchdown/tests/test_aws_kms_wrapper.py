@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import os
+import sys
+import unittest
 
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.fixtures.folder import TemporaryFolderFixture
@@ -31,6 +33,7 @@ DUMMY_EDITOR = (
 
 class TestKmsWrapper(StubberTestCase):
 
+    @unittest.skipIf(sys.platform == 'win32', 'touchdown edit not tested on win')
     def test_edit_file_encrypted_with_kms(self):
         goal = self.create_goal('edit')
 
