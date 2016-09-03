@@ -60,7 +60,7 @@ class StreamingDistribution(Resource):
     }
 
     name = argument.String()
-    cname = argument.String(default=lambda instance: instance.name, serializer=serializers.Argument('cname'))
+    cname = argument.String(default=lambda instance: instance.name, serializer=serializers.ListOfOne(maybe_empty=True))
     comment = argument.String(field='Comment', default=lambda instance: instance.name)
     aliases = argument.List()
     enabled = argument.Boolean(default=True, field='Enabled')
@@ -103,12 +103,13 @@ class Describe(SimpleDescribe, Plan):
     def describe_object_matches(self, d):
         return self.resource.name == d['Comment'] or self.resource.name in d['Aliases'].get('Items', [])
 
-    def describe_object(self):
-        distribution = super(Describe, self).describe_object()
-        if distribution:
-            result = self.client.get_streaming_distribution(Id=distribution['Id'])
-            distribution = {'ETag': result['ETag'], 'Id': distribution['Id']}
-            distribution.update(result['StreamingDistribution'])
+    def annotate_object(self, obj):
+        result = self.client.get_streaming_distribution(Id=obj['Id'])
+        distribution = {
+            'ETag': result['ETag'],
+            'Id': obj['Id'],
+        }
+        distribution.update(result['StreamingDistribution'])
         return distribution
 
 

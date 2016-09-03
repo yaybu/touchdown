@@ -38,6 +38,7 @@ from .rds_subnet_group import RdsSubnetGroupStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
 from .security_group import SecurityGroupStubber
+from .streaming_distribution import StreamingDistributionStubber
 from .subnet import SubnetStubber
 from .topic import TopicStubber
 from .volume_attachment import VolumeAttachmentStubber
@@ -70,6 +71,7 @@ __all__ = [
     'RouteTableStubber',
     'SecurityGroupStubber',
     'ServiceStubber',
+    'StreamingDistributionStubber',
     'Stubber',
     'SubnetStubber',
     'TopicStubber',

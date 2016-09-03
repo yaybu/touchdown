@@ -53,3 +53,21 @@ class BucketStubber(ServiceStubber):
             {},
             {'Bucket': self.resource.name},
         )
+
+    def add_list_buckets_one_response(self):
+        return self.add_response(
+            'list_buckets',
+            service_response={
+                'Buckets': [{
+                    'Name': self.resource.name,
+                }],
+            },
+            expected_params={},
+        )
+
+    def add_head_bucket(self):
+        return self.add_response(
+            'head_bucket',
+            service_response={},
+            expected_params={'Bucket': self.resource.name},
+        )
