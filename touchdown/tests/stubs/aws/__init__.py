@@ -37,6 +37,7 @@ from .password_policy import PasswordPolicyStubber
 from .pipeline import PipelineStubber
 from .queue import QueueStubber
 from .replication_group import ReplicationGroupStubber
+from .rest_api import RestApiStubber
 from .rds_subnet_group import RdsSubnetGroupStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
@@ -72,6 +73,7 @@ __all__ = [
     'PipelineStubber',
     'QueueStubber',
     'ReplicationGroupStubber',
+    'RestApiStubber',
     'RdsSubnetGroupStubber',
     'RoleStubber',
     'RouteTableStubber',
