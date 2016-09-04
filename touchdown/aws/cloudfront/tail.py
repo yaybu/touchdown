@@ -15,6 +15,8 @@
 # This code is not currently exposed publically. It is an example of how to
 # stream from a aws log using the FilterLogEvents API.
 
+import gzip
+
 from touchdown.aws import common
 from touchdown.aws.cloudfront import Distribution
 from touchdown.core import plan
@@ -85,15 +87,8 @@ class Plan(common.SimplePlan, plan.Plan):
                 Key=log['Key'],
             )
 
-            import StringIO
-            body = StringIO.StringIO(response['Body'].read())
+            blob = gzip.decompress(response['Body'].read())
 
-            import gzip
-            blob = gzip.GzipFile(
-                mode='r',
-                fileobj=body,
-            )
-
-            lines = blob.read().split('\n')
+            lines = blob.split(b'\n')
             for line in lines[2:]:
                 print(line)
