@@ -17,6 +17,8 @@
 
 import gzip
 
+import six
+
 from touchdown.aws import common
 from touchdown.aws.cloudfront import Distribution
 from touchdown.core import plan
@@ -87,7 +89,8 @@ class Plan(common.SimplePlan, plan.Plan):
                 Key=log['Key'],
             )
 
-            blob = gzip.decompress(response['Body'].read())
+            with gzip.GzipFile(fileobj=six.BytesIO(response['Body'].read())) as f:
+                blob = f.read()
 
             lines = blob.split(b'\n')
             for line in lines[2:]:

@@ -85,7 +85,10 @@ class TestDistributionTail(StubberTestCase):
             }
         )
 
-        log_chunk = gzip.compress(b'line1\nline2\nline3\n')
+        buf = six.BytesIO()
+        with gzip.GzipFile(fileobj=buf, mode='wb') as f:
+            f.write(b'line1\nline2\nline3\n')
+        log_chunk = buf.getvalue()
 
         distribution.add_response(
             'get_object',
