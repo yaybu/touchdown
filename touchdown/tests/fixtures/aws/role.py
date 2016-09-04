@@ -12,21 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .bucket import BucketFixture
-from .launch_configuration import LaunchConfigurationFixture
-from .network_acl import NetworkAclFixture
-from .role import RoleFixture
-from .route_table import RouteTableFixture
-from .subnet import SubnetFixture
-from .vpc import VpcFixture
+from touchdown.tests.stubs.aws import RoleStubber
+
+from .fixture import AwsFixture
 
 
-__all__ = [
-    'BucketFixture',
-    'LaunchConfigurationFixture',
-    'NetworkAclFixture',
-    'RoleFixture',
-    'RouteTableFixture',
-    'SubnetFixture',
-    'VpcFixture',
-]
+class RoleFixture(AwsFixture):
+
+    def __enter__(self):
+        self.role = self.fixtures.enter_context(RoleStubber(
+            self.goal.get_service(
+                self.aws.get_role(
+                    name='my-test-role',
+                ),
+                'describe',
+            ),
+        ))
+        self.role.add_list_roles_one_response_by_name()
+
+        return self.role.resource

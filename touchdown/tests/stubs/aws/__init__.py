@@ -33,6 +33,7 @@ from .load_balancer import LoadBalancerStubber
 from .log_group import LogGroupStubber
 from .network_acl import NetworkAclStubber
 from .password_policy import PasswordPolicyStubber
+from .pipeline import PipelineStubber
 from .queue import QueueStubber
 from .rds_subnet_group import RdsSubnetGroupStubber
 from .role import RoleStubber
@@ -65,6 +66,7 @@ __all__ = [
     'LogGroupStubber',
     'NetworkAclStubber',
     'PasswordPolicyStubber',
+    'PipelineStubber',
     'QueueStubber',
     'RdsSubnetGroupStubber',
     'RoleStubber',

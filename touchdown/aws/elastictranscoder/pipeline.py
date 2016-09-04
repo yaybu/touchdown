@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core import argument, serializers
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
@@ -90,6 +90,12 @@ class Apply(SimpleApply, Describe):
 
     create_action = 'create_pipeline'
 
+    signature = (
+        Present('name'),
+        Present('input_bucket'),
+        Present('role'),
+    )
+
     def update_object(self):
         d = serializers.Resource(group='notifications').diff(
             self.runner,
@@ -98,7 +104,7 @@ class Apply(SimpleApply, Describe):
         )
         if not d.matches():
             yield self.generic_action(
-                ['Update pipline notification topics'] + list(d.lines()),
+                ['Update pipeline notification topics'] + list(d.lines()),
                 self.client.update_pipeline_notifications,
                 Id=serializers.Identifier(),
                 Notifications=serializers.Resource(group='notifications'),
