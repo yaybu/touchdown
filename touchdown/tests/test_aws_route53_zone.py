@@ -13,7 +13,13 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
-from touchdown.tests.stubs.aws import HostedZoneStubber, LoadBalancerStubber
+from touchdown.tests.stubs.aws import (
+    DistributionStubber,
+    HostedZoneStubber,
+    LoadBalancerStubber,
+)
+
+from .test_aws_cloudfront_distribution import EXAMPLE_DISTRIBUTION_CONFIG
 
 
 class TestHostedZoneCreation(StubberTestCase):
@@ -140,6 +146,52 @@ class TestUpdateRrset(StubberTestCase):
             'AliasTarget': {
                 'DNSName': 'mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com.',
                 'HostedZoneId': 'Z3DZXE0Q79N41H',
+                'EvaluateTargetHealth': False,
+            },
+        })
+
+        goal.execute()
+
+    def test_add_rrset_alias_distribution(self):
+        goal = self.create_goal('apply')
+
+        distribution = self.fixtures.enter_context(DistributionStubber(
+            goal.get_service(
+                self.aws.get_distribution(name='www.example.com'),
+                'describe',
+            )
+        ))
+        distribution.add_list_distributions_one_response(EXAMPLE_DISTRIBUTION_CONFIG)
+        distribution.add_get_distribution(EXAMPLE_DISTRIBUTION_CONFIG)
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                    records=[{
+                        'name': 'www.example.com.',
+                        'type': 'A',
+                        'ttl': 900,
+                        'alias': distribution.resource,
+                    }],
+                ),
+                'apply',
+            )
+        ))
+
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
+
+        # There are no rrset
+        zone.add_list_resource_record_sets()
+
+        zone.add_change_resource_record_sets_upsert({
+            'Name': 'www.example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'AliasTarget': {
+                'DNSName': 'example.com.',
+                'HostedZoneId': 'Z2FDTNDATAQYW2',
                 'EvaluateTargetHealth': False,
             },
         })
