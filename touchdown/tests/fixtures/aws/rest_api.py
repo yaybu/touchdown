@@ -12,23 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .bucket import BucketFixture
-from .launch_configuration import LaunchConfigurationFixture
-from .network_acl import NetworkAclFixture
-from .rest_api import RestApiFixture
-from .role import RoleFixture
-from .route_table import RouteTableFixture
-from .subnet import SubnetFixture
-from .vpc import VpcFixture
+from touchdown.tests.stubs.aws import RestApiStubber
+
+from .fixture import AwsFixture
 
 
-__all__ = [
-    'BucketFixture',
-    'LaunchConfigurationFixture',
-    'NetworkAclFixture',
-    'RestApiFixture',
-    'RoleFixture',
-    'RouteTableFixture',
-    'SubnetFixture',
-    'VpcFixture',
-]
+class RestApiFixture(AwsFixture):
+
+    def __enter__(self):
+        self.rest_api = self.fixtures.enter_context(RestApiStubber(
+            self.goal.get_service(
+                self.aws.get_rest_api(
+                    name='my-test-rest_api',
+                ),
+                'describe',
+            ),
+        ))
+        self.rest_api.add_get_rest_apis_one_response()
+
+        return self.rest_api.resource, self.rest_api.make_id(self.rest_api.resource.name)
