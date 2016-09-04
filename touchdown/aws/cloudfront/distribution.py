@@ -376,9 +376,6 @@ class Destroy(SimpleDestroy, Describe):
         )
 
     def destroy_object(self):
-        if not self.object:
-            return
-
         if self.object.get('Enabled', False):
             yield self.generic_action(
                 'Disable distribution',

@@ -141,9 +141,6 @@ class Destroy(SimpleDestroy, Describe):
         )
 
     def destroy_object(self):
-        if not self.object:
-            return
-
         if self.object['StreamingDistributionConfig'].get('Enabled', False):
             yield self.generic_action(
                 'Disable streaming distribution',
