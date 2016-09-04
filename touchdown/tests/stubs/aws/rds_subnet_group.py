@@ -17,7 +17,7 @@ from .service import ServiceStubber
 
 class RdsSubnetGroupStubber(ServiceStubber):
 
-    client_service = 'rds'
+    client_service = 'elasticache'
 
     def add_describe_db_subnet_groups_empty(self):
         return self.add_response(
