@@ -21,6 +21,7 @@ from .bucket import BucketStubber
 from .database import DatabaseStubber
 from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
+from .elasticache_subnet_group import ElastiCacheSubnetGroupStubber
 from .endpoint import VpcEndpointStubber
 from .event_rule import EventRuleStubber
 from .external_account import ExternalAccountStubber
@@ -54,6 +55,7 @@ __all__ = [
     'DatabaseStubber',
     'DistributionStubber',
     'EC2InstanceStubber',
+    'ElastiCacheSubnetGroupStubber',
     'EventRuleStubber',
     'ExternalAccountStubber',
     'HostedZoneStubber',
