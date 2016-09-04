@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
-from touchdown.tests.stubs.aws import HostedZoneStubber
+from touchdown.tests.stubs.aws import HostedZoneStubber, LoadBalancerStubber
 
 
 class TestHostedZoneCreation(StubberTestCase):
@@ -96,6 +96,52 @@ class TestUpdateRrset(StubberTestCase):
             'Type': 'A',
             'TTL': 900,
             'ResourceRecords': [{'Value': '127.0.0.1'}],
+        })
+
+        goal.execute()
+
+    def test_add_rrset_alias_loadbalancer(self):
+        goal = self.create_goal('apply')
+
+        lb = self.fixtures.enter_context(LoadBalancerStubber(
+            goal.get_service(
+                self.aws.get_load_balancer(name='my-load-balancer'),
+                'describe',
+            )
+        ))
+        lb.add_describe_load_balancers_one()
+        lb.add_describe_load_balancer_attributes()
+
+        zone = self.fixtures.enter_context(HostedZoneStubber(
+            goal.get_service(
+                self.aws.add_hosted_zone(
+                    name='example.com',
+                    records=[{
+                        'name': 'example.com.',
+                        'type': 'A',
+                        'ttl': 900,
+                        'alias': lb.resource,
+                    }],
+                ),
+                'apply',
+            )
+        ))
+
+        # There is a matching zone deployed at AWS
+        zone.add_list_hosted_zones_one_response()
+
+        # There are no rrset
+        zone.add_list_resource_record_sets()
+
+        zone.add_change_resource_record_sets_upsert({
+            'Name': 'example.com.',
+            'Type': 'A',
+            'TTL': 900,
+            'AliasTarget': {
+                'DNSName': 'mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com.',
+                'HostedZoneId': 'Z3DZXE0Q79N41H',
+                'EvaluateTargetHealth': False,
+            },
         })
 
         goal.execute()

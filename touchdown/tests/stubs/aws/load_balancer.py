@@ -34,6 +34,9 @@ class LoadBalancerStubber(ServiceStubber):
             service_response={
                 'LoadBalancerDescriptions': [{
                     'LoadBalancerName': self.resource.name,
+                    'CanonicalHostedZoneName': 'mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com',
+                    'CanonicalHostedZoneNameID': 'Z3DZXE0Q79N41H',
+                    'DNSName': 'mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com',
                 }]
             },
             expected_params={
