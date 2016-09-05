@@ -101,6 +101,22 @@ class AutoScalingGroupStubber(ServiceStubber):
             }
         )
 
+    def add_update_auto_scaling_group(self, desired=None, min=None, max=None):
+        params = {
+            'AutoScalingGroupName': self.resource.name,
+        }
+        if desired is not None:
+            params['DesiredCapacity'] = desired
+        if min is not None:
+            params['MinSize'] = min
+        if max is not None:
+            params['MaxSize'] = max
+        return self.add_response(
+            'update_auto_scaling_group',
+            service_response={},
+            expected_params=params,
+        )
+
     def add_update_auto_scaling_group_SCALEDOWN(self):
         return self.add_response(
             'update_auto_scaling_group',
@@ -120,5 +136,37 @@ class AutoScalingGroupStubber(ServiceStubber):
             },
             expected_params={
                 'AutoScalingGroupName': self.resource.name,
+            },
+        )
+
+    def add_suspend_processes(self):
+        return self.add_response(
+            'suspend_processes',
+            service_response={
+            },
+            expected_params={
+                'AutoScalingGroupName': self.resource.name,
+                'ScalingProcesses': [
+                    'AlarmNotification',
+                    'AZRebalance',
+                    'ReplaceUnhealthy',
+                    'ScheduledActions',
+                ],
+            },
+        )
+
+    def add_resume_processes(self):
+        return self.add_response(
+            'resume_processes',
+            service_response={
+            },
+            expected_params={
+                'AutoScalingGroupName': self.resource.name,
+                'ScalingProcesses': [
+                    'AlarmNotification',
+                    'AZRebalance',
+                    'ReplaceUnhealthy',
+                    'ScheduledActions',
+                ],
             },
         )

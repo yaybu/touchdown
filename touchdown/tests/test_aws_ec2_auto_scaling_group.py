@@ -82,6 +82,78 @@ class TestCreateAutoScalingGroupuration(StubberTestCase):
 
         goal.execute()
 
+    def test_update_auto_scaling_group_replace_instances(self):
+        goal = self.create_goal('apply')
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationFixture(goal, self.aws))
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.add_auto_scaling_group(
+                    name='my-asg',
+                    min_size=1,
+                    max_size=1,
+                    launch_configuration=launch_config,
+                ),
+                'apply',
+            )
+        ))
+
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            min_size=1,
+            max_size=1,
+            instances=[
+                # This one should be ignored
+                {'LifecycleState': 'Terminating'},
+                # This one should be removed
+                {'LifecycleState': 'InService'},
+            ],
+        )
+
+        auto_scaling_group.add_suspend_processes()
+
+        auto_scaling_group.add_update_auto_scaling_group(desired=1, max=1)
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            min_size=1,
+            max_size=1,
+            instances=[
+                # This one should be removed
+                {'LifecycleState': 'InService'},
+            ],
+        )
+
+        auto_scaling_group.add_response(
+            'terminate_instance_in_auto_scaling_group',
+            service_response={},
+            expected_params={
+                'InstanceId': 'i-abcd1234',
+                'ShouldDecrementDesiredCapacity': False,
+            },
+        )
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            min_size=1,
+            max_size=1,
+            instances=[
+                {'LifecycleState': 'InService'},
+            ],
+        )
+
+        # GracefulReplacement.unscale
+        auto_scaling_group.add_update_auto_scaling_group(desired=0, max=1)
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            min_size=1,
+            max_size=1,
+            instances=[],
+        )
+
+        # GracefulReplacement.run -'Resuming autoscaling activities'
+        auto_scaling_group.add_resume_processes()
+
+        # Set self.plan.object before returning control
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response()
+
+        goal.execute()
+
     def test_create_auto_scaling_group_idempotent(self):
         goal = self.create_goal('apply')
 
