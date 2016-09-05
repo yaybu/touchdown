@@ -39,25 +39,6 @@ class BaseFrontend(object):
         else:
             self._echo(text)
 
-    def table(self, data):
-        widths = {}
-        for row in data:
-            for i, column in enumerate(row):
-                widths[i] = max(len(column), widths.get(i, 0))
-
-        line = '| ' + ' | '.join(
-            '{{:<{}}}'.format(widths[i]) for i in range(len(widths))
-        ) + ' |'
-
-        sep = '+-' + '-+-'.join('-' * widths[i] for i in range(len(widths))) + '-+'
-
-        self.echo(sep)
-        self.echo(line.format(*data[0]))
-        self.echo(sep)
-        for row in data[1:]:
-            self.echo(line.format(*row))
-        self.echo(sep)
-
     def render_plan(self, plan):
         for resource, actions in plan:
             self.echo('%s:' % resource)
