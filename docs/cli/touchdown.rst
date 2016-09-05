@@ -93,7 +93,6 @@ There are a bunch of commands you can run against your Touchdown config:
 .. toctree::
 
    apply
-   cost
    destroy
    get_signin_url
    tail
