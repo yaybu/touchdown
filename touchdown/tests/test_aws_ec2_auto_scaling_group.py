@@ -43,6 +43,45 @@ class TestCreateAutoScalingGroupuration(StubberTestCase):
         auto_scaling_group.add_describe_auto_scaling_groups_one_response()
         goal.execute()
 
+    def test_create_auto_scaling_group_wait_for_healthy(self):
+        goal = self.create_goal('apply')
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationFixture(goal, self.aws))
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.add_auto_scaling_group(
+                    name='my-asg',
+                    min_size=1,
+                    max_size=1,
+                    launch_configuration=launch_config,
+                ),
+                'apply',
+            )
+        ))
+
+        auto_scaling_group.add_describe_auto_scaling_groups_empty_response()
+        auto_scaling_group.add_create_auto_scaling_group(
+            min_size=1,
+            max_size=1,
+        )
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response()
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response()
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response()
+
+        # Now wait for an ec2 instance to be in a healthy state
+        # First of all lets mock one starting...
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{'LifecycleState': 'Pending'}],
+        )
+
+        # And now its ready...
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{'LifecycleState': 'InService'}],
+        )
+
+        goal.execute()
+
     def test_create_auto_scaling_group_idempotent(self):
         goal = self.create_goal('apply')
 

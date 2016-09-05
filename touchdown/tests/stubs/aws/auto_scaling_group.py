@@ -21,6 +21,20 @@ class AutoScalingGroupStubber(ServiceStubber):
 
     client_service = 'ec2'
 
+    def build_instances(self, instances):
+        retval = []
+        for row in instances:
+            instance = {
+                'InstanceId': 'i-abcd1234',
+                'AvailabilityZone': 'eu-west-1a',
+                'HealthStatus': 'Healthy',
+                'LaunchConfigurationName': 'old-launch-config',
+                'ProtectedFromScaleIn': True,
+            }
+            instance.update(row)
+            retval.append(instance)
+        return retval
+
     def add_describe_auto_scaling_groups_empty_response(self):
         return self.add_response(
             'describe_auto_scaling_groups',
@@ -32,20 +46,21 @@ class AutoScalingGroupStubber(ServiceStubber):
             },
         )
 
-    def add_describe_auto_scaling_groups_one_response(self):
+    def add_describe_auto_scaling_groups_one_response(self, min_size=0, max_size=0, instances=None):
         return self.add_response(
             'describe_auto_scaling_groups',
             service_response={
                 'AutoScalingGroups': [{
                     'AutoScalingGroupName': self.resource.name,
                     'LaunchConfigurationName': 'my-test-lc',
-                    'MinSize': 0,
-                    'MaxSize': 0,
+                    'MinSize': min_size,
+                    'MaxSize': max_size,
                     'DesiredCapacity': 0,
                     'DefaultCooldown': 0,
                     'AvailabilityZones': ['eu-west-1a'],
                     'HealthCheckType': 'ELB',
                     'CreatedTime': datetime.datetime.now(),
+                    'Instances': self.build_instances(instances or []),
                 }],
             },
             expected_params={
@@ -70,7 +85,7 @@ class AutoScalingGroupStubber(ServiceStubber):
             },
         )
 
-    def add_create_auto_scaling_group(self):
+    def add_create_auto_scaling_group(self, min_size=0, max_size=0):
         return self.add_response(
             'create_auto_scaling_group',
             service_response={
@@ -78,8 +93,8 @@ class AutoScalingGroupStubber(ServiceStubber):
             expected_params={
                 'AutoScalingGroupName': 'my-asg',
                 'LaunchConfigurationName': 'my-test-lc',
-                'MinSize': 0,
-                'MaxSize': 0,
+                'MinSize': min_size,
+                'MaxSize': max_size,
                 'DefaultCooldown': 300,
                 'Tags': [],
                 'TerminationPolicies': ['Default'],
