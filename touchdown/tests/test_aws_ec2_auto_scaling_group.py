@@ -121,7 +121,10 @@ class TestDestroyAutoScalingGroupuration(StubberTestCase):
             )
         ))
 
-        auto_scaling_group.add_describe_auto_scaling_groups_one_response()
+        # Test stopping an ASG that has instances running
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{'LifecycleState': 'InService'}],
+        )
 
         # Scale the ASG down to 0 (min, max and desired)
         auto_scaling_group.add_update_auto_scaling_group_SCALEDOWN()
