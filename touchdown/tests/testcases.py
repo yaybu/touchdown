@@ -31,12 +31,12 @@ class WorkspaceTestCase(unittest.TestCase):
         self.fixtures = ExitStack()
         self.addCleanup(self.fixtures.close)
 
-    def create_goal(self, goal_name):
+    def create_goal(self, goal_name, map_class=SerialMap):
         return goals.create(
             goal_name,
             self.workspace,
             MultiFrontend([
                 ConsoleFrontend(interactive=False),
             ]),
-            map=SerialMap
+            map=map_class,
         )
