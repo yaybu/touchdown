@@ -40,7 +40,7 @@ class DatabaseStubber(ServiceStubber):
             }
         )
 
-    def add_create_db_instance(self):
+    def add_create_db_instance(self, password='password'):
         return self.add_response(
             'create_db_instance',
             service_response={
@@ -53,7 +53,7 @@ class DatabaseStubber(ServiceStubber):
                 'AllocatedStorage': 5,
                 'DBInstanceClass': 'db.m3.medium',
                 'Engine': 'postgres',
-                'MasterUserPassword': 'password',
+                'MasterUserPassword': password,
                 'MasterUsername': 'root',
                 'StorageEncrypted': True,
             },
