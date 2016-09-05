@@ -127,6 +127,9 @@ class TestDestroyAutoScalingGroupuration(StubberTestCase):
         auto_scaling_group.add_update_auto_scaling_group_SCALEDOWN()
 
         # It waits for describe_auto_scaling_groups().Instances to be []
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{'LifecycleState': 'InService'}],
+        )
         auto_scaling_group.add_describe_auto_scaling_groups_one_response()
 
         # Make sure there are no activities in progress
