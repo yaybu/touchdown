@@ -393,7 +393,8 @@ class Json(Formatter):
         return json.dumps(self.inner.render(runner, object), sort_keys=True)
 
     def diff(self, runner, object, value):
-        return self.inner.diff(runner, object, json.loads(value))
+        value = json.loads(value) if value else {}
+        return self.inner.diff(runner, object, value)
 
 
 class Append(Formatter):
@@ -507,7 +508,7 @@ class Map(Dict):
         return any(maybe(v).pending(runner, v) for v in object.values())
 
     def dependencies(self, object):
-        return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in object.values())))
+        return frozenset(itertools.chain(*tuple(maybe(c).dependencies(object) for c in object.values())))
 
 
 class Resource(Dict):
@@ -596,7 +597,7 @@ class Resource(Dict):
         return False
 
     def dependencies(self, object):
-        raise NotImplementedError(self.dependencies, object)
+        return set()
 
 
 class List(Serializer):

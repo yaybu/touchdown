@@ -36,6 +36,12 @@ class ReplicationGroupStubber(ServiceStubber):
                 'ReplicationGroups': [{
                     'ReplicationGroupId': self.resource.name,
                     'Status': status,
+                    'NodeGroups': [{
+                        'PrimaryEndpoint': {
+                            'Address': 'myreplgrp.q68zge.ng.0001.use1devo.elmo-dev.amazonaws.com',
+                            'Port': 6379,
+                        }
+                    }]
                 }],
             },
             expected_params={

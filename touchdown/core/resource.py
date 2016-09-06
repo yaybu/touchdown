@@ -63,6 +63,9 @@ class Field(object):
                     instance.add_dependency(dep)
         else:
             value = self.clean_value(instance, value)
+            for dep in self.argument.serializer.dependencies(value):
+                if dep != instance:
+                    instance.add_dependency(dep)
         instance._values[self.name] = value
 
     def __get__(self, instance, owner):

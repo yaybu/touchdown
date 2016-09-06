@@ -43,6 +43,11 @@ class LaunchConfiguration(resource.Resource):
 
     user_data = argument.String(field='UserData')
 
+    json_user_data = argument.Dict(
+        field='UserData',
+        serializer=serializers.Json(serializers.Map()),
+    )
+
     instance_type = argument.String(max=255, field='InstanceType')
 
     kernel = argument.String(max=255, field='KernelId')

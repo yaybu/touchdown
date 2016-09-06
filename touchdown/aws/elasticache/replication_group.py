@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument, serializers
+from touchdown.core import argument, output, serializers
 from touchdown.core.plan import Plan
 
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
@@ -29,6 +29,9 @@ class ReplicationGroup(BaseCacheCluster):
     primary_cluster = argument.Resource('touchdown.aws.elasticache.cache.CacheCluster', field='PrimaryClusterId')
     automatic_failover = argument.Boolean(field='AutomaticFailoverEnabled')
     num_cache_clusters = argument.Integer(field='NumCacheClusters', update=False)
+
+    endpoint_address = output.Output(serializers.Property('NodeGroups[0].PrimaryEndpoint.Address'))
+    endpoint_port = output.Output(serializers.Property('NodeGroups[0].PrimaryEndpoint.Port'))
 
 
 class Describe(SimpleDescribe, Plan):

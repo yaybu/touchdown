@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
-from touchdown.tests.stubs.aws import ReplicationGroupStubber
+from touchdown.tests.stubs.aws import (
+    LaunchConfigurationStubber,
+    ReplicationGroupStubber,
+)
 
 
 class TestReplicationGroupCreation(StubberTestCase):
@@ -91,3 +94,52 @@ class TestReplicationGroupDeletion(StubberTestCase):
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(replication_group.resource)), 0)
+
+
+class TestReplicationGroupComplications(StubberTestCase):
+
+    def test_with_launch_configuration(self):
+        goal = self.create_goal('apply')
+
+        replication_group = self.fixtures.enter_context(ReplicationGroupStubber(
+            goal.get_service(
+                self.aws.add_replication_group(
+                    name='my-rep_group',
+                ),
+                'apply',
+            )
+        ))
+        replication_group.add_describe_replication_groups_empty_response()
+        replication_group.add_create_replication_group()
+        replication_group.add_describe_replication_groups_one_response(status='creating')
+        replication_group.add_describe_replication_groups_one_response()
+        replication_group.add_describe_replication_groups_one_response()
+
+        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
+            goal.get_service(
+                self.aws.add_launch_configuration(
+                    name='my-test-lc',
+                    image='ami-cba130bc',
+                    instance_type='t2.micro',
+                    json_user_data={
+                        'REDIS_ADDRESS': replication_group.resource.endpoint_address,
+                        'REDIS_PORT': replication_group.resource.endpoint_port,
+                    }
+                ),
+                'apply',
+            )
+        ))
+
+        user_data = (
+            '{"REDIS_ADDRESS": "myreplgrp.q68zge.ng.0001.use1devo.elmo-dev.amazonaws.com", '
+            '"REDIS_PORT": 6379}'
+        )
+
+        launch_config.add_describe_launch_configurations_empty_response()
+        launch_config.add_describe_launch_configurations_empty_response()
+        launch_config.add_create_launch_configuration(user_data=user_data)
+        launch_config.add_describe_launch_configurations_one_response(user_data=user_data)
+        launch_config.add_describe_launch_configurations_one_response(user_data=user_data)
+        launch_config.add_describe_launch_configurations_one_response(user_data=user_data)
+
+        goal.execute()

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import datetime
+
+from touchdown.core.utils import force_bytes, force_str
 
 from .service import ServiceStubber
 
@@ -30,16 +33,19 @@ class LaunchConfigurationStubber(ServiceStubber):
             expected_params={},
         )
 
-    def add_describe_launch_configurations_one_response(self):
+    def add_describe_launch_configurations_one_response(self, user_data=None):
+        launch_config = {
+            'LaunchConfigurationName': self.resource.name,
+            'ImageId': 'ami-cba130bc',
+            'InstanceType': 't2.micro',
+            'CreatedTime': datetime.datetime.now(),
+        }
+        if user_data:
+            launch_config['UserData'] = force_str(base64.b64encode(force_bytes(user_data)))
         return self.add_response(
             'describe_launch_configurations',
             service_response={
-                'LaunchConfigurations': [{
-                    'LaunchConfigurationName': self.resource.name,
-                    'ImageId': 'ami-cba130bc',
-                    'InstanceType': 't2.micro',
-                    'CreatedTime': datetime.datetime.now(),
-                }],
+                'LaunchConfigurations': [launch_config],
             },
             expected_params={},
         )
@@ -53,17 +59,19 @@ class LaunchConfigurationStubber(ServiceStubber):
             expected_params={},
         )
 
-    def add_create_launch_configuration(self):
+    def add_create_launch_configuration(self, user_data=None):
+        expected_params = {
+            'ImageId': 'ami-cba130bc',
+            'InstanceMonitoring': {'Enabled': False},
+            'InstanceType': 't2.micro',
+            'LaunchConfigurationName': 'my-test-lc.1',
+        }
+        if user_data:
+            expected_params['UserData'] = user_data
         return self.add_response(
             'create_launch_configuration',
-            service_response={
-            },
-            expected_params={
-                'ImageId': 'ami-cba130bc',
-                'InstanceMonitoring': {'Enabled': False},
-                'InstanceType': 't2.micro',
-                'LaunchConfigurationName': 'my-test-lc.1'
-            }
+            service_response={},
+            expected_params=expected_params,
         )
 
     def add_delete_launch_configuration(self):
