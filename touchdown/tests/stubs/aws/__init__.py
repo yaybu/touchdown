@@ -15,6 +15,7 @@
 from .service import Stubber, ServiceStubber
 
 from .account import AccountStubber
+from .acm_certificate import CertificateStubber
 from .ami_copy import ImageCopyStubber
 from .auto_scaling_group import AutoScalingGroupStubber
 from .bucket import BucketStubber
@@ -57,6 +58,7 @@ __all__ = [
     'AutoScalingGroupStubber',
     'BucketStubber',
     'CacheClusterStubber',
+    'CertificateStubber',
     'DatabaseStubber',
     'DistributionStubber',
     'EC2InstanceStubber',

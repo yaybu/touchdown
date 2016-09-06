@@ -58,6 +58,9 @@ class Describe(SimpleDescribe, Plan):
     def describe_object_matches(self, obj):
         return obj['DomainName'] == self.resource.name
 
+    def get_describe_filters(self):
+        return {'CertificateArn': self.resource_id}
+
 
 class Apply(SimpleApply, Describe):
 

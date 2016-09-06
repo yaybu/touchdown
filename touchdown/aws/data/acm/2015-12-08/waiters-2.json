@@ -7,37 +7,37 @@
       "operation": "DescribeCertificate",
       "acceptors": [
         {
-          "matcher": "pathAll",
+          "matcher": "path",
           "expected": "ISSUED",
           "argument": "Certificate.Status",
           "state": "success"
         },
         {
-          "matcher": "pathAll",
+          "matcher": "path",
           "expected": "INACTIVE",
           "argument": "Certificate.Status",
           "state": "failure"
         },
         {
-          "matcher": "pathAll",
+          "matcher": "path",
           "expected": "EXPIRED",
           "argument": "Certificate.Status",
           "state": "failure"
         },
         {
-          "matcher": "pathAll",
+          "matcher": "path",
           "expected": "VALIDATION_TIMED_OUT",
           "argument": "Certificate.Status",
           "state": "failure"
         },
         {
-          "matcher": "pathAll",
+          "matcher": "path",
           "expected": "REVOKED",
           "argument": "Certificate.Status",
           "state": "failure"
         },
         {
-          "matcher": "pathAll",
+          "matcher": "path",
           "expected": "FAILED",
           "argument": "Certificate.Status",
           "state": "failure"
