@@ -16,7 +16,6 @@ import unittest
 
 import botocore.session
 import mock
-import six
 from botocore import xform_name
 
 from touchdown.aws import common
@@ -52,8 +51,6 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
     def test_valid(self):
         session = botocore.session.get_session()
 
-        base_gdf_func = six.get_method_function(common.SimpleDescribe.get_describe_filters)
-
         for impl in common.SimpleDescribe.__subclasses__():
             if issubclass(impl, self.ignore):
                 continue
@@ -66,8 +63,7 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
 
             # Not allowed to set Describe.describe_filters AND implement Describe.get_describe_filters
             is_df_set = bool(impl.describe_filters is not None)
-            gdf_func = six.get_method_function(impl.get_describe_filters)
-            is_gdf_set = bool(gdf_func is not base_gdf_func)
+            is_gdf_set = 'get_describe_filters' in impl.__dict__
             assert (is_gdf_set and not is_df_set) or not is_gdf_set
 
             service = session.get_service_model(impl.service_name, impl.api_version)
