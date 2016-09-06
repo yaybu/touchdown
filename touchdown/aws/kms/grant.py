@@ -60,7 +60,6 @@ class Describe(SimpleDescribe, Plan):
     api_version = '2014-11-01'
     describe_action = 'list_grants'
     describe_envelope = 'Grants'
-    describe_filters = {}
     key = 'GrantId'
 
     def get_describe_filters(self):

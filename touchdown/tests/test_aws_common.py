@@ -57,7 +57,13 @@ class TestSimpleDescribeImplementations(unittest.TestCase):
             if getattr(impl, 'describe_action', None) is None:
                 continue
 
+            # API use must be versioned
             assert len(impl.api_version or '') == 10, '{} is not versioned'.format(impl)
+
+            # Not allowed to set Describe.describe_filters AND implement Describe.get_describe_filters
+            is_df_set = bool(impl.describe_filters is not None)
+            is_gdf_set = bool(impl.get_describe_filters.__func__ is not common.SimpleDescribe.get_describe_filters.__func__)
+            assert (is_gdf_set and not is_df_set) or not is_gdf_set
 
             service = session.get_service_model(impl.service_name, impl.api_version)
             methods = {xform_name(s): s for s in service.operation_names}

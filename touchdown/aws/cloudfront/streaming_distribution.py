@@ -25,6 +25,7 @@ from ..common import (
     SimpleApply,
     SimpleDescribe,
     SimpleDestroy,
+    Waiter,
 )
 from ..s3 import Bucket
 from .common import CloudFrontList
@@ -87,6 +88,12 @@ class StreamingDistribution(Resource):
     account = argument.Resource(BaseAccount)
 
 
+class StreamingDistributionWaiter(Waiter):
+
+    def get_waiter_filters(self):
+        return {'Id': self.plan.object['Id']}
+
+
 class Describe(SimpleDescribe, Plan):
 
     resource = StreamingDistribution
@@ -97,8 +104,8 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = 'StreamingDistributionList.Items'
     key = 'Id'
 
-    def get_describe_filters(self):
-        return {'Id': self.object['Id']}
+    def get_waiter(self, description, waiter, eventual_consistency_threshold=1):
+        return StreamingDistributionWaiter(self, description, waiter, eventual_consistency_threshold)
 
     def describe_object_matches(self, d):
         return self.resource.name == d['Comment'] or self.resource.name in d['Aliases'].get('Items', [])
