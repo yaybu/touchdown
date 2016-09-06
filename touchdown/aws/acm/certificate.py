@@ -17,7 +17,7 @@ from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
-from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
+from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, Waiter
 
 
 class DomainValidationOption(Resource):
@@ -45,6 +45,14 @@ class Certificate(Resource):
     account = argument.Resource(BaseAccount)
 
 
+class CertificateWaiter(Waiter):
+
+    def get_waiter_filters(self):
+        return {
+            'CertificateArn': self.plan.resource_id,
+        }
+
+
 class Describe(SimpleDescribe, Plan):
 
     resource = Certificate
@@ -58,8 +66,8 @@ class Describe(SimpleDescribe, Plan):
     def describe_object_matches(self, obj):
         return obj['DomainName'] == self.resource.name
 
-    def get_describe_filters(self):
-        return {'CertificateArn': self.resource_id}
+    def get_waiter(self, description, waiter, eventual_consistency_threshold=1):
+        return CertificateWaiter(self, description, waiter, eventual_consistency_threshold)
 
 
 class Apply(SimpleApply, Describe):

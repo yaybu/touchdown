@@ -41,10 +41,18 @@ class Waiter(Action):
         self.waiter = self.plan.client.get_waiter(waiter)
         self.eventual_consistency_threshold = eventual_consistency_threshold
 
+    def get_waiter_filters(self):
+        ''' Allow subclasses to use a different filter for their waiter to their describer '''
+        return self.plan.get_describe_filters()
+
+    def get_filtered_response(self, response):
+        ''' Allow subclasses to filter out unrelated responses '''
+        return response
+
     def poll(self):
-        filters = self.plan.get_describe_filters()
+        filters = self.get_waiter_filters()
         logger.debug('Polling with waiter {} and filters {}'.format(self.waiter, filters))
-        return self.waiter._operation_method(**filters)
+        return self.get_filtered_response(self.waiter._operation_method(**filters))
 
     def ready(self):
         acceptors = list(self.waiter.config.acceptors)
