@@ -18,6 +18,7 @@ from .account import AccountStubber
 from .ami_copy import ImageCopyStubber
 from .auto_scaling_group import AutoScalingGroupStubber
 from .bucket import BucketStubber
+from .cache_cluster import CacheClusterStubber
 from .database import DatabaseStubber
 from .distribution import DistributionStubber
 from .ec2_instance import EC2InstanceStubber
@@ -55,6 +56,7 @@ __all__ = [
     'AccountStubber',
     'AutoScalingGroupStubber',
     'BucketStubber',
+    'CacheClusterStubber',
     'DatabaseStubber',
     'DistributionStubber',
     'EC2InstanceStubber',
