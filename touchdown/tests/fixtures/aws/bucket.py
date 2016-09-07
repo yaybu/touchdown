@@ -20,7 +20,7 @@ from .fixture import AwsFixture
 class BucketFixture(AwsFixture):
 
     def __enter__(self):
-        self.bucket = self.fixtures.enter_context(BucketStubber(
+        self.bucket_stubber = self.fixtures.enter_context(BucketStubber(
             self.goal.get_service(
                 self.aws.get_bucket(
                     name='my-test-bucket',
@@ -28,12 +28,14 @@ class BucketFixture(AwsFixture):
                 'describe',
             ),
         ))
-        self.bucket.add_list_buckets_one_response()
-        self.bucket.add_head_bucket()
-        self.bucket.add_get_bucket_location()
-        self.bucket.add_get_bucket_cors()
-        self.bucket.add_get_bucket_policy()
-        self.bucket.add_get_bucket_notification_configuration()
-        self.bucket.add_get_bucket_accelerate_configuration()
+        self.bucket_stubber.add_list_buckets_one_response()
+        self.bucket_stubber.add_head_bucket()
+        self.bucket_stubber.add_get_bucket_location()
+        self.bucket_stubber.add_get_bucket_cors()
+        self.bucket_stubber.add_get_bucket_policy()
+        self.bucket_stubber.add_get_bucket_notification_configuration()
+        self.bucket_stubber.add_get_bucket_accelerate_configuration()
 
-        return self.bucket.resource
+        self.bucket = self.bucket_stubber.resource
+
+        return self

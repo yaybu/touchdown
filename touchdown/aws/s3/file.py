@@ -45,7 +45,7 @@ class Describe(SimpleDescribe, Plan):
     api_version = '2006-03-01'
     describe_action = 'list_objects'
     describe_envelope = 'Contents'
-    key = 'Name'
+    key = 'Key'
 
     def get_describe_filters(self):
         if not self.runner.get_plan(self.resource.bucket).resource_id:
@@ -57,8 +57,7 @@ class Describe(SimpleDescribe, Plan):
         }
 
     def describe_object_matches(self, obj):
-        if obj['Key'] == self.resource.name:
-            return True
+        return obj['Key'] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):

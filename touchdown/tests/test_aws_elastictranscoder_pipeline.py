@@ -29,7 +29,7 @@ class TestPipelineCreation(StubberTestCase):
             goal.get_service(
                 self.aws.add_pipeline(
                     name='test-pipeline',
-                    input_bucket=bucket,
+                    input_bucket=bucket.bucket,
                     role=role,
                 ),
                 'apply',
@@ -53,7 +53,7 @@ class TestPipelineCreation(StubberTestCase):
             goal.get_service(
                 self.aws.add_pipeline(
                     name='test-pipeline',
-                    input_bucket=bucket,
+                    input_bucket=bucket.bucket,
                     role=role,
                 ),
                 'apply',

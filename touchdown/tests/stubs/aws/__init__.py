@@ -49,6 +49,7 @@ from .route_table import RouteTableStubber
 from .security_group import SecurityGroupStubber
 from .streaming_distribution import StreamingDistributionStubber
 from .subnet import SubnetStubber
+from .s3_file import S3FileStubber
 from .topic import TopicStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
@@ -94,6 +95,7 @@ __all__ = [
     'StreamingDistributionStubber',
     'Stubber',
     'SubnetStubber',
+    'S3FileStubber',
     'TopicStubber',
     'VolumeAttachmentStubber',
     'VolumeStubber',

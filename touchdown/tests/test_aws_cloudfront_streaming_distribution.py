@@ -54,7 +54,7 @@ class TestStreamingDistributionCreation(aws.StubberTestCase):
             goal.get_service(
                 self.aws.add_streaming_distribution(
                     name='www.example.com',
-                    bucket=bucket,
+                    bucket=bucket.bucket,
                 ),
                 'apply',
             )
@@ -84,7 +84,7 @@ class TestStreamingDistributionCreation(aws.StubberTestCase):
             goal.get_service(
                 self.aws.add_streaming_distribution(
                     name='www.example.com',
-                    bucket=bucket,
+                    bucket=bucket.bucket,
                 ),
                 'apply',
             )
@@ -111,7 +111,7 @@ class TestStreamingDistributionDeletion(aws.StubberTestCase):
             goal.get_service(
                 self.aws.add_streaming_distribution(
                     name='www.example.com',
-                    bucket=bucket,
+                    bucket=bucket.bucket,
                 ),
                 'destroy',
             )
