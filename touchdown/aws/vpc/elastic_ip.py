@@ -15,7 +15,7 @@
 from touchdown.config import String
 from touchdown.core import argument, serializers
 from touchdown.core.action import Action
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
 from ..account import BaseAccount
@@ -40,6 +40,11 @@ class Describe(SimpleDescribe, Plan):
     describe_action = 'describe_addresses'
     describe_envelope = 'Addresses'
     key = 'PublicIp'
+
+    signature = (
+        Present('name'),
+        Present('public_ip'),
+    )
 
     def get_describe_filters(self):
         public_ip, _ = self.runner.get_service(self.resource.public_ip, 'get').execute()

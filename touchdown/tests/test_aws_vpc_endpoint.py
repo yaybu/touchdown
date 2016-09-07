@@ -13,12 +13,9 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.fixtures.aws import VpcFixture
 from touchdown.tests.stubs import TemporaryFolder
-from touchdown.tests.stubs.aws import (
-    RouteTableStubber,
-    VpcEndpointStubber,
-    VpcStubber,
-)
+from touchdown.tests.stubs.aws import RouteTableStubber, VpcEndpointStubber
 
 
 class TestVpcEndpoint(StubberTestCase):
@@ -29,17 +26,11 @@ class TestVpcEndpoint(StubberTestCase):
         # Therfore a VPCE is created
         goal = self.create_goal('apply')
 
-        vpc = self.fixtures.enter_context(VpcStubber(
-            goal.get_service(
-                self.aws.get_vpc(name='test-vpc'),
-                'describe',
-            )
-        ))
-        vpc.add_describe_vpcs_one_response_by_name()
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         route_table = self.fixtures.enter_context(RouteTableStubber(
             goal.get_service(
-                vpc.resource.get_route_table(name='test-route-table'),
+                vpcf.vpc.get_route_table(name='test-route-table'),
                 'describe',
             )
         ))
@@ -53,7 +44,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint = self.fixtures.enter_context(VpcEndpointStubber(
             goal.get_service(
-                vpc.resource.add_endpoint(
+                vpcf.vpc.add_endpoint(
                     name='is-this-even-used',
                     id=name,
                     service='s3',
@@ -63,7 +54,7 @@ class TestVpcEndpoint(StubberTestCase):
             )
         ))
         endpoint.add_create_vpc_endpoint(
-            vpc.make_id(vpc.resource.name),
+            vpcf.vpc_id,
             [route_table.make_id(route_table.resource.name)],
         )
 
@@ -76,17 +67,11 @@ class TestVpcEndpoint(StubberTestCase):
 
         goal = self.create_goal('apply')
 
-        vpc = self.fixtures.enter_context(VpcStubber(
-            goal.get_service(
-                self.aws.get_vpc(name='test-vpc'),
-                'describe',
-            )
-        ))
-        vpc.add_describe_vpcs_one_response_by_name()
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         route_table = self.fixtures.enter_context(RouteTableStubber(
             goal.get_service(
-                vpc.resource.get_route_table(name='test-route-table'),
+                vpcf.vpc.get_route_table(name='test-route-table'),
                 'describe',
             )
         ))
@@ -102,7 +87,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint = self.fixtures.enter_context(VpcEndpointStubber(
             goal.get_service(
-                vpc.resource.add_endpoint(
+                vpcf.vpc.add_endpoint(
                     name='is-this-even-used',
                     id=name,
                     service='s3',
@@ -114,7 +99,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint.add_describe_vpc_endpoints_empty_response('vpce-1234abcd')
         endpoint.add_create_vpc_endpoint(
-            vpc.make_id(vpc.resource.name),
+            vpcf.vpc_id,
             [route_table.make_id(route_table.resource.name)],
         )
 
@@ -127,17 +112,11 @@ class TestVpcEndpoint(StubberTestCase):
 
         goal = self.create_goal('apply')
 
-        vpc = self.fixtures.enter_context(VpcStubber(
-            goal.get_service(
-                self.aws.get_vpc(name='test-vpc'),
-                'describe',
-            )
-        ))
-        vpc.add_describe_vpcs_one_response_by_name()
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         route_table = self.fixtures.enter_context(RouteTableStubber(
             goal.get_service(
-                vpc.resource.get_route_table(name='test-route-table'),
+                vpcf.vpc.get_route_table(name='test-route-table'),
                 'describe',
             )
         ))
@@ -153,7 +132,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint = self.fixtures.enter_context(VpcEndpointStubber(
             goal.get_service(
-                vpc.resource.add_endpoint(
+                vpcf.vpc.add_endpoint(
                     name='is-this-even-used',
                     id=name,
                     service='s3',
@@ -174,17 +153,11 @@ class TestVpcEndpoint(StubberTestCase):
 
         goal = self.create_goal('destroy')
 
-        vpc = self.fixtures.enter_context(VpcStubber(
-            goal.get_service(
-                self.aws.get_vpc(name='test-vpc'),
-                'describe',
-            )
-        ))
-        vpc.add_describe_vpcs_one_response_by_name()
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         route_table = self.fixtures.enter_context(RouteTableStubber(
             goal.get_service(
-                vpc.resource.get_route_table(name='test-route-table'),
+                vpcf.vpc.get_route_table(name='test-route-table'),
                 'describe',
             )
         ))
@@ -200,7 +173,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint = self.fixtures.enter_context(VpcEndpointStubber(
             goal.get_service(
-                vpc.resource.add_endpoint(
+                vpcf.vpc.add_endpoint(
                     name='is-this-even-used',
                     id=name,
                     service='s3',
@@ -221,17 +194,11 @@ class TestVpcEndpoint(StubberTestCase):
 
         goal = self.create_goal('destroy')
 
-        vpc = self.fixtures.enter_context(VpcStubber(
-            goal.get_service(
-                self.aws.get_vpc(name='test-vpc'),
-                'describe',
-            )
-        ))
-        vpc.add_describe_vpcs_one_response_by_name()
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         route_table = self.fixtures.enter_context(RouteTableStubber(
             goal.get_service(
-                vpc.resource.get_route_table(name='test-route-table'),
+                vpcf.vpc.get_route_table(name='test-route-table'),
                 'describe',
             )
         ))
@@ -245,7 +212,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint = self.fixtures.enter_context(VpcEndpointStubber(
             goal.get_service(
-                vpc.resource.add_endpoint(
+                vpcf.vpc.add_endpoint(
                     name='is-this-even-used',
                     id=name,
                     service='s3',
@@ -265,17 +232,11 @@ class TestVpcEndpoint(StubberTestCase):
 
         goal = self.create_goal('destroy')
 
-        vpc = self.fixtures.enter_context(VpcStubber(
-            goal.get_service(
-                self.aws.get_vpc(name='test-vpc'),
-                'describe',
-            )
-        ))
-        vpc.add_describe_vpcs_one_response_by_name()
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         route_table = self.fixtures.enter_context(RouteTableStubber(
             goal.get_service(
-                vpc.resource.get_route_table(name='test-route-table'),
+                vpcf.vpc.get_route_table(name='test-route-table'),
                 'describe',
             )
         ))
@@ -291,7 +252,7 @@ class TestVpcEndpoint(StubberTestCase):
 
         endpoint = self.fixtures.enter_context(VpcEndpointStubber(
             goal.get_service(
-                vpc.resource.add_endpoint(
+                vpcf.vpc.add_endpoint(
                     name='is-this-even-used',
                     id=name,
                     service='s3',
