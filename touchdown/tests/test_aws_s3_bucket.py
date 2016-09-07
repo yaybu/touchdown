@@ -17,6 +17,53 @@ from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import BucketStubber
 
 
+class TestBucketDeletion(StubberTestCase):
+
+    def test_delete_bucket(self):
+        goal = self.create_goal('destroy')
+
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(
+                    name='my-bucket',
+                ),
+                'destroy',
+            )
+        ))
+        bucket.add_list_buckets_one_response()
+        bucket.add_head_bucket()
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
+
+        bucket.add_list_objects([
+            {'Key': 'a'},
+        ])
+        bucket.add_delete_objects(['a'])
+
+        bucket.add_delete_bucket()
+
+        goal.execute()
+
+    def test_delete_bucket_idempotent(self):
+        goal = self.create_goal('destroy')
+
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(
+                    name='my-bucket',
+                ),
+                'destroy',
+            )
+        ))
+        bucket.add_list_buckets_empty_response()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(bucket.resource)), 0)
+
+
 class TestBucketDescribe(StubberTestCase):
 
     def test_annotate_object(self):

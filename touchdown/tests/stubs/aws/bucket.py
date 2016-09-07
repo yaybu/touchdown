@@ -54,6 +54,13 @@ class BucketStubber(ServiceStubber):
             {'Bucket': self.resource.name},
         )
 
+    def add_list_buckets_empty_response(self):
+        return self.add_response(
+            'list_buckets',
+            service_response={},
+            expected_params={},
+        )
+
     def add_list_buckets_one_response(self):
         return self.add_response(
             'list_buckets',
@@ -70,4 +77,35 @@ class BucketStubber(ServiceStubber):
             'head_bucket',
             service_response={},
             expected_params={'Bucket': self.resource.name},
+        )
+
+    def add_list_objects(self, contents):
+        return self.add_response(
+            'list_objects',
+            service_response={
+                'Contents': contents,
+            },
+            expected_params={'Bucket': self.resource.name},
+        )
+
+    def add_delete_objects(self, contents):
+        return self.add_response(
+            'delete_objects',
+            service_response={},
+            expected_params={
+                'Delete': {
+                    'Objects': [{'Key': key} for key in contents],
+                    'Quiet': True,
+                },
+                'Bucket': self.resource.name,
+            },
+        )
+
+    def add_delete_bucket(self):
+        return self.add_response(
+            'delete_bucket',
+            service_response={},
+            expected_params={
+                'Bucket': self.resource.name,
+            },
         )
