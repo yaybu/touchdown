@@ -180,7 +180,7 @@ class Apply(SimpleApply, Describe):
             self.object.get('NotificationConfiguration', {}),
         )
 
-        if d.matches():
+        if not d.matches():
             yield self.generic_action(
                 ['Update notification configuration'] + list(d.lines()),
                 self.client.put_bucket_notification_configuration,

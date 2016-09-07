@@ -17,6 +17,69 @@ from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import BucketStubber
 
 
+class TestBucketCreation(StubberTestCase):
+
+    def test_create_bucket(self):
+        goal = self.create_goal('apply')
+
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(
+                    name='my-bucket',
+                ),
+                'apply',
+            )
+        ))
+        bucket.add_list_buckets_empty_response()
+        bucket.add_create_bucket()
+
+        bucket.add_list_buckets_one_response()
+        bucket.add_head_bucket()
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
+
+        bucket.add_list_buckets_one_response()
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
+
+        bucket.add_list_buckets_one_response()
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
+
+        goal.execute()
+
+    def test_create_bucket_idempotent(self):
+        goal = self.create_goal('apply')
+
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(
+                    name='my-bucket',
+                ),
+                'apply',
+            )
+        ))
+        bucket.add_list_buckets_one_response()
+        bucket.add_head_bucket()
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
+
+        self.assertEqual(len(list(goal.plan())), 0)
+        self.assertEqual(len(goal.get_changes(bucket.resource)), 0)
+
+
 class TestBucketDeletion(StubberTestCase):
 
     def test_delete_bucket(self):

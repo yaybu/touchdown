@@ -101,6 +101,30 @@ class BucketStubber(ServiceStubber):
             },
         )
 
+    def add_create_bucket(self):
+        return self.add_response(
+            'create_bucket',
+            service_response={},
+            expected_params={
+                'Bucket': self.resource.name,
+                'CreateBucketConfiguration': {
+                    'LocationConstraint': 'eu-west-1',
+                }
+            },
+        )
+
+    def add_put_bucket_notification_configuration(self):
+        return self.add_response(
+            'put_bucket_notification_configuration',
+            service_response={},
+            expected_params={
+                'Bucket': self.resource.name,
+                'NotificationConfiguration': {
+                    'LambdaFunctionConfigurations': [],
+                }
+            },
+        )
+
     def add_delete_bucket(self):
         return self.add_response(
             'delete_bucket',
