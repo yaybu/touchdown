@@ -51,6 +51,7 @@ from .topic import TopicStubber
 from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
 from .vpc import VpcStubber
+from .vpn_connection import VpnConnectionStubber
 
 
 __all__ = [
@@ -93,4 +94,5 @@ __all__ = [
     'VolumeStubber',
     'VpcEndpointStubber',
     'VpcStubber',
+    'VpnConnectionStubber',
 ]

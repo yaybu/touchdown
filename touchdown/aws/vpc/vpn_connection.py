@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core import argument, serializers
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
@@ -69,6 +69,12 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = 'create_vpn_connection'
     waiter = 'vpn_connection_available'
+
+    signature = (
+        Present('name'),
+        Present('vpn_gateway'),
+        Present('customer_gateway'),
+    )
 
     def update_object(self):
         remote_routes = set(r['DestinationCidrBlock'] for r in self.object.get('Routes', []) if r['State'] != 'deleted')
