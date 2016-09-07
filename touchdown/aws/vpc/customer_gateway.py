@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from touchdown.core import argument
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
 
+from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
-from .vpc import VPC
 
 
 class CustomerGateway(Resource):
@@ -29,7 +29,7 @@ class CustomerGateway(Resource):
     public_ip = argument.IPAddress(field='PublicIp')
     bgp_asn = argument.Integer(default=65000, field='BgpAsn')
     tags = argument.Dict()
-    vpc = argument.Resource(VPC)
+    account = argument.Resource(BaseAccount)
 
 
 class Describe(SimpleDescribe, Plan):
@@ -42,10 +42,6 @@ class Describe(SimpleDescribe, Plan):
     key = 'CustomerGatewayId'
 
     def get_describe_filters(self):
-        vpc = self.runner.get_plan(self.resource.vpc)
-        if not vpc.resource_id:
-            return None
-
         return {
             'Filters': [
                 {'Name': 'tag:Name', 'Values': [self.resource.name]},
@@ -57,6 +53,11 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = 'create_customer_gateway'
     waiter = 'customer_gateway_available'
+
+    signature = (
+        Present('name'),
+        Present('public_ip'),
+    )
 
 
 class Destroy(SimpleDestroy, Describe):
