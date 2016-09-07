@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .bucket import BucketFixture
+from .customer_gateway import CustomerGatewayFixture
 from .launch_configuration import LaunchConfigurationFixture
 from .network_acl import NetworkAclFixture
 from .rest_api import RestApiFixture
@@ -20,10 +21,12 @@ from .role import RoleFixture
 from .route_table import RouteTableFixture
 from .subnet import SubnetFixture
 from .vpc import VpcFixture
+from .vpn_gateway import VpnGatewayFixture
 
 
 __all__ = [
     'BucketFixture',
+    'CustomerGatewayFixture',
     'LaunchConfigurationFixture',
     'NetworkAclFixture',
     'RestApiFixture',
@@ -31,4 +34,5 @@ __all__ = [
     'RouteTableFixture',
     'SubnetFixture',
     'VpcFixture',
+    'VpnGatewayFixture',
 ]

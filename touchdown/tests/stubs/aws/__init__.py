@@ -53,6 +53,7 @@ from .volume_attachment import VolumeAttachmentStubber
 from .volume import VolumeStubber
 from .vpc import VpcStubber
 from .vpn_connection import VpnConnectionStubber
+from .vpn_gateway import VpnGatewayStubber
 
 
 __all__ = [
@@ -97,4 +98,5 @@ __all__ = [
     'VpcEndpointStubber',
     'VpcStubber',
     'VpnConnectionStubber',
+    'VpnGatewayStubber',
 ]

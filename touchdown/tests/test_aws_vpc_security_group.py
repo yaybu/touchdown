@@ -21,11 +21,11 @@ class TestSecurityGroupCreation(StubberTestCase):
 
     def test_create_security_group(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         security_group = self.fixtures.enter_context(SecurityGroupStubber(
             goal.get_service(
-                vpc.add_security_group(
+                vpcf.vpc.add_security_group(
                     name='test-security-group',
                     description='test-security-group',
                 ),
@@ -42,11 +42,11 @@ class TestSecurityGroupCreation(StubberTestCase):
 
     def test_adding_ingress(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         security_group = self.fixtures.enter_context(SecurityGroupStubber(
             goal.get_service(
-                vpc.add_security_group(
+                vpcf.vpc.add_security_group(
                     name='test-security-group',
                     description='test-security-group',
                     ingress=[
@@ -75,11 +75,11 @@ class TestSecurityGroupCreation(StubberTestCase):
 
     def test_create_security_group_idempotent(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         security_group = self.fixtures.enter_context(SecurityGroupStubber(
             goal.get_service(
-                vpc.add_security_group(
+                vpcf.vpc.add_security_group(
                     name='test-security-group',
                     description='test-security-group',
                 ),
@@ -97,11 +97,11 @@ class TestSecurityGroupDestroy(StubberTestCase):
 
     def test_destroy_security_group(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         security_group = self.fixtures.enter_context(SecurityGroupStubber(
             goal.get_service(
-                vpc.add_security_group(
+                vpcf.vpc.add_security_group(
                     name='test-security-group',
                     description='test-security-group',
                 ),
@@ -116,11 +116,11 @@ class TestSecurityGroupDestroy(StubberTestCase):
 
     def test_destroy_security_group_idempotent(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         security_group = self.fixtures.enter_context(SecurityGroupStubber(
             goal.get_service(
-                vpc.add_security_group(
+                vpcf.vpc.add_security_group(
                     name='test-security-group',
                     description='test-security-group',
                 ),

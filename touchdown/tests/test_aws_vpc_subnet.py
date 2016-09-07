@@ -25,11 +25,11 @@ class TestSubnetCreation(StubberTestCase):
 
     def test_create_subnet(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         subnet = self.fixtures.enter_context(SubnetStubber(
             goal.get_service(
-                vpc.add_subnet(
+                vpcf.vpc.add_subnet(
                     name='test-subnet',
                     cidr_block='192.168.0.0/25',
                 ),
@@ -55,12 +55,12 @@ class TestSubnetCreation(StubberTestCase):
 
     def test_adding_route_table_to_subnet(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
-        route_table = self.fixtures.enter_context(RouteTableFixture(goal, self.aws, vpc))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        route_table = self.fixtures.enter_context(RouteTableFixture(goal, self.aws, vpcf.vpc))
 
         subnet = self.fixtures.enter_context(SubnetStubber(
             goal.get_service(
-                vpc.add_subnet(
+                vpcf.vpc.add_subnet(
                     name='test-subnet',
                     cidr_block='192.168.0.0/25',
                     route_table=route_table,
@@ -79,12 +79,12 @@ class TestSubnetCreation(StubberTestCase):
 
     def test_adding_nacl_table_to_subnet(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
-        nacl = self.fixtures.enter_context(NetworkAclFixture(goal, self.aws, vpc))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        nacl = self.fixtures.enter_context(NetworkAclFixture(goal, self.aws, vpcf.vpc))
 
         subnet = self.fixtures.enter_context(SubnetStubber(
             goal.get_service(
-                vpc.add_subnet(
+                vpcf.vpc.add_subnet(
                     name='test-subnet',
                     cidr_block='192.168.0.0/25',
                     network_acl=nacl,
@@ -103,11 +103,11 @@ class TestSubnetCreation(StubberTestCase):
 
     def test_create_subnet_idempotent(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         subnet = self.fixtures.enter_context(SubnetStubber(
             goal.get_service(
-                vpc.add_subnet(
+                vpcf.vpc.add_subnet(
                     name='test-subnet',
                     cidr_block='192.168.0.0/25',
                 ),
@@ -127,11 +127,11 @@ class TestSubnetDestroy(StubberTestCase):
 
     def test_destroy_subnet(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         subnet = self.fixtures.enter_context(SubnetStubber(
             goal.get_service(
-                vpc.add_subnet(
+                vpcf.vpc.add_subnet(
                     name='test-subnet',
                     cidr_block='192.168.0.0/25',
                 ),
@@ -148,11 +148,11 @@ class TestSubnetDestroy(StubberTestCase):
 
     def test_destroy_subnet_idempotent(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         subnet = self.fixtures.enter_context(SubnetStubber(
             goal.get_service(
-                vpc.add_subnet(
+                vpcf.vpc.add_subnet(
                     name='test-subnet',
                     cidr_block='192.168.0.0/25',
                 ),

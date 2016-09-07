@@ -12,26 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.tests.stubs.aws import VpcStubber
+from touchdown.tests.stubs.aws import CustomerGatewayStubber
 
 from .fixture import AwsFixture
 
 
-class VpcFixture(AwsFixture):
+class CustomerGatewayFixture(AwsFixture):
 
     def __enter__(self):
-        self.vpc_stubber = self.fixtures.enter_context(VpcStubber(
+        self.customer_gateway_stubber = self.fixtures.enter_context(CustomerGatewayStubber(
             self.goal.get_service(
-                self.aws.get_vpc(
+                self.aws.get_customer_gateway(
                     name='test-vpc',
-                    cidr_block='192.168.0.0/25',
+                    public_ip='8.8.8.8',
                 ),
                 'describe',
             ),
         ))
-        self.vpc_stubber.add_describe_vpcs_one_response_by_name()
+        self.customer_gateway_stubber.add_describe_customer_gateways_one_response()
 
-        self.vpc = self.vpc_stubber.resource
-        self.vpc_id = self.vpc_stubber.make_id(self.vpc.name)
+        self.customer_gateway = self.customer_gateway_stubber.resource
+        self.customer_gateway_id = self.customer_gateway_stubber.make_id(self.customer_gateway.name)
 
         return self

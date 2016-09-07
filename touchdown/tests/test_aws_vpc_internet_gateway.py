@@ -21,11 +21,11 @@ class TestInternetGatewayCreation(StubberTestCase):
 
     def test_create_internet_gateway(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
             goal.get_service(
-                vpc.add_internet_gateway(
+                vpcf.vpc.add_internet_gateway(
                     name='test-internet_gateway',
                 ),
                 'apply',
@@ -35,17 +35,17 @@ class TestInternetGatewayCreation(StubberTestCase):
         internet_gateway.add_describe_internet_gateways_empty_response()
         internet_gateway.add_create_internet_gateway()
         internet_gateway.add_create_tags(Name='test-internet_gateway')
-        internet_gateway.add_attach_internet_gateway(vpc_id='vpc-f96b65a5')
+        internet_gateway.add_attach_internet_gateway(vpc_id=vpcf.vpc_id)
 
         goal.execute()
 
     def test_create_internet_gateway_idempotent(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
             goal.get_service(
-                vpc.add_internet_gateway(
+                vpcf.vpc.add_internet_gateway(
                     name='test-internet_gateway',
                 ),
                 'apply',
@@ -53,7 +53,7 @@ class TestInternetGatewayCreation(StubberTestCase):
         ))
 
         internet_gateway.add_describe_internet_gateways_one_response(
-            vpc_ids=['vpc-f96b65a5'],
+            vpc_ids=[vpcf.vpc_id],
         )
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -64,11 +64,11 @@ class TestInternetGatewayDestroy(StubberTestCase):
 
     def test_destroy_internet_gateway(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
             goal.get_service(
-                vpc.add_internet_gateway(
+                vpcf.vpc.add_internet_gateway(
                     name='test-internet_gateway',
                 ),
                 'destroy',
@@ -82,11 +82,11 @@ class TestInternetGatewayDestroy(StubberTestCase):
 
     def test_destroy_internet_gateway_idempotent(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
             goal.get_service(
-                vpc.add_internet_gateway(
+                vpcf.vpc.add_internet_gateway(
                     name='test-internet_gateway',
                 ),
                 'destroy',

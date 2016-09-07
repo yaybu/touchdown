@@ -46,11 +46,11 @@ class TestExternalAccount(StubberTestCase):
             'zyxwvutsrqpnomlkjihgfedcba',
         )
 
-        vpc = self.fixtures.enter_context(VpcFixture(
+        vpcf = self.fixtures.enter_context(VpcFixture(
             goal,
             external_account.resource,
         ))
-        self.assertEqual(goal.get_service(vpc, 'describe').describe_object(), {
-            'VpcId': 'vpc-f96b65a5',
+        self.assertEqual(goal.get_service(vpcf.vpc, 'describe').describe_object(), {
+            'VpcId': vpcf.vpc_id,
             'State': 'available',
         })

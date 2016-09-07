@@ -15,13 +15,16 @@
 from .service import ServiceStubber
 
 
-class VpnConnectionStubber(ServiceStubber):
+class VpnGatewayStubber(ServiceStubber):
 
     client_service = 'ec2'
 
-    def add_describe_vpn_connections_empty_response(self):
+    def make_id(self, name):
+        return 'vgw-' + super(VpnGatewayStubber, self).make_id(name)[:8]
+
+    def add_describe_vpn_gateways_empty_response(self):
         return self.add_response(
-            'describe_vpn_connections',
+            'describe_vpn_gateways',
             service_response={},
             expected_params={
                 'Filters': [
@@ -30,13 +33,14 @@ class VpnConnectionStubber(ServiceStubber):
             },
         )
 
-    def add_describe_vpn_connections_one_response(self, state='available'):
+    def add_describe_vpn_gateways_one_response(self, state='available', attachments=None):
         return self.add_response(
-            'describe_vpn_connections',
+            'describe_vpn_gateways',
             service_response={
-                'VpnConnections': [{
-                    'VpnConnectionId': self.make_id(self.resource.name),
+                'VpnGateways': [{
+                    'VpnGatewayId': self.make_id(self.resource.name),
                     'State': state,
+                    'VpcAttachments': attachments or [],
                 }]
             },
             expected_params={
@@ -46,19 +50,16 @@ class VpnConnectionStubber(ServiceStubber):
             },
         )
 
-    def add_create_vpn_connection(self, customer_gateway_id, vpn_gateway_id):
+    def add_create_vpn_gateway(self):
         return self.add_response(
-            'create_vpn_connection',
+            'create_vpn_gateway',
             service_response={
-                'VpnConnection': {
-                    'VpnConnectionId': self.make_id(self.resource.name),
+                'VpnGateway': {
+                    'VpnGatewayId': self.make_id(self.resource.name),
                 },
             },
             expected_params={
-                'Options': {'StaticRoutesOnly': True},
                 'Type': 'ipsec.1',
-                'VpnGatewayId': vpn_gateway_id,
-                'CustomerGatewayId': customer_gateway_id,
             },
         )
 
@@ -74,11 +75,21 @@ class VpnConnectionStubber(ServiceStubber):
             },
         )
 
-    def add_delete_vpn_connection(self):
+    def add_attach_vpn_gateway(self, vpc_id):
         return self.add_response(
-            'delete_vpn_connection',
+            'attach_vpn_gateway',
             service_response={},
             expected_params={
-                'VpnConnectionId': self.make_id(self.resource.name),
+                'VpcId': vpc_id,
+                'VpnGatewayId': self.make_id(self.resource.name),
+            },
+        )
+
+    def add_delete_vpn_gateway(self):
+        return self.add_response(
+            'delete_vpn_gateway',
+            service_response={},
+            expected_params={
+                'VpnGatewayId': self.make_id(self.resource.name),
             },
         )

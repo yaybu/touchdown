@@ -26,11 +26,11 @@ class TestNetworkAclCreation(StubberTestCase):
 
     def test_create_network_acl(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         network_acl = self.fixtures.enter_context(NetworkAclStubber(
             goal.get_service(
-                vpc.add_network_acl(
+                vpcf.vpc.add_network_acl(
                     name='test-network-acl',
                 ),
                 'apply',
@@ -58,11 +58,11 @@ class TestNetworkAclCreation(StubberTestCase):
 
     def test_create_network_acl_idempotent(self):
         goal = self.create_goal('apply')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         network_acl = self.fixtures.enter_context(NetworkAclStubber(
             goal.get_service(
-                vpc.add_network_acl(
+                vpcf.vpc.add_network_acl(
                     name='test-network-acl',
                 ),
                 'apply',
@@ -80,11 +80,11 @@ class TestNetworkAclDestroy(StubberTestCase):
 
     def test_destroy_network_acl(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         network_acl = self.fixtures.enter_context(NetworkAclStubber(
             goal.get_service(
-                vpc.add_network_acl(
+                vpcf.vpc.add_network_acl(
                     name='test-network-acl',
                 ),
                 'destroy',
@@ -100,11 +100,11 @@ class TestNetworkAclDestroy(StubberTestCase):
 
     def test_destroy_network_acl_idempotent(self):
         goal = self.create_goal('destroy')
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
         network_acl = self.fixtures.enter_context(NetworkAclStubber(
             goal.get_service(
-                vpc.add_network_acl(
+                vpcf.vpc.add_network_acl(
                     name='test-network-acl',
                 ),
                 'destroy',

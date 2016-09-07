@@ -22,8 +22,8 @@ class TestSubnetGroupCreation(StubberTestCase):
     def test_create_subnet_group(self):
         goal = self.create_goal('apply')
 
-        vpc = self.fixtures.enter_context(VpcFixture(goal, self.aws))
-        subnet = self.fixtures.enter_context(SubnetFixture(goal, vpc))
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
+        subnet = self.fixtures.enter_context(SubnetFixture(goal, vpcf.vpc))
 
         subnet_group = self.fixtures.enter_context(RdsSubnetGroupStubber(
             goal.get_service(

@@ -88,6 +88,9 @@ class Apply(TagsMixin, SimpleApply, Describe):
     create_action = 'create_vpn_gateway'
 
     def update_object(self):
+        for change in super(Apply, self).update_object():
+            yield change
+
         attach = True
         wait = True
 
