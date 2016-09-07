@@ -25,6 +25,25 @@ from touchdown.interfaces import File
 from .key import Key
 
 
+def encrypt(aes_key, aes_key_protected, blob):
+    io = BytesIO()
+    tar = tarfile.open(name='xxxx', fileobj=io, mode='w')
+
+    ti = tarfile.TarInfo('key')
+    ti.size = len(aes_key_protected)
+    tar.addfile(ti, BytesIO(aes_key_protected))
+
+    f = Fernet(base64.urlsafe_b64encode(aes_key))
+    encrypted = f.encrypt(blob)
+
+    ti = tarfile.TarInfo('blob')
+    ti.size = len(encrypted)
+    tar.addfile(ti, BytesIO(encrypted))
+
+    tar.close()
+    return io.getvalue()
+
+
 class Wrapper(File):
 
     resource_name = 'cipher'
@@ -47,7 +66,9 @@ class FileIo(Plan):
         kms = self.runner.get_service(self.resource.key, 'describe')
         tar = tarfile.open(
             name='ffff',
-            fileobj=self.runner.get_service(self.resource.file, 'fileio').read(),
+            fileobj=BytesIO(
+                self.runner.get_service(self.resource.file, 'fileio').read().read(),
+            ),
             mode='r',
         )
         f = Fernet(base64.urlsafe_b64encode(kms.decrypt_data_key(tar.extractfile('key').read())))
@@ -56,21 +77,5 @@ class FileIo(Plan):
     def write(self, c):
         kms = self.runner.get_service(self.resource.key, 'describe')
         aes_key, aes_key_protected = kms.create_data_key()
-        io = BytesIO()
-        tar = tarfile.open(name='xxxx', fileobj=io, mode='w')
-
-        ti = tarfile.TarInfo('key')
-        ti.size = len(aes_key_protected)
-        tar.addfile(ti, BytesIO(aes_key_protected))
-
-        f = Fernet(base64.urlsafe_b64encode(aes_key))
-        encrypted = f.encrypt(c)
-
-        ti = tarfile.TarInfo('blob')
-        ti.size = len(encrypted)
-        tar.addfile(ti, BytesIO(encrypted))
-
-        tar.close()
-
         fp = self.runner.get_service(self.resource.file, 'fileio')
-        fp.write(io.getvalue())
+        fp.write(encrypt(aes_key, aes_key_protected, c))

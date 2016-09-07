@@ -16,10 +16,14 @@ import os
 import sys
 import unittest
 
+import six
+from botocore.response import StreamingBody
+from botocore.stub import ANY
+
+from touchdown.aws.kms.wrapper import encrypt
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.fixtures.folder import TemporaryFolderFixture
-from touchdown.tests.stubs.aws import KeyStubber
-
+from touchdown.tests.stubs.aws import BucketStubber, KeyStubber
 
 DUMMY_EDITOR = (
     '#! /usr/bin/python\n'
@@ -84,6 +88,110 @@ class TestKmsWrapper(StubberTestCase):
         key.add_decrypt()
 
         wrapped_file = key.resource.add_cipher(file=folder.add_file(name='test.cfg'))
+        config_file = wrapped_file.add_ini_file()
+
+        variable = config_file.add_string(
+            name='strings.variable1',
+            default='value1',
+        )
+
+        goal.execute('strings.variable1', '1eulav')
+
+        getter = goal.get_service(variable, 'get')
+        self.assertEqual(getter.execute(), ('1eulav', True))
+
+    def test_inifile_string_encrypted_with_kms_on_s3(self):
+        goal = self.create_goal('set')
+
+        folder = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.get_bucket(
+                    name='test-bucket',
+                ),
+                'describe',
+            )
+        ))
+        folder.add_list_buckets_one_response()
+        folder.add_head_bucket()
+        folder.add_get_bucket_location()
+        folder.add_get_bucket_cors()
+        folder.add_get_bucket_policy()
+        folder.add_get_bucket_notification_configuration()
+        folder.add_get_bucket_accelerate_configuration()
+
+        folder.add_list_buckets_one_response()
+        folder.add_head_bucket()
+        folder.add_get_bucket_location()
+        folder.add_get_bucket_cors()
+        folder.add_get_bucket_policy()
+        folder.add_get_bucket_notification_configuration()
+        folder.add_get_bucket_accelerate_configuration()
+
+        file = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                folder.resource.add_file(name='test.cfg'),
+                'describe',
+            ),
+        ))
+
+        aes_key_protected = b'0' * 32
+        aes_key = b'1' * 32
+
+        old_value = encrypt(aes_key, aes_key_protected, b'[strings]\nvariable1=fred')
+        file.add_response(
+            'get_object',
+            service_response={
+                'Body': StreamingBody(
+                    six.BytesIO(old_value),
+                    len(old_value),
+                ),
+            },
+            expected_params={
+                'Bucket': 'test-bucket',
+                'Key': 'test.cfg',
+            }
+        )
+
+        file.add_response(
+            'put_object',
+            service_response={},
+            expected_params={
+                'Body': ANY,
+                'Bucket': 'test-bucket',
+                'Key': 'test.cfg',
+            }
+        )
+
+        new_value = encrypt(aes_key, aes_key_protected, b'[strings]\nvariable1=1eulav')
+        file.add_response(
+            'get_object',
+            service_response={
+                'Body': StreamingBody(
+                    six.BytesIO(new_value),
+                    len(new_value),
+                ),
+            },
+            expected_params={
+                'Bucket': 'test-bucket',
+                'Key': 'test.cfg',
+            }
+        )
+
+        key = self.fixtures.enter_context(KeyStubber(
+            goal.get_service(
+                self.aws.add_key(
+                    name='test-key',
+                ),
+                'describe',
+            )
+        ))
+        key.add_decrypt()
+        key.add_list_keys_one()
+        key.add_describe_key()
+        key.add_generate_data_key()
+        key.add_decrypt()
+
+        wrapped_file = key.resource.add_cipher(file=file.resource)
         config_file = wrapped_file.add_ini_file()
 
         variable = config_file.add_string(
