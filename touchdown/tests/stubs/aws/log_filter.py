@@ -23,7 +23,7 @@ class LogFilterStubber(ServiceStubber):
         self.add_response(
             'describe_metric_filters',
             service_response={},
-            expected_params={'filterNamePrefix': self.resource.name, 
+            expected_params={'filterNamePrefix': self.resource.name,
                              'logGroupName': 'test-log-group'}
         )
 
@@ -38,7 +38,7 @@ class LogFilterStubber(ServiceStubber):
                         'metricName': 'transformation-name',
                         'metricNamespace': 'transformation-namespace',
                         'metricValue': 'transformation-value',
-                     }],
+                        }],
                 }],
             },
             expected_params={'filterNamePrefix': self.resource.name,
@@ -57,7 +57,7 @@ class LogFilterStubber(ServiceStubber):
                     'metricName': 'transformation-name',
                     'metricNamespace': 'transformation-namespace',
                     'metricValue': 'transformation-value',
-                 }],
+                    }],
             }
         )
 
