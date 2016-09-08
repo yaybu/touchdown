@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.core import argument, serializers
-from touchdown.core.plan import Plan
+from touchdown.core.plan import Plan, Present
 
 from ..common import Resource, SimpleApply, SimpleDescribe, SimpleDestroy
 from .group import LogGroup
@@ -62,6 +62,8 @@ class Describe(SimpleDescribe, Plan):
 
 
 class Apply(SimpleApply, Describe):
+
+    signature = (Present('name'), Present('pattern'), Present('transformations'))
 
     create_action = 'put_metric_filter'
     update_action = 'put_metric_filter'

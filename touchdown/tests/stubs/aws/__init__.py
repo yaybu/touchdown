@@ -35,6 +35,7 @@ from .key import KeyStubber
 from .keypair import KeyPairStubber
 from .launch_configuration import LaunchConfigurationStubber
 from .load_balancer import LoadBalancerStubber
+from .log_filter import LogFilterStubber
 from .log_group import LogGroupStubber
 from .network_acl import NetworkAclStubber
 from .password_policy import PasswordPolicyStubber
@@ -79,6 +80,7 @@ __all__ = [
     'KeyStubber',
     'LaunchConfigurationStubber',
     'LoadBalancerStubber',
+    'LogFilterStubber',
     'LogGroupStubber',
     'NetworkAclStubber',
     'PasswordPolicyStubber',
