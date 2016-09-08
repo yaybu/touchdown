@@ -49,7 +49,7 @@ class SshConnectionFixture(Fixture):
 
     def __enter__(self):
         self.listen_socket = socket.socket()
-        self.listen_socket.bind(('localhost', 0))
+        self.listen_socket.bind(('0.0.0.0', 0))
         self.listen_socket.listen(1)
         self.address, self.port = self.listen_socket.getsockname()
         self.fixtures.push(lambda *exc_info: self.listen_socket.close())
