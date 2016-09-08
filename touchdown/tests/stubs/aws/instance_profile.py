@@ -28,6 +28,22 @@ class InstanceProfileStubber(ServiceStubber):
             expected_params={}
         )
 
+    def add_list_instance_profile_one_response(self):
+        self.add_response(
+            'list_instance_profiles',
+            service_response={'InstanceProfiles': [
+                {
+                    'Path': '/',
+                    'InstanceProfileName': self.resource.name,
+                    'InstanceProfileId': self.make_id(self.resource.name),
+                    'Arn': self.make_id(self.resource.name),
+                    'CreateDate': datetime.datetime.now(),
+                    'Roles': [],
+                },
+            ]},
+            expected_params={}
+        )
+
     def add_create_instance_profile(self):
         self.add_response(
             'create_instance_profile',

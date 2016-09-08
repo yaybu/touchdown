@@ -12,12 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-
-import mock
-
-from botocore.stub import Stubber
-
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import InstanceProfileStubber
 
@@ -40,36 +34,21 @@ class TestCreateInstanceProfile(StubberTestCase):
 
         goal.execute()
 
-    def test_create_role_idempotent(self):
+    def test_create_instance_profile_idempotent(self):
         goal = self.create_goal('apply')
 
-        role = self.fixtures.enter_context(InstanceProfileStubber(
+        instance_profile = self.fixtures.enter_context(InstanceProfileStubber(
             goal.get_service(
-                self.aws.add_role(
-                    name='my-test-role',
-                    assume_role_policy={
-                        'Statement': [{
-                            'Effect': 'Allow',
-                            'Principal': {'Service': 'ec2.amazonaws.com'},
-                            'Action': 'sts:AssumeRole',
-                        }],
-                    },
+                self.aws.add_instance_profile(
+                    name='my-test-profile',
                 ),
                 'apply',
             )
         ))
-
-        role.add_list_roles_one_response_by_name(
-            assume_role_policy_document=(
-                '{"Statement": [{"Action": "sts:AssumeRole", "Effect": "Allow",'
-                '"Principal": {"Service": "ec2.amazonaws.com"}, "Sid": ""}],'
-                '"Version": "2012-10-17"}'
-            )
-        )
-        role.add_list_role_policies()
+        instance_profile.add_list_instance_profile_one_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
-        self.assertEqual(len(goal.get_changes(role.resource)), 0)
+        self.assertEqual(len(goal.get_changes(instance_profile.resource)), 0)
 
 
 class TestDestroyInstanceProfile(StubberTestCase):

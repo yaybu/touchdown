@@ -76,6 +76,7 @@ __all__ = [
     'ExternalAccountStubber',
     'HostedZoneStubber',
     'ImageCopyStubber',
+    'InstanceProfileStubber',
     'InternetGatewayStubber',
     'KeyPairStubber',
     'KeyStubber',
