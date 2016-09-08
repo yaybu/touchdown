@@ -57,3 +57,10 @@ class InstanceProfileStubber(ServiceStubber):
                 }},
             expected_params={'InstanceProfileName': self.resource.name}
         )
+
+    def add_delete_instance_profile(self):
+        self.add_response(
+            'delete_instance_profile',
+            service_response={},
+            expected_params={'InstanceProfileName': self.resource.name}
+        )

@@ -53,50 +53,34 @@ class TestCreateInstanceProfile(StubberTestCase):
 
 class TestDestroyInstanceProfile(StubberTestCase):
 
-    def test_destroy_role(self):
+    def test_destroy_instance_profile(self):
         goal = self.create_goal('destroy')
 
-        role = self.fixtures.enter_context(InstanceProfileStubber(
+        instance_profile = self.fixtures.enter_context(InstanceProfileStubber(
             goal.get_service(
-                self.aws.add_role(
-                    name='my-test-role',
-                    assume_role_policy={
-                        'Statement': [{
-                            'Effect': 'Allow',
-                            'Principal': {'Service': 'ec2.amazonaws.com'},
-                            'Action': 'sts:AssumeRole',
-                        }],
-                    },
+                self.aws.add_instance_profile(
+                    name='my-test-profile',
                 ),
                 'destroy',
             )
         ))
+        instance_profile.add_list_instance_profile_one_response()
+        instance_profile.add_delete_instance_profile()
 
-        role.add_list_roles_one_response_by_name()
-        role.add_list_role_policies()
-        role.add_delete_role()
         goal.execute()
 
     def test_destroy_role_idempotent(self):
         goal = self.create_goal('destroy')
 
-        role = self.fixtures.enter_context(InstanceProfileStubber(
+        instance_profile = self.fixtures.enter_context(InstanceProfileStubber(
             goal.get_service(
-                self.aws.add_role(
-                    name='my-test-role',
-                    assume_role_policy={
-                        'Statement': [{
-                            'Effect': 'Allow',
-                            'Principal': {'Service': 'ec2.amazonaws.com'},
-                            'Action': 'sts:AssumeRole',
-                        }],
-                    },
+                self.aws.add_instance_profile(
+                    name='my-test-profile',
                 ),
                 'destroy',
             )
         ))
-
-        role.add_list_roles_empty_response_by_name()
+        instance_profile.add_list_instance_profile_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
-        self.assertEqual(len(goal.get_changes(role.resource)), 0)
+        self.assertEqual(len(goal.get_changes(instance_profile.resource)), 0)
