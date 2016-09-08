@@ -15,7 +15,10 @@
 from touchdown.core import errors
 from touchdown.tests.aws import Stubber, StubberTestCase
 from touchdown.tests.fixtures.aws import LaunchConfigurationFixture
-from touchdown.tests.stubs.aws import AutoScalingGroupStubber
+from touchdown.tests.stubs.aws import (
+    AutoScalingGroupStubber,
+    EC2InstanceStubber,
+)
 
 
 class TestCreateAutoScalingGroupuration(StubberTestCase):
@@ -512,6 +515,110 @@ class TestSshAutoScalingGroup(StubberTestCase):
             '-o', 'User=\'root\'',
             '-o', 'Port=22',
             '-o', 'HostName=10.0.0.1',
+            '-o', 'ProxyCommand=/usr/bin/ssh -o User=\'root\' -o Port=\'22\' -W %h:%p 8.8.8.8',
+            'remote',
+        ])
+
+    def test_ssh_ec2_instance_via_auto_scaling_group(self):
+        # Private ec2 instance and public asg. Ec2 instance has an ssh_connection that proxies via the public asg ssh_connection
+
+        # In this scenario there are 2 ASG's. One is public and one is not. They
+        # both have SSH conenctions associated with them, and the private
+        # ssh_connection has a proxy attribute set to the public ssh_connection.
+        # `touchdown ssh` for the private connection should use -o ProxyCommand
+        # to bounce off the public host.
+        goal = self.create_goal('ssh')
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23f',
+            }]
+        )
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23f',
+            }]
+        )
+
+        ec2_client_stub = self.fixtures.enter_context(Stubber(
+            auto_scaling_group.service.ec2_client
+        ))
+        ec2_client_stub.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [{
+                    'Instances': [{
+                        'PublicIpAddress': '8.8.8.8',
+                        'VpcId': 'vpc-de3db33',
+                    }]
+                }]
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23f']
+            },
+        )
+        ec2_client_stub.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [{
+                    'Instances': [{
+                        'PublicIpAddress': '8.8.8.8',
+                        'VpcId': 'vpc-de3db33',
+                    }]
+                }]
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23f']
+            },
+        )
+
+        ssh_connection = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group.resource,
+                username='root',
+                password='password',
+            ),
+            'ssh',
+        )
+
+        ec2_instance = self.fixtures.enter_context(EC2InstanceStubber(
+            goal.get_service(
+                self.aws.get_ec2_instance(
+                    name='my-ec2-instance',
+                ),
+                'describe',
+            )
+        ))
+        ec2_instance.add_describe_instances_one_response_by_name()
+        ec2_instance.add_describe_instances_one_response_by_name()
+
+        ssh_connection_2 = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=ec2_instance.resource,
+                username='root',
+                password='password',
+                proxy=ssh_connection.resource,
+            ),
+            'ssh',
+        )
+
+        self.assertEqual(ssh_connection_2.get_command_and_args(), [
+            '/usr/bin/ssh',
+            '-o', 'User=\'root\'',
+            '-o', 'Port=22',
+            '-o', 'HostName=10.0.0.42',
             '-o', 'ProxyCommand=/usr/bin/ssh -o User=\'root\' -o Port=\'22\' -W %h:%p 8.8.8.8',
             'remote',
         ])

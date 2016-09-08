@@ -48,6 +48,8 @@ class EC2InstanceStubber(ServiceStubber):
                         'State': {
                             'Name': state
                         },
+                        'VpcId': 'vpc-de3db33',
+                        'PrivateIpAddress': '10.0.0.42',
                     }],
                 }]
             },
