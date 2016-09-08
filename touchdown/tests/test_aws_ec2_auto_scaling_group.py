@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from touchdown.core import errors
 from touchdown.tests.aws import Stubber, StubberTestCase
 from touchdown.tests.fixtures.aws import LaunchConfigurationFixture
 from touchdown.tests.stubs.aws import AutoScalingGroupStubber
@@ -238,6 +239,105 @@ class TestDestroyAutoScalingGroupuration(StubberTestCase):
 
 class TestSshAutoScalingGroup(StubberTestCase):
 
+    def test_ssh_auto_scaling_group_no_instances(self):
+        goal = self.create_goal('ssh')
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[]
+        )
+
+        ssh_connection = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group.resource,
+                username='root',
+                password='password',
+            ),
+            'ssh',
+        )
+
+        self.assertRaises(errors.ServiceNotReady, ssh_connection.get_command_and_args)
+
+    def test_ssh_auto_scaling_group_no_instances_in_service(self):
+        goal = self.create_goal('ssh')
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'Terminating',
+            }]
+        )
+
+        ssh_connection = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group.resource,
+                username='root',
+                password='password',
+            ),
+            'ssh',
+        )
+
+        self.assertRaises(errors.ServiceNotReady, ssh_connection.get_command_and_args)
+
+    def test_ssh_auto_scaling_group_instances_not_found_in_ec2(self):
+        goal = self.create_goal('ssh')
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23f',
+            }]
+        )
+
+        ec2_client_stub = self.fixtures.enter_context(Stubber(
+            auto_scaling_group.service.ec2_client
+        ))
+        ec2_client_stub.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [],
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23f']
+            },
+        )
+
+        ssh_connection = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group.resource,
+                username='root',
+                password='password',
+            ),
+            'ssh',
+        )
+
+        self.assertRaises(errors.ServiceNotReady, ssh_connection.get_command_and_args)
+
     def test_ssh_auto_scaling_group_direct(self):
         goal = self.create_goal('ssh')
 
@@ -289,5 +389,129 @@ class TestSshAutoScalingGroup(StubberTestCase):
             '-o', 'User=\'root\'',
             '-o', 'Port=22',
             '-o', 'HostName=8.8.8.8',
+            'remote',
+        ])
+
+    def test_ssh_auto_scaling_group_via_auto_scaling_group(self):
+        # In this scenario there are 2 ASG's. One is public and one is not. They
+        # both have SSH conenctions associated with them, and the private
+        # ssh_connection has a proxy attribute set to the public ssh_connection.
+        # `touchdown ssh` for the private connection should use -o ProxyCommand
+        # to bounce off the public host.
+        goal = self.create_goal('ssh')
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23f',
+            }]
+        )
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23f',
+            }]
+        )
+
+        ec2_client_stub = self.fixtures.enter_context(Stubber(
+            auto_scaling_group.service.ec2_client
+        ))
+        ec2_client_stub.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [{
+                    'Instances': [{
+                        'PublicIpAddress': '8.8.8.8',
+                        'VpcId': 'vpc-de3db33',
+                    }]
+                }]
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23f']
+            },
+        )
+        ec2_client_stub.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [{
+                    'Instances': [{
+                        'PublicIpAddress': '8.8.8.8',
+                        'VpcId': 'vpc-de3db33',
+                    }]
+                }]
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23f']
+            },
+        )
+
+        ssh_connection = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group.resource,
+                username='root',
+                password='password',
+            ),
+            'ssh',
+        )
+
+        auto_scaling_group2 = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg-2',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group2.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23g',
+            }]
+        )
+
+        ec2_client_stub2 = self.fixtures.enter_context(Stubber(
+            auto_scaling_group2.service.ec2_client
+        ))
+        ec2_client_stub2.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [{
+                    'Instances': [{
+                        'PrivateIpAddress': '10.0.0.1',
+                        'VpcId': 'vpc-de3db33',
+                    }]
+                }]
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23g']
+            },
+        )
+
+        ssh_connection_2 = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group2.resource,
+                username='root',
+                password='password',
+                proxy=ssh_connection.resource,
+            ),
+            'ssh',
+        )
+
+        self.assertEqual(ssh_connection_2.get_command_and_args(), [
+            '/usr/bin/ssh',
+            '-o', 'User=\'root\'',
+            '-o', 'Port=22',
+            '-o', 'HostName=10.0.0.1',
+            '-o', 'ProxyCommand=/usr/bin/ssh -o User=\'root\' -o Port=\'22\' -W %h:%p 8.8.8.8',
             'remote',
         ])
