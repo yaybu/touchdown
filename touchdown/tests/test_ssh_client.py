@@ -14,8 +14,8 @@
 
 import mock
 
-from touchdown.tests.testcases import WorkspaceTestCase
 from touchdown.tests.fixtures.ssh_connection import SshConnectionFixture
+from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestSshClient(WorkspaceTestCase):
@@ -28,6 +28,6 @@ class TestSshClient(WorkspaceTestCase):
         self.fixtures.enter_context(mock.patch('touchdown.ssh.client.Client.verify_transport'))
         self.fixtures.enter_context(mock.patch('touchdown.ssh.client.Client.set_input_encoding'))
 
-        client = connection_plan.get_client()
+        connection_plan.get_client()
 
         # FIXME: How to make the dummy server run stuff? Or fake run stuff.

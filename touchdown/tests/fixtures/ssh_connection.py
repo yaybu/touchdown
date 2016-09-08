@@ -61,7 +61,8 @@ class SshConnectionFixture(Fixture):
             port=self.port,
         )
 
-        self.listen_thread = threading.Thread(target=self.server_thread, daemon=True)
+        self.listen_thread = threading.Thread(target=self.server_thread)
+        self.listen_thread.daemon = True
         self.listen_thread.start()
 
         return self
