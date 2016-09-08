@@ -30,6 +30,7 @@ from .endpoint import VpcEndpointStubber
 from .event_rule import EventRuleStubber
 from .external_account import ExternalAccountStubber
 from .hosted_zone import HostedZoneStubber
+from .instance_profile import InstanceProfileStubber
 from .internet_gateway import InternetGatewayStubber
 from .key import KeyStubber
 from .keypair import KeyPairStubber
