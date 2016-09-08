@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.tests.aws import StubberTestCase
+from touchdown.tests.aws import Stubber, StubberTestCase
 from touchdown.tests.fixtures.aws import LaunchConfigurationFixture
 from touchdown.tests.stubs.aws import AutoScalingGroupStubber
 
@@ -234,3 +234,60 @@ class TestDestroyAutoScalingGroupuration(StubberTestCase):
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(auto_scaling_group.resource)), 0)
+
+
+class TestSshAutoScalingGroup(StubberTestCase):
+
+    def test_ssh_auto_scaling_group_direct(self):
+        goal = self.create_goal('ssh')
+
+        auto_scaling_group = self.fixtures.enter_context(AutoScalingGroupStubber(
+            goal.get_service(
+                self.aws.get_auto_scaling_group(
+                    name='my-asg',
+                ),
+                'describe',
+            )
+        ))
+        auto_scaling_group.add_describe_auto_scaling_groups_one_response(
+            instances=[{
+                'LifecycleState': 'InService',
+                'InstanceId': 'i-abcde23f',
+            }]
+        )
+
+        ec2_client_stub = self.fixtures.enter_context(Stubber(
+            auto_scaling_group.service.ec2_client
+        ))
+        ec2_client_stub.add_response(
+            'describe_instances',
+            service_response={
+                'Reservations': [{
+                    'Instances': [{
+                        'PublicIpAddress': '8.8.8.8',
+                    }]
+                }]
+            },
+            expected_params={
+                'InstanceIds': ['i-abcde23f']
+            },
+        )
+
+        ssh_connection = goal.get_service(
+            self.workspace.add_ssh_connection(
+                name='my-ssh-connection',
+                instance=auto_scaling_group.resource,
+                username='root',
+                password='password',
+            ),
+            'ssh',
+        )
+
+        self.assertEqual(ssh_connection.get_command(), '/usr/bin/ssh')
+        self.assertEqual(ssh_connection.get_command_and_args(), [
+            '/usr/bin/ssh',
+            '-o', 'User=\'root\'',
+            '-o', 'Port=22',
+            '-o', 'HostName=8.8.8.8',
+            'remote',
+        ])

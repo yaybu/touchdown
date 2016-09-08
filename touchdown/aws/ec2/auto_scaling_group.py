@@ -20,6 +20,7 @@ from touchdown.core import argument, errors, serializers
 from touchdown.core.action import Action
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource
+from touchdown.core.utils import cached_property
 
 from ..account import BaseAccount
 from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
@@ -225,6 +226,10 @@ class Describe(SimpleDescribe, Plan):
     describe_envelope = 'AutoScalingGroups'
     key = 'AutoScalingGroupName'
 
+    @cached_property
+    def ec2_client(self):
+        return self.session.create_client('ec2')
+
     def get_describe_filters(self):
         return {'AutoScalingGroupNames': [self.resource.name]}
 
@@ -356,19 +361,15 @@ class Instance(ssh.Instance):
         if len(obj.get('Instances', [])) == 0:
             raise errors.ServiceNotReady('No instances currently running in group {}'.format(self.adapts))
 
-        asg_inservice = filter(
+        asg_inservice = list(filter(
             lambda x: x['LifecycleState'] == 'InService',
             obj.get('Instances', []),
-        )
+        ))
 
         if len(asg_inservice) == 0:
             raise errors.ServiceNotReady('None of the instances in {} are in service'.format(self.adapts))
 
-        # Annoyingly we have to get antother client (different API) to get info
-        # on teh EC2 instances in our asg
-        client = plan.session.create_client('ec2')
-
-        reservations = client.describe_instances(
+        reservations = plan.ec2_client.describe_instances(
             InstanceIds=[i['InstanceId'] for i in asg_inservice],
         ).get('Reservations', [])
 
