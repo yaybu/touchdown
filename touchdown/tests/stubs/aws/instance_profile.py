@@ -38,7 +38,13 @@ class InstanceProfileStubber(ServiceStubber):
                     'InstanceProfileId': self.make_id(self.resource.name),
                     'Arn': self.make_id(self.resource.name),
                     'CreateDate': datetime.datetime.now(),
-                    'Roles': [],
+                    'Roles': [{
+                        'RoleName': 'my-test-role',
+                        'RoleId': self.make_id(self.resource.name),
+                        'Path': '/',
+                        'Arn': self.make_id(self.resource.name),
+                        'CreateDate': datetime.datetime.now(),
+                    }],
                 },
             ]},
             expected_params={}
@@ -63,4 +69,20 @@ class InstanceProfileStubber(ServiceStubber):
             'delete_instance_profile',
             service_response={},
             expected_params={'InstanceProfileName': self.resource.name}
+        )
+
+    def add_add_role_to_instance_profile(self):
+        self.add_response(
+            'add_role_to_instance_profile',
+            service_response={},
+            expected_params={'InstanceProfileName': self.resource.name,
+                             'RoleName': 'my-test-role'}
+        )
+
+    def add_remove_role_from_instance_profile(self):
+        self.add_response(
+            'remove_role_from_instance_profile',
+            service_response={},
+            expected_params={'InstanceProfileName': self.resource.name,
+                             'RoleName': 'my-test-role'}
         )
