@@ -1,0 +1,67 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+    Signature Algorithm: md5WithRSAEncryption
+        Issuer: C=UK, ST=Yorkshire, L=York, O=Isotoma, O=Ltd, OU=Condor Project, CN=David Bell
+        Validity
+            Not Before: Sep 11 15:58:28 2016 GMT
+            Not After : Sep 11 15:58:28 2017 GMT
+        Subject: C=UK, ST=Yorkshire, L=York, O=Isotoma, O=Ltd, OU=Condor Project, CN=test.host.com/emailAddress=david.bell@isotoma.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:c2:2f:cb:53:7f:79:34:b9:eb:bd:6b:7d:f3:79:
+                    10:d7:d5:bd:68:7a:1e:42:5b:55:12:1f:67:d4:95:
+                    50:f4:f4:99:66:1f:3a:79:5b:ad:47:78:2c:94:7f:
+                    ae:b1:a9:17:18:29:16:db:f2:36:6d:46:15:6c:17:
+                    01:88:6a:df:49:0e:89:30:25:7d:bb:9d:4c:49:ea:
+                    58:c4:e5:18:ef:85:5f:cf:d2:bc:43:66:93:8b:05:
+                    8d:4c:e0:f7:6f:33:27:5c:f8:27:62:27:d7:e9:c7:
+                    1d:49:be:ef:c0:9f:6d:a4:ac:3f:d1:ea:ef:2c:e9:
+                    f8:24:0c:b8:5d:44:7f:6b:ff
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                CD:3C:B9:CC:21:24:D9:85:49:38:D4:E7:FD:32:FA:16:8E:D8:99:EC
+            X509v3 Authority Key Identifier: 
+                keyid:60:27:51:6B:0D:83:EE:28:55:75:2C:58:B7:2C:1C:90:DF:6B:CC:91
+                DirName:/C=UK/ST=Yorkshire/L=York/O=Isotoma/O=Ltd/OU=Condor Project/CN=David Bell
+                serial:C1:32:91:56:E9:D1:28:46
+
+    Signature Algorithm: md5WithRSAEncryption
+         3f:a8:42:05:0f:d4:2f:a5:9f:b8:6d:35:d7:89:66:c3:72:83:
+         8e:f8:f2:29:36:c4:77:aa:ad:7b:1e:ee:f6:0f:83:73:3a:2a:
+         02:40:98:d2:63:40:a3:ef:5e:68:f8:cb:94:96:97:14:93:b5:
+         ce:e1:76:56:c6:5e:c9:51:62:63:31:4e:5a:56:73:2a:be:a5:
+         77:84:50:0f:a3:c1:7e:6a:59:ac:e0:28:c0:81:a0:12:3f:e5:
+         86:28:2a:b6:af:4a:b9:42:6b:e9:27:7c:6e:a9:3a:d6:a7:08:
+         c0:e1:dd:49:30:8c:61:13:16:41:fe:c5:6d:c3:6e:e0:ac:9a:
+         c9:ab
+-----BEGIN CERTIFICATE-----
+MIIDsDCCAxmgAwIBAgIBATANBgkqhkiG9w0BAQQFADB+MQswCQYDVQQGEwJVSzES
+MBAGA1UECBMJWW9ya3NoaXJlMQ0wCwYDVQQHEwRZb3JrMRAwDgYDVQQKEwdJc290
+b21hMQwwCgYDVQQKEwNMdGQxFzAVBgNVBAsTDkNvbmRvciBQcm9qZWN0MRMwEQYD
+VQQDEwpEYXZpZCBCZWxsMB4XDTE2MDkxMTE1NTgyOFoXDTE3MDkxMTE1NTgyOFow
+gagxCzAJBgNVBAYTAlVLMRIwEAYDVQQIEwlZb3Jrc2hpcmUxDTALBgNVBAcTBFlv
+cmsxEDAOBgNVBAoTB0lzb3RvbWExDDAKBgNVBAoTA0x0ZDEXMBUGA1UECxMOQ29u
+ZG9yIFByb2plY3QxFjAUBgNVBAMTDXRlc3QuaG9zdC5jb20xJTAjBgkqhkiG9w0B
+CQEWFmRhdmlkLmJlbGxAaXNvdG9tYS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0A
+MIGJAoGBAMIvy1N/eTS5671rffN5ENfVvWh6HkJbVRIfZ9SVUPT0mWYfOnlbrUd4
+LJR/rrGpFxgpFtvyNm1GFWwXAYhq30kOiTAlfbudTEnqWMTlGO+FX8/SvENmk4sF
+jUzg928zJ1z4J2In1+nHHUm+78CfbaSsP9Hq7yzp+CQMuF1Ef2v/AgMBAAGjggER
+MIIBDTAJBgNVHRMEAjAAMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NMIEdlbmVyYXRl
+ZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUzTy5zCEk2YVJONTn/TL6Fo7YmewwgbIG
+A1UdIwSBqjCBp4AUYCdRaw2D7ihVdSxYtywckN9rzJGhgYOkgYAwfjELMAkGA1UE
+BhMCVUsxEjAQBgNVBAgTCVlvcmtzaGlyZTENMAsGA1UEBxMEWW9yazEQMA4GA1UE
+ChMHSXNvdG9tYTEMMAoGA1UEChMDTHRkMRcwFQYDVQQLEw5Db25kb3IgUHJvamVj
+dDETMBEGA1UEAxMKRGF2aWQgQmVsbIIJAMEykVbp0ShGMA0GCSqGSIb3DQEBBAUA
+A4GBAD+oQgUP1C+ln7htNdeJZsNyg4748ik2xHeqrXse7vYPg3M6KgJAmNJjQKPv
+Xmj4y5SWlxSTtc7hdlbGXslRYmMxTlpWcyq+pXeEUA+jwX5qWazgKMCBoBI/5YYo
+KravSrlCa+knfG6pOtanCMDh3UkwjGETFkH+xW3DbuCsmsmr
+-----END CERTIFICATE-----
