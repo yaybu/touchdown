@@ -22,6 +22,8 @@ from touchdown.core.datetime import utc
 class ServerCertificateStubber(ServiceStubber):
 
     client_service = 'iam'
+
+    # generated according to http://pages.cs.wisc.edu/~zmiller/ca-howto/
     cert_file = os.path.join(os.path.dirname(__file__), '../../assets/host.crt')
     key_file = os.path.join(os.path.dirname(__file__), '../../assets/host.key')
 
