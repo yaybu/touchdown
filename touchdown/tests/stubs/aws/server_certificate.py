@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import datetime
+import os
+
+from touchdown.core.datetime import utc
 
 from .service import ServiceStubber
-from touchdown.core.datetime import utc
 
 
 class ServerCertificateStubber(ServiceStubber):
@@ -55,7 +56,7 @@ class ServerCertificateStubber(ServiceStubber):
                 'ServerCertificateName': self.resource.name + '.1',
                 'CertificateBody': open(self.cert_file).read(),
                 'PrivateKey': open(self.key_file).read()
-            } 
+            }
         )
 
     def add_get_server_certificate(self):
@@ -72,12 +73,12 @@ class ServerCertificateStubber(ServiceStubber):
                 'CertificateBody': open(self.cert_file).read(),
                 'CertificateChain': ' ',
             }},
-            expected_params={'ServerCertificateName': self.resource.name + '.1'} 
+            expected_params={'ServerCertificateName': self.resource.name + '.1'}
         )
 
     def add_delete_server_certificate(self):
         self.add_response(
             'delete_server_certificate',
             service_response={},
-            expected_params={'ServerCertificateName': self.resource.name + '.1'} 
+            expected_params={'ServerCertificateName': self.resource.name + '.1'}
         )

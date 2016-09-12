@@ -96,7 +96,7 @@ __all__ = [
     'RoleStubber',
     'RouteTableStubber',
     'SecurityGroupStubber',
-    'SererCertificateStubber',
+    'ServerCertificateStubber',
     'ServiceStubber',
     'StreamingDistributionStubber',
     'Stubber',

@@ -15,22 +15,18 @@
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import ServerCertificateStubber
 
-from .fixtures.aws import RoleFixture
-
 
 class TestCreateServerCertificate(StubberTestCase):
 
     def test_create_server_certificate(self):
         goal = self.create_goal('apply')
 
-        role = self.fixtures.enter_context(RoleFixture(goal, self.aws))
-
         server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
             goal.get_service(
                 self.aws.add_server_certificate(
                     name='my-test-server-certificate',
-                    certificate_body = open(ServerCertificateStubber.cert_file).read(),
-                    private_key = open(ServerCertificateStubber.key_file).read()
+                    certificate_body=open(ServerCertificateStubber.cert_file).read(),
+                    private_key=open(ServerCertificateStubber.key_file).read()
                 ),
                 'apply',
             )
@@ -55,14 +51,12 @@ class TestCreateServerCertificate(StubberTestCase):
     def test_create_server_certificate_idempotent(self):
         goal = self.create_goal('apply')
 
-        role = self.fixtures.enter_context(RoleFixture(goal, self.aws))
-
         server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
             goal.get_service(
                 self.aws.add_server_certificate(
                     name='my-test-server-certificate',
-                    certificate_body = open(ServerCertificateStubber.cert_file).read(),
-                    private_key = open(ServerCertificateStubber.key_file).read()
+                    certificate_body=open(ServerCertificateStubber.cert_file).read(),
+                    private_key=open(ServerCertificateStubber.key_file).read()
                 ),
                 'apply',
             )
@@ -80,8 +74,6 @@ class TestDestroyServerCertificate(StubberTestCase):
 
     def test_destroy_server_certificate(self):
         goal = self.create_goal('destroy')
-
-        role = self.fixtures.enter_context(RoleFixture(goal, self.aws))
 
         server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
             goal.get_service(
