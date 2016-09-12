@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import datetime
 
 from .service import ServiceStubber
@@ -21,6 +22,8 @@ from touchdown.core.datetime import utc
 class ServerCertificateStubber(ServiceStubber):
 
     client_service = 'iam'
+    cert_file = os.path.join(os.path.dirname(__file__), '../../assets/host.crt')
+    key_file = os.path.join(os.path.dirname(__file__), '../../assets/host.key')
 
     def add_list_server_certificate_empty_response(self):
         self.add_response(
@@ -48,8 +51,8 @@ class ServerCertificateStubber(ServiceStubber):
             service_response={},
             expected_params={
                 'ServerCertificateName': self.resource.name + '.1',
-                'CertificateBody': open('host_omega.crt').read(),
-                'PrivateKey': open('host_omega.key').read(),
+                'CertificateBody': open(self.cert_file).read(),
+                'PrivateKey': open(self.key_file).read()
             } 
         )
 
@@ -64,7 +67,7 @@ class ServerCertificateStubber(ServiceStubber):
                     'Arn': self.make_id(self.resource.name),
                     'Expiration': datetime.datetime.utcnow().replace(tzinfo=utc)
                 },
-                'CertificateBody': open('host_omega.crt').read(),
+                'CertificateBody': open(self.cert_file).read(),
                 'CertificateChain': ' ',
             }},
             expected_params={'ServerCertificateName': self.resource.name + '.1'} 

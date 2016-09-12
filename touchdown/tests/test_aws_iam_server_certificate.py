@@ -29,8 +29,8 @@ class TestCreateServerCertificate(StubberTestCase):
             goal.get_service(
                 self.aws.add_server_certificate(
                     name='my-test-server-certificate',
-                    certificate_body=open('host_omega.crt').read(),
-                    private_key=open('host_omega.key').read(),
+                    certificate_body = open(ServerCertificateStubber.cert_file).read(),
+                    private_key = open(ServerCertificateStubber.key_file).read()
                 ),
                 'apply',
             )
@@ -61,8 +61,8 @@ class TestCreateServerCertificate(StubberTestCase):
             goal.get_service(
                 self.aws.add_server_certificate(
                     name='my-test-server-certificate',
-                    certificate_body=open('host_omega.crt').read(),
-                    private_key=open('host_omega.key').read(),
+                    certificate_body = open(ServerCertificateStubber.cert_file).read(),
+                    private_key = open(ServerCertificateStubber.key_file).read()
                 ),
                 'apply',
             )
