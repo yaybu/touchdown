@@ -15,6 +15,7 @@
 import datetime
 
 from .service import ServiceStubber
+from touchdown.core.datetime import utc
 
 
 class ServerCertificateStubber(ServiceStubber):
@@ -61,9 +62,17 @@ class ServerCertificateStubber(ServiceStubber):
                     'ServerCertificateId': self.make_id(self.resource.name),
                     'Path': '/',
                     'Arn': self.make_id(self.resource.name),
+                    'Expiration': datetime.datetime.utcnow().replace(tzinfo=utc)
                 },
                 'CertificateBody': open('host_omega.crt').read(),
                 'CertificateChain': ' ',
             }},
+            expected_params={'ServerCertificateName': self.resource.name + '.1'} 
+        )
+
+    def add_delete_server_certificate(self):
+        self.add_response(
+            'delete_server_certificate',
+            service_response={},
             expected_params={'ServerCertificateName': self.resource.name + '.1'} 
         )

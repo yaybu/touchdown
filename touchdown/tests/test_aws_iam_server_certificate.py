@@ -60,13 +60,17 @@ class TestCreateServerCertificate(StubberTestCase):
         server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
             goal.get_service(
                 self.aws.add_server_certificate(
-                    name='my-test-profile',
-                    roles=[role],
+                    name='my-test-server-certificate',
+                    certificate_body=open('host_omega.crt').read(),
+                    private_key=open('host_omega.key').read(),
                 ),
                 'apply',
             )
         ))
-        server_certificate.add_list_instance_profile_one_response()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(server_certificate.resource)), 0)
@@ -82,30 +86,32 @@ class TestDestroyServerCertificate(StubberTestCase):
         server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
             goal.get_service(
                 self.aws.add_server_certificate(
-                    name='my-test-profile',
-                    roles=[role],
+                    name='my-test-server-certificate',
                 ),
                 'destroy',
             )
         ))
-        server_certificate.add_list_instance_profile_one_response()
-        server_certificate.add_remove_role_from_instance_profile()
-        server_certificate.add_delete_instance_profile()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
+        server_certificate.add_delete_server_certificate()
 
         goal.execute()
 
-    def test_destroy_role_idempotent(self):
+    def test_destroy_server_certificate_idempotent(self):
         goal = self.create_goal('destroy')
 
         server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
             goal.get_service(
                 self.aws.add_server_certificate(
-                    name='my-test-profile',
+                    name='my-test-server-certificate',
                 ),
                 'destroy',
             )
         ))
-        server_certificate.add_list_instance_profile_empty_response()
+        server_certificate.add_list_server_certificate_empty_response()
+        server_certificate.add_list_server_certificate_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(server_certificate.resource)), 0)
