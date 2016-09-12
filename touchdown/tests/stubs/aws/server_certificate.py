@@ -32,6 +32,7 @@ class ServerCertificateStubber(ServiceStubber):
         self.add_response(
             'list_server_certificates',
             service_response={'ServerCertificateMetadataList': [{
+                # see touchdown/aws/replacement.py
                 'ServerCertificateName': self.resource.name + '.1',
                 'ServerCertificateId': self.make_id(self.resource.name),
                 'Path': '/',
@@ -45,7 +46,7 @@ class ServerCertificateStubber(ServiceStubber):
             'upload_server_certificate',
             service_response={},
             expected_params={
-                'ServerCertificateName': self.resource.name + '.1',  # TODO why .1?
+                'ServerCertificateName': self.resource.name + '.1',
                 'CertificateBody': open('host_omega.crt').read(),
                 'PrivateKey': open('host_omega.key').read(),
             } 

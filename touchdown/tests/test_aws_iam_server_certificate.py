@@ -35,13 +35,18 @@ class TestCreateServerCertificate(StubberTestCase):
                 'apply',
             )
         ))
+        # first list is to find things to delete
         server_certificate.add_list_server_certificate_empty_response()
+        # second is to find if there is an existing matching cert
         server_certificate.add_list_server_certificate_empty_response()
         server_certificate.add_upload_server_certificate()
+        # CreateAction needs to look up cert again as create response has no info
         server_certificate.add_list_server_certificate_one_response()
         server_certificate.add_get_server_certificate()
+        # refresh resource metadata
         server_certificate.add_list_server_certificate_one_response()
         server_certificate.add_get_server_certificate()
+        # sanity check / PostCreation
         server_certificate.add_list_server_certificate_one_response()
         server_certificate.add_get_server_certificate()
 
