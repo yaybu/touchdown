@@ -28,6 +28,18 @@ class ServerCertificateStubber(ServiceStubber):
             expected_params={}
         )
 
+    def add_list_server_certificate_one_response(self):
+        self.add_response(
+            'list_server_certificates',
+            service_response={'ServerCertificateMetadataList': [{
+                'ServerCertificateName': self.resource.name + '.1',
+                'ServerCertificateId': self.make_id(self.resource.name),
+                'Path': '/',
+                'Arn': self.make_id(self.resource.name),
+            }]},
+            expected_params={}
+        )
+
     def add_upload_server_certificate(self):
         self.add_response(
             'upload_server_certificate',
@@ -37,4 +49,20 @@ class ServerCertificateStubber(ServiceStubber):
                 'CertificateBody': open('host_omega.crt').read(),
                 'PrivateKey': open('host_omega.key').read(),
             } 
+        )
+
+    def add_get_server_certificate(self):
+        self.add_response(
+            'get_server_certificate',
+            service_response={'ServerCertificate': {
+                'ServerCertificateMetadata': {
+                    'ServerCertificateName': self.resource.name + '.1',
+                    'ServerCertificateId': self.make_id(self.resource.name),
+                    'Path': '/',
+                    'Arn': self.make_id(self.resource.name),
+                },
+                'CertificateBody': open('host_omega.crt').read(),
+                'CertificateChain': ' ',
+            }},
+            expected_params={'ServerCertificateName': self.resource.name + '.1'} 
         )

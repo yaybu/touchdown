@@ -38,9 +38,12 @@ class TestCreateServerCertificate(StubberTestCase):
         server_certificate.add_list_server_certificate_empty_response()
         server_certificate.add_list_server_certificate_empty_response()
         server_certificate.add_upload_server_certificate()
-        server_certificate.add_list_server_certificate_empty_response()
-        server_certificate.add_list_server_certificate_empty_response()
-        server_certificate.add_list_server_certificate_empty_response()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
+        server_certificate.add_list_server_certificate_one_response()
+        server_certificate.add_get_server_certificate()
 
         goal.execute()
 
