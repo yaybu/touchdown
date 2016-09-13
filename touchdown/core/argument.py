@@ -29,10 +29,8 @@ class Argument(object):
     empty_serializer = None
     adapters = {}
 
-    def __init__(self, default=None, help=None, **kwargs):
+    def __init__(self, help=None, **kwargs):
         self.__doc__ = help
-        if default is not None:
-            self.default = default
         for k, v in kwargs.items():
             setattr(self, k, v)
 
