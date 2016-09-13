@@ -13,6 +13,11 @@ Changelog for Touchdown
 
 - Windows: Fix unix epoch handling in AWS CloudWatch log tailing.
 
+- Core: Fix some issues around pending resources that could break very early on
+  for **fresh** deployments (from scratch).
+
+- Config: Fix a case where a key is present but has no value breaking things.
+
 
 0.15.5 (2016-08-24)
 -------------------
