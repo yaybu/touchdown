@@ -21,9 +21,9 @@ class TestCreateServerCertificate(StubberTestCase):
     def test_create_server_certificate(self):
         goal = self.create_goal('apply')
 
-        with open(ServerCertificateStubber.cert_file) as cert_file,\
-                open(ServerCertificateStubber.key_file) as key_file,\
-                open(ServerCertificateStubber.chain_file) as chain_file:
+        with open(ServerCertificateStubber.cert_file, 'rb') as cert_file,\
+                open(ServerCertificateStubber.key_file, 'rb') as key_file,\
+                open(ServerCertificateStubber.chain_file, 'rb') as chain_file:
             server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
                 goal.get_service(
                     self.aws.add_server_certificate(
@@ -55,7 +55,7 @@ class TestCreateServerCertificate(StubberTestCase):
     def test_create_server_certificate_idempotent(self):
         goal = self.create_goal('apply')
 
-        with open(ServerCertificateStubber.cert_file) as cert_file, open(ServerCertificateStubber.key_file) as key_file:
+        with open(ServerCertificateStubber.cert_file, 'rb') as cert_file, open(ServerCertificateStubber.key_file, 'rb') as key_file:
             server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
                 goal.get_service(
                     self.aws.add_server_certificate(
