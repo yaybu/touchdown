@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.15.6 (unreleased)
+0.15.6 (2016-09-13)
 -------------------
 
 - VPC: Support VPC Endpoints. These allow private network interfaces to access
