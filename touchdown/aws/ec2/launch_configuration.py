@@ -45,6 +45,7 @@ class LaunchConfiguration(resource.Resource):
 
     json_user_data = argument.Dict(
         field='UserData',
+        default=None,
         serializer=serializers.Json(serializers.Map()),
     )
 
