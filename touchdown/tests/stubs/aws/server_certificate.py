@@ -50,33 +50,35 @@ class ServerCertificateStubber(ServiceStubber):
         )
 
     def add_upload_server_certificate(self):
-        self.add_response(
-            'upload_server_certificate',
-            service_response={},
-            expected_params={
-                'ServerCertificateName': self.resource.name + '.1',
-                'CertificateBody': open(self.cert_file).read(),
-                'PrivateKey': open(self.key_file).read(),
-                'CertificateChain': open(self.chain_file).read(),
-            }
-        )
+        with open(self.cert_file) as cert_file, open(self.key_file) as key_file, open(self.chain_file) as chain_file:
+            self.add_response(
+                'upload_server_certificate',
+                service_response={},
+                expected_params={
+                    'ServerCertificateName': self.resource.name + '.1',
+                    'CertificateBody': cert_file.read(),
+                    'PrivateKey': key_file.read(),
+                    'CertificateChain': chain_file.read(),
+                }
+            )
 
     def add_get_server_certificate(self):
-        self.add_response(
-            'get_server_certificate',
-            service_response={'ServerCertificate': {
-                'ServerCertificateMetadata': {
-                    'ServerCertificateName': self.resource.name + '.1',
-                    'ServerCertificateId': self.make_id(self.resource.name),
-                    'Path': '/',
-                    'Arn': self.make_id(self.resource.name),
-                    'Expiration': datetime.datetime.utcnow().replace(tzinfo=utc)
-                },
-                'CertificateBody': open(self.cert_file).read(),
-                'CertificateChain': open(self.chain_file).read(),
-            }},
-            expected_params={'ServerCertificateName': self.resource.name + '.1'}
-        )
+        with open(self.cert_file) as cert_file, open(self.chain_file) as chain_file:
+            self.add_response(
+                'get_server_certificate',
+                service_response={'ServerCertificate': {
+                    'ServerCertificateMetadata': {
+                        'ServerCertificateName': self.resource.name + '.1',
+                        'ServerCertificateId': self.make_id(self.resource.name),
+                        'Path': '/',
+                        'Arn': self.make_id(self.resource.name),
+                        'Expiration': datetime.datetime.utcnow().replace(tzinfo=utc)
+                    },
+                    'CertificateBody': cert_file.read(),
+                    'CertificateChain': chain_file.read(),
+                }},
+                expected_params={'ServerCertificateName': self.resource.name + '.1'}
+            )
 
     def add_delete_server_certificate(self):
         self.add_response(

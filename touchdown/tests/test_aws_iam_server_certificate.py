@@ -21,17 +21,20 @@ class TestCreateServerCertificate(StubberTestCase):
     def test_create_server_certificate(self):
         goal = self.create_goal('apply')
 
-        server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
-            goal.get_service(
-                self.aws.add_server_certificate(
-                    name='my-test-server-certificate',
-                    certificate_body=open(ServerCertificateStubber.cert_file).read(),
-                    private_key=open(ServerCertificateStubber.key_file).read(),
-                    certificate_chain=open(ServerCertificateStubber.chain_file).read(),
-                ),
-                'apply',
-            )
-        ))
+        with open(ServerCertificateStubber.cert_file) as cert_file,\
+                open(ServerCertificateStubber.key_file) as key_file,\
+                open(ServerCertificateStubber.chain_file) as chain_file:
+            server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
+                goal.get_service(
+                    self.aws.add_server_certificate(
+                        name='my-test-server-certificate',
+                        certificate_body=cert_file.read(),
+                        private_key=key_file.read(),
+                        certificate_chain=chain_file.read(),
+                    ),
+                    'apply',
+                )
+            ))
         # first list is to find things to delete
         server_certificate.add_list_server_certificate_empty_response()
         # second is to find if there is an existing matching cert
@@ -52,16 +55,17 @@ class TestCreateServerCertificate(StubberTestCase):
     def test_create_server_certificate_idempotent(self):
         goal = self.create_goal('apply')
 
-        server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
-            goal.get_service(
-                self.aws.add_server_certificate(
-                    name='my-test-server-certificate',
-                    certificate_body=open(ServerCertificateStubber.cert_file).read(),
-                    private_key=open(ServerCertificateStubber.key_file).read()
-                ),
-                'apply',
-            )
-        ))
+        with open(ServerCertificateStubber.cert_file) as cert_file, open(ServerCertificateStubber.key_file) as key_file:
+            server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
+                goal.get_service(
+                    self.aws.add_server_certificate(
+                        name='my-test-server-certificate',
+                        certificate_body=cert_file.read(),
+                        private_key=key_file.read()
+                    ),
+                    'apply',
+                )
+            ))
         server_certificate.add_list_server_certificate_one_response()
         server_certificate.add_get_server_certificate()
         server_certificate.add_list_server_certificate_one_response()
