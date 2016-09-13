@@ -104,6 +104,12 @@ class Get(Plan):
         assert len(value) == 1
         return value[0]
 
+    def get_default_value(self):
+        return serializers.maybe(self.resource.default).render(
+            self.runner,
+            self.resource,
+        )
+
     def execute(self):
         conf = self.runner.get_service(self.resource.config, 'describe')
         if '.' not in self.resource.name:
@@ -111,11 +117,11 @@ class Get(Plan):
         try:
             value = conf.get(self.resource.name)
         except KeyError:
-            default = serializers.maybe(self.resource.default).render(
-                self.runner,
-                self.resource,
-            )
-            return default, False
+            value = None
+
+        if not value:
+            return self.get_default_value(), False
+
         return self.from_lines(value.splitlines()), True
 
 
