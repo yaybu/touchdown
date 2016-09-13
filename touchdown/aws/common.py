@@ -568,6 +568,10 @@ class SimpleDestroy(SimpleDescribe):
     def get_actions(self):
         self.object = self.describe_object()
 
+        if 'never-destroy' in self.resource.ensure:
+            logger.debug('Resource "{}" not considered for deletion due to ensure policy'.format(resource))
+            return
+
         if not self.object:
             logger.debug('Resource "{}" not found - assuming already destroyed'.format(self.resource))
             return
