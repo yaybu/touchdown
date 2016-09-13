@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.15.7 (unreleased)
+0.15.7 (2016-09-13)
 -------------------
 
 - AWS LaunchConfiguration: Fix regression where json_user_data field stops
