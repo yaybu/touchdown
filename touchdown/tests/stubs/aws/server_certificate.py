@@ -27,6 +27,7 @@ class ServerCertificateStubber(ServiceStubber):
     # generated according to http://pages.cs.wisc.edu/~zmiller/ca-howto/
     cert_file = os.path.join(os.path.dirname(__file__), '../../assets/host.crt')
     key_file = os.path.join(os.path.dirname(__file__), '../../assets/host.key')
+    chain_file = os.path.join(os.path.dirname(__file__), '../../assets/chain.crt')
 
     def add_list_server_certificate_empty_response(self):
         self.add_response(
@@ -55,7 +56,8 @@ class ServerCertificateStubber(ServiceStubber):
             expected_params={
                 'ServerCertificateName': self.resource.name + '.1',
                 'CertificateBody': open(self.cert_file).read(),
-                'PrivateKey': open(self.key_file).read()
+                'PrivateKey': open(self.key_file).read(),
+                'CertificateChain': open(self.chain_file).read(),
             }
         )
 
@@ -71,7 +73,7 @@ class ServerCertificateStubber(ServiceStubber):
                     'Expiration': datetime.datetime.utcnow().replace(tzinfo=utc)
                 },
                 'CertificateBody': open(self.cert_file).read(),
-                'CertificateChain': ' ',
+                'CertificateChain': open(self.chain_file).read(),
             }},
             expected_params={'ServerCertificateName': self.resource.name + '.1'}
         )

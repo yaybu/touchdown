@@ -26,7 +26,8 @@ class TestCreateServerCertificate(StubberTestCase):
                 self.aws.add_server_certificate(
                     name='my-test-server-certificate',
                     certificate_body=open(ServerCertificateStubber.cert_file).read(),
-                    private_key=open(ServerCertificateStubber.key_file).read()
+                    private_key=open(ServerCertificateStubber.key_file).read(),
+                    certificate_chain=open(ServerCertificateStubber.chain_file).read(),
                 ),
                 'apply',
             )
