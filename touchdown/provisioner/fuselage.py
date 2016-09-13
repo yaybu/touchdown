@@ -88,6 +88,12 @@ class BundleSerializer(serializers.Serializer):
             ))
         return builder.build(b)
 
+    def pending(self, runner, value):
+        for res in value:
+            if serializers.Resource().pending(runner, res):
+                return True
+        return False
+
 
 class Bundle(provisioner.Provisioner):
 
