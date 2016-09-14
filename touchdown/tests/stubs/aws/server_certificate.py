@@ -50,7 +50,7 @@ class ServerCertificateStubber(ServiceStubber):
         )
 
     def add_upload_server_certificate(self):
-        with open(self.cert_file, 'rb') as cert_file, open(self.key_file, 'rb') as key_file, open(self.chain_file, 'rb') as chain_file:
+        with open(self.cert_file) as cert_file, open(self.key_file) as key_file, open(self.chain_file) as chain_file:
             self.add_response(
                 'upload_server_certificate',
                 service_response={},
@@ -63,7 +63,7 @@ class ServerCertificateStubber(ServiceStubber):
             )
 
     def add_get_server_certificate(self):
-        with open(self.cert_file, 'rb') as cert_file, open(self.chain_file, 'rb') as chain_file:
+        with open(self.cert_file) as cert_file, open(self.chain_file) as chain_file:
             self.add_response(
                 'get_server_certificate',
                 service_response={'ServerCertificate': {
