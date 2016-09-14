@@ -34,7 +34,7 @@ class AutoScalingGroupTag(Resource):
     resource_name = 'auto_scaling_group_tag'
 
     resource_type = argument.Serializer(serializer=serializers.Const('auto-scaling-group'), field='ResourceType')
-    resource_id = argument.ReadOnly(lambda x: x.parent.name, field='ResourceId')
+    resource_id = argument.Callable(lambda x: x.parent.name, field='ResourceId')
 
     name = argument.String(field='Key', min=1, max=127)
     value = argument.String(field='Value', min=0, max=255)

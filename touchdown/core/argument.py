@@ -91,10 +91,11 @@ class Callable(ReadOnly):
             )
     '''
 
-    def __init__(self, func):
+    def __init__(self, func, **kwargs):
         self.func = func
+        super(Callable, self).__init__(**kwargs)
 
-    def default(self, instance):
+    def get_default(self, instance):
         return self.func(instance)
 
 
@@ -113,10 +114,11 @@ class Output(ReadOnly):
     if they have different ways of storing their ARN.
     '''
 
-    def __init__(self, propname):
+    def __init__(self, propname, **kwargs):
         self.propname = propname
+        super(Output, self).__init__(**kwargs)
 
-    def default(self, instance):
+    def get_default(self, instance):
         return instance.get_property(self.propname)
 
 
@@ -133,7 +135,7 @@ class Serializer(ReadOnly):
             )
     '''
 
-    def default(self, instance):
+    def get_default(self, instance):
         return instance
 
 
