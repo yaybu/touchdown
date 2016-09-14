@@ -70,6 +70,7 @@ class Apply(TagsMixin, SimpleApply, Describe):
             return
 
         instance = self.runner.get_plan(self.resource.instance)
+        attachment = None
         for attachment in self.object.get('Attachments', []):
             if attachment['InstanceId'] == instance.resource_id:
                 break

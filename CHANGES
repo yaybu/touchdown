@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.9 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- AWS EBS: Fix racey volume attachment code.
 
 
 0.15.8 (2016-09-14)
