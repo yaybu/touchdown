@@ -80,24 +80,28 @@ class TestCreateServerCertificate(StubberTestCase):
                 open(ServerCertificateStubber.key_file) as key_file,\
                 open(ServerCertificateStubber.chain_file) as chain_file:
 
-            self.assertRaises(errors.Error, self.aws.add_server_certificate,
-                              name='my-test-server-certificate',
-                              certificate_body=chain_file.read(),  # to trigger error
-                              private_key=key_file.read(),
-                              certificate_chain=cert_file.read(),  # to trigger error
-                              )
+            with self.assertRaises(errors.Error) as cm:
+                self.aws.add_server_certificate(
+                    name='my-test-server-certificate',
+                    certificate_body=chain_file.read(),  # to trigger error
+                    private_key=key_file.read(),
+                    certificate_chain=cert_file.read(),  # to trigger error
+                )
+            self.assertIn('Certificate does not match private_key', cm.exception.message)
 
     def test_create_server_certificate_bad_chain(self):
         with open(ServerCertificateStubber.cert_file) as cert_file,\
                 open(ServerCertificateStubber.key_file) as key_file,\
                 open(ServerCertificateStubber.bad_chain_file) as bad_chain_file:
 
-            self.assertRaises(errors.Error, self.aws.add_server_certificate,
-                              name='my-test-server-certificate',
-                              certificate_body=cert_file.read(),  # to trigger error
-                              private_key=key_file.read(),
-                              certificate_chain=bad_chain_file.read(),  # to trigger error
-                              )
+            with self.assertRaises(errors.Error) as cm:
+                self.aws.add_server_certificate(
+                    name='my-test-server-certificate',
+                    certificate_body=cert_file.read(),  # to trigger error
+                    private_key=key_file.read(),
+                    certificate_chain=bad_chain_file.read(),  # to trigger error
+                )
+            self.assertIn('Invalid chain for', cm.exception.message)
 
 
 class TestDestroyServerCertificate(StubberTestCase):
