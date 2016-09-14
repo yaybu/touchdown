@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.10 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- AWS S3: Fix regression in syncing a local folder to S3.
 
 
 0.15.9 (2016-09-14)

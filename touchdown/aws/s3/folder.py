@@ -61,7 +61,7 @@ class Describe(SimpleDescribe, Plan):
                     yield key['Key'][len(self.resource.name):].lstrip('/'), {
                         'LastModified': key['LastModified'],
                         'ETag': key['ETag'],
-                        'Md5': key['ETag'].strip('\''),
+                        'Md5': key['ETag'].strip('"'),
                         'Size': key['Size'],
                     }
 
