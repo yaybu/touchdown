@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.15.8 (unreleased)
+0.15.8 (2016-09-14)
 -------------------
 
 - Core: Ensure that an argument.Serializer or similar contributing to a
