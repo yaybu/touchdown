@@ -28,6 +28,7 @@ class ServerCertificateStubber(ServiceStubber):
     cert_file = os.path.join(os.path.dirname(__file__), '../../assets/host.crt')
     key_file = os.path.join(os.path.dirname(__file__), '../../assets/host.key')
     chain_file = os.path.join(os.path.dirname(__file__), '../../assets/chain.crt')
+    bad_chain_file = os.path.join(os.path.dirname(__file__), '../../assets/bad_chain.crt')
 
     def add_list_server_certificate_empty_response(self):
         self.add_response(

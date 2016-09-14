@@ -75,7 +75,7 @@ class TestCreateServerCertificate(StubberTestCase):
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(server_certificate.resource)), 0)
 
-    def test_create_server_certificate_invalid_chain(self):
+    def test_create_server_certificate_wrong_chain(self):
         with open(ServerCertificateStubber.cert_file) as cert_file,\
                 open(ServerCertificateStubber.key_file) as key_file,\
                 open(ServerCertificateStubber.chain_file) as chain_file:
@@ -85,6 +85,18 @@ class TestCreateServerCertificate(StubberTestCase):
                               certificate_body=chain_file.read(),  # to trigger error
                               private_key=key_file.read(),
                               certificate_chain=cert_file.read(),  # to trigger error
+                              )
+
+    def test_create_server_certificate_bad_chain(self):
+        with open(ServerCertificateStubber.cert_file) as cert_file,\
+                open(ServerCertificateStubber.key_file) as key_file,\
+                open(ServerCertificateStubber.bad_chain_file) as bad_chain_file:
+
+            self.assertRaises(errors.Error, self.aws.add_server_certificate,
+                              name='my-test-server-certificate',
+                              certificate_body=cert_file.read(),  # to trigger error
+                              private_key=key_file.read(),
+                              certificate_chain=bad_chain_file.read(),  # to trigger error
                               )
 
 
