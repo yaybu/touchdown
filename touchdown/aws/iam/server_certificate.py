@@ -20,6 +20,7 @@ from cryptography.x509.oid import ExtensionOID, NameOID
 from touchdown.core import argument, datetime, errors
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
+from touchdown.core.utils import force_bytes
 
 from ..account import BaseAccount
 from ..replacement import (
@@ -61,7 +62,7 @@ class ServerCertificate(Resource):
 
     def clean_certificate_body(self, value):
         backend = default_backend()
-        cert = load_pem_x509_certificate(value, backend)
+        cert = load_pem_x509_certificate(force_bytes(value), backend)
         private_key = serialization.load_pem_private_key(
             self.private_key.encode('utf-8'),
             password=None,
@@ -81,7 +82,7 @@ class ServerCertificate(Resource):
         # catch problems before doing a deployment.
         backend = default_backend()
 
-        certs = [load_pem_x509_certificate(self.certificate_body, backend)]
+        certs = [load_pem_x509_certificate(force_bytes(self.certificate_body), backend)]
         for cert in split_cert_chain(value):
             certs.append(load_pem_x509_certificate(cert, backend))
 
