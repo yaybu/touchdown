@@ -49,6 +49,7 @@ from .rds_subnet_group import RdsSubnetGroupStubber
 from .role import RoleStubber
 from .route_table import RouteTableStubber
 from .security_group import SecurityGroupStubber
+from .server_certificate import ServerCertificateStubber
 from .streaming_distribution import StreamingDistributionStubber
 from .subnet import SubnetStubber
 from .s3_file import S3FileStubber
@@ -95,6 +96,7 @@ __all__ = [
     'RoleStubber',
     'RouteTableStubber',
     'SecurityGroupStubber',
+    'ServerCertificateStubber',
     'ServiceStubber',
     'StreamingDistributionStubber',
     'Stubber',
