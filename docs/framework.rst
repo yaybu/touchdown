@@ -15,10 +15,8 @@ infrastructure. Implementation wise they work a bit like a typical python ORM::
         port = argument.String()
         ssl = argument.Boolean()
 
-States that you want to target, such as "ensure it exists with these settings"
-are implemented as "targets". A target compares the local resource definition
-to the remote state and works out a series of changes to apply to bring the API
-up to date.
+Resources are stateless. Services and goals compare resource definitions to remote state
+and perform necessary transitions.
 
 Resources pack as much validation as possible::
 
@@ -129,7 +127,8 @@ Finding existing resources at Amazon
         This is the name of an API service, for example ``ec2`` or ``sns``. It
         matches the parameter you would pass to botocore's ``create_client()``.
 
-Under the hood finding a resource generally involves calling an API that returns a list of resources. Touchdown will automatically handle pagination where botocore provides a paginator but it needs helping filtering the objects returned:
+Under the hood finding a resource generally involves calling an API that returns a list of resources.
+Touchdown will automatically handle pagination where botocore provides a paginator but it needs help filtering the objects returned:
 
   * Some listing API's take a name parameter and can return a list of a single matching item.
 
@@ -172,25 +171,12 @@ The following attributes and functions control how the object finding process wo
                 if not vpc.resource_id:
                     return None
 
-                if self.key in self.object:
-                    return {
-                        "Filters": [
-                            {'Name': 'route-table-id', 'Values': [self.object[self.key]]}
-                        ]
-                    }
-
                 return {
                     "Filters": [
                         {'Name': 'tag:Name', 'Values': [self.resource.name]},
                         {'Name': 'vpc-id':, 'Values': vpc.resource_id}
                     ],
                 }
-
-        This example also highlights that you can use different filters
-        depending on how much data you have collected. After a
-        :class:`~touchdown.aws.vpc.RouteTable` has just been created but before
-        it has been named the first will work, but the second won't - it doesn't
-        have a name until we apply the tags.
 
         If get_describe_filters returns ``None`` it signals that the resource
         can't exist yet. In this case, if a :class:`~touchdown.aws.vpc.VPC`
@@ -213,7 +199,10 @@ The following attributes and functions control how the object finding process wo
 
     .. attribute:: describe_notfound_exception
 
-        Some API's will return an empty list when there are no matching results. However some will return an error that manifests as a botocore ``ClientError`` exception. If the error type matches ``describe_notfound_exception`` then it will be captured and treated like the API return no matches.
+        Some API's will return an empty list when there are no matching results.
+        However some will return an error that manifests as a botocore ``ClientError`` exception.
+        If the error type matches ``describe_notfound_exception`` then it will be captured
+        and treated like the API return no matches.
 
 
 The data returned by the API may need some massaging before it is useful.
@@ -236,7 +225,8 @@ The data returned by the API may need some massaging before it is useful.
 
         So the expression is ``DistributionList.Items``.
 
-        If you need to use an API that returns a single item rather than a list of items you can use jmespath here too. For example, in SQS we use `get_queue_url` instead of a listing API:
+        If you need to use an API that returns a single item rather than a list of items you
+        can use jmespath here too. For example, in SQS we use `get_queue_url` instead of a listing API:
 
             describe_action = 'get_queue_url'
             describe_envelope = "[@]"
@@ -246,13 +236,17 @@ The data returned by the API may need some massaging before it is useful.
         This is the field in the result that contains that object id. For
         example, ``SecurityGroupId`` or ``SubnetId``.
 
-        This field is how `serializers.Identifier()` determines the unique id for a resource: It simply looks up the `key` in the description of the resource that was retrieved.
+        This field is how `serializers.Identifier()` determines the unique id for a resource: It
+        simply looks up the `key` in the description of the resource that was retrieved.
 
     .. method:: annotate_object
 
-        Some list API's do not return enough information to be usable by touchdown. We have to extend that information by calling an additional API. `annotate_object()` is a hook that is called on the output of the describe step so that subclasses can add this additional information.
+        Some list API's do not return enough information to be usable by touchdown.
+        We have to extend that information by calling an additional API. `annotate_object()` is a
+        hook that is called on the output of the describe step so that subclasses can add this additional information.
 
-        For example, `WAF` does not return much information from its `list_rules` API so in order to get the predicates for that rule we need to annotate the results::
+        For example, `WAF` does not return much information from its `list_rules` API so
+        in order to get the predicates for that rule we need to annotate the results::
 
             def annotate_object(self, rule):
                 result = self.client.get_rule(
@@ -269,7 +263,6 @@ Before creating a new instance we have to check if an instance exists already.
 We leverage the ``SimpleDescribe`` subclass we have already made to do this,
 and mix in the ``SimpleApply`` mixin to create an instance if its missing (and
 apply any required changes).
-
 
 .. class:: SimpleApply
 
