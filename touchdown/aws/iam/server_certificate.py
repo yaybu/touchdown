@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import binascii
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import asymmetric, serialization
 from cryptography.x509 import load_pem_x509_certificate
@@ -41,6 +42,11 @@ def split_cert_chain(chain):
             lines = []
     if lines:
         yield '\n'.join(lines).encode('utf-8')
+
+
+def format_key_identifier(hex):
+    hex = str(binascii.hexlify(hex))
+    return ':'.join([hex[i:i+2] for i in range(0, len(hex), 2)])
 
 
 class ServerCertificate(Resource):
@@ -104,10 +110,10 @@ class ServerCertificate(Resource):
                 cert_name = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 cert_issuer = cert.issuer.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 akib = cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-                aki = ':'.join('{:02x}'.format(ord(c)) for c in akib)
+                aki = format_key_identifier(akib)
                 issuer_name = issuer.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
                 skib = issuer.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_KEY_IDENTIFIER).value.digest
-                ski = ':'.join('{:02x}'.format(ord(c)) for c in skib)
+                ski = format_key_identifier(skib)
                 raise errors.Error(
                     error_message.format(
                         cert_name,
