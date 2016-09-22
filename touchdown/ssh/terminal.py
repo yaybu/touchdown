@@ -33,8 +33,8 @@ class SshMixin(object):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = [
             '/usr/bin/ssh',
-            '-o', 'User=\'{username}\''.format(**kwargs),
-            '-o', 'Port=\'{port}\''.format(**kwargs),
+            '-o', 'User="{username}"'.format(**kwargs),
+            '-o', 'Port="{port}"'.format(**kwargs),
             '-W', '%h:%p',
             kwargs['hostname'],
         ]
@@ -44,9 +44,9 @@ class SshMixin(object):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = [
             self.get_command(),
-            '-o', 'User=\'{username}\''.format(**kwargs),
-            '-o', 'Port={port}'.format(**kwargs),
-            '-o', 'HostName={hostname}'.format(**kwargs),
+            '-o', 'User="{username}"'.format(**kwargs),
+            '-o', 'Port="{port}"'.format(**kwargs),
+            '-o', 'HostName="{hostname}"'.format(**kwargs),
         ]
         if self.resource.proxy:
             proxy = self.runner.get_plan(self.resource.proxy)
