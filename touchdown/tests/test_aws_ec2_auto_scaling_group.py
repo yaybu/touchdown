@@ -389,9 +389,9 @@ class TestSshAutoScalingGroup(StubberTestCase):
         self.assertEqual(ssh_connection.get_command(), '/usr/bin/ssh')
         self.assertEqual(ssh_connection.get_command_and_args(), [
             '/usr/bin/ssh',
-            '-o', 'User=\'root\'',
-            '-o', 'Port=22',
-            '-o', 'HostName=8.8.8.8',
+            '-o', 'User="root"',
+            '-o', 'Port="22"',
+            '-o', 'HostName="8.8.8.8"',
             'remote',
         ])
 
@@ -512,10 +512,10 @@ class TestSshAutoScalingGroup(StubberTestCase):
 
         self.assertEqual(ssh_connection_2.get_command_and_args(), [
             '/usr/bin/ssh',
-            '-o', 'User=\'root\'',
-            '-o', 'Port=22',
-            '-o', 'HostName=10.0.0.1',
-            '-o', 'ProxyCommand=/usr/bin/ssh -o User=\'root\' -o Port=\'22\' -W %h:%p 8.8.8.8',
+            '-o', 'User="root"',
+            '-o', 'Port="22"',
+            '-o', 'HostName="10.0.0.1"',
+            '-o', 'ProxyCommand=/usr/bin/ssh -o User="root" -o Port="22" -W %h:%p 8.8.8.8',
             'remote',
         ])
 
@@ -616,9 +616,9 @@ class TestSshAutoScalingGroup(StubberTestCase):
 
         self.assertEqual(ssh_connection_2.get_command_and_args(), [
             '/usr/bin/ssh',
-            '-o', 'User=\'root\'',
-            '-o', 'Port=22',
-            '-o', 'HostName=10.0.0.42',
-            '-o', 'ProxyCommand=/usr/bin/ssh -o User=\'root\' -o Port=\'22\' -W %h:%p 8.8.8.8',
+            '-o', 'User="root"',
+            '-o', 'Port="22"',
+            '-o', 'HostName="10.0.0.42"',
+            '-o', 'ProxyCommand=/usr/bin/ssh -o User="root" -o Port="22" -W %h:%p 8.8.8.8',
             'remote',
         ])
