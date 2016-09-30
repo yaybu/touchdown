@@ -21,7 +21,7 @@ from cryptography.x509.oid import ExtensionOID, NameOID
 from touchdown.core import argument, datetime, errors
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
-from touchdown.core.utils import force_bytes
+from touchdown.core.utils import force_bytes, force_str
 
 from ..account import BaseAccount
 from ..replacement import (
@@ -80,7 +80,7 @@ class ServerCertificate(Resource):
                 'Certificate does not match private_key',
             )
 
-        return value.strip()
+        return force_str(cert.public_bytes(serialization.Encoding.PEM).strip())
 
     def clean_certificate_chain(self, value):
         # Perform a basic validation of the SSL chain.
@@ -124,7 +124,7 @@ class ServerCertificate(Resource):
                         ski,
                     ))
 
-        return value.strip()
+        return force_str(b''.join([cert.public_bytes(serialization.Encoding.PEM) for cert in certs[1:]]).strip())
 
 
 class Describe(ReplacementDescribe, Plan):
@@ -139,14 +139,21 @@ class Describe(ReplacementDescribe, Plan):
     biggest_serial = 0
 
     def get_possible_objects(self):
+        backend = default_backend()
         for obj in super(Describe, self).get_possible_objects():
             response = self.client.get_server_certificate(
                 ServerCertificateName=self.name_for_remote(obj),
             )['ServerCertificate']
 
             result = dict(response['ServerCertificateMetadata'])
-            result['CertificateBody'] = response['CertificateBody']
-            result['CertificateChain'] = response['CertificateChain']
+            cert = load_pem_x509_certificate(force_bytes(response['CertificateBody']), backend)
+            result['CertificateBody'] = force_str(cert.public_bytes(serialization.Encoding.PEM).strip())
+
+            chain = []
+            for pem in split_cert_chain(response['CertificateChain']):
+                cert = load_pem_x509_certificate(force_bytes(pem), backend)
+                chain.append(cert.public_bytes(serialization.Encoding.PEM))
+            result['CertificateChain'] = force_str(b''.join(chain).strip())
 
             yield result
 
