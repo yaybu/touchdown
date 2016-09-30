@@ -6,6 +6,8 @@ Changelog for Touchdown
 
 - AWS S3: Fix regression in syncing a local folder to S3.
 
+- SSH: Fix regression shelling in to boxes with 'ssh'
+
 
 0.15.9 (2016-09-14)
 -------------------
