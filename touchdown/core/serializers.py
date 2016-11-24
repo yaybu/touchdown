@@ -31,6 +31,9 @@ class RequiredFieldNotPresent(Exception):
 
 
 class Pending(object):
+    ''' A render can return a Pending if it is rendered while in the pending state
+       eq and nonzero are safety check to ensure it's not used anywhere
+    '''
 
     def __init__(self, value):
         self.value = value
@@ -51,16 +54,20 @@ class Pending(object):
 class Serializer(object):
 
     def render(self, runner, object):
+        ''' turn incoming into 'json' for botocore '''
         raise NotImplementedError(self.render)
 
     def diff(self, runner, object, value):
+        ''' takes a resource and some botocore 'stuff'. returns the differences '''
         rendered = self.render(runner, object)
         return diff.ValueDiff(value, rendered)
 
     def pending(self, runner, obj):
+        ''' given something to serialize, do I know enough to serialize it yet '''
         return False
 
     def dependencies(self, object):
+        ''' given something to serialize what other things do I need in order to serialize it '''
         return frozenset()
 
 
@@ -124,7 +131,7 @@ class Const(Serializer):
         return isinstance(object, Pending)
 
     def dependencies(self, object):
-        if hasattr(self.const, 'add_dependency'):
+        if hasattr(self.const, 'add_dependency'):  # if is a Resource
             return frozenset((self.const, ))
         return frozenset()
 
@@ -164,6 +171,8 @@ class Identifier(Serializer):
 
 
 class Property(Serializer):
+    ''' an output from a botocore action
+        e.g. describe queue returns queue_url'''
 
     def __init__(self, property, inner=Identity()):
         self.selector = property
@@ -194,6 +203,9 @@ class Property(Serializer):
 
 
 class Argument(Serializer):
+    ''' for retrieving an argument from a resource object
+        i.e. rather than acting on this resource act on a field of this resource
+    '''
 
     def __init__(self, attribute, field=None):
         self.attribute = attribute
@@ -303,6 +315,7 @@ class Default(Annotation):
 
 
 class Formatter(Serializer):
+    ''' abc '''
 
     def __init__(self, inner=Identity()):
         self.inner = inner
@@ -361,6 +374,7 @@ class Integer(Formatter):
 
 
 class ListOfOne(Formatter):
+    ''' list that can only have one entry - thanks amazon '''
 
     def __init__(self, *args, **kwargs):
         self.maybe_empty = kwargs.pop('maybe_empty', False)
@@ -706,6 +720,7 @@ class List(Serializer):
 
 
 class Context(Serializer):
+    ''' new way of doing inner (Identity) '''
 
     def __init__(self, serializer, inner):
         if not isinstance(serializer, Serializer):
