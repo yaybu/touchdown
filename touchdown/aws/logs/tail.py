@@ -39,9 +39,9 @@ class Plan(common.SimplePlan, plan.Plan):
             'logGroupName': self.get_log_group_name(),
         }
         if start:
-            kwargs['startTime'] = as_seconds(start)
+            kwargs['startTime'] = as_seconds(start) * 1000
         if end:
-            kwargs['endTime'] = as_seconds(end)
+            kwargs['endTime'] = as_seconds(end) * 1000
 
         def pull(kwargs, previous_events):
             seen = set()
