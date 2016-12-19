@@ -8,6 +8,7 @@ six==1.10.0
 fuselage==1.0.0
 cryptography==1.5
 python-gnupg==0.3.8
+pyvmomi==6.5
 
 Jinja2
 
