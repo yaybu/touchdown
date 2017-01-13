@@ -1,6 +1,6 @@
 botocore==1.4.93
 jmespath==0.9.0
-netaddr==0.7.18
+netaddr==0.7.19
 contextlib2==0.5.4
 paramiko==2.1.1
 ecdsa==0.13
