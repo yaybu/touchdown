@@ -1,4 +1,4 @@
-botocore==1.4.93
+botocore==1.5.0
 jmespath==0.9.0
 netaddr==0.7.19
 contextlib2==0.5.4
@@ -11,7 +11,7 @@ python-gnupg==0.3.9
 
 Jinja2
 
-coverage==4.3.1
+coverage==4.3.2
 codecov==2.0.5
 
 # See https://github.com/gforcada/flake8-isort/pull/14
