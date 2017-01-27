@@ -6,7 +6,7 @@ paramiko==2.1.1
 ecdsa==0.13
 six==1.10.0
 fuselage==1.0.0
-cryptography==1.7.1
+cryptography==1.7.2
 python-gnupg==0.3.9
 
 Jinja2
