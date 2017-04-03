@@ -14,6 +14,7 @@
 
 from .bucket import BucketFixture
 from .customer_gateway import CustomerGatewayFixture
+from .instance_profile import InstanceProfileFixture
 from .launch_configuration import LaunchConfigurationFixture
 from .network_acl import NetworkAclFixture
 from .rest_api import RestApiFixture

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .service import ServiceStubber
+from .instance_profile import InstanceProfileStubber
 
 
 class EC2InstanceStubber(ServiceStubber):
@@ -72,6 +73,26 @@ class EC2InstanceStubber(ServiceStubber):
                 }],
             },
             expected_params={
+                'BlockDeviceMappings': [],
+                'MaxCount': 1,
+                'MinCount': 1,
+                'ImageId': 'foobarbaz',
+            },
+        )
+
+    def add_run_instance_with_profile(self):
+        return self.add_response(
+            'run_instances',
+            service_response={
+                'Instances': [{
+                    'InstanceId': self.make_id(self.resource.name),
+                }],
+            },
+            expected_params={
+                'IamInstanceProfile': {
+                    'Name': 'my-test-profile',
+                    'Arn': '90a968bd192ecc426bafad9eae40504de04e9837',
+                },
                 'BlockDeviceMappings': [],
                 'MaxCount': 1,
                 'MinCount': 1,

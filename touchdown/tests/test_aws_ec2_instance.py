@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
-from touchdown.tests.stubs.aws import EC2InstanceStubber
+from touchdown.tests.stubs.aws import EC2InstanceStubber, InstanceProfileStubber
+from .fixtures.aws import InstanceProfileFixture
 
 
 class TestInstanceCreation(StubberTestCase):
@@ -60,6 +61,36 @@ class TestInstanceCreation(StubberTestCase):
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(instance.resource)), 0)
+
+    def test_create_instance_with_profile(self):
+        goal = self.create_goal('apply')
+
+        instance_profile = self.fixtures.enter_context(InstanceProfileFixture(goal, self.aws))
+
+        instance = self.fixtures.enter_context(EC2InstanceStubber(
+            goal.get_service(
+                self.aws.add_ec2_instance(
+                    name='my-ec2-instance',
+                    ami='foobarbaz',
+                    instance_profile=instance_profile,
+                ),
+                'apply',
+            )
+        ))
+
+        instance.add_describe_instances_empty_response_by_name()
+        instance.add_run_instance_with_profile()
+        instance.add_create_tags(Name='my-ec2-instance')
+
+        # Test that it waits for the instance to be available
+        instance.add_describe_instances_empty_response_by_name()
+        instance.add_describe_instances_empty_response_by_name()
+        instance.add_describe_instances_one_response_by_name()
+
+        # And then it will refresh its metadata
+        instance.add_describe_instances_one_response_by_name()
+
+        goal.execute()
 
 
 class TestInstanceDeletion(StubberTestCase):
