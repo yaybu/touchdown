@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from .service import ServiceStubber
-from .instance_profile import InstanceProfileStubber
 
 
 class EC2InstanceStubber(ServiceStubber):

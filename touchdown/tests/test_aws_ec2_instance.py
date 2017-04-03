@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
-from touchdown.tests.stubs.aws import EC2InstanceStubber, InstanceProfileStubber
+from touchdown.tests.stubs.aws import EC2InstanceStubber
 from .fixtures.aws import InstanceProfileFixture
 
 
