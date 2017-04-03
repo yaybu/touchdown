@@ -79,6 +79,26 @@ class EC2InstanceStubber(ServiceStubber):
             },
         )
 
+    def add_run_instance_with_profile(self):
+        return self.add_response(
+            'run_instances',
+            service_response={
+                'Instances': [{
+                    'InstanceId': self.make_id(self.resource.name),
+                }],
+            },
+            expected_params={
+                'IamInstanceProfile': {
+                    'Name': 'my-test-profile',
+                    'Arn': '90a968bd192ecc426bafad9eae40504de04e9837',
+                },
+                'BlockDeviceMappings': [],
+                'MaxCount': 1,
+                'MinCount': 1,
+                'ImageId': 'foobarbaz',
+            },
+        )
+
     def add_create_tags(self, **tags):
         tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
         self.add_response(

@@ -53,7 +53,14 @@ class Instance(Resource):
     instance_type = argument.String(field='InstanceType')
     key_pair = argument.Resource(KeyPair, field='KeyName')
     subnet = argument.Resource(Subnet, field='SubnetId')
-    instance_profile = argument.Resource(InstanceProfile, field='IamInstanceProfile')
+    instance_profile = argument.Resource(
+        InstanceProfile,
+        field='IamInstanceProfile',
+        serializer=serializers.Dict(
+            Arn=serializers.Property('Arn'),
+            Name=serializers.Property('InstanceProfileName')
+        )
+    )
 
     user_data = argument.String(field='UserData')
 
