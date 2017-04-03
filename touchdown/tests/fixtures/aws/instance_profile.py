@@ -16,6 +16,7 @@ from touchdown.tests.stubs.aws import InstanceProfileStubber
 
 from .fixture import AwsFixture
 
+
 class InstanceProfileFixture(AwsFixture):
 
     def __enter__(self):
