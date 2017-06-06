@@ -18,7 +18,7 @@ codecov==2.0.9
 flake8==2.6.2  # rq.filter: <3
 flake8-quotes==0.11.0
 flake8-isort==2.2.1
-isort==4.2.13
+isort==4.2.14
 mccabe==0.6.1
 mock==2.0.0
 pep8==1.5.7  # rq.filter: <1.6
