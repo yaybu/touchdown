@@ -90,7 +90,6 @@ class EC2InstanceStubber(ServiceStubber):
             expected_params={
                 'IamInstanceProfile': {
                     'Name': 'my-test-profile',
-                    'Arn': '90a968bd192ecc426bafad9eae40504de04e9837',
                 },
                 'BlockDeviceMappings': [],
                 'MaxCount': 1,

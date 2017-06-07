@@ -57,7 +57,6 @@ class Instance(Resource):
         InstanceProfile,
         field='IamInstanceProfile',
         serializer=serializers.Dict(
-            Arn=serializers.Property('Arn'),
             Name=serializers.Property('InstanceProfileName')
         )
     )
