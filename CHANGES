@@ -1,7 +1,7 @@
 Changelog for Touchdown
 =======================
 
-0.15.12 (unreleased)
+0.15.12 (2017-06-07)
 --------------------
 
 - AWS EC2: Fix serialisation of instance profiles
