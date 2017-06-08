@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.13 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- AWS EC2: Prefer name to ARN in instance profile serialisation
 
 
 0.15.12 (2017-06-07)
