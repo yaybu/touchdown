@@ -67,6 +67,11 @@ class Database(Resource):
         if not value:
             return False
         supported_instances = [
+            'db.m4.large',
+            'db.m4.xlarge',
+            'db.m4.2xlarge',
+            'db.m4.4xlarge',
+            'db.m4.10xlarge',
             'db.m3.medium',
             'db.m3.large',
             'db.m3.xlarge',
@@ -76,7 +81,7 @@ class Database(Resource):
             'db.r3.2xlarge',
             'db.r3.4xlarge',
             'db.r3.8xlarge',
-            'db.cr1.8xlarge',
+            'db.t2.large',
         ]
         if self.instance_class not in supported_instances:
             raise InvalidParameter('Encryption-at-rest is only supported for a subset of instance classes (such as db.m3.medium)')
