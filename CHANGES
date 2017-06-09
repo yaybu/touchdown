@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.14 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- AWS RDS: Add m4 database instance classes to encrypted list
 
 
 0.15.13 (2017-06-08)
