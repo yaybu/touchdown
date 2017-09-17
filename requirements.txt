@@ -4,7 +4,7 @@ netaddr==0.7.19
 contextlib2==0.5.5
 paramiko==2.2.1
 ecdsa==0.13
-six==1.10.0
+six==1.11.0
 fuselage==1.0.0
 cryptography==2.0.3
 python-gnupg==0.4.1
