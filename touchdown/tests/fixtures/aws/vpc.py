@@ -30,6 +30,7 @@ class VpcFixture(AwsFixture):
             ),
         ))
         self.vpc_stubber.add_describe_vpcs_one_response_by_name()
+        self.vpc_stubber.add_describe_vpc_attributes()
 
         self.vpc = self.vpc_stubber.resource
         self.vpc_id = self.vpc_stubber.make_id(self.vpc.name)

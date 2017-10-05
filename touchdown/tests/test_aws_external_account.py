@@ -52,5 +52,7 @@ class TestExternalAccount(StubberTestCase):
         ))
         self.assertEqual(goal.get_service(vpcf.vpc, 'describe').describe_object(), {
             'VpcId': vpcf.vpc_id,
+            'EnableDnsHostnames': {'Value': False},
+            'EnableDnsSupport': {'Value': True},
             'State': 'available',
         })

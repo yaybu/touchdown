@@ -37,11 +37,14 @@ class TestVpcCreation(StubberTestCase):
 
         # Wait for VPC to exist
         vpc.add_describe_vpcs_empty_response_by_name()
+
         vpc.add_describe_vpcs_one_response_by_name(state='pending')
+
         vpc.add_describe_vpcs_one_response_by_name()
 
         # Check it really does exist, gather more info about it and carry on
         vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
 
         goal.execute()
 
@@ -59,6 +62,7 @@ class TestVpcCreation(StubberTestCase):
         ))
 
         vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(vpc.resource)), 0)
@@ -80,6 +84,7 @@ class TestVpcDestroy(StubberTestCase):
         ))
 
         vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
         vpc.add_delete_vpc()
 
         goal.execute()
