@@ -37,11 +37,14 @@ class TestVpcCreation(StubberTestCase):
 
         # Wait for VPC to exist
         vpc.add_describe_vpcs_empty_response_by_name()
+
         vpc.add_describe_vpcs_one_response_by_name(state='pending')
+
         vpc.add_describe_vpcs_one_response_by_name()
 
         # Check it really does exist, gather more info about it and carry on
         vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
 
         goal.execute()
 
@@ -59,9 +62,31 @@ class TestVpcCreation(StubberTestCase):
         ))
 
         vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(vpc.resource)), 0)
+
+    def test_modify_vpc(self):
+        goal = self.create_goal('apply')
+
+        vpc = self.fixtures.enter_context(VpcStubber(
+            goal.get_service(
+                self.aws.add_vpc(
+                    name='test-vpc',
+                    cidr_block='192.168.0.0/26',
+                    enable_dns_support=False,
+                    enable_dns_hostnames=True,
+                ),
+                'apply',
+            )
+        ))
+
+        vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
+        vpc.add_modify_vpc_attributes()
+
+        goal.execute()
 
 
 class TestVpcDestroy(StubberTestCase):
@@ -80,6 +105,7 @@ class TestVpcDestroy(StubberTestCase):
         ))
 
         vpc.add_describe_vpcs_one_response_by_name()
+        vpc.add_describe_vpc_attributes()
         vpc.add_delete_vpc()
 
         goal.execute()

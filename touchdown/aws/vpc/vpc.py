@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from touchdown.core import argument
+from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan
 from touchdown.core.resource import Resource
 
@@ -32,6 +32,24 @@ class VPC(Resource):
 
     account = argument.Resource(BaseAccount)
 
+    enable_dns_support = argument.Boolean(
+        default=True,
+        field='EnableDnsSupport',
+        serializer=serializers.Dict(
+            Value=serializers.Identity()
+        ),
+        group='dns_support_attribute',
+    )
+
+    enable_dns_hostnames = argument.Boolean(
+        default=True,
+        field='EnableDnsHostnames',
+        serializer=serializers.Dict(
+            Value=serializers.Identity()
+        ),
+        group='dns_hostnames_attribute',
+    )
+
 
 class Describe(SimpleDescribe, Plan):
 
@@ -49,11 +67,58 @@ class Describe(SimpleDescribe, Plan):
             ],
         }
 
+    def annotate_object(self, obj):
+        obj['EnableDnsSupport'] = self.client.describe_vpc_attribute(
+            Attribute='enableDnsSupport',
+            VpcId=obj['VpcId'],
+        )['EnableDnsSupport']
+        obj['EnableDnsHostnames'] = self.client.describe_vpc_attribute(
+            Attribute='enableDnsHostnames',
+            VpcId=obj['VpcId'],
+        )['EnableDnsHostnames']
+        return obj
+
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
     create_action = 'create_vpc'
     waiter = 'vpc_available'
+
+    def update_dnssupport_attribute(self):
+        diff = self.resource.diff(
+            self.runner,
+            self.object.get('EnableDnsSupport', {}),
+            group='dns_support_attribute',
+        )
+        if not diff.matches():
+            yield self.generic_action(
+                ['Configure DNS Support Setting'] + list(diff.lines()),
+                self.client.modify_vpc_attribute,
+                VpcId=serializers.Identifier(),
+                EnableDnsSupport=serializers.Argument('enable_dns_support'),
+            )
+
+    def update_dnshostnames_attribute(self):
+        diff = self.resource.diff(
+            self.runner,
+            self.object.get('EnableDnsHostnames', {}),
+            group='dns_hostnames_attribute',
+        )
+        if not diff.matches():
+            yield self.generic_action(
+                ['Configure DNS Hostnames Setting'] + list(diff.lines()),
+                self.client.modify_vpc_attribute,
+                VpcId=serializers.Identifier(),
+                EnableDnsHostnames=serializers.Argument('enable_dns_hostnames'),
+            )
+
+    def update_object(self):
+        for action in super(Apply, self).update_object():
+            yield action
+        for action in self.update_dnssupport_attribute():
+            yield action
+        for action in self.update_dnshostnames_attribute():
+            yield action
 
 
 class Destroy(SimpleDestroy, Describe):

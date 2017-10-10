@@ -51,6 +51,64 @@ class VpcStubber(ServiceStubber):
             },
         )
 
+    def add_describe_vpc_attributes(self):
+        self.add_response(
+            'describe_vpc_attribute',
+            service_response={
+                'EnableDnsSupport': {
+                    'Value': True
+                },
+                'VpcId': self.make_id(self.resource.name),
+            },
+            expected_params={
+                'VpcId': self.make_id(self.resource.name),
+                'Attribute': 'enableDnsSupport',
+            },
+        )
+        return self.add_response(
+            'describe_vpc_attribute',
+            service_response={
+                'EnableDnsHostnames': {
+                    'Value': False
+                },
+                'VpcId': self.make_id(self.resource.name),
+            },
+            expected_params={
+                'VpcId': self.make_id(self.resource.name),
+                'Attribute': 'enableDnsHostnames',
+            },
+        )
+
+    def add_modify_vpc_attributes(self):
+        self.add_response(
+            'modify_vpc_attribute',
+            service_response={
+                'ResponseMetadata': {
+                    '...': '...',
+                },
+            },
+            expected_params={
+                'VpcId': self.make_id(self.resource.name),
+                'EnableDnsSupport': {
+                    'Value': False
+                }
+            },
+        )
+        return self.add_response(
+            'modify_vpc_attribute',
+            service_response={
+                'ResponseMetadata': {
+                    '...': '...',
+                },
+            },
+            expected_params={
+                'VpcId': self.make_id(self.resource.name),
+                'EnableDnsHostnames': {
+                    'Value': True
+                }
+            },
+        )
+
     def add_create_vpc(self):
         return self.add_response(
             'create_vpc',
@@ -68,7 +126,7 @@ class VpcStubber(ServiceStubber):
 
     def add_create_tags(self, **tags):
         tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
-        self.add_response(
+        return self.add_response(
             'create_tags',
             service_response={
             },
