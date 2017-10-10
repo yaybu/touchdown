@@ -90,7 +90,7 @@ class VpcStubber(ServiceStubber):
             expected_params={
                 'VpcId': self.make_id(self.resource.name),
                 'EnableDnsSupport': {
-                    'Value': True
+                    'Value': False
                 }
             },
         )
@@ -104,7 +104,7 @@ class VpcStubber(ServiceStubber):
             expected_params={
                 'VpcId': self.make_id(self.resource.name),
                 'EnableDnsHostnames': {
-                    'Value': False
+                    'Value': True
                 }
             },
         )
