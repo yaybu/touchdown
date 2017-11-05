@@ -11,7 +11,7 @@ python-gnupg==0.4.1
 
 Jinja2
 
-coverage==4.4.1
+coverage==4.4.2
 codecov==2.0.9
 
 # See https://github.com/gforcada/flake8-isort/pull/14
