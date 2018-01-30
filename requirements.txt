@@ -12,7 +12,7 @@ python-gnupg==0.4.1
 Jinja2
 
 coverage==4.4.2
-codecov==2.0.14
+codecov==2.0.15
 
 # See https://github.com/gforcada/flake8-isort/pull/14
 flake8==2.6.2  # rq.filter: <3
