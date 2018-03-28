@@ -7,7 +7,7 @@ ecdsa==0.13
 six==1.11.0
 fuselage==1.0.0
 cryptography==2.2.2
-python-gnupg==0.4.1
+python-gnupg==0.4.2
 
 Jinja2
 
