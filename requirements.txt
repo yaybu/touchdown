@@ -24,7 +24,7 @@ mock==2.0.0
 pep8==1.5.7  # rq.filter: <1.6
 py==1.5.3
 pyflakes==1.1.0  # rq.filter: <1.2.0
-pytest==3.6.0
+pytest==3.6.1
 pytest-cov==2.5.1
 requests==2.18.4
 
