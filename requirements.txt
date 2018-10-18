@@ -26,6 +26,6 @@ py==1.7.0
 pyflakes==1.1.0  # rq.filter: <1.2.0
 pytest==3.9.1
 pytest-cov==2.6.0
-requests==2.19.1
+requests==2.20.0
 
 -e .
