@@ -17,7 +17,7 @@ codecov==2.0.15
 # See https://github.com/gforcada/flake8-isort/pull/14
 flake8==2.6.2  # rq.filter: <3
 flake8-quotes==1.0.0
-flake8-isort==2.5
+flake8-isort==2.6.0
 isort==4.3.4
 mccabe==0.6.1
 mock==2.0.0
