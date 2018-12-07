@@ -4,7 +4,7 @@ Changelog for Touchdown
 0.15.16 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Change ACM Certificates to simple strings, so they can actually be used
 
 
 0.15.15 (2017-12-13)
