@@ -11,14 +11,14 @@ python-gnupg==0.4.4
 
 Jinja2
 
-coverage==4.5.2
+coverage==4.5.3
 codecov==2.0.15
 
 # See https://github.com/gforcada/flake8-isort/pull/14
 flake8==2.6.2  # rq.filter: <3
 flake8-quotes==1.0.0
 flake8-isort==2.6.0
-isort==4.3.14
+isort==4.3.15
 mccabe==0.6.1
 mock==2.0.0
 pep8==1.5.7  # rq.filter: <1.6
