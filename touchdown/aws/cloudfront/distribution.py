@@ -16,7 +16,7 @@ import uuid
 
 from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan, Present
-from touchdown.core.resource import Resource, Meta
+from touchdown.core.resource import Meta, Resource
 
 from .. import route53
 from ..account import BaseAccount
@@ -32,6 +32,7 @@ from ..iam import ServerCertificate
 from ..s3 import Bucket
 from ..waf import WebACL
 from .common import CloudFrontList, CloudFrontResourceList, S3Origin
+
 
 class CustomOrigin(Resource):
 
