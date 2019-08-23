@@ -16,7 +16,7 @@ import uuid
 
 from touchdown.core import argument, serializers
 from touchdown.core.plan import Plan, Present
-from touchdown.core.resource import Meta, Resource
+from touchdown.core.resource import Resource
 
 from .. import route53
 from ..account import BaseAccount
