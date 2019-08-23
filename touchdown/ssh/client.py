@@ -40,13 +40,13 @@ def private_key_from_string(private_key):
         except paramiko.SSHException:
             continue
         return key
-    raise paramiko.SSHException('not a valid private key file')
+    raise paramiko.SSHException("not a valid private key file")
 
 
 class Client(paramiko.SSHClient):
 
     connection_attempts = 20
-    input_encoding = 'utf-8'
+    input_encoding = "utf-8"
 
     def __init__(self, plan, *args, **kwargs):
         self.plan = plan
@@ -78,10 +78,10 @@ class Client(paramiko.SSHClient):
             channel.exec_command(command)
 
             # We don't want a stdin
-            channel.makefile('wb', -1).close()
+            channel.makefile("wb", -1).close()
 
-            r_stdout = channel.makefile('r')
-            r_stderr = channel.makefile_stderr('r')
+            r_stdout = channel.makefile("r")
+            r_stderr = channel.makefile_stderr("r")
 
             # FIXME: It would be better to block with select
             exit_status_ready = channel.exit_status_ready()
@@ -107,7 +107,7 @@ class Client(paramiko.SSHClient):
 
     def get_path_contents(self, path):
         sftp = self.open_sftp()
-        sftp.chdir('.')
+        sftp.chdir(".")
         try:
             with sftp.file(path) as fp:
                 return fp.read()
@@ -116,7 +116,7 @@ class Client(paramiko.SSHClient):
 
     def get_path_bytes(self, path):
         sftp = self.open_sftp()
-        sftp.chdir('.')
+        sftp.chdir(".")
         try:
             with sftp.file(path) as fp:
                 return fp.read()
@@ -125,10 +125,10 @@ class Client(paramiko.SSHClient):
 
     def run_script(self, script, args=None, sudo=True):
         sftp = self.open_sftp()
-        sftp.chdir('.')
+        sftp.chdir(".")
 
-        random_string = binascii.hexlify(os.urandom(4)).decode('ascii')
-        path = os.path.join(sftp.getcwd(), 'touchdown_%s' % (random_string))
+        random_string = binascii.hexlify(os.urandom(4)).decode("ascii")
+        path = os.path.join(sftp.getcwd(), "touchdown_%s" % (random_string))
 
         try:
             sftp.putfo(script, path)
@@ -136,11 +136,11 @@ class Client(paramiko.SSHClient):
             try:
                 transport = self.get_transport()
                 cmd = path
-                if sudo and self.get_transport().get_username() != 'root':
-                    cmd = 'sudo -E ' + path
+                if sudo and self.get_transport().get_username() != "root":
+                    cmd = "sudo -E " + path
                 if args:
-                    args = ' '.join(pipes.quote(a) for a in args)
-                    cmd = cmd + ' ' + args
+                    args = " ".join(pipes.quote(a) for a in args)
+                    cmd = cmd + " " + args
                 self._run(transport, cmd)
             finally:
                 sftp.remove(path)
@@ -155,7 +155,7 @@ class Client(paramiko.SSHClient):
             result_buf.write(message)
 
         self._run(self.get_transport(), command, echo=echo)
-        return 0, result_buf.getvalue(), ''
+        return 0, result_buf.getvalue(), ""
 
     def verify_transport(self):
         # Some weird AMI's hijack SSH a bit and allow authentication to succeed, but then return an error
@@ -165,27 +165,26 @@ class Client(paramiko.SSHClient):
         # FIXME: Run a shell command like 'false' and make sure it returns false
 
         try:
-            whoami = self.check_output('whoami')[1].strip()
+            whoami = self.check_output("whoami")[1].strip()
         except errors.RemoteCommandFailed:
-            raise errors.Error('Unable to selftest SSH connection (whoami failed)')
+            raise errors.Error("Unable to selftest SSH connection (whoami failed)")
 
         if whoami != self.get_transport().get_username():
             raise errors.Error(
-                'Tried to connect as {}, but ended up connected as {}'.format(
-                    self.get_transport().get_username(),
-                    whoami,
+                "Tried to connect as {}, but ended up connected as {}".format(
+                    self.get_transport().get_username(), whoami
                 )
             )
 
     def set_input_encoding(self):
         try:
-            lang = self.check_output('printenv LANG')[1]
+            lang = self.check_output("printenv LANG")[1]
         except errors.RemoteCommandFailed:
             try:
-                lang = self.check_output('printenv LC_CTYPE')[1]
+                lang = self.check_output("printenv LC_CTYPE")[1]
             except errors.RemoteCommandFailed:
-                lang = 'UTF-8'
-        self.input_encoding = lang.rsplit('.', 1)[-1]
+                lang = "UTF-8"
+        self.input_encoding = lang.rsplit(".", 1)[-1]
 
     def connect(self, **kwargs):
         for i in range(self.connection_attempts):
@@ -193,11 +192,15 @@ class Client(paramiko.SSHClient):
                 super(Client, self).connect(**kwargs)
                 break
             except paramiko.PasswordRequiredException:
-                raise errors.Error('Unable to authenticate with remote server')
+                raise errors.Error("Unable to authenticate with remote server")
             except (socket.error, EOFError):
                 time.sleep(i + 1)
         else:
-            raise errors.Error('Unable to connect to remove server after {} tries'.format(self.connection_attempts))
+            raise errors.Error(
+                "Unable to connect to remove server after {} tries".format(
+                    self.connection_attempts
+                )
+            )
 
         self.verify_transport()
         self.set_input_encoding()

@@ -27,16 +27,16 @@ from .key import Key
 
 def encrypt(aes_key, aes_key_protected, blob):
     io = BytesIO()
-    tar = tarfile.open(name='xxxx', fileobj=io, mode='w')
+    tar = tarfile.open(name="xxxx", fileobj=io, mode="w")
 
-    ti = tarfile.TarInfo('key')
+    ti = tarfile.TarInfo("key")
     ti.size = len(aes_key_protected)
     tar.addfile(ti, BytesIO(aes_key_protected))
 
     f = Fernet(base64.urlsafe_b64encode(aes_key))
     encrypted = f.encrypt(blob)
 
-    ti = tarfile.TarInfo('blob')
+    ti = tarfile.TarInfo("blob")
     ti.size = len(encrypted)
     tar.addfile(ti, BytesIO(encrypted))
 
@@ -46,7 +46,7 @@ def encrypt(aes_key, aes_key_protected, blob):
 
 class Wrapper(File):
 
-    resource_name = 'cipher'
+    resource_name = "cipher"
 
     name = argument.String()
     file = argument.Resource(File)
@@ -57,25 +57,29 @@ class Wrapper(File):
 class FileIo(Plan):
 
     resource = Wrapper
-    service_name = 'kms'
-    name = 'fileio'
+    service_name = "kms"
+    name = "fileio"
 
     signature = []
 
     def read(self):
-        kms = self.runner.get_service(self.resource.key, 'describe')
+        kms = self.runner.get_service(self.resource.key, "describe")
         tar = tarfile.open(
-            name='ffff',
+            name="ffff",
             fileobj=BytesIO(
-                self.runner.get_service(self.resource.file, 'fileio').read().read(),
+                self.runner.get_service(self.resource.file, "fileio").read().read()
             ),
-            mode='r',
+            mode="r",
         )
-        f = Fernet(base64.urlsafe_b64encode(kms.decrypt_data_key(tar.extractfile('key').read())))
-        return BytesIO(f.decrypt(tar.extractfile('blob').read()))
+        f = Fernet(
+            base64.urlsafe_b64encode(
+                kms.decrypt_data_key(tar.extractfile("key").read())
+            )
+        )
+        return BytesIO(f.decrypt(tar.extractfile("blob").read()))
 
     def write(self, c):
-        kms = self.runner.get_service(self.resource.key, 'describe')
+        kms = self.runner.get_service(self.resource.key, "describe")
         aes_key, aes_key_protected = kms.create_data_key()
-        fp = self.runner.get_service(self.resource.file, 'fileio')
+        fp = self.runner.get_service(self.resource.file, "fileio")
         fp.write(encrypt(aes_key, aes_key_protected, c))

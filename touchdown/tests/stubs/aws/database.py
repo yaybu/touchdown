@@ -17,54 +17,52 @@ from .service import ServiceStubber
 
 class DatabaseStubber(ServiceStubber):
 
-    client_service = 'rds'
+    client_service = "rds"
 
     def add_describe_db_instances_empty(self):
         return self.add_client_error(
-            'describe_db_instances',
-            service_error_code='DBInstanceNotFound',
-            service_message='',
+            "describe_db_instances",
+            service_error_code="DBInstanceNotFound",
+            service_message="",
         )
 
     def add_describe_db_instances_one(self):
         return self.add_response(
-            'describe_db_instances',
+            "describe_db_instances",
             service_response={
-                'DBInstances': [{
-                    'DBInstanceIdentifier': self.resource.name,
-                    'DBInstanceStatus': 'available',
-                }],
+                "DBInstances": [
+                    {
+                        "DBInstanceIdentifier": self.resource.name,
+                        "DBInstanceStatus": "available",
+                    }
+                ]
             },
-            expected_params={
-                'DBInstanceIdentifier': self.resource.name,
-            }
+            expected_params={"DBInstanceIdentifier": self.resource.name},
         )
 
-    def add_create_db_instance(self, password='password'):
+    def add_create_db_instance(self, password="password"):
         return self.add_response(
-            'create_db_instance',
+            "create_db_instance",
             service_response={
-                'DBInstance': {
-                    'DBInstanceIdentifier': self.resource.name,
-                },
+                "DBInstance": {"DBInstanceIdentifier": self.resource.name}
             },
             expected_params={
-                'DBInstanceIdentifier': self.resource.name,
-                'AllocatedStorage': 5,
-                'DBInstanceClass': 'db.m3.medium',
-                'Engine': 'postgres',
-                'MasterUserPassword': password,
-                'MasterUsername': 'root',
-                'StorageEncrypted': True,
+                "DBInstanceIdentifier": self.resource.name,
+                "AllocatedStorage": 5,
+                "DBInstanceClass": "db.m3.medium",
+                "Engine": "postgres",
+                "MasterUserPassword": password,
+                "MasterUsername": "root",
+                "StorageEncrypted": True,
             },
         )
 
     def add_delete_db_instance(self):
         return self.add_response(
-            'delete_db_instance',
+            "delete_db_instance",
             service_response={},
             expected_params={
-                'DBInstanceIdentifier': self.resource.name,
-                'SkipFinalSnapshot': True,
+                "DBInstanceIdentifier": self.resource.name,
+                "SkipFinalSnapshot": True,
             },
         )

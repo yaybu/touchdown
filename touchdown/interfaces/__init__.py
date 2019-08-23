@@ -14,7 +14,4 @@
 
 from .file import File, FileNotFound
 
-__all__ = [
-    'File',
-    'FileNotFound',
-]
+__all__ = ["File", "FileNotFound"]

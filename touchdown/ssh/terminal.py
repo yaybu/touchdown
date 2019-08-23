@@ -28,25 +28,30 @@ except ImportError:
 
 
 class SshMixin(object):
-
     def get_proxy_command(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = [
-            '/usr/bin/ssh',
-            '-o', 'User="{username}"'.format(**kwargs),
-            '-o', 'Port="{port}"'.format(**kwargs),
-            '-W', '%h:%p',
-            kwargs['hostname'],
+            "/usr/bin/ssh",
+            "-o",
+            'User="{username}"'.format(**kwargs),
+            "-o",
+            'Port="{port}"'.format(**kwargs),
+            "-W",
+            "%h:%p",
+            kwargs["hostname"],
         ]
-        return ['-o', 'ProxyCommand={}'.format(' '.join(cmd))]
+        return ["-o", "ProxyCommand={}".format(" ".join(cmd))]
 
     def get_command_and_args(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         cmd = [
             self.get_command(),
-            '-o', 'User="{username}"'.format(**kwargs),
-            '-o', 'Port="{port}"'.format(**kwargs),
-            '-o', 'HostName="{hostname}"'.format(**kwargs),
+            "-o",
+            'User="{username}"'.format(**kwargs),
+            "-o",
+            'Port="{port}"'.format(**kwargs),
+            "-o",
+            'HostName="{hostname}"'.format(**kwargs),
         ]
         if self.resource.proxy:
             proxy = self.runner.get_plan(self.resource.proxy)
@@ -60,16 +65,16 @@ class SshMixin(object):
         environ = os.environ.copy()
 
         if self.resource.private_key and PosixAgentServer:
-            socket_dir = tempfile.mkdtemp(prefix='ssh-')
-            socket_file = os.path.join(socket_dir, 'agent.{}'.format(os.getpid()))
+            socket_dir = tempfile.mkdtemp(prefix="ssh-")
+            socket_file = os.path.join(socket_dir, "agent.{}".format(os.getpid()))
 
-            environ['SSH_AUTH_SOCK'] = socket_file
-            del environ['SHELL']
+            environ["SSH_AUTH_SOCK"] = socket_file
+            del environ["SHELL"]
 
             child_pid = os.fork()
             if child_pid:
                 a = PosixAgentServer(socket_file)
-                a.add(self.resource.private_key, 'touchdown.pem')
+                a.add(self.resource.private_key, "touchdown.pem")
                 try:
                     a.serve_while_pid(child_pid)
                 finally:
@@ -84,15 +89,15 @@ class SshMixin(object):
 
 class SshPlan(plan.Plan, SshMixin):
 
-    name = 'ssh'
+    name = "ssh"
     resource = Connection
 
     def get_command(self):
-        return '/usr/bin/ssh'
+        return "/usr/bin/ssh"
 
     def get_command_and_args(self):
         cmd = super(SshPlan, self).get_command_and_args()
-        cmd.append('remote')
+        cmd.append("remote")
         return cmd
 
     def execute(self, args):
@@ -101,11 +106,11 @@ class SshPlan(plan.Plan, SshMixin):
 
 class ScpPlan(plan.Plan, SshMixin):
 
-    name = 'scp'
+    name = "scp"
     resource = Connection
 
     def get_command(self):
-        return '/usr/bin/scp'
+        return "/usr/bin/scp"
 
     def execute(self, source, destination):
         self.run([source, destination])

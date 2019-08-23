@@ -33,11 +33,7 @@ class ActionGoalMixin(object):
 
     def plan(self):
         self.reset_changes()
-        self.visit(
-            'Building plan...',
-            self.get_plan_order(),
-            self.get_changes,
-        )
+        self.visit("Building plan...", self.get_plan_order(), self.get_changes)
         for resource in self.get_execution_order().all():
             changes = self.get_changes(resource)
             if changes:
@@ -46,9 +42,9 @@ class ActionGoalMixin(object):
     def apply_resource(self, resource):
         for change in self.get_changes(resource):
             description = list(change.description)
-            self.ui.echo('[{}] {}'.format(resource, description[0]))
+            self.ui.echo("[{}] {}".format(resource, description[0]))
             for line in description[1:]:
-                self.ui.echo('[{}]     {}'.format(resource, line))
+                self.ui.echo("[{}]     {}".format(resource, line))
             change.run()
 
     def apply_resources(self):
@@ -64,7 +60,9 @@ class ActionGoalMixin(object):
         plan = list(self.plan())
 
         if not len(plan):
-            raise errors.NothingChanged('Planning stage found no changes were required.')
+            raise errors.NothingChanged(
+                "Planning stage found no changes were required."
+            )
 
         if not self.ui.confirm_plan(plan):
             return

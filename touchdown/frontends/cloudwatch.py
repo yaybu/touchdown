@@ -25,7 +25,6 @@ from .progress import ProgressBar
 
 
 class CloudWatchFrontend(BaseFrontend):
-
     def __init__(self, group, stream):
         super(CloudWatchFrontend, self).__init__()
         self.group = group
@@ -34,32 +33,38 @@ class CloudWatchFrontend(BaseFrontend):
         self.queue = queue.Queue()
 
     def _echo(self, text, nl=True, **kwargs):
-        text = text.rstrip('\r\n')
+        text = text.rstrip("\r\n")
         if text:
-            self.queue.put({
-                'message': text,
-                'timestamp': calendar.timegm(datetime.datetime.utcnow().timetuple()) * 1000,
-            })
+            self.queue.put(
+                {
+                    "message": text,
+                    "timestamp": calendar.timegm(datetime.datetime.utcnow().timetuple())
+                    * 1000,
+                }
+            )
 
     def start(self, subcommand, goal):
         self.plan = goal.get_plan(self.group)
         self.client = self.plan.client
 
         try:
-            self.client.create_log_group(
-                logGroupName=self.group.name,
-            )
+            self.client.create_log_group(logGroupName=self.group.name)
         except ClientError as e:
-            if e.response.get('Error', {}).get('Code') != 'ResourceAlreadyExistsException':
+            if (
+                e.response.get("Error", {}).get("Code")
+                != "ResourceAlreadyExistsException"
+            ):
                 raise
 
         try:
             self.client.create_log_stream(
-                logGroupName=self.group.name,
-                logStreamName=self.stream,
+                logGroupName=self.group.name, logStreamName=self.stream
             )
         except ClientError as e:
-            if e.response.get('Error', {}).get('Code') != 'ResourceAlreadyExistsException':
+            if (
+                e.response.get("Error", {}).get("Code")
+                != "ResourceAlreadyExistsException"
+            ):
                 raise
 
         self.thread = threading.Thread(target=self._sender)
@@ -88,14 +93,12 @@ class CloudWatchFrontend(BaseFrontend):
     def _send(self):
         for batch in self._get_batches():
             kwargs = dict(
-                logEvents=batch,
-                logGroupName=self.group.name,
-                logStreamName=self.stream,
+                logEvents=batch, logGroupName=self.group.name, logStreamName=self.stream
             )
             if self.sequence_token:
-                kwargs['sequenceToken'] = self.sequence_token
+                kwargs["sequenceToken"] = self.sequence_token
             response = self.client.put_log_events(**kwargs)
-            self.sequence_token = response['nextSequenceToken']
+            self.sequence_token = response["nextSequenceToken"]
 
     def _sender(self):
         self.sequence_token = None

@@ -16,17 +16,13 @@ from . import errors, serializers
 
 
 class Output(object):
-
     def __init__(self, serializer):
         self.serializer = serializer
 
     def __set__(self, instance, value):
-        raise errors.Error('This attribute is read-only!')
+        raise errors.Error("This attribute is read-only!")
 
     def __get__(self, instance, owner):
         if instance is None:
             return self
-        return serializers.Context(
-            serializers.Const(instance),
-            self.serializer,
-        )
+        return serializers.Context(serializers.Const(instance), self.serializer)

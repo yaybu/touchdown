@@ -20,13 +20,13 @@ from .function import Function
 
 class Subscription(sns.Subscription):
 
-    ''' Adapts a Lambda Function into a Subscription '''
+    """ Adapts a Lambda Function into a Subscription """
 
     input = Function
 
     def get_serializer(self, runner, **kwargs):
         return serializers.Dict(
-            Protocol=serializers.Const('lambda'),
+            Protocol=serializers.Const("lambda"),
             Endpoint=self.adapts.arn,
-            TopicArn=kwargs['TopicArn'],
+            TopicArn=kwargs["TopicArn"],
         )

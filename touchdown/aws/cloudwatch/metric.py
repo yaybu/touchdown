@@ -22,10 +22,10 @@ from ..common import SimpleApply, SimpleDescribe
 
 class Metric(Resource):
 
-    resource_name = 'metric'
+    resource_name = "metric"
 
-    name = argument.String(field='MetricName')
-    namespace = argument.String(field='Namespace')
+    name = argument.String(field="MetricName")
+    namespace = argument.String(field="Namespace")
 
     account = argument.Resource(BaseAccount)
 
@@ -33,30 +33,24 @@ class Metric(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = Metric
-    service_name = 'cloudwatch'
-    api_version = '2010-08-01'
-    describe_action = 'list_metrics'
-    describe_envelope = 'Metrics'
-    key = 'MetricName'
+    service_name = "cloudwatch"
+    api_version = "2010-08-01"
+    describe_action = "list_metrics"
+    describe_envelope = "Metrics"
+    key = "MetricName"
 
     def get_describe_filters(self):
-        return {
-            self.key: self.resource.name,
-            'Namespace': self.resource.namespace,
-        }
+        return {self.key: self.resource.name, "Namespace": self.resource.namespace}
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'put_metric_data'
+    create_action = "put_metric_data"
 
     def get_create_serializer(self):
         return serializers.Dict(
-            Namespace=serializers.Argument('namespace'),
+            Namespace=serializers.Argument("namespace"),
             MetricData=serializers.ListOfOne(
-                serializers.Dict(
-                    MetricName=serializers.Argument('name'),
-                    Value=0,
-                )
-            )
+                serializers.Dict(MetricName=serializers.Argument("name"), Value=0)
+            ),
         )

@@ -17,40 +17,35 @@ from touchdown.tests.stubs.aws import EventRuleStubber
 
 
 class TestRuleDeletion(StubberTestCase):
-
     def test_delete_rule(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        rule = self.fixtures.enter_context(EventRuleStubber(
-            goal.get_service(
-                self.aws.add_event_rule(
-                    name='my-rule',
-                ),
-                'destroy',
+        rule = self.fixtures.enter_context(
+            EventRuleStubber(
+                goal.get_service(self.aws.add_event_rule(name="my-rule"), "destroy")
             )
-        ))
+        )
         rule.add_list_rules_one_response_by_name()
-        rule.add_list_targets_by_rule([
-            {'Id': 'SomeTargetId', 'Arn': 'some:arn:12345'},
-            {'Id': 'SomeTargetId2', 'Arn': 'some:arn:12345'},
-        ])
-        rule.add_remove_targets(['SomeTargetId'])
-        rule.add_remove_targets(['SomeTargetId2'])
+        rule.add_list_targets_by_rule(
+            [
+                {"Id": "SomeTargetId", "Arn": "some:arn:12345"},
+                {"Id": "SomeTargetId2", "Arn": "some:arn:12345"},
+            ]
+        )
+        rule.add_remove_targets(["SomeTargetId"])
+        rule.add_remove_targets(["SomeTargetId2"])
         rule.add_delete_rule()
 
         goal.execute()
 
     def test_delete_rule_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        rule = self.fixtures.enter_context(EventRuleStubber(
-            goal.get_service(
-                self.aws.add_event_rule(
-                    name='my-rule',
-                ),
-                'destroy',
+        rule = self.fixtures.enter_context(
+            EventRuleStubber(
+                goal.get_service(self.aws.add_event_rule(name="my-rule"), "destroy")
             )
-        ))
+        )
         rule.add_list_rules_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)

@@ -17,19 +17,17 @@ from touchdown.tests.stubs.aws import LoadBalancerStubber, Stubber
 
 
 class TestCreateLoadBalancer(StubberTestCase):
-
     def test_create_load_balancer(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        load_balancer = self.fixtures.enter_context(LoadBalancerStubber(
-            goal.get_service(
-                self.aws.add_load_balancer(
-                    name='test-load_balancer',
-                    listeners=[],
-                ),
-                'apply',
+        load_balancer = self.fixtures.enter_context(
+            LoadBalancerStubber(
+                goal.get_service(
+                    self.aws.add_load_balancer(name="test-load_balancer", listeners=[]),
+                    "apply",
+                )
             )
-        ))
+        )
 
         load_balancer.add_describe_load_balancers_empty()
         load_balancer.add_create_load_balancer()
@@ -46,17 +44,16 @@ class TestCreateLoadBalancer(StubberTestCase):
         goal.execute()
 
     def test_create_load_balancer_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        load_balancer = self.fixtures.enter_context(LoadBalancerStubber(
-            goal.get_service(
-                self.aws.add_load_balancer(
-                    name='test-load_balancer',
-                    listeners=[],
-                ),
-                'apply',
+        load_balancer = self.fixtures.enter_context(
+            LoadBalancerStubber(
+                goal.get_service(
+                    self.aws.add_load_balancer(name="test-load_balancer", listeners=[]),
+                    "apply",
+                )
             )
-        ))
+        )
 
         load_balancer.add_describe_load_balancers_one()
         load_balancer.add_describe_load_balancer_attributes()
@@ -66,18 +63,16 @@ class TestCreateLoadBalancer(StubberTestCase):
 
 
 class TestDestroyLoadBalancer(StubberTestCase):
-
     def test_destroy_load_balancer(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        load_balancer = self.fixtures.enter_context(LoadBalancerStubber(
-            goal.get_service(
-                self.aws.add_load_balancer(
-                    name='test-load_balancer',
-                ),
-                'destroy',
+        load_balancer = self.fixtures.enter_context(
+            LoadBalancerStubber(
+                goal.get_service(
+                    self.aws.add_load_balancer(name="test-load_balancer"), "destroy"
+                )
             )
-        ))
+        )
 
         load_balancer.add_describe_load_balancers_one()
         load_balancer.add_describe_load_balancer_attributes()
@@ -87,29 +82,27 @@ class TestDestroyLoadBalancer(StubberTestCase):
             Stubber(load_balancer.service.ec2_client)
         )
         network_interface_waiter.add_response(
-            'describe_network_interfaces',
+            "describe_network_interfaces",
             service_response={},
             expected_params={
-                'Filters': [{
-                    'Name': 'description',
-                    'Values': ['ELB test-load_balancer'],
-                }],
+                "Filters": [
+                    {"Name": "description", "Values": ["ELB test-load_balancer"]}
+                ]
             },
         )
 
         goal.execute()
 
     def test_destroy_load_balancer_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        load_balancer = self.fixtures.enter_context(LoadBalancerStubber(
-            goal.get_service(
-                self.aws.add_load_balancer(
-                    name='test-load_balancer',
-                ),
-                'destroy',
+        load_balancer = self.fixtures.enter_context(
+            LoadBalancerStubber(
+                goal.get_service(
+                    self.aws.add_load_balancer(name="test-load_balancer"), "destroy"
+                )
             )
-        ))
+        )
 
         load_balancer.add_describe_load_balancers_empty()
 

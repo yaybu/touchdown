@@ -14,7 +14,4 @@
 
 from .topic import Subscription, Topic
 
-__all__ = [
-    'Subscription',
-    'Topic',
-]
+__all__ = ["Subscription", "Topic"]

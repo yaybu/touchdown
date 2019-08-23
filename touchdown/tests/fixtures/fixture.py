@@ -19,7 +19,6 @@ except ImportError:
 
 
 class Fixture(object):
-
     def __init__(self, goal, workspace):
         self.fixtures = ExitStack()
         self.goal = goal

@@ -25,7 +25,6 @@ except ImportError:
 
 
 class WorkspaceTestCase(unittest.TestCase):
-
     def setUp(self):
         self.workspace = workspace.Workspace()
         self.fixtures = ExitStack()
@@ -35,8 +34,6 @@ class WorkspaceTestCase(unittest.TestCase):
         return goals.create(
             goal_name,
             self.workspace,
-            MultiFrontend([
-                ConsoleFrontend(interactive=False),
-            ]),
+            MultiFrontend([ConsoleFrontend(interactive=False)]),
             map=map_class,
         )

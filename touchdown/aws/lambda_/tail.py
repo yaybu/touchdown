@@ -19,9 +19,9 @@ from .function import Function
 
 class Plan(tail.Plan):
 
-    name = 'tail'
+    name = "tail"
     resource = Function
-    service_name = 'logs'
+    service_name = "logs"
 
     def get_log_group_name(self):
-        return '/aws/lambda/{}'.format(self.resource.name)
+        return "/aws/lambda/{}".format(self.resource.name)

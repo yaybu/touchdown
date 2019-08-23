@@ -19,43 +19,44 @@ from touchdown.tests.stubs.aws import RouteTableStubber, VpcEndpointStubber
 
 
 class TestVpcEndpoint(StubberTestCase):
-
     def test_create_endpoint(self):
         # The VPC and RouteTable already exist
         # There is no local state describing a VPCE
         # Therfore a VPCE is created
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        route_table = self.fixtures.enter_context(RouteTableStubber(
-            goal.get_service(
-                vpcf.vpc.get_route_table(name='test-route-table'),
-                'describe',
+        route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                goal.get_service(
+                    vpcf.vpc.get_route_table(name="test-route-table"), "describe"
+                )
             )
-        ))
+        )
         route_table.add_describe_route_tables_one_response_by_name()
 
         folder = self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )
-        config = folder.add_file(name='text.cfg').add_ini_file()
-        name = config.add_string(name='vpc.endpoint-id')
+        config = folder.add_file(name="text.cfg").add_ini_file()
+        name = config.add_string(name="vpc.endpoint-id")
 
-        endpoint = self.fixtures.enter_context(VpcEndpointStubber(
-            goal.get_service(
-                vpcf.vpc.add_endpoint(
-                    name='is-this-even-used',
-                    id=name,
-                    service='s3',
-                    route_tables=[route_table.resource],
-                ),
-                'apply',
+        endpoint = self.fixtures.enter_context(
+            VpcEndpointStubber(
+                goal.get_service(
+                    vpcf.vpc.add_endpoint(
+                        name="is-this-even-used",
+                        id=name,
+                        service="s3",
+                        route_tables=[route_table.resource],
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         endpoint.add_create_vpc_endpoint(
-            vpcf.vpc_id,
-            [route_table.make_id(route_table.resource.name)],
+            vpcf.vpc_id, [route_table.make_id(route_table.resource.name)]
         )
 
         goal.execute()
@@ -65,42 +66,44 @@ class TestVpcEndpoint(StubberTestCase):
         # There is local state describing a VPCE but it does not exist
         # Therefore a VPCE is created
 
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        route_table = self.fixtures.enter_context(RouteTableStubber(
-            goal.get_service(
-                vpcf.vpc.get_route_table(name='test-route-table'),
-                'describe',
+        route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                goal.get_service(
+                    vpcf.vpc.get_route_table(name="test-route-table"), "describe"
+                )
             )
-        ))
+        )
         route_table.add_describe_route_tables_one_response_by_name()
 
         folder = self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )
-        config = folder.add_file(name='text.cfg').add_ini_file()
-        name = config.add_string(name='vpc.endpoint-id')
+        config = folder.add_file(name="text.cfg").add_ini_file()
+        name = config.add_string(name="vpc.endpoint-id")
 
-        goal.get_service(name, 'set').execute('vpce-1234abcd')
+        goal.get_service(name, "set").execute("vpce-1234abcd")
 
-        endpoint = self.fixtures.enter_context(VpcEndpointStubber(
-            goal.get_service(
-                vpcf.vpc.add_endpoint(
-                    name='is-this-even-used',
-                    id=name,
-                    service='s3',
-                    route_tables=[route_table.resource],
-                ),
-                'apply',
+        endpoint = self.fixtures.enter_context(
+            VpcEndpointStubber(
+                goal.get_service(
+                    vpcf.vpc.add_endpoint(
+                        name="is-this-even-used",
+                        id=name,
+                        service="s3",
+                        route_tables=[route_table.resource],
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
 
-        endpoint.add_describe_vpc_endpoints_empty_response('vpce-1234abcd')
+        endpoint.add_describe_vpc_endpoints_empty_response("vpce-1234abcd")
         endpoint.add_create_vpc_endpoint(
-            vpcf.vpc_id,
-            [route_table.make_id(route_table.resource.name)],
+            vpcf.vpc_id, [route_table.make_id(route_table.resource.name)]
         )
 
         goal.execute()
@@ -110,38 +113,41 @@ class TestVpcEndpoint(StubberTestCase):
         # There is local state describing a VPCE and it does exist
         # Therefore no VPCE is created
 
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        route_table = self.fixtures.enter_context(RouteTableStubber(
-            goal.get_service(
-                vpcf.vpc.get_route_table(name='test-route-table'),
-                'describe',
+        route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                goal.get_service(
+                    vpcf.vpc.get_route_table(name="test-route-table"), "describe"
+                )
             )
-        ))
+        )
         route_table.add_describe_route_tables_one_response_by_name()
 
         folder = self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )
-        config = folder.add_file(name='text.cfg').add_ini_file()
-        name = config.add_string(name='vpc.endpoint-id')
+        config = folder.add_file(name="text.cfg").add_ini_file()
+        name = config.add_string(name="vpc.endpoint-id")
 
-        goal.get_service(name, 'set').execute('vpce-1234abcd')
+        goal.get_service(name, "set").execute("vpce-1234abcd")
 
-        endpoint = self.fixtures.enter_context(VpcEndpointStubber(
-            goal.get_service(
-                vpcf.vpc.add_endpoint(
-                    name='is-this-even-used',
-                    id=name,
-                    service='s3',
-                    route_tables=[route_table.resource],
-                ),
-                'apply',
+        endpoint = self.fixtures.enter_context(
+            VpcEndpointStubber(
+                goal.get_service(
+                    vpcf.vpc.add_endpoint(
+                        name="is-this-even-used",
+                        id=name,
+                        service="s3",
+                        route_tables=[route_table.resource],
+                    ),
+                    "apply",
+                )
             )
-        ))
-        endpoint.add_describe_vpc_endpoints_one_response_for_vpceid('vpce-1234abcd')
+        )
+        endpoint.add_describe_vpc_endpoints_one_response_for_vpceid("vpce-1234abcd")
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(endpoint.resource)), 0)
@@ -151,39 +157,42 @@ class TestVpcEndpoint(StubberTestCase):
         # There is local state describing a VPCE and it does exist
         # Therefore VPCE is destroyed
 
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        route_table = self.fixtures.enter_context(RouteTableStubber(
-            goal.get_service(
-                vpcf.vpc.get_route_table(name='test-route-table'),
-                'describe',
+        route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                goal.get_service(
+                    vpcf.vpc.get_route_table(name="test-route-table"), "describe"
+                )
             )
-        ))
+        )
         route_table.add_describe_route_tables_one_response_by_name()
 
         folder = self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )
-        config = folder.add_file(name='text.cfg').add_ini_file()
-        name = config.add_string(name='vpc.endpoint-id')
+        config = folder.add_file(name="text.cfg").add_ini_file()
+        name = config.add_string(name="vpc.endpoint-id")
 
-        goal.get_service(name, 'set').execute('vpce-1234abcd')
+        goal.get_service(name, "set").execute("vpce-1234abcd")
 
-        endpoint = self.fixtures.enter_context(VpcEndpointStubber(
-            goal.get_service(
-                vpcf.vpc.add_endpoint(
-                    name='is-this-even-used',
-                    id=name,
-                    service='s3',
-                    route_tables=[route_table.resource],
-                ),
-                'destroy',
+        endpoint = self.fixtures.enter_context(
+            VpcEndpointStubber(
+                goal.get_service(
+                    vpcf.vpc.add_endpoint(
+                        name="is-this-even-used",
+                        id=name,
+                        service="s3",
+                        route_tables=[route_table.resource],
+                    ),
+                    "destroy",
+                )
             )
-        ))
-        endpoint.add_describe_vpc_endpoints_one_response_for_vpceid('vpce-1234abcd')
-        endpoint.add_delete_vpc_endpoint('vpce-1234abcd')
+        )
+        endpoint.add_describe_vpc_endpoints_one_response_for_vpceid("vpce-1234abcd")
+        endpoint.add_delete_vpc_endpoint("vpce-1234abcd")
 
         goal.execute()
 
@@ -192,35 +201,38 @@ class TestVpcEndpoint(StubberTestCase):
         # There is no local state describing a VPCE
         # Therefore no VPCE is destroyed
 
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        route_table = self.fixtures.enter_context(RouteTableStubber(
-            goal.get_service(
-                vpcf.vpc.get_route_table(name='test-route-table'),
-                'describe',
+        route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                goal.get_service(
+                    vpcf.vpc.get_route_table(name="test-route-table"), "describe"
+                )
             )
-        ))
+        )
         route_table.add_describe_route_tables_one_response_by_name()
 
         folder = self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )
-        config = folder.add_file(name='text.cfg').add_ini_file()
-        name = config.add_string(name='vpc.endpoint-id')
+        config = folder.add_file(name="text.cfg").add_ini_file()
+        name = config.add_string(name="vpc.endpoint-id")
 
-        endpoint = self.fixtures.enter_context(VpcEndpointStubber(
-            goal.get_service(
-                vpcf.vpc.add_endpoint(
-                    name='is-this-even-used',
-                    id=name,
-                    service='s3',
-                    route_tables=[route_table.resource],
-                ),
-                'destroy',
+        endpoint = self.fixtures.enter_context(
+            VpcEndpointStubber(
+                goal.get_service(
+                    vpcf.vpc.add_endpoint(
+                        name="is-this-even-used",
+                        id=name,
+                        service="s3",
+                        route_tables=[route_table.resource],
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(endpoint.resource)), 0)
@@ -230,38 +242,41 @@ class TestVpcEndpoint(StubberTestCase):
         # There is local state describing a VPCE and it does not exist
         # Therefore no VPCE is destroyed
 
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        route_table = self.fixtures.enter_context(RouteTableStubber(
-            goal.get_service(
-                vpcf.vpc.get_route_table(name='test-route-table'),
-                'describe',
+        route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                goal.get_service(
+                    vpcf.vpc.get_route_table(name="test-route-table"), "describe"
+                )
             )
-        ))
+        )
         route_table.add_describe_route_tables_one_response_by_name()
 
         folder = self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )
-        config = folder.add_file(name='text.cfg').add_ini_file()
-        name = config.add_string(name='vpc.endpoint-id')
+        config = folder.add_file(name="text.cfg").add_ini_file()
+        name = config.add_string(name="vpc.endpoint-id")
 
-        goal.get_service(name, 'set').execute('vpce-1234abcd')
+        goal.get_service(name, "set").execute("vpce-1234abcd")
 
-        endpoint = self.fixtures.enter_context(VpcEndpointStubber(
-            goal.get_service(
-                vpcf.vpc.add_endpoint(
-                    name='is-this-even-used',
-                    id=name,
-                    service='s3',
-                    route_tables=[route_table.resource],
-                ),
-                'destroy',
+        endpoint = self.fixtures.enter_context(
+            VpcEndpointStubber(
+                goal.get_service(
+                    vpcf.vpc.add_endpoint(
+                        name="is-this-even-used",
+                        id=name,
+                        service="s3",
+                        route_tables=[route_table.resource],
+                    ),
+                    "destroy",
+                )
             )
-        ))
-        endpoint.add_describe_vpc_endpoints_empty_response('vpce-1234abcd')
+        )
+        endpoint.add_describe_vpc_endpoints_empty_response("vpce-1234abcd")
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(endpoint.resource)), 0)

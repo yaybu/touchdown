@@ -18,16 +18,14 @@ from .fixture import AwsFixture
 
 
 class InstanceProfileFixture(AwsFixture):
-
     def __enter__(self):
-        self.profile = self.fixtures.enter_context(InstanceProfileStubber(
-            self.goal.get_service(
-                self.aws.get_instance_profile(
-                    name='my-test-profile',
-                ),
-                'describe',
-            ),
-        ))
+        self.profile = self.fixtures.enter_context(
+            InstanceProfileStubber(
+                self.goal.get_service(
+                    self.aws.get_instance_profile(name="my-test-profile"), "describe"
+                )
+            )
+        )
         self.profile.add_list_instance_profile_one_response()
 
         return self.profile.resource

@@ -18,42 +18,39 @@ from .stubs.aws import InternetGatewayStubber
 
 
 class TestInternetGatewayCreation(StubberTestCase):
-
     def test_create_internet_gateway(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
-            goal.get_service(
-                vpcf.vpc.add_internet_gateway(
-                    name='test-internet_gateway',
-                ),
-                'apply',
+        internet_gateway = self.fixtures.enter_context(
+            InternetGatewayStubber(
+                goal.get_service(
+                    vpcf.vpc.add_internet_gateway(name="test-internet_gateway"), "apply"
+                )
             )
-        ))
+        )
 
         internet_gateway.add_describe_internet_gateways_empty_response()
         internet_gateway.add_create_internet_gateway()
-        internet_gateway.add_create_tags(Name='test-internet_gateway')
+        internet_gateway.add_create_tags(Name="test-internet_gateway")
         internet_gateway.add_attach_internet_gateway(vpc_id=vpcf.vpc_id)
 
         goal.execute()
 
     def test_create_internet_gateway_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
-            goal.get_service(
-                vpcf.vpc.add_internet_gateway(
-                    name='test-internet_gateway',
-                ),
-                'apply',
+        internet_gateway = self.fixtures.enter_context(
+            InternetGatewayStubber(
+                goal.get_service(
+                    vpcf.vpc.add_internet_gateway(name="test-internet_gateway"), "apply"
+                )
             )
-        ))
+        )
 
         internet_gateway.add_describe_internet_gateways_one_response(
-            vpc_ids=[vpcf.vpc_id],
+            vpc_ids=[vpcf.vpc_id]
         )
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -61,19 +58,18 @@ class TestInternetGatewayCreation(StubberTestCase):
 
 
 class TestInternetGatewayDestroy(StubberTestCase):
-
     def test_destroy_internet_gateway(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
-            goal.get_service(
-                vpcf.vpc.add_internet_gateway(
-                    name='test-internet_gateway',
-                ),
-                'destroy',
+        internet_gateway = self.fixtures.enter_context(
+            InternetGatewayStubber(
+                goal.get_service(
+                    vpcf.vpc.add_internet_gateway(name="test-internet_gateway"),
+                    "destroy",
+                )
             )
-        ))
+        )
 
         internet_gateway.add_describe_internet_gateways_one_response()
         internet_gateway.add_delete_internet_gateway()
@@ -81,17 +77,17 @@ class TestInternetGatewayDestroy(StubberTestCase):
         goal.execute()
 
     def test_destroy_internet_gateway_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        internet_gateway = self.fixtures.enter_context(InternetGatewayStubber(
-            goal.get_service(
-                vpcf.vpc.add_internet_gateway(
-                    name='test-internet_gateway',
-                ),
-                'destroy',
+        internet_gateway = self.fixtures.enter_context(
+            InternetGatewayStubber(
+                goal.get_service(
+                    vpcf.vpc.add_internet_gateway(name="test-internet_gateway"),
+                    "destroy",
+                )
             )
-        ))
+        )
 
         internet_gateway.add_describe_internet_gateways_empty_response()
 

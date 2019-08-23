@@ -17,81 +17,67 @@ from .service import ServiceStubber
 
 class ElasticIpStubber(ServiceStubber):
 
-    client_service = 'ec2'
+    client_service = "ec2"
 
     def make_id(self, name):
-        return 'eip-' + super(ElasticIpStubber, self).make_id(name)[:8]
+        return "eip-" + super(ElasticIpStubber, self).make_id(name)[:8]
 
     def add_describe_addresses_one_response(self, public_ip):
         return self.add_response(
-            'describe_addresses',
+            "describe_addresses",
             service_response={
-                'Addresses': [{
-                    'AllocationId': self.make_id(self.resource.name),
-                    'PublicIp': '8.8.8.8',
-                }]
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'public-ip', 'Values': [public_ip]}
+                "Addresses": [
+                    {
+                        "AllocationId": self.make_id(self.resource.name),
+                        "PublicIp": "8.8.8.8",
+                    }
                 ]
             },
+            expected_params={"Filters": [{"Name": "public-ip", "Values": [public_ip]}]},
         )
 
     def add_describe_addresses_empty_response(self, public_ip):
         return self.add_response(
-            'describe_addresses',
-            service_response={
-                'Addresses': [],
-            },
-            expected_params={
-                'Filters': [
-                    {'Name': 'public-ip', 'Values': [public_ip]}
-                ]
-            },
+            "describe_addresses",
+            service_response={"Addresses": []},
+            expected_params={"Filters": [{"Name": "public-ip", "Values": [public_ip]}]},
         )
 
     def add_create_elastic_ip(self):
         return self.add_response(
-            'create_elastic_ip',
+            "create_elastic_ip",
             service_response={
-                'ElasticIp': {
-                    'AllocationId': self.make_id(self.resource.name),
-                    'PublicIp': '8.8.8.8',
+                "ElasticIp": {
+                    "AllocationId": self.make_id(self.resource.name),
+                    "PublicIp": "8.8.8.8",
                 }
             },
-            expected_params={
-            },
+            expected_params={},
         )
 
     def add_attach_elastic_ip(self, vpc_id):
         return self.add_response(
-            'attach_elastic_ip',
+            "attach_elastic_ip",
             service_response={},
             expected_params={
-                'AllocationId': self.make_id(self.resource.name),
-                'VpcId': vpc_id,
+                "AllocationId": self.make_id(self.resource.name),
+                "VpcId": vpc_id,
             },
         )
 
     def add_allocate_address(self):
         return self.add_response(
-            'allocate_address',
+            "allocate_address",
             service_response={
-                'AllocationId': self.make_id(self.resource.name),
-                'PublicIp': '8.8.8.8',
+                "AllocationId": self.make_id(self.resource.name),
+                "PublicIp": "8.8.8.8",
             },
-            expected_params={
-                'Domain': 'vpc',
-            },
+            expected_params={"Domain": "vpc"},
         )
 
     def add_release_address(self):
         return self.add_response(
-            'release_address',
-            service_response={
-            },
-            expected_params={
-                'AllocationId': self.make_id(self.resource.name),
-            },
+            "release_address",
+            service_response={},
+            expected_params={"AllocationId": self.make_id(self.resource.name)},
         )

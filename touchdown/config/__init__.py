@@ -22,12 +22,12 @@ from .string import String
 from .variable import Variable
 
 __all__ = [
-    'IniFile',
-    'Integer',
-    'List',
-    'String',
-    'Variable',
-    'IPNetwork',
-    'Allocations',
-    'Allocation',
+    "IniFile",
+    "Integer",
+    "List",
+    "String",
+    "Variable",
+    "IPNetwork",
+    "Allocations",
+    "Allocation",
 ]

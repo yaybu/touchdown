@@ -26,16 +26,16 @@ from .vpn_connection import VpnConnection
 from .vpn_gateway import VpnGateway
 
 __all__ = [
-    'VPC',
-    'CustomerGateway',
-    'ElasticIp',
-    'Endpoint',
-    'InternetGateway',
-    'NatGateway',
-    'NetworkACL',
-    'RouteTable',
-    'Subnet',
-    'SecurityGroup',
-    'VpnConnection',
-    'VpnGateway',
+    "VPC",
+    "CustomerGateway",
+    "ElasticIp",
+    "Endpoint",
+    "InternetGateway",
+    "NatGateway",
+    "NetworkACL",
+    "RouteTable",
+    "Subnet",
+    "SecurityGroup",
+    "VpnConnection",
+    "VpnGateway",
 ]

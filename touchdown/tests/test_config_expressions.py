@@ -19,7 +19,6 @@ from touchdown.core import serializers
 
 
 class TestExpressions(unittest.TestCase):
-
     def test_pwgen(self):
         serializer = expressions.pwgen(length=31, symbols=True)
         self.assertTrue(isinstance(serializer, serializers.Expression))
@@ -42,24 +41,12 @@ class TestExpressions(unittest.TestCase):
         serializer = expressions.rsa_private_key()
         self.assertTrue(isinstance(serializer, serializers.Expression))
         rendered = serializer.render(None, None).splitlines()
-        self.assertEqual(
-            rendered[0],
-            '-----BEGIN RSA PRIVATE KEY-----',
-        )
-        self.assertEqual(
-            rendered[-1],
-            '-----END RSA PRIVATE KEY-----',
-        )
+        self.assertEqual(rendered[0], "-----BEGIN RSA PRIVATE KEY-----")
+        self.assertEqual(rendered[-1], "-----END RSA PRIVATE KEY-----")
 
     def test_dsa_private_key(self):
         serializer = expressions.rsa_private_key()
         self.assertTrue(isinstance(serializer, serializers.Expression))
         rendered = serializer.render(None, None).splitlines()
-        self.assertEqual(
-            rendered[0],
-            '-----BEGIN RSA PRIVATE KEY-----',
-        )
-        self.assertEqual(
-            rendered[-1],
-            '-----END RSA PRIVATE KEY-----',
-        )
+        self.assertEqual(rendered[0], "-----BEGIN RSA PRIVATE KEY-----")
+        self.assertEqual(rendered[-1], "-----END RSA PRIVATE KEY-----")

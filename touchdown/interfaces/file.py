@@ -33,18 +33,18 @@ class File(Resource):
 class Edit(Plan):
 
     resource = File
-    name = 'edit'
+    name = "edit"
 
     def get_editor(self):
-        for var in ('VISUAL', 'EDITOR'):
+        for var in ("VISUAL", "EDITOR"):
             if var in os.environ:
                 return os.environ[var]
 
         # if is_windows():
         #     return 'notepad.exe'
 
-        for editor in ('vim', 'nano'):
-            for path in os.environ.get('PATH', '/usr/bin').split(os.path.pathsep):
+        for editor in ("vim", "nano"):
+            for path in os.environ.get("PATH", "/usr/bin").split(os.path.pathsep):
                 e = os.path.join(path, editor)
                 if os.path.exists(e):
                     return e
@@ -56,19 +56,19 @@ class Edit(Plan):
             p = subprocess.Popen([editor, filename])
             exit_code = p.wait()
         except OSError as e:
-            raise errors.Error('Editing failed: %s' % (e))
+            raise errors.Error("Editing failed: %s" % (e))
 
         if exit_code != 0:
-            raise errors.Error('Editing failed: Exit code' % exit_code)
+            raise errors.Error("Editing failed: Exit code" % exit_code)
 
     def edit(self, contents):
-        contents = contents or b''
-        if contents and not contents.endswith(b'\n'):
-            contents += b'\n'
+        contents = contents or b""
+        if contents and not contents.endswith(b"\n"):
+            contents += b"\n"
 
-        fd, name = tempfile.mkstemp(prefix='edit-')
+        fd, name = tempfile.mkstemp(prefix="edit-")
         try:
-            f = os.fdopen(fd, 'wb')
+            f = os.fdopen(fd, "wb")
             f.write(contents)
             f.close()
             timestamp = os.path.getmtime(name)
@@ -77,7 +77,7 @@ class Edit(Plan):
 
             changed = os.path.getmtime(name) != timestamp
 
-            with open(name, 'rb') as fp:
+            with open(name, "rb") as fp:
                 contents = fp.read()
 
             return contents, changed
@@ -85,12 +85,12 @@ class Edit(Plan):
             os.unlink(name)
 
     def execute(self):
-        f = self.runner.get_service(self.resource, 'fileio')
+        f = self.runner.get_service(self.resource, "fileio")
 
         try:
             contents = f.read().read()
         except FileNotFound:
-            contents = b''
+            contents = b""
 
         contents, changed = self.edit(contents)
 
@@ -101,26 +101,26 @@ class Edit(Plan):
 class Set(Plan):
 
     resource = File
-    name = 'set'
+    name = "set"
 
     def from_string(self, value):
         return value
 
     def execute(self, value):
-        f = self.runner.get_service(self.resource, 'fileio')
+        f = self.runner.get_service(self.resource, "fileio")
         f.write(force_bytes(value))
 
 
 class Get(Plan):
 
     resource = File
-    name = 'get'
+    name = "get"
 
     def to_string(self, value):
         return value
 
     def execute(self):
-        f = self.runner.get_service(self.resource, 'fileio')
+        f = self.runner.get_service(self.resource, "fileio")
         return force_str(f.read().read()), True
 
 
@@ -135,15 +135,14 @@ class Get(Plan):
 
 
 class FileAsString(serializers.Serializer):
-
     def __init__(self, resource):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, 'fileio').read().read()
+        return runner.get_service(self.resource, "fileio").read().read()
 
     def dependencies(self, object):
-        return frozenset((self.resource, ))
+        return frozenset((self.resource,))
 
 
 argument.String.register_adapter(File, lambda r: FileAsString(r))

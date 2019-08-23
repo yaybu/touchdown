@@ -17,7 +17,6 @@ import tempfile
 
 
 class TemporaryFolder(object):
-
     def __enter__(self):
         self.folder = tempfile.mkdtemp()
         return self

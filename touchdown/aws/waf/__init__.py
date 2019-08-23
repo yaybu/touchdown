@@ -17,9 +17,4 @@ from .ip_set import IpSet
 from .rule import Rule
 from .web_acl import WebACL
 
-__all__ = [
-    'ByteMatchSet',
-    'IpSet',
-    'Rule',
-    'WebACL',
-]
+__all__ = ["ByteMatchSet", "IpSet", "Rule", "WebACL"]

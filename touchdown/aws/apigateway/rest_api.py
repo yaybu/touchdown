@@ -22,10 +22,10 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class RestApi(Resource):
 
-    resource_name = 'rest_api'
+    resource_name = "rest_api"
 
-    name = argument.String(field='name')
-    description = argument.String(name='description')
+    name = argument.String(field="name")
+    description = argument.String(name="description")
 
     account = argument.Resource(BaseAccount)
 
@@ -33,30 +33,28 @@ class RestApi(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = RestApi
-    service_name = 'apigateway'
-    api_version = '2015-07-09'
-    describe_action = 'get_rest_apis'
-    describe_envelope = 'items'
-    key = 'id'
+    service_name = "apigateway"
+    api_version = "2015-07-09"
+    describe_action = "get_rest_apis"
+    describe_envelope = "items"
+    key = "id"
 
     def get_describe_filters(self):
         return {}
 
     def describe_object_matches(self, obj):
-        return self.resource.name == obj.get('name', '')
+        return self.resource.name == obj.get("name", "")
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_rest_api'
-    create_envelope = '@'
+    create_action = "create_rest_api"
+    create_envelope = "@"
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_rest_api'
+    destroy_action = "delete_rest_api"
 
     def get_destroy_serializer(self):
-        return serializers.Dict(
-            restApiId=serializers.Identifier(),
-        )
+        return serializers.Dict(restApiId=serializers.Identifier())

@@ -17,42 +17,42 @@ from .service import ServiceStubber
 
 class CertificateStubber(ServiceStubber):
 
-    client_service = 'acm'
+    client_service = "acm"
 
     def add_list_certificates_empty_response(self):
-        self.add_response(
-            'list_certificates',
-            service_response={},
-            expected_params={}
-        )
+        self.add_response("list_certificates", service_response={}, expected_params={})
 
     def add_list_certificates_one_response(self):
         self.add_response(
-            'list_certificates',
-            service_response={'CertificateSummaryList': [
-                {'CertificateArn': self.make_id(self.resource.name),
-                 'DomainName': self.resource.name}
-            ]},
-            expected_params={}
+            "list_certificates",
+            service_response={
+                "CertificateSummaryList": [
+                    {
+                        "CertificateArn": self.make_id(self.resource.name),
+                        "DomainName": self.resource.name,
+                    }
+                ]
+            },
+            expected_params={},
         )
 
     def add_delete_certificate(self):
         self.add_response(
-            'delete_certificate',
+            "delete_certificate",
             service_response={},
-            expected_params={'CertificateArn': self.make_id(self.resource.name)}
+            expected_params={"CertificateArn": self.make_id(self.resource.name)},
         )
 
     def add_request_certificate(self):
         self.add_response(
-            'request_certificate',
-            service_response={'CertificateArn': self.make_id(self.resource.name)},
-            expected_params={'DomainName': self.resource.name}
+            "request_certificate",
+            service_response={"CertificateArn": self.make_id(self.resource.name)},
+            expected_params={"DomainName": self.resource.name},
         )
 
     def add_describe_certificate(self):
         self.add_response(
-            'describe_certificate',
-            service_response={'Certificate': {'Status': 'ISSUED'}},
-            expected_params={'CertificateArn': self.make_id(self.resource.name)}
+            "describe_certificate",
+            service_response={"Certificate": {"Status": "ISSUED"}},
+            expected_params={"CertificateArn": self.make_id(self.resource.name)},
         )

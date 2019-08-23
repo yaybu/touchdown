@@ -17,39 +17,33 @@ from .service import ServiceStubber
 
 class PasswordPolicyStubber(ServiceStubber):
 
-    client_service = 'iam'
+    client_service = "iam"
 
     def add_get_account_password_policy_empty_response(self):
         return self.add_client_error(
-            'get_account_password_policy',
-            service_error_code='NoSuchEntity',
-            service_message='',
+            "get_account_password_policy",
+            service_error_code="NoSuchEntity",
+            service_message="",
         )
 
     def add_get_account_password_policy(self):
         return self.add_response(
-            'get_account_password_policy',
+            "get_account_password_policy",
             service_response={
-                'PasswordPolicy': {
-                    'AllowUsersToChangePassword': False,
-                },
-                'ResponseMetadata': {
-                    'HTTPStatusCode': 200,
-                }
+                "PasswordPolicy": {"AllowUsersToChangePassword": False},
+                "ResponseMetadata": {"HTTPStatusCode": 200},
             },
             expected_params={},
         )
 
     def add_update_account_password_policy(self, **policy):
         return self.add_response(
-            'update_account_password_policy',
+            "update_account_password_policy",
             service_response={},
             expected_params=policy,
         )
 
     def add_delete_account_password_policy(self):
         return self.add_response(
-            'delete_account_password_policy',
-            service_response={},
-            expected_params={},
+            "delete_account_password_policy", service_response={}, expected_params={}
         )

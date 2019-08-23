@@ -24,7 +24,7 @@ except ImportError:
 
 class Gpg(Resource):
 
-    resource_name = 'gpg'
+    resource_name = "gpg"
 
     name = argument.String()
 
@@ -46,12 +46,12 @@ class Gpg(Resource):
 class Describe(Plan):
 
     resource = Gpg
-    name = 'describe'
+    name = "describe"
 
     def get_gnupg(self):
         return gnupg.GPG()
 
     def get_actions(self):
         if not gnupg:
-            raise errors.NotFound('\'gnupg\' python module is not available.')
+            raise errors.NotFound("'gnupg' python module is not available.")
         return []

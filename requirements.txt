@@ -24,5 +24,6 @@ pyflakes==2.1.1
 pytest==5.1.1
 pytest-cov==2.7.1
 requests==2.22.0
+black
 
 -e .

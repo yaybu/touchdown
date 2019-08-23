@@ -22,64 +22,57 @@ from .service import ServiceStubber
 
 class LaunchConfigurationStubber(ServiceStubber):
 
-    client_service = 'ec2'
+    client_service = "ec2"
 
     def add_describe_launch_configurations_empty_response(self):
         return self.add_response(
-            'describe_launch_configurations',
-            service_response={
-                'LaunchConfigurations': [],
-            },
+            "describe_launch_configurations",
+            service_response={"LaunchConfigurations": []},
             expected_params={},
         )
 
     def add_describe_launch_configurations_one_response(self, user_data=None):
         launch_config = {
-            'LaunchConfigurationName': self.resource.name,
-            'ImageId': 'ami-cba130bc',
-            'InstanceType': 't2.micro',
-            'CreatedTime': datetime.datetime.now(),
+            "LaunchConfigurationName": self.resource.name,
+            "ImageId": "ami-cba130bc",
+            "InstanceType": "t2.micro",
+            "CreatedTime": datetime.datetime.now(),
         }
         if user_data:
-            launch_config['UserData'] = force_str(base64.b64encode(force_bytes(user_data)))
+            launch_config["UserData"] = force_str(
+                base64.b64encode(force_bytes(user_data))
+            )
         return self.add_response(
-            'describe_launch_configurations',
-            service_response={
-                'LaunchConfigurations': [launch_config],
-            },
+            "describe_launch_configurations",
+            service_response={"LaunchConfigurations": [launch_config]},
             expected_params={},
         )
 
     def add_describe_auto_scaling_groups(self):
         return self.add_response(
-            'describe_auto_scaling_groups',
-            service_response={
-                'AutoScalingGroups': [],
-            },
+            "describe_auto_scaling_groups",
+            service_response={"AutoScalingGroups": []},
             expected_params={},
         )
 
     def add_create_launch_configuration(self, user_data=None):
         expected_params = {
-            'ImageId': 'ami-cba130bc',
-            'InstanceMonitoring': {'Enabled': False},
-            'InstanceType': 't2.micro',
-            'LaunchConfigurationName': 'my-test-lc.1',
+            "ImageId": "ami-cba130bc",
+            "InstanceMonitoring": {"Enabled": False},
+            "InstanceType": "t2.micro",
+            "LaunchConfigurationName": "my-test-lc.1",
         }
         if user_data:
-            expected_params['UserData'] = user_data
+            expected_params["UserData"] = user_data
         return self.add_response(
-            'create_launch_configuration',
+            "create_launch_configuration",
             service_response={},
             expected_params=expected_params,
         )
 
     def add_delete_launch_configuration(self):
         return self.add_response(
-            'delete_launch_configuration',
-            service_response={
-            },
-            expected_params={
-                'LaunchConfigurationName': self.resource.name,
-            },
+            "delete_launch_configuration",
+            service_response={},
+            expected_params={"LaunchConfigurationName": self.resource.name},
         )

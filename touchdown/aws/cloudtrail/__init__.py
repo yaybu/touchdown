@@ -14,6 +14,4 @@
 
 from .trail import Trail
 
-__all__ = [
-    'Trail',
-]
+__all__ = ["Trail"]

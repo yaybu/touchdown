@@ -18,52 +18,47 @@ from touchdown.tests.stubs.aws import ResourceStubber
 
 
 class TestCreateResource(StubberTestCase):
-
     def test_create_resource(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        rest_api, rest_api_id = self.fixtures.enter_context(RestApiFixture(goal, self.aws))
+        rest_api, rest_api_id = self.fixtures.enter_context(
+            RestApiFixture(goal, self.aws)
+        )
 
-        parent = self.fixtures.enter_context(ResourceStubber(
-            goal.get_service(
-                rest_api.get_resource(
-                    name='/',
-                ),
-                'describe',
+        parent = self.fixtures.enter_context(
+            ResourceStubber(
+                goal.get_service(rest_api.get_resource(name="/"), "describe")
             )
-        ))
+        )
         parent.add_get_resources_one_response(rest_api_id)
 
-        resource = self.fixtures.enter_context(ResourceStubber(
-            goal.get_service(
-                rest_api.add_resource(
-                    name='test-resource',
-                    parent_resource=parent.resource,
-                ),
-                'apply',
+        resource = self.fixtures.enter_context(
+            ResourceStubber(
+                goal.get_service(
+                    rest_api.add_resource(
+                        name="test-resource", parent_resource=parent.resource
+                    ),
+                    "apply",
+                )
             )
-        ))
-        resource.add_get_resources_empty_response(rest_api_id)
-        resource.add_create_resource(
-            rest_api_id,
-            parent.make_id(parent.resource.name),
         )
+        resource.add_get_resources_empty_response(rest_api_id)
+        resource.add_create_resource(rest_api_id, parent.make_id(parent.resource.name))
 
         goal.execute()
 
     def test_create_resource_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        rest_api, rest_api_id = self.fixtures.enter_context(RestApiFixture(goal, self.aws))
+        rest_api, rest_api_id = self.fixtures.enter_context(
+            RestApiFixture(goal, self.aws)
+        )
 
-        resource = self.fixtures.enter_context(ResourceStubber(
-            goal.get_service(
-                rest_api.add_resource(
-                    name='test-resource',
-                ),
-                'apply',
+        resource = self.fixtures.enter_context(
+            ResourceStubber(
+                goal.get_service(rest_api.add_resource(name="test-resource"), "apply")
             )
-        ))
+        )
         resource.add_get_resources_one_response(rest_api_id)
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -71,38 +66,35 @@ class TestCreateResource(StubberTestCase):
 
 
 class TestDestroyResource(StubberTestCase):
-
     def test_destroy_resource(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        rest_api, rest_api_id = self.fixtures.enter_context(RestApiFixture(goal, self.aws))
+        rest_api, rest_api_id = self.fixtures.enter_context(
+            RestApiFixture(goal, self.aws)
+        )
 
-        resource = self.fixtures.enter_context(ResourceStubber(
-            goal.get_service(
-                rest_api.add_resource(
-                    name='test-resource',
-                ),
-                'destroy',
+        resource = self.fixtures.enter_context(
+            ResourceStubber(
+                goal.get_service(rest_api.add_resource(name="test-resource"), "destroy")
             )
-        ))
+        )
         resource.add_get_resources_one_response(rest_api_id)
         resource.add_delete_resource(rest_api_id)
 
         goal.execute()
 
     def test_destroy_resource_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        rest_api, rest_api_id = self.fixtures.enter_context(RestApiFixture(goal, self.aws))
+        rest_api, rest_api_id = self.fixtures.enter_context(
+            RestApiFixture(goal, self.aws)
+        )
 
-        resource = self.fixtures.enter_context(ResourceStubber(
-            goal.get_service(
-                rest_api.add_resource(
-                    name='test-resource',
-                ),
-                'destroy',
+        resource = self.fixtures.enter_context(
+            ResourceStubber(
+                goal.get_service(rest_api.add_resource(name="test-resource"), "destroy")
             )
-        ))
+        )
         resource.add_get_resources_empty_response(rest_api_id)
 
         self.assertEqual(len(list(goal.plan())), 0)

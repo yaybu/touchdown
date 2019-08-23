@@ -18,41 +18,40 @@ from touchdown.tests.stubs.aws import ExternalAccountStubber
 
 
 class TestExternalAccount(StubberTestCase):
-
     def test_acquire_role(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        external_account = self.fixtures.enter_context(ExternalAccountStubber(
-            goal.get_service(
-                self.aws.add_external_role(
-                    name='session-name',
-                    arn='arn:aws:iam::123456789012:role/S3Access',
-                ),
-                'null',
-            ),
-        ))
+        external_account = self.fixtures.enter_context(
+            ExternalAccountStubber(
+                goal.get_service(
+                    self.aws.add_external_role(
+                        name="session-name",
+                        arn="arn:aws:iam::123456789012:role/S3Access",
+                    ),
+                    "null",
+                )
+            )
+        )
         external_account.add_assume_role()
 
         self.assertEqual(
-            external_account.service.session.access_key_id,
-            'AKIASSUMEROLEASSUMEROLE',
+            external_account.service.session.access_key_id, "AKIASSUMEROLEASSUMEROLE"
         )
         self.assertEqual(
             external_account.service.session.secret_access_key,
-            'abcdefghijklmnopqrstuvwxyz',
+            "abcdefghijklmnopqrstuvwxyz",
         )
         self.assertEqual(
-            external_account.service.session.session_token,
-            'zyxwvutsrqpnomlkjihgfedcba',
+            external_account.service.session.session_token, "zyxwvutsrqpnomlkjihgfedcba"
         )
 
-        vpcf = self.fixtures.enter_context(VpcFixture(
-            goal,
-            external_account.resource,
-        ))
-        self.assertEqual(goal.get_service(vpcf.vpc, 'describe').describe_object(), {
-            'VpcId': vpcf.vpc_id,
-            'EnableDnsHostnames': {'Value': False},
-            'EnableDnsSupport': {'Value': True},
-            'State': 'available',
-        })
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, external_account.resource))
+        self.assertEqual(
+            goal.get_service(vpcf.vpc, "describe").describe_object(),
+            {
+                "VpcId": vpcf.vpc_id,
+                "EnableDnsHostnames": {"Value": False},
+                "EnableDnsSupport": {"Value": True},
+                "State": "available",
+            },
+        )

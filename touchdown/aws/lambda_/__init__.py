@@ -18,9 +18,4 @@ from .permission import Permission
 from .s3 import S3LambdaNotification
 from .sns import Subscription
 
-__all__ = [
-    'Function',
-    'Permission',
-    'S3LambdaNotification',
-    'Subscription',
-]
+__all__ = ["Function", "Permission", "S3LambdaNotification", "Subscription"]

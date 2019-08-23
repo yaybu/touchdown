@@ -16,42 +16,41 @@ from touchdown.core import action, argument, plan, resource, serializers, worksp
 
 
 class Target(resource.Resource):
-    resource_name = 'target'
+    resource_name = "target"
 
 
 class Provisioner(resource.Resource):
 
-    resource_name = 'provisioner'
+    resource_name = "provisioner"
 
     target = argument.Resource(Target)
     root = argument.Resource(workspace.Workspace)
 
 
 class RunScript(action.Action):
-
     @property
     def description(self):
-        yield 'Applying {} to {}'.format(self.resource, self.resource.target)
+        yield "Applying {} to {}".format(self.resource, self.resource.target)
 
     def run(self):
         kwargs = serializers.Resource().render(self.runner, self.resource)
         client = self.get_plan(self.resource.target).get_client()
         try:
-            client.run_script(kwargs['script'])
-            self.plan.object['Result'] = 'Success'
+            client.run_script(kwargs["script"])
+            self.plan.object["Result"] = "Success"
         except Exception as e:
-            self.plan.object['Result'] = 'Error'
-            self.plan.object['ErrorMessage'] = str(e)
+            self.plan.object["Result"] = "Error"
+            self.plan.object["ErrorMessage"] = str(e)
             raise
 
 
 class Describe(plan.Plan):
 
-    name = 'describe'
+    name = "describe"
     resource = Provisioner
 
     def describe_object(self):
-        return {'Result': 'Pending'}
+        return {"Result": "Pending"}
 
     def get_actions(self):
         self.object = self.describe_object()
@@ -60,18 +59,20 @@ class Describe(plan.Plan):
 
 class Apply(plan.Plan):
 
-    name = 'apply'
+    name = "apply"
     resource = Provisioner
 
     def get_actions(self):
-        self.object = self.runner.get_service(self.resource, 'describe').describe_object()
-        if self.resource.target and self.object.get('Result', 'Pending') == 'Pending':
+        self.object = self.runner.get_service(
+            self.resource, "describe"
+        ).describe_object()
+        if self.resource.target and self.object.get("Result", "Pending") == "Pending":
             yield RunScript(self)
 
 
 class Destroy(plan.Plan):
 
-    name = 'destroy'
+    name = "destroy"
     resource = Provisioner
 
     def get_actions(self):

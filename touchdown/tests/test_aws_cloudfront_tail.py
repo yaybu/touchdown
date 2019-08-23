@@ -23,85 +23,72 @@ from touchdown.tests.stubs.aws import DistributionStubber
 
 
 class TestDistributionTail(StubberTestCase):
-
     def test_tail_no_follow(self):
-        goal = self.create_goal('tail')
+        goal = self.create_goal("tail")
 
-        self.fixtures.enter_context(DistributionStubber(
-            goal.get_service(
-                self.aws.get_distribution(
-                    name='www.example.com',
-                ),
-                'tail',
+        self.fixtures.enter_context(
+            DistributionStubber(
+                goal.get_service(
+                    self.aws.get_distribution(name="www.example.com"), "tail"
+                )
             )
-        ))
+        )
 
-        goal.execute('www.example.com', None, None, True)
+        goal.execute("www.example.com", None, None, True)
 
     def test_tail_no_logging(self):
-        goal = self.create_goal('tail')
+        goal = self.create_goal("tail")
 
-        self.fixtures.enter_context(DistributionStubber(
-            goal.get_service(
-                self.aws.get_distribution(
-                    name='www.example.com',
-                ),
-                'tail',
+        self.fixtures.enter_context(
+            DistributionStubber(
+                goal.get_service(
+                    self.aws.get_distribution(name="www.example.com"), "tail"
+                )
             )
-        ))
+        )
 
-        goal.execute('www.example.com', None, None, False)
+        goal.execute("www.example.com", None, None, False)
 
     def test_tail(self):
-        goal = self.create_goal('tail')
+        goal = self.create_goal("tail")
 
-        bucket = self.aws.get_bucket(name='my-log-bucket')
+        bucket = self.aws.get_bucket(name="my-log-bucket")
 
-        distribution = self.fixtures.enter_context(DistributionStubber(
-            goal.get_service(
-                self.aws.get_distribution(
-                    name='www.example.com',
-                    logging={
-                        'enabled': True,
-                        'bucket': bucket,
-                        'prefix': '/my/prefix',
-                    },
-                ),
-                'tail',
+        distribution = self.fixtures.enter_context(
+            DistributionStubber(
+                goal.get_service(
+                    self.aws.get_distribution(
+                        name="www.example.com",
+                        logging={
+                            "enabled": True,
+                            "bucket": bucket,
+                            "prefix": "/my/prefix",
+                        },
+                    ),
+                    "tail",
+                )
             )
-        ))
+        )
 
         distribution.add_response(
-            'list_objects',
+            "list_objects",
             service_response={
-                'Contents': [{
-                    'Key': 'log-chunk-1.gz',
-                    'LastModified': now(),
-                }]
+                "Contents": [{"Key": "log-chunk-1.gz", "LastModified": now()}]
             },
-            expected_params={
-                'Bucket': 'my-log-bucket',
-                'Prefix': '/my/prefix',
-            }
+            expected_params={"Bucket": "my-log-bucket", "Prefix": "/my/prefix"},
         )
 
         buf = six.BytesIO()
-        with gzip.GzipFile(fileobj=buf, mode='wb') as f:
-            f.write(b'line1\nline2\nline3\n')
+        with gzip.GzipFile(fileobj=buf, mode="wb") as f:
+            f.write(b"line1\nline2\nline3\n")
         log_chunk = buf.getvalue()
 
         distribution.add_response(
-            'get_object',
+            "get_object",
             service_response={
-                'Body': StreamingBody(
-                    six.BytesIO(log_chunk),
-                    len(log_chunk),
-                ),
+                "Body": StreamingBody(six.BytesIO(log_chunk), len(log_chunk))
             },
-            expected_params={
-                'Bucket': 'my-log-bucket',
-                'Key': 'log-chunk-1.gz',
-            }
+            expected_params={"Bucket": "my-log-bucket", "Key": "log-chunk-1.gz"},
         )
 
-        goal.execute('www.example.com', None, None, False)
+        goal.execute("www.example.com", None, None, False)

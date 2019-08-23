@@ -22,7 +22,6 @@ class ServiceNotReady(Error):
 
 
 class CommandFailed(Error):
-
     def __init__(self, exit_code, stdout=None, stderr=None):
         self.exit_code = exit_code
         self.stdout = stdout
@@ -30,12 +29,10 @@ class CommandFailed(Error):
         Error.__init__(self, str(self))
 
     def __str__(self):
-        return 'Bundle deployment failed with exit code: {}'.format(
-            self.exit_code)
+        return "Bundle deployment failed with exit code: {}".format(self.exit_code)
 
 
 class RemoteCommandFailed(CommandFailed):
-
     def __init__(self, exit_code, stdout=None, stderr=None):
         self.exit_code = exit_code
         self.stdout = stdout
@@ -43,8 +40,7 @@ class RemoteCommandFailed(CommandFailed):
         Error.__init__(self, str(self))
 
     def __str__(self):
-        return 'Bundle deployment failed with exit code: {}'.format(
-            self.exit_code)
+        return "Bundle deployment failed with exit code: {}".format(self.exit_code)
 
 
 class NothingChanged(Error):
@@ -68,5 +64,5 @@ class NonConformingPolicy(Error):
 
 
 class CycleError(Error):
-    ''' The graph has a cycle so there is no way to apply changes to the cluster
-    sanely '''
+    """ The graph has a cycle so there is no way to apply changes to the cluster
+    sanely """

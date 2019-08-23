@@ -17,56 +17,42 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestTemplate(WorkspaceTestCase):
-
     def apply(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
         goal.execute()
         return goal
 
     def test_static_template(self):
         template = self.workspace.add_jinja2_template(
-            name='foo',
-            source='hello {{ name }}!',
-            context={
-                'name': 'john',
-            },
+            name="foo", source="hello {{ name }}!", context={"name": "john"}
         )
         state = self.apply()
         self.assertEqual(
-            state.get_service(template, 'apply').object['Rendered'],
-            'hello john!',
+            state.get_service(template, "apply").object["Rendered"], "hello john!"
         )
 
     def test_serializer_template(self):
         template = self.workspace.add_jinja2_template(
-            name='foo',
-            source='hello {{ name }}!',
-            context=serializers.Dict(
-                name=serializers.Const('andrew'),
-            ),
+            name="foo",
+            source="hello {{ name }}!",
+            context=serializers.Dict(name=serializers.Const("andrew")),
         )
 
         state = self.apply()
         self.assertEqual(
-            state.get_service(template, 'apply').object['Rendered'],
-            'hello andrew!',
+            state.get_service(template, "apply").object["Rendered"], "hello andrew!"
         )
 
     def test_echo_template(self):
         template = self.workspace.add_jinja2_template(
-            name='foo',
-            source='hello {{ name }}!',
-            context=serializers.Dict(
-                name=serializers.Const('mitchell'),
-            ),
+            name="foo",
+            source="hello {{ name }}!",
+            context=serializers.Dict(name=serializers.Const("mitchell")),
         )
 
-        echo = self.workspace.add_echo(
-            text=template,
-        )
+        echo = self.workspace.add_echo(text=template)
 
         state = self.apply()
         self.assertEqual(
-            state.get_service(echo, 'apply').object['Text'],
-            'hello mitchell!',
+            state.get_service(echo, "apply").object["Text"], "hello mitchell!"
         )

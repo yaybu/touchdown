@@ -21,24 +21,25 @@ from touchdown.tests.stubs.aws import DatabaseStubber, KeyStubber
 
 
 class TestDatabaseCreation(StubberTestCase):
-
     def test_create_database(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'apply',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         database.add_describe_db_instances_empty()
         database.add_create_db_instance()
 
@@ -48,22 +49,24 @@ class TestDatabaseCreation(StubberTestCase):
         goal.execute()
 
     def test_create_database_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'apply',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         database.add_describe_db_instances_one()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -71,24 +74,25 @@ class TestDatabaseCreation(StubberTestCase):
 
 
 class TestDatabaseDeletion(StubberTestCase):
-
     def test_delete_database(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'destroy',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
         database.add_describe_db_instances_one()
         database.add_delete_db_instance()
         database.add_describe_db_instances_empty()
@@ -96,22 +100,24 @@ class TestDatabaseDeletion(StubberTestCase):
         goal.execute()
 
     def test_delete_database_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'destroy',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
         database.add_describe_db_instances_empty()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -119,25 +125,23 @@ class TestDatabaseDeletion(StubberTestCase):
 
 
 class TestDatabaseComplications(StubberTestCase):
-
     def test_database_with_config_password(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         # have pwgen generate consistent passwords
-        secure_random = self.fixtures.enter_context(mock.patch('touchdown.config.expressions.random.SystemRandom'))
+        secure_random = self.fixtures.enter_context(
+            mock.patch("touchdown.config.expressions.random.SystemRandom")
+        )
         secure_random.return_value.choice.side_effect = lambda x: x[0]
 
-        folder = self.fixtures.enter_context(TemporaryFolderFixture(goal, self.workspace))
+        folder = self.fixtures.enter_context(
+            TemporaryFolderFixture(goal, self.workspace)
+        )
 
         # A pre-existing KMS key that is used to encrypt a locally stored INI file
-        key = self.fixtures.enter_context(KeyStubber(
-            goal.get_service(
-                self.aws.get_key(
-                    name='test-key',
-                ),
-                'describe',
-            )
-        ))
+        key = self.fixtures.enter_context(
+            KeyStubber(goal.get_service(self.aws.get_key(name="test-key"), "describe"))
+        )
 
         # These are the calls from the planning stage - touchdown needs to check
         # it exists and get key metadata before it will allow any changes to
@@ -161,46 +165,44 @@ class TestDatabaseComplications(StubberTestCase):
 
         # An ini file that is encrypted with KMS and store on disk
         config_file = key.resource.add_cipher(
-            file=folder.add_file(name='test.cfg'),
+            file=folder.add_file(name="test.cfg")
         ).add_ini_file()
 
         # A password that is generated by SystemRandom helpers and stored
         # in the secrets config the first time a deployment happens
         password_variable = config_file.add_string(
-            name='database.password',
-            default=pwgen(symbols=True),
-            retain_default=True,
+            name="database.password", default=pwgen(symbols=True), retain_default=True
         )
 
         # A database that uses the password created above
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password=password_variable,
-                    storage_encrypted=True,
-                ),
-                'apply',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password=password_variable,
+                        storage_encrypted=True,
+                    ),
+                    "apply",
+                )
             )
-        ))
-        database.add_describe_db_instances_empty()
-        database.add_create_db_instance(
-            password='a' * 28,
         )
+        database.add_describe_db_instances_empty()
+        database.add_create_db_instance(password="a" * 28)
 
         database.add_describe_db_instances_one()
         database.add_describe_db_instances_one()
 
         goal.execute()
 
-        stored = goal.get_service(password_variable, 'get').execute()
+        stored = goal.get_service(password_variable, "get").execute()
 
         # Assert that the generated password is remembered by touchdown
-        self.assertEqual(stored[0], 'a' * 28)
+        self.assertEqual(stored[0], "a" * 28)
 
         # Assert that touchdown considers this config to be 'user set'
         self.assertEqual(stored[1], True)

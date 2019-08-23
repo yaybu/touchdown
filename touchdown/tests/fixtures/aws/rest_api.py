@@ -18,16 +18,17 @@ from .fixture import AwsFixture
 
 
 class RestApiFixture(AwsFixture):
-
     def __enter__(self):
-        self.rest_api = self.fixtures.enter_context(RestApiStubber(
-            self.goal.get_service(
-                self.aws.get_rest_api(
-                    name='my-test-rest_api',
-                ),
-                'describe',
-            ),
-        ))
+        self.rest_api = self.fixtures.enter_context(
+            RestApiStubber(
+                self.goal.get_service(
+                    self.aws.get_rest_api(name="my-test-rest_api"), "describe"
+                )
+            )
+        )
         self.rest_api.add_get_rest_apis_one_response()
 
-        return self.rest_api.resource, self.rest_api.make_id(self.rest_api.resource.name)
+        return (
+            self.rest_api.resource,
+            self.rest_api.make_id(self.rest_api.resource.name),
+        )

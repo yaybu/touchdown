@@ -32,27 +32,22 @@ except ImportError:
 
 
 REGEX_DELTA = re.compile(
-    r'(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?'
+    r"(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?"
 )
 
-UNITS = {
-    'm': 60,
-    'h': 60 * 60,
-    'd': 60 * 60 * 24,
-    'w': 60 * 60 * 24 * 7,
-}
+UNITS = {"m": 60, "h": 60 * 60, "d": 60 * 60 * 24, "w": 60 * 60 * 24 * 7}
 
 if not pytz:
-    class UTC(tzinfo):
 
+    class UTC(tzinfo):
         def __repr__(self):
-            return '<UTC>'
+            return "<UTC>"
 
         def utcoffset(self, value):
             return timedelta(0)
 
         def tzname(self, value):
-            return 'UTC'
+            return "UTC"
 
         def dst(self, value):
             return timedelta(0)
@@ -75,28 +70,33 @@ def parse_datetime(value):
     match = REGEX_DELTA.match(value)
     if match:
         amount, unit = match.groups()
-        return now() - timedelta(
-            seconds=int(amount) * UNITS[unit[0]],
-        )
+        return now() - timedelta(seconds=int(amount) * UNITS[unit[0]])
 
     if parser:
         try:
             return parser.parse(value)
         except Exception:
-            raise errors.Error(
-                'Unable to parse {} as a date or time'.format(value)
-            )
+            raise errors.Error("Unable to parse {} as a date or time".format(value))
 
-    raise errors.Error(
-        'Unable to parse {} as a date or time'.format(value)
-    )
+    raise errors.Error("Unable to parse {} as a date or time".format(value))
 
 
 def as_seconds(value):
     if value.tzinfo is None:
-        return int(time.mktime((
-            value.year, value.month, value.day,
-            value.hour, value.minute, value.second,
-            -1, -1, -1)))
+        return int(
+            time.mktime(
+                (
+                    value.year,
+                    value.month,
+                    value.day,
+                    value.hour,
+                    value.minute,
+                    value.second,
+                    -1,
+                    -1,
+                    -1,
+                )
+            )
+        )
     else:
         return int((value - _EPOCH).total_seconds())

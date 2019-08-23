@@ -22,58 +22,54 @@ def datetime(value):
         return parse_datetime(value)
     except errors.Error:
         import argparse
-        raise argparse.ArgumentTypeError(
-            '{} is not a valid date/time'.format(value),
-        )
+
+        raise argparse.ArgumentTypeError("{} is not a valid date/time".format(value))
 
 
 class Tail(Goal):
 
-    ''' Inspect (and stream) your logs '''
+    """ Inspect (and stream) your logs """
 
-    name = 'tail'
+    name = "tail"
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan('tail')
+        plan_class = resource.meta.get_plan("tail")
         if not plan_class:
-            plan_class = resource.meta.get_plan('null')
+            plan_class = resource.meta.get_plan("null")
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            'stream',
-            metavar='STREAM',
-            type=str,
-            help='The logstream to tail'
+            "stream", metavar="STREAM", type=str, help="The logstream to tail"
         )
         parser.add_argument(
-            '-f',
-            '--follow',
+            "-f",
+            "--follow",
             default=False,
-            action='store_true',
-            help='Don\'t exit and continue to print new events in the stream'
+            action="store_true",
+            help="Don't exit and continue to print new events in the stream",
         )
         parser.add_argument(
-            '-s',
-            '--start',
-            default='5m ago',
-            action='store',
+            "-s",
+            "--start",
+            default="5m ago",
+            action="store",
             type=datetime,
-            help='The earliest event to retrieve'
+            help="The earliest event to retrieve",
         )
         parser.add_argument(
-            '-e',
-            '--end',
+            "-e",
+            "--end",
             default=None,
-            action='store',
+            action="store",
             type=datetime,
-            help='The latest event to retrieve'
+            help="The latest event to retrieve",
         )
 
-    def execute(self, stream, start='5m ago', end=None, follow=False):
-        tailers = self.collect_as_dict('tail')
+    def execute(self, stream, start="5m ago", end=None, follow=False):
+        tailers = self.collect_as_dict("tail")
         if stream not in tailers:
             raise errors.Error('No such log stream "{}"'.format(stream))
         tailers[stream].tail(start, end, follow)

@@ -18,21 +18,19 @@ from touchdown.tests.stubs.aws import S3FileStubber
 
 
 class TestBucketCreation(StubberTestCase):
-
     def test_create_bucket(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         bucket = self.fixtures.enter_context(BucketFixture(goal, self.aws))
 
-        s3_file = self.fixtures.enter_context(S3FileStubber(
-            goal.get_service(
-                bucket.bucket.add_file(
-                    name='my-file',
-                    contents='my-test-content',
-                ),
-                'apply',
+        s3_file = self.fixtures.enter_context(
+            S3FileStubber(
+                goal.get_service(
+                    bucket.bucket.add_file(name="my-file", contents="my-test-content"),
+                    "apply",
+                )
             )
-        ))
+        )
         s3_file.add_list_objects_empty_response()
         s3_file.add_put_object()
         s3_file.add_list_objects_one_response()
@@ -42,19 +40,18 @@ class TestBucketCreation(StubberTestCase):
         goal.execute()
 
     def test_create_bucket_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         bucket = self.fixtures.enter_context(BucketFixture(goal, self.aws))
 
-        s3_file = self.fixtures.enter_context(S3FileStubber(
-            goal.get_service(
-                bucket.bucket.add_file(
-                    name='my-file',
-                    contents='my-test-content',
-                ),
-                'apply',
+        s3_file = self.fixtures.enter_context(
+            S3FileStubber(
+                goal.get_service(
+                    bucket.bucket.add_file(name="my-file", contents="my-test-content"),
+                    "apply",
+                )
             )
-        ))
+        )
         s3_file.add_list_objects_one_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -62,38 +59,31 @@ class TestBucketCreation(StubberTestCase):
 
 
 class TestBucketDeletion(StubberTestCase):
-
     def test_delete_bucket(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         bucket = self.fixtures.enter_context(BucketFixture(goal, self.aws))
 
-        s3_file = self.fixtures.enter_context(S3FileStubber(
-            goal.get_service(
-                bucket.bucket.add_file(
-                    name='my-file',
-                ),
-                'destroy',
+        s3_file = self.fixtures.enter_context(
+            S3FileStubber(
+                goal.get_service(bucket.bucket.add_file(name="my-file"), "destroy")
             )
-        ))
+        )
         s3_file.add_list_objects_one_response()
         s3_file.add_delete_object()
 
         goal.execute()
 
     def test_delete_bucket_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         bucket = self.fixtures.enter_context(BucketFixture(goal, self.aws))
 
-        s3_file = self.fixtures.enter_context(S3FileStubber(
-            goal.get_service(
-                bucket.bucket.add_file(
-                    name='my-file',
-                ),
-                'destroy',
+        s3_file = self.fixtures.enter_context(
+            S3FileStubber(
+                goal.get_service(bucket.bucket.add_file(name="my-file"), "destroy")
             )
-        ))
+        )
         s3_file.add_list_objects_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)

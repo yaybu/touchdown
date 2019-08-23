@@ -18,9 +18,10 @@ from touchdown.aws.session import session
 
 
 class TestSimpleDescribeImplementations(unittest.TestCase):
-
     def test_image_retry(self):
         self.assertEqual(
-            session.get_component('data_loader').load_data('_retry')['retry']['__default__']['max_attempts'],
-            10
+            session.get_component("data_loader").load_data("_retry")["retry"][
+                "__default__"
+            ]["max_attempts"],
+            10,
         )

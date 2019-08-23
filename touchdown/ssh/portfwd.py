@@ -25,52 +25,50 @@ except ImportError:
 
 class PortForward(resource.Resource):
 
-    resource_name = 'port_forward'
+    resource_name = "port_forward"
 
     name = argument.String()
 
-    host = argument.String(field='host')
-    port = argument.Integer(field='port')
+    host = argument.String(field="host")
+    port = argument.Integer(field="port")
 
     via = argument.Resource(Connection)
 
 
-class ForwardServer (SocketServer.ThreadingTCPServer):
+class ForwardServer(SocketServer.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
 
-class Handler (SocketServer.BaseRequestHandler):
-
+class Handler(SocketServer.BaseRequestHandler):
     def handle(self):
         try:
             chan = self.ssh_transport.open_channel(
-                'direct-tcpip',
+                "direct-tcpip",
                 (self.chain_host, self.chain_port),
                 self.request.getpeername(),
             )
         except Exception as e:
             raise errors.Error(
-                'Failed to connect to {}:{} ({})'.format(
-                    self.chain_host,
-                    self.chain_port,
-                    repr(e),
+                "Failed to connect to {}:{} ({})".format(
+                    self.chain_host, self.chain_port, repr(e)
                 )
             )
 
         if chan is None:
             raise errors.Error(
-                'Connect to {}:{} rejected by remote SSH server'.format(
-                    self.chain_host,
-                    self.chain_port,
-                ),
+                "Connect to {}:{} rejected by remote SSH server".format(
+                    self.chain_host, self.chain_port
+                )
             )
 
-        self.plan.echo('Tunnel {} -> {} -> {} established'.format(
-            self.request.getpeername(),
-            chan.getpeername(),
-            (self.chain_host, self.chain_port),
-        ))
+        self.plan.echo(
+            "Tunnel {} -> {} -> {} established".format(
+                self.request.getpeername(),
+                chan.getpeername(),
+                (self.chain_host, self.chain_port),
+            )
+        )
 
         while True:
             r, w, x = select.select([self.request, chan], [], [])
@@ -88,30 +86,30 @@ class Handler (SocketServer.BaseRequestHandler):
         peername = self.request.getpeername()
         chan.close()
         self.request.close()
-        self.plan.echo('Tunnel closed from {}'.format(peername))
+        self.plan.echo("Tunnel closed from {}".format(peername))
 
 
 class ConnectionPlan(plan.Plan):
 
-    name = 'portfwd'
+    name = "portfwd"
     resource = PortForward
 
     def start(self, local_port):
-        via = self.runner.get_service(self.resource.via, 'describe')
+        via = self.runner.get_service(self.resource.via, "describe")
         transport = via.get_client().get_transport()
 
         params = serializers.Resource().render(self.runner, self.resource)
 
-        class SubHandler (Handler):
-            chain_host = params['host']
-            chain_port = params['port']
+        class SubHandler(Handler):
+            chain_host = params["host"]
+            chain_port = params["port"]
             ssh_transport = transport
             plan = self
 
-        server = ForwardServer(('', local_port), SubHandler)
-        self.echo('Opening port *:{} -> {}:{}'.format(
-            server.server_address[1],
-            params['host'],
-            params['port'],
-        ))
+        server = ForwardServer(("", local_port), SubHandler)
+        self.echo(
+            "Opening port *:{} -> {}:{}".format(
+                server.server_address[1], params["host"], params["port"]
+            )
+        )
         return server

@@ -21,7 +21,7 @@ from . import IniFile
 
 class Variable(resource.Resource):
 
-    resource_name = 'variable'
+    resource_name = "variable"
 
     name = argument.String()
     retain_default = argument.Boolean(default=False)
@@ -31,43 +31,39 @@ class Variable(resource.Resource):
 class Describe(Plan):
 
     resource = Variable
-    name = 'describe'
+    name = "describe"
 
     def get_actions(self):
         try:
-            val, user_set = self.runner.get_service(self.resource, 'get').execute()
+            val, user_set = self.runner.get_service(self.resource, "get").execute()
         except KeyError:
             val = None
             user_set = False
-        self.object = {
-            'Value': val,
-            'UserSet': user_set,
-        }
+        self.object = {"Value": val, "UserSet": user_set}
         return []
 
 
 class ApplyAction(Action):
-
     @property
     def description(self):
-        yield 'Generate and store setting {!r}'.format(self.resource.name)
+        yield "Generate and store setting {!r}".format(self.resource.name)
 
     def run(self):
         default = serializers.maybe(self.resource.default).render(
             self.runner, self.resource
         )
-        self.runner.get_service(self.resource, 'set').execute(default)
+        self.runner.get_service(self.resource, "set").execute(default)
 
 
 class Apply(Plan):
 
     resource = Variable
-    name = 'apply'
+    name = "apply"
     apply_action = ApplyAction
 
     def get_actions(self):
         try:
-            val, user_set = self.runner.get_service(self.resource, 'get').execute()
+            val, user_set = self.runner.get_service(self.resource, "get").execute()
         except KeyError:
             user_set = False
         if not user_set and self.resource.retain_default:
@@ -77,7 +73,7 @@ class Apply(Plan):
 class Set(Plan):
 
     resource = Variable
-    name = 'set'
+    name = "set"
 
     def from_string(self, value):
         return value
@@ -86,16 +82,16 @@ class Set(Plan):
         return [value]
 
     def execute(self, value):
-        conf = self.runner.get_service(self.resource.config, 'describe')
-        if '.' not in self.resource.name:
-            raise errors.Error('You didn\'t specify a section')
-        conf.set(self.resource.name, '\n'.join(self.to_lines(value)))
+        conf = self.runner.get_service(self.resource.config, "describe")
+        if "." not in self.resource.name:
+            raise errors.Error("You didn't specify a section")
+        conf.set(self.resource.name, "\n".join(self.to_lines(value)))
 
 
 class Get(Plan):
 
     resource = Variable
-    name = 'get'
+    name = "get"
 
     def to_string(self, value):
         return str(value)
@@ -106,14 +102,13 @@ class Get(Plan):
 
     def get_default_value(self):
         return serializers.maybe(self.resource.default).render(
-            self.runner,
-            self.resource,
+            self.runner, self.resource
         )
 
     def execute(self):
-        conf = self.runner.get_service(self.resource.config, 'describe')
-        if '.' not in self.resource.name:
-            raise errors.Error('You didn\'t specify a section')
+        conf = self.runner.get_service(self.resource.config, "describe")
+        if "." not in self.resource.name:
+            raise errors.Error("You didn't specify a section")
         try:
             value = conf.get(self.resource.name)
         except KeyError:
@@ -128,23 +123,21 @@ class Get(Plan):
 class Refresh(Plan):
 
     resource = Variable
-    name = 'refresh'
+    name = "refresh"
 
     def execute(self):
-        setter = self.runner.get_service(self.resource, 'set')
-        setter.execute(serializers.maybe(self.resource.default).render(
-            self.runner,
-            self.resource,
-        ))
+        setter = self.runner.get_service(self.resource, "set")
+        setter.execute(
+            serializers.maybe(self.resource.default).render(self.runner, self.resource)
+        )
 
 
 class VariableAsString(serializers.Serializer):
-
     def __init__(self, resource):
         self.resource = resource
 
     def render(self, runner, object):
-        return runner.get_service(self.resource, 'get').execute()[0]
+        return runner.get_service(self.resource, "get").execute()[0]
 
     def dependencies(self, object):
-        return frozenset((self.resource, ))
+        return frozenset((self.resource,))

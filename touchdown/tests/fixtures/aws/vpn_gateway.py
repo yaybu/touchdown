@@ -18,20 +18,18 @@ from .fixture import AwsFixture
 
 
 class VpnGatewayFixture(AwsFixture):
-
     def __init__(self, goal, vpc):
         super(VpnGatewayFixture, self).__init__(goal, vpc.account)
         self.vpc = vpc
 
     def __enter__(self):
-        self.vpn_gateway_stubber = self.fixtures.enter_context(VpnGatewayStubber(
-            self.goal.get_service(
-                self.vpc.get_vpn_gateway(
-                    name='test-vpn_gateway',
-                ),
-                'describe',
-            ),
-        ))
+        self.vpn_gateway_stubber = self.fixtures.enter_context(
+            VpnGatewayStubber(
+                self.goal.get_service(
+                    self.vpc.get_vpn_gateway(name="test-vpn_gateway"), "describe"
+                )
+            )
+        )
         self.vpn_gateway_stubber.add_describe_vpn_gateways_one_response()
 
         self.vpn_gateway = self.vpn_gateway_stubber.resource

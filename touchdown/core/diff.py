@@ -13,7 +13,6 @@
 
 
 class ValueDiff(object):
-
     def __init__(self, remote_value, local_value):
         self._remote_value = remote_value
         self._local_value = local_value
@@ -21,27 +20,26 @@ class ValueDiff(object):
     @property
     def local_value(self):
         if self._local_value is None:
-            return '(unset)'
+            return "(unset)"
         return repr(self._local_value)
 
     @property
     def remote_value(self):
         if self._remote_value is None:
-            return '(unset)'
+            return "(unset)"
         return repr(self._remote_value)
 
     def matches(self):
         return self._remote_value == self._local_value
 
     def lines(self):
-        return ['{0.remote_value} => {0.local_value}'.format(self)]
+        return ["{0.remote_value} => {0.local_value}".format(self)]
 
     def __str__(self):
-        return '\n'.join(self.lines())
+        return "\n".join(self.lines())
 
 
 class AttributeDiff(object):
-
     def __init__(self):
         self.diffs = []
 
@@ -54,19 +52,18 @@ class AttributeDiff(object):
 
     def lines(self):
         for field, diff in self.diffs:
-            yield '{}: '.format(field)
+            yield "{}: ".format(field)
             for line in diff.lines():
-                yield '    {}'.format(line)
+                yield "    {}".format(line)
 
     def __len__(self):
         return len(self.diffs)
 
     def __str__(self):
-        return '\n'.join(self.lines())
+        return "\n".join(self.lines())
 
 
 class ItemRemoved(object):
-
     def __init__(self, value):
         self.value = value
 
@@ -74,14 +71,13 @@ class ItemRemoved(object):
         return False
 
     def lines(self):
-        return ['Item removed']
+        return ["Item removed"]
 
     def __str__(self):
-        return '\n'.join(self.lines())
+        return "\n".join(self.lines())
 
 
 class ListDiff(object):
-
     def __init__(self):
         self.diffs = []
 
@@ -94,12 +90,12 @@ class ListDiff(object):
 
     def lines(self):
         for index, diff in self.diffs:
-            yield '[{}]: '.format(index)
+            yield "[{}]: ".format(index)
             for line in diff.lines():
-                yield '    {}'.format(line)
+                yield "    {}".format(line)
 
     def __len__(self):
         return len(self.diffs)
 
     def __str__(self):
-        return '\n'.join(self.lines())
+        return "\n".join(self.lines())

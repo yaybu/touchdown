@@ -29,143 +29,111 @@ def dummy_function(a, b):
 
 
 class TestLambdaFunction(StubberTestCase):
-
     def test_get_all_unaliased_versions(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
             code=dummy_function,
         )
-        apply_service = goal.get_service(self.fn, 'apply')
+        apply_service = goal.get_service(self.fn, "apply")
 
         with Stubber(apply_service.client) as stub:
             stub.add_response(
-                'list_versions_by_function',
+                "list_versions_by_function",
                 service_response={
-                    'Versions': [
-                        {
-                            'FunctionName': 'myfunction',
-                            'Version': '$LATEST',
-                        },
-                        {
-                            'FunctionName': 'myfunction',
-                            'Version': '1',
-                        },
-                        {
-                            'FunctionName': 'myfunction',
-                            'Version': '2',
-                        },
-                        {
-                            'FunctionName': 'myfunction',
-                            'Version': '3',
-                        },
-                    ],
-                },
-                expected_params={
-                    'FunctionName': 'myfunction'
-                },
-            )
-            stub.add_response(
-                'list_aliases',
-                service_response={
-                    'Aliases': [
-                        {
-                            'Name': 'stable',
-                            'FunctionVersion': '1',
-                        }
+                    "Versions": [
+                        {"FunctionName": "myfunction", "Version": "$LATEST"},
+                        {"FunctionName": "myfunction", "Version": "1"},
+                        {"FunctionName": "myfunction", "Version": "2"},
+                        {"FunctionName": "myfunction", "Version": "3"},
                     ]
                 },
-                expected_params={
-                    'FunctionName': 'myfunction'
+                expected_params={"FunctionName": "myfunction"},
+            )
+            stub.add_response(
+                "list_aliases",
+                service_response={
+                    "Aliases": [{"Name": "stable", "FunctionVersion": "1"}]
                 },
+                expected_params={"FunctionName": "myfunction"},
             )
             versions = apply_service.get_all_unaliased_versions()
 
-        self.assertEqual(versions, [{
-            'FunctionName': 'myfunction',
-            'Version': '2',
-        }])
+        self.assertEqual(versions, [{"FunctionName": "myfunction", "Version": "2"}])
 
     def test_dont_update_code(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
             code=dummy_function,
         )
-        self.apply_service = goal.get_service(self.fn, 'apply')
+        self.apply_service = goal.get_service(self.fn, "apply")
         self.apply_service.object = {
-            'FunctionName': 'myfunction',
-            'CodeSha256': 'QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8='
+            "FunctionName": "myfunction",
+            "CodeSha256": "QWfDvEHUTP0EFEWOjRkXeP733yzB67f9ViAssuXF6/8=",
         }
 
         # FIXME: Zip's produced on Windows have stables hashes (zipping the
         # same thing repeatedly yields the same result)
         # But the hashes are different from posix zips.
-        if sys.platform == 'win32':
-            self.apply_service.object['CodeSha256'] = 'kI3Czz0As/qAcnAq0JzbVG/NzSPUS4khRcbHuKivW0k='
+        if sys.platform == "win32":
+            self.apply_service.object[
+                "CodeSha256"
+            ] = "kI3Czz0As/qAcnAq0JzbVG/NzSPUS4khRcbHuKivW0k="
 
         with Stubber(self.apply_service.client):
             for action in self.apply_service.update_code_by_zip():
                 action.run()
 
     def test_update_code(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
             code=dummy_function,
         )
-        self.apply_service = goal.get_service(self.fn, 'apply')
-        self.apply_service.object = {
-            'FunctionName': 'myfunction',
-            'CodeSha256': ''
-        }
+        self.apply_service = goal.get_service(self.fn, "apply")
+        self.apply_service.object = {"FunctionName": "myfunction", "CodeSha256": ""}
         with Stubber(self.apply_service.client) as stub:
             stub.add_response(
-                'update_function_code',
-                service_response={
-                    'FunctionName': 'myfunction',
-                },
+                "update_function_code",
+                service_response={"FunctionName": "myfunction"},
                 expected_params={
-                    'FunctionName': 'myfunction',
-                    'ZipFile': ANY,
-                    'Publish': True,
+                    "FunctionName": "myfunction",
+                    "ZipFile": ANY,
+                    "Publish": True,
                 },
             )
             for action in self.apply_service.update_code_by_zip():
                 action.run()
 
     def test_update_code_via_s3(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
-            s3_file=self.aws.get_bucket(name='mybucket').get_file(name='myfile'),
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            s3_file=self.aws.get_bucket(name="mybucket").get_file(name="myfile"),
         )
-        self.apply_service = goal.get_service(self.fn, 'apply')
-        self.apply_service.object = {
-            'FunctionName': 'myfunction',
-        }
+        self.apply_service = goal.get_service(self.fn, "apply")
+        self.apply_service.object = {"FunctionName": "myfunction"}
         with Stubber(self.apply_service.client) as stub:
             stub.add_response(
-                'update_function_code',
-                service_response={
-                    'FunctionName': 'myfunction',
-                },
+                "update_function_code",
+                service_response={"FunctionName": "myfunction"},
                 expected_params={
-                    'FunctionName': 'myfunction',
-                    'S3Bucket': 'mybucket',
-                    'S3Key': 'myfile',
-                    'Publish': True,
+                    "FunctionName": "myfunction",
+                    "S3Bucket": "mybucket",
+                    "S3Key": "myfile",
+                    "Publish": True,
                 },
             )
             for action in self.apply_service.update_code_by_s3():
@@ -173,86 +141,72 @@ class TestLambdaFunction(StubberTestCase):
 
 
 class TestLambdaFunctionIntegration(StubberTestCase):
-
     def test_bundle_ran_and_output_different(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
-        )
-        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
+        bundle = self.workspace.add_fuselage_bundle(target=self.workspace.add_local())
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
         bundle.add_file(
-            name=os.path.join(self.test_dir, 'lambda.zip'),
-            source=lambda_zip,
+            name=os.path.join(self.test_dir, "lambda.zip"), source=lambda_zip
         )
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
-            code=bundle.add_output(name=os.path.join(self.test_dir, 'lambda.zip')),
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
+            code=bundle.add_output(name=os.path.join(self.test_dir, "lambda.zip")),
         )
 
-        role_service = goal.get_service(self.fn.role, 'describe')
-        fn_service = goal.get_service(self.fn, 'apply')
+        role_service = goal.get_service(self.fn.role, "describe")
+        fn_service = goal.get_service(self.fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
-            'list_roles',
+            "list_roles",
             service_response={
-                'Roles': [{
-                    'RoleName': 'myrole',
-                    'Path': '/iam/myrole',
-                    'RoleId': '1234567890123456',
-                    'Arn': '12345678901234567890',
-                    'CreateDate': datetime.datetime.now(),
-                }],
+                "Roles": [
+                    {
+                        "RoleName": "myrole",
+                        "Path": "/iam/myrole",
+                        "RoleId": "1234567890123456",
+                        "Arn": "12345678901234567890",
+                        "CreateDate": datetime.datetime.now(),
+                    }
+                ]
             },
             expected_params={},
         )
 
         fn_stubber = Stubber(fn_service.client)
         fn_stubber.add_response(
-            'get_function_configuration',
+            "get_function_configuration",
             service_response={
-                'FunctionName': 'myfunction',
-                'CodeSha256': '',
-                'Handler': 'mymodule.myfunction',
-                'Role': '12345678901234567890',
+                "FunctionName": "myfunction",
+                "CodeSha256": "",
+                "Handler": "mymodule.myfunction",
+                "Role": "12345678901234567890",
             },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_versions_by_function',
-            service_response={
-                'Versions': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_versions_by_function",
+            service_response={"Versions": []},
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_aliases',
-            service_response={
-                'Aliases': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_aliases",
+            service_response={"Aliases": []},
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'update_function_code',
-            service_response={
-                'FunctionName': 'myfunction',
-            },
+            "update_function_code",
+            service_response={"FunctionName": "myfunction"},
             expected_params={
-                'FunctionName': 'myfunction',
-                'ZipFile': ANY,
-                'Publish': True,
+                "FunctionName": "myfunction",
+                "ZipFile": ANY,
+                "Publish": True,
             },
         )
 
@@ -261,7 +215,7 @@ class TestLambdaFunctionIntegration(StubberTestCase):
                 goal.execute()
 
     def test_bundle_ran_and_output_same(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         # The local bundle has a payload that will *always* do something
         # It's an execute - there is no way for fuselage to skip running it
@@ -269,69 +223,58 @@ class TestLambdaFunctionIntegration(StubberTestCase):
         self.test_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.test_dir)
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
-        )
-        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
+        bundle = self.workspace.add_fuselage_bundle(target=self.workspace.add_local())
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
         bundle.add_file(
-            name=os.path.join(self.test_dir, 'lambda.zip'),
-            source=lambda_zip,
+            name=os.path.join(self.test_dir, "lambda.zip"), source=lambda_zip
         )
         fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = goal.get_service(fn.role, 'describe')
-        fn_service = goal.get_service(fn, 'apply')
+        role_service = goal.get_service(fn.role, "describe")
+        fn_service = goal.get_service(fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
-            'list_roles',
+            "list_roles",
             service_response={
-                'Roles': [{
-                    'RoleName': 'myrole',
-                    'Path': '/iam/myrole',
-                    'RoleId': '1234567890123456',
-                    'Arn': '12345678901234567890',
-                    'CreateDate': datetime.datetime.now(),
-                }],
+                "Roles": [
+                    {
+                        "RoleName": "myrole",
+                        "Path": "/iam/myrole",
+                        "RoleId": "1234567890123456",
+                        "Arn": "12345678901234567890",
+                        "CreateDate": datetime.datetime.now(),
+                    }
+                ]
             },
             expected_params={},
         )
 
         fn_stubber = Stubber(fn_service.client)
         fn_stubber.add_response(
-            'get_function_configuration',
+            "get_function_configuration",
             service_response={
-                'FunctionName': 'myfunction',
-                'CodeSha256': 'LjWn8H6iob8nXeoTeRwWTGctKEUJb6L6epmiwUQVCr0=',
-                'Handler': 'mymodule.myfunction',
-                'Role': '12345678901234567890',
+                "FunctionName": "myfunction",
+                "CodeSha256": "LjWn8H6iob8nXeoTeRwWTGctKEUJb6L6epmiwUQVCr0=",
+                "Handler": "mymodule.myfunction",
+                "Role": "12345678901234567890",
             },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_versions_by_function',
-            service_response={
-                'Versions': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_versions_by_function",
+            service_response={"Versions": []},
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_aliases',
-            service_response={
-                'Aliases': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_aliases",
+            service_response={"Aliases": []},
+            expected_params={"FunctionName": "myfunction"},
         )
 
         with role_stubber:
@@ -342,71 +285,58 @@ class TestLambdaFunctionIntegration(StubberTestCase):
                 fn_stubber.assert_no_pending_responses()
 
     def test_bundle_skipped_but_output_same(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
-        )
-        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
-        bundle.add_execute(
-            command='echo HELLO EVERYONE',
-            creates=lambda_zip,
-        )
+        bundle = self.workspace.add_fuselage_bundle(target=self.workspace.add_local())
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
+        bundle.add_execute(command="echo HELLO EVERYONE", creates=lambda_zip)
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = goal.get_service(self.fn.role, 'describe')
-        fn_service = goal.get_service(self.fn, 'apply')
+        role_service = goal.get_service(self.fn.role, "describe")
+        fn_service = goal.get_service(self.fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
-            'list_roles',
+            "list_roles",
             service_response={
-                'Roles': [{
-                    'RoleName': 'myrole',
-                    'Path': '/iam/myrole',
-                    'RoleId': '1234567890123456',
-                    'Arn': '12345678901234567890',
-                    'CreateDate': datetime.datetime.now(),
-                }],
+                "Roles": [
+                    {
+                        "RoleName": "myrole",
+                        "Path": "/iam/myrole",
+                        "RoleId": "1234567890123456",
+                        "Arn": "12345678901234567890",
+                        "CreateDate": datetime.datetime.now(),
+                    }
+                ]
             },
             expected_params={},
         )
 
         fn_stubber = Stubber(fn_service.client)
         fn_stubber.add_response(
-            'get_function_configuration',
+            "get_function_configuration",
             service_response={
-                'FunctionName': 'myfunction',
-                'CodeSha256': 'LjWn8H6iob8nXeoTeRwWTGctKEUJb6L6epmiwUQVCr0=',
-                'Handler': 'mymodule.myfunction',
-                'Role': '12345678901234567890',
+                "FunctionName": "myfunction",
+                "CodeSha256": "LjWn8H6iob8nXeoTeRwWTGctKEUJb6L6epmiwUQVCr0=",
+                "Handler": "mymodule.myfunction",
+                "Role": "12345678901234567890",
             },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_versions_by_function',
-            service_response={
-                'Versions': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_versions_by_function",
+            service_response={"Versions": []},
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_aliases',
-            service_response={
-                'Aliases': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_aliases",
+            service_response={"Aliases": []},
+            expected_params={"FunctionName": "myfunction"},
         )
 
         with role_stubber:
@@ -415,81 +345,66 @@ class TestLambdaFunctionIntegration(StubberTestCase):
                 self.assertEqual(len(goal.get_changes(bundle)), 0)
 
     def test_bundle_skipped_but_output_different(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        bundle = self.workspace.add_fuselage_bundle(
-            target=self.workspace.add_local()
-        )
-        lambda_zip = os.path.join(os.path.dirname(__file__), 'assets/lambda.zip')
-        bundle.add_execute(
-            command='echo HELLO EVERYONE',
-            creates=lambda_zip,
-        )
+        bundle = self.workspace.add_fuselage_bundle(target=self.workspace.add_local())
+        lambda_zip = os.path.join(os.path.dirname(__file__), "assets/lambda.zip")
+        bundle.add_execute(command="echo HELLO EVERYONE", creates=lambda_zip)
         self.fn = self.aws.add_lambda_function(
-            name='myfunction',
-            role=self.aws.get_role(name='myrole'),
-            handler='mymodule.myfunction',
+            name="myfunction",
+            role=self.aws.get_role(name="myrole"),
+            handler="mymodule.myfunction",
             code=bundle.add_output(name=lambda_zip),
         )
 
-        role_service = goal.get_service(self.fn.role, 'describe')
-        fn_service = goal.get_service(self.fn, 'apply')
+        role_service = goal.get_service(self.fn.role, "describe")
+        fn_service = goal.get_service(self.fn, "apply")
 
         role_stubber = Stubber(role_service.client)
         role_stubber.add_response(
-            'list_roles',
+            "list_roles",
             service_response={
-                'Roles': [{
-                    'RoleName': 'myrole',
-                    'Path': '/iam/myrole',
-                    'RoleId': '1234567890123456',
-                    'Arn': '12345678901234567890',
-                    'CreateDate': datetime.datetime.now(),
-                }],
+                "Roles": [
+                    {
+                        "RoleName": "myrole",
+                        "Path": "/iam/myrole",
+                        "RoleId": "1234567890123456",
+                        "Arn": "12345678901234567890",
+                        "CreateDate": datetime.datetime.now(),
+                    }
+                ]
             },
             expected_params={},
         )
 
         fn_stubber = Stubber(fn_service.client)
         fn_stubber.add_response(
-            'get_function_configuration',
+            "get_function_configuration",
             service_response={
-                'FunctionName': 'myfunction',
-                'CodeSha256': 'XXXXXXXXXXXX=',
-                'Handler': 'mymodule.myfunction',
-                'Role': '12345678901234567890',
+                "FunctionName": "myfunction",
+                "CodeSha256": "XXXXXXXXXXXX=",
+                "Handler": "mymodule.myfunction",
+                "Role": "12345678901234567890",
             },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_versions_by_function',
-            service_response={
-                'Versions': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_versions_by_function",
+            service_response={"Versions": []},
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'list_aliases',
-            service_response={
-                'Aliases': [],
-            },
-            expected_params={
-                'FunctionName': 'myfunction',
-            },
+            "list_aliases",
+            service_response={"Aliases": []},
+            expected_params={"FunctionName": "myfunction"},
         )
         fn_stubber.add_response(
-            'update_function_code',
-            service_response={
-                'FunctionName': 'myfunction',
-            },
+            "update_function_code",
+            service_response={"FunctionName": "myfunction"},
             expected_params={
-                'FunctionName': 'myfunction',
-                'ZipFile': ANY,
-                'Publish': True,
+                "FunctionName": "myfunction",
+                "ZipFile": ANY,
+                "Publish": True,
             },
         )
 

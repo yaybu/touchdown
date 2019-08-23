@@ -18,20 +18,18 @@ from .fixture import AwsFixture
 
 
 class NetworkAclFixture(AwsFixture):
-
     def __init__(self, goal, aws, vpc):
         super(NetworkAclFixture, self).__init__(goal, aws)
         self.vpc = vpc
 
     def __enter__(self):
-        self.network_acl = self.fixtures.enter_context(NetworkAclStubber(
-            self.goal.get_service(
-                self.vpc.get_network_acl(
-                    name='test-network-acl',
-                ),
-                'describe',
-            ),
-        ))
+        self.network_acl = self.fixtures.enter_context(
+            NetworkAclStubber(
+                self.goal.get_service(
+                    self.vpc.get_network_acl(name="test-network-acl"), "describe"
+                )
+            )
+        )
         self.network_acl.add_describe_network_acls_one_response_by_name()
 
         return self.network_acl.resource

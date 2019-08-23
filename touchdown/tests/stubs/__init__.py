@@ -14,6 +14,4 @@
 
 from .folder import TemporaryFolder
 
-__all__ = [
-    'TemporaryFolder',
-]
+__all__ = ["TemporaryFolder"]

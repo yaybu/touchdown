@@ -17,18 +17,14 @@ from touchdown.tests.stubs.aws import LogGroupStubber
 
 
 class TestLogGroupCreation(StubberTestCase):
-
     def test_create_log_group(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        log_group = self.fixtures.enter_context(LogGroupStubber(
-            goal.get_service(
-                self.aws.add_log_group(
-                    name='test-log_group',
-                ),
-                'apply',
+        log_group = self.fixtures.enter_context(
+            LogGroupStubber(
+                goal.get_service(self.aws.add_log_group(name="test-log_group"), "apply")
             )
-        ))
+        )
 
         log_group.add_describe_log_groups_empty_response()
         log_group.add_create_log_group()
@@ -39,17 +35,15 @@ class TestLogGroupCreation(StubberTestCase):
         goal.execute()
 
     def test_update_log_group_retention(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        log_group = self.fixtures.enter_context(LogGroupStubber(
-            goal.get_service(
-                self.aws.add_log_group(
-                    name='test-log_group',
-                    retention=7,
-                ),
-                'apply',
+        log_group = self.fixtures.enter_context(
+            LogGroupStubber(
+                goal.get_service(
+                    self.aws.add_log_group(name="test-log_group", retention=7), "apply"
+                )
             )
-        ))
+        )
 
         log_group.add_describe_log_groups_one_response()
         log_group.add_put_retention_policy(7)
@@ -57,16 +51,13 @@ class TestLogGroupCreation(StubberTestCase):
         goal.execute()
 
     def test_create_log_group_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        log_group = self.fixtures.enter_context(LogGroupStubber(
-            goal.get_service(
-                self.aws.add_log_group(
-                    name='test-log_group',
-                ),
-                'apply',
+        log_group = self.fixtures.enter_context(
+            LogGroupStubber(
+                goal.get_service(self.aws.add_log_group(name="test-log_group"), "apply")
             )
-        ))
+        )
 
         log_group.add_describe_log_groups_one_response()
 
@@ -75,18 +66,16 @@ class TestLogGroupCreation(StubberTestCase):
 
 
 class TestLogGroupDestroy(StubberTestCase):
-
     def test_destroy_log_group(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        log_group = self.fixtures.enter_context(LogGroupStubber(
-            goal.get_service(
-                self.aws.add_log_group(
-                    name='test-log_group',
-                ),
-                'destroy',
+        log_group = self.fixtures.enter_context(
+            LogGroupStubber(
+                goal.get_service(
+                    self.aws.add_log_group(name="test-log_group"), "destroy"
+                )
             )
-        ))
+        )
 
         log_group.add_describe_log_groups_one_response()
         log_group.add_delete_log_group()
@@ -94,16 +83,15 @@ class TestLogGroupDestroy(StubberTestCase):
         goal.execute()
 
     def test_destroy_log_group_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        log_group = self.fixtures.enter_context(LogGroupStubber(
-            goal.get_service(
-                self.aws.add_log_group(
-                    name='test-log_group',
-                ),
-                'destroy',
+        log_group = self.fixtures.enter_context(
+            LogGroupStubber(
+                goal.get_service(
+                    self.aws.add_log_group(name="test-log_group"), "destroy"
+                )
             )
-        ))
+        )
 
         log_group.add_describe_log_groups_empty_response()
 

@@ -17,23 +17,23 @@ from touchdown.tests.stubs.aws import VolumeStubber
 
 
 class TestVolumeCreation(StubberTestCase):
-
     def test_create_volume(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        volume = self.fixtures.enter_context(VolumeStubber(
-            goal.get_service(
-                self.aws.add_volume(
-                    name='my-volume',
-                    availability_zone='eu-west-1a',
-                ),
-                'apply',
+        volume = self.fixtures.enter_context(
+            VolumeStubber(
+                goal.get_service(
+                    self.aws.add_volume(
+                        name="my-volume", availability_zone="eu-west-1a"
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
 
         volume.add_describe_volumes_empty_response_by_name()
-        volume.add_create_volume(availability_zone='eu-west-1a')
-        volume.add_create_tags(Name='my-volume')
+        volume.add_create_volume(availability_zone="eu-west-1a")
+        volume.add_create_tags(Name="my-volume")
 
         # Test that it waits for the volume to be available
         volume.add_describe_volumes_one_response_by_name()
@@ -44,17 +44,18 @@ class TestVolumeCreation(StubberTestCase):
         goal.execute()
 
     def test_create_volume_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        volume = self.fixtures.enter_context(VolumeStubber(
-            goal.get_service(
-                self.aws.add_volume(
-                    name='my-volume',
-                    availability_zone='eu-west-1a',
-                ),
-                'apply',
+        volume = self.fixtures.enter_context(
+            VolumeStubber(
+                goal.get_service(
+                    self.aws.add_volume(
+                        name="my-volume", availability_zone="eu-west-1a"
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         volume.add_describe_volumes_one_response_by_name()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -62,19 +63,19 @@ class TestVolumeCreation(StubberTestCase):
 
 
 class TestVolumeDeletion(StubberTestCase):
-
     def test_delete_volume(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        volume = self.fixtures.enter_context(VolumeStubber(
-            goal.get_service(
-                self.aws.add_volume(
-                    name='my-volume',
-                    availability_zone='eu-west-1a',
-                ),
-                'destroy',
+        volume = self.fixtures.enter_context(
+            VolumeStubber(
+                goal.get_service(
+                    self.aws.add_volume(
+                        name="my-volume", availability_zone="eu-west-1a"
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
         volume.add_describe_volumes_one_response_by_name()
         volume.add_delete_volume()
 
@@ -86,17 +87,18 @@ class TestVolumeDeletion(StubberTestCase):
         goal.execute()
 
     def test_delete_volume_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        volume = self.fixtures.enter_context(VolumeStubber(
-            goal.get_service(
-                self.aws.add_volume(
-                    name='my-volume',
-                    availability_zone='eu-west-1a',
-                ),
-                'destroy',
+        volume = self.fixtures.enter_context(
+            VolumeStubber(
+                goal.get_service(
+                    self.aws.add_volume(
+                        name="my-volume", availability_zone="eu-west-1a"
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
         volume.add_describe_volumes_empty_response_by_name()
 
         self.assertEqual(len(list(goal.plan())), 0)

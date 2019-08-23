@@ -18,21 +18,21 @@ from .fixture import AwsFixture
 
 
 class SubnetFixture(AwsFixture):
-
     def __init__(self, goal, vpc):
         super(SubnetFixture, self).__init__(goal, vpc.account)
         self.vpc = vpc
 
     def __enter__(self):
-        self.subnet = self.fixtures.enter_context(SubnetStubber(
-            self.goal.get_service(
-                self.vpc.get_subnet(
-                    name='test-route-table',
-                    cidr_block='192.168.0.0/25',
-                ),
-                'describe',
-            ),
-        ))
+        self.subnet = self.fixtures.enter_context(
+            SubnetStubber(
+                self.goal.get_service(
+                    self.vpc.get_subnet(
+                        name="test-route-table", cidr_block="192.168.0.0/25"
+                    ),
+                    "describe",
+                )
+            )
+        )
         self.subnet.add_describe_subnets_one_response()
         self.subnet.add_describe_network_acls()
         self.subnet.add_describe_route_tables()

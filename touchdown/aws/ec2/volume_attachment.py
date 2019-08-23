@@ -24,45 +24,39 @@ from .volume import Volume
 
 class VolumeAttachment(Resource):
 
-    resource_name = 'volume_attachment'
+    resource_name = "volume_attachment"
 
-    name = argument.Callable(lambda r: ':'.join((r.instance.name, r.device)))
+    name = argument.Callable(lambda r: ":".join((r.instance.name, r.device)))
 
-    volume = argument.Resource(Volume, field='VolumeId')
-    instance = argument.Resource(Instance, field='InstanceId')
-    device = argument.String(field='Device')
+    volume = argument.Resource(Volume, field="VolumeId")
+    instance = argument.Resource(Instance, field="InstanceId")
+    device = argument.String(field="Device")
 
 
 class Describe(SimpleDescribe, Plan):
 
     resource = VolumeAttachment
-    service_name = 'ec2'
-    api_version = '2015-10-01'
-    describe_action = 'describe_volumes'
-    describe_envelope = 'Volumes'
-    key = 'VolumeId'
+    service_name = "ec2"
+    api_version = "2015-10-01"
+    describe_action = "describe_volumes"
+    describe_envelope = "Volumes"
+    key = "VolumeId"
 
-    signature = (
-        Present('volume'),
-        Present('instance'),
-        Present('device'),
-    )
+    signature = (Present("volume"), Present("instance"), Present("device"))
 
     def get_describe_filters(self):
         volume = self.runner.get_plan(self.resource.volume)
         if not volume.resource_id:
             return None
 
-        return {
-            'VolumeIds': [volume.resource_id]
-        }
+        return {"VolumeIds": [volume.resource_id]}
 
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = 'attach_volume'
-    create_envelope = '@'
-    waiter = 'volume_in_use'
+    create_action = "attach_volume"
+    create_envelope = "@"
+    waiter = "volume_in_use"
 
     def update_object(self):
         if not self.object:
@@ -70,38 +64,32 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
         instance = self.runner.get_plan(self.resource.instance)
         attachment = None
-        for attachment in self.object.get('Attachments', []):
-            if attachment['InstanceId'] == instance.resource_id:
+        for attachment in self.object.get("Attachments", []):
+            if attachment["InstanceId"] == instance.resource_id:
                 break
-            elif attachment['State'] == 'attached':
+            elif attachment["State"] == "attached":
                 yield self.generic_action(
-                    'Detaching from instance {}'.format(attachment['InstanceId']),
+                    "Detaching from instance {}".format(attachment["InstanceId"]),
                     self.client.detach_volume,
                     VolumeId=self.resource_id,
                 )
                 yield common.Waiter(
-                    self,
-                    ['Waiting for volume to be detached'],
-                    'volume_available',
-                    1
+                    self, ["Waiting for volume to be detached"], "volume_available", 1
                 )
                 attachment = None
                 break
 
         if not attachment:
             yield self.create_object()
-            attachment = {'State': 'attaching'}
+            attachment = {"State": "attaching"}
 
-        if attachment['State'] == 'attaching':
+        if attachment["State"] == "attaching":
             yield common.Waiter(
-                self,
-                ['Waiting for volume to be attached'],
-                'volume_in_use',
-                1
+                self, ["Waiting for volume to be attached"], "volume_in_use", 1
             )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'detach_volume'
-    waiter = 'volume_available'
+    destroy_action = "detach_volume"
+    waiter = "volume_available"

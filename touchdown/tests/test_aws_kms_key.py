@@ -17,18 +17,12 @@ from touchdown.tests.stubs.aws import KeyStubber
 
 
 class TestKeyCreation(StubberTestCase):
-
     def test_create_key(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        key = self.fixtures.enter_context(KeyStubber(
-            goal.get_service(
-                self.aws.add_key(
-                    name='test-key',
-                ),
-                'apply',
-            )
-        ))
+        key = self.fixtures.enter_context(
+            KeyStubber(goal.get_service(self.aws.add_key(name="test-key"), "apply"))
+        )
 
         key.add_list_keys_empty()
         key.add_create_key()
@@ -36,16 +30,11 @@ class TestKeyCreation(StubberTestCase):
         goal.execute()
 
     def test_create_key_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        key = self.fixtures.enter_context(KeyStubber(
-            goal.get_service(
-                self.aws.add_key(
-                    name='test-key',
-                ),
-                'apply',
-            )
-        ))
+        key = self.fixtures.enter_context(
+            KeyStubber(goal.get_service(self.aws.add_key(name="test-key"), "apply"))
+        )
 
         key.add_list_keys_one()
         key.add_describe_key()
@@ -55,18 +44,12 @@ class TestKeyCreation(StubberTestCase):
 
 
 class TestKeyDestroy(StubberTestCase):
-
     def test_destroy_key(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        key = self.fixtures.enter_context(KeyStubber(
-            goal.get_service(
-                self.aws.add_key(
-                    name='test-key',
-                ),
-                'destroy',
-            )
-        ))
+        key = self.fixtures.enter_context(
+            KeyStubber(goal.get_service(self.aws.add_key(name="test-key"), "destroy"))
+        )
 
         key.add_list_keys_one()
         key.add_describe_key()
@@ -75,16 +58,11 @@ class TestKeyDestroy(StubberTestCase):
         goal.execute()
 
     def test_destroy_key_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        key = self.fixtures.enter_context(KeyStubber(
-            goal.get_service(
-                self.aws.add_key(
-                    name='test-key',
-                ),
-                'destroy',
-            )
-        ))
+        key = self.fixtures.enter_context(
+            KeyStubber(goal.get_service(self.aws.add_key(name="test-key"), "destroy"))
+        )
 
         key.add_list_keys_empty()
 

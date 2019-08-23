@@ -23,7 +23,7 @@ from .folder import LocalFolder
 
 class LocalFile(File):
 
-    resource_name = 'file'
+    resource_name = "file"
 
     name = argument.String()
     path = argument.Callable(lambda r: os.path.join(r.folder.name, r.name))
@@ -33,14 +33,14 @@ class LocalFile(File):
 class FileIo(Plan):
 
     resource = LocalFile
-    name = 'fileio'
+    name = "fileio"
 
     def read(self):
         try:
-            return open(self.resource.path, 'rb')
+            return open(self.resource.path, "rb")
         except IOError:
             raise FileNotFound(self.resource.path)
 
     def write(self, contents):
-        with open(self.resource.path, 'wb') as fp:
+        with open(self.resource.path, "wb") as fp:
             fp.write(contents)

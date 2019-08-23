@@ -17,10 +17,4 @@ from .client import Client, private_key_from_string
 from .connection import Connection, Instance
 from .portfwd import PortForward
 
-__all__ = [
-    'Client',
-    'Connection',
-    'Instance',
-    'PortForward',
-    'private_key_from_string',
-]
+__all__ = ["Client", "Connection", "Instance", "PortForward", "private_key_from_string"]

@@ -29,32 +29,28 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 
 class PublicKeyFromPrivateKey(serializers.Formatter):
-
     def render(self, runner, value):
         private_key = serialization.load_pem_private_key(
-            force_bytes(value),
-            password=None,
-            backend=default_backend(),
+            force_bytes(value), password=None, backend=default_backend()
         )
         numbers = private_key.public_key().public_numbers()
 
-        output = b''
-        parts = [b'ssh-rsa', deflate_long(numbers.e), deflate_long(numbers.n)]
+        output = b""
+        parts = [b"ssh-rsa", deflate_long(numbers.e), deflate_long(numbers.n)]
         for part in parts:
-            output += struct.pack('>I', len(part)) + part
-        return force_str(b'ssh-rsa ' + base64.b64encode(output) + b'\n')
+            output += struct.pack(">I", len(part)) + part
+        return force_str(b"ssh-rsa " + base64.b64encode(output) + b"\n")
 
 
 class KeyPair(Resource):
 
-    resource_name = 'keypair'
+    resource_name = "keypair"
 
-    name = argument.String(field='KeyName')
+    name = argument.String(field="KeyName")
 
-    public_key = argument.String(field='PublicKeyMaterial')
+    public_key = argument.String(field="PublicKeyMaterial")
     private_key = argument.String(
-        field='PublicKeyMaterial',
-        serializer=PublicKeyFromPrivateKey(),
+        field="PublicKeyMaterial", serializer=PublicKeyFromPrivateKey()
     )
 
     account = argument.Resource(BaseAccount)
@@ -63,31 +59,25 @@ class KeyPair(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = KeyPair
-    service_name = 'ec2'
-    api_version = '2015-10-01'
-    describe_action = 'describe_key_pairs'
-    describe_envelope = 'KeyPairs'
-    describe_notfound_exception = 'InvalidKeyPair.NotFound'
-    key = 'KeyName'
+    service_name = "ec2"
+    api_version = "2015-10-01"
+    describe_action = "describe_key_pairs"
+    describe_envelope = "KeyPairs"
+    describe_notfound_exception = "InvalidKeyPair.NotFound"
+    key = "KeyName"
 
     def get_describe_filters(self):
-        return {'KeyNames': [self.resource.name]}
+        return {"KeyNames": [self.resource.name]}
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'import_key_pair'
-    create_response = 'id-only'
+    create_action = "import_key_pair"
+    create_response = "id-only"
 
-    signature = (
-        Present('name'),
-        XOR(
-            Present('public_key'),
-            Present('private_key'),
-        ),
-    )
+    signature = (Present("name"), XOR(Present("public_key"), Present("private_key")))
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_key_pair'
+    destroy_action = "delete_key_pair"

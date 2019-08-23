@@ -19,7 +19,6 @@ from touchdown.aws.session import session
 
 
 class TestMetadata(unittest.TestCase):
-
     def test_waiter_waity_enough(self):
-        waiter = session.get_waiter_model('ec2', api_version=Describe.api_version)
-        self.assertEqual(waiter.get_waiter('ImageAvailable').max_attempts, 160)
+        waiter = session.get_waiter_model("ec2", api_version=Describe.api_version)
+        self.assertEqual(waiter.get_waiter("ImageAvailable").max_attempts, 160)

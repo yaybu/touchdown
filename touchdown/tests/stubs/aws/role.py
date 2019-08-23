@@ -19,106 +19,86 @@ from .service import ServiceStubber
 
 class RoleStubber(ServiceStubber):
 
-    client_service = 'iam'
+    client_service = "iam"
 
     def add_list_roles_one_response_by_name(self, assume_role_policy_document=None):
         role = {
-            'RoleName': self.resource.name,
-            'Path': '/iam/myrole',
-            'RoleId': '1234567890123456',
-            'Arn': '12345678901234567890',
-            'CreateDate': datetime.datetime.now(),
+            "RoleName": self.resource.name,
+            "Path": "/iam/myrole",
+            "RoleId": "1234567890123456",
+            "Arn": "12345678901234567890",
+            "CreateDate": datetime.datetime.now(),
         }
 
         if assume_role_policy_document:
-            role['AssumeRolePolicyDocument'] = assume_role_policy_document
+            role["AssumeRolePolicyDocument"] = assume_role_policy_document
 
         return self.add_response(
-            'list_roles',
-            service_response={
-                'Roles': [role],
-            },
-            expected_params={},
+            "list_roles", service_response={"Roles": [role]}, expected_params={}
         )
 
     def add_list_roles_empty_response_by_name(self):
         return self.add_response(
-            'list_roles',
-            service_response={
-                'Roles': [],
-            },
-            expected_params={},
+            "list_roles", service_response={"Roles": []}, expected_params={}
         )
 
     def add_list_role_policies(self, *policies):
         return self.add_response(
-            'list_role_policies',
-            service_response={
-                'PolicyNames': list(policies),
-            },
-            expected_params={
-                'RoleName': self.resource.name,
-            }
+            "list_role_policies",
+            service_response={"PolicyNames": list(policies)},
+            expected_params={"RoleName": self.resource.name},
         )
 
     def add_get_role_policy(self, name, policy):
         return self.add_response(
-            'get_role_policy',
+            "get_role_policy",
             service_response={
-                'RoleName': self.resource.name,
-                'PolicyName': name,
-                'PolicyDocument': policy,
+                "RoleName": self.resource.name,
+                "PolicyName": name,
+                "PolicyDocument": policy,
             },
-            expected_params={
-                'RoleName': self.resource.name,
-                'PolicyName': name,
-            }
+            expected_params={"RoleName": self.resource.name, "PolicyName": name},
         )
 
     def add_create_role(self, assume_role_policy_document):
         return self.add_response(
-            'create_role',
+            "create_role",
             service_response={
-                'Role': {
-                    'RoleName': self.resource.name,
-                    'Path': '/iam/myrole',
-                    'RoleId': '1234567890123456',
-                    'Arn': '12345678901234567890',
-                    'CreateDate': datetime.datetime.now(),
-                },
+                "Role": {
+                    "RoleName": self.resource.name,
+                    "Path": "/iam/myrole",
+                    "RoleId": "1234567890123456",
+                    "Arn": "12345678901234567890",
+                    "CreateDate": datetime.datetime.now(),
+                }
             },
             expected_params={
-                'RoleName': self.resource.name,
-                'AssumeRolePolicyDocument': assume_role_policy_document,
-            }
+                "RoleName": self.resource.name,
+                "AssumeRolePolicyDocument": assume_role_policy_document,
+            },
         )
 
     def add_put_role_policy(self, name, policy):
         return self.add_response(
-            'put_role_policy',
+            "put_role_policy",
             service_response={},
             expected_params={
-                'RoleName': self.resource.name,
-                'PolicyName': name,
-                'PolicyDocument': policy,
-            }
+                "RoleName": self.resource.name,
+                "PolicyName": name,
+                "PolicyDocument": policy,
+            },
         )
 
     def add_delete_role_policy(self, name):
         return self.add_response(
-            'delete_role_policy',
+            "delete_role_policy",
             service_response={},
-            expected_params={
-                'RoleName': self.resource.name,
-                'PolicyName': name,
-            }
+            expected_params={"RoleName": self.resource.name, "PolicyName": name},
         )
 
     def add_delete_role(self):
         return self.add_response(
-            'delete_role',
+            "delete_role",
             service_response={},
-            expected_params={
-                'RoleName': self.resource.name,
-            }
+            expected_params={"RoleName": self.resource.name},
         )

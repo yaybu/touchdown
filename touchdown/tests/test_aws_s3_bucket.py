@@ -18,18 +18,14 @@ from touchdown.tests.stubs.aws import BucketStubber
 
 
 class TestBucketCreation(StubberTestCase):
-
     def test_create_bucket(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        bucket = self.fixtures.enter_context(BucketStubber(
-            goal.get_service(
-                self.aws.add_bucket(
-                    name='my-bucket',
-                ),
-                'apply',
+        bucket = self.fixtures.enter_context(
+            BucketStubber(
+                goal.get_service(self.aws.add_bucket(name="my-bucket"), "apply")
             )
-        ))
+        )
         bucket.add_list_buckets_empty_response()
         bucket.add_create_bucket()
 
@@ -58,16 +54,13 @@ class TestBucketCreation(StubberTestCase):
         goal.execute()
 
     def test_create_bucket_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        bucket = self.fixtures.enter_context(BucketStubber(
-            goal.get_service(
-                self.aws.add_bucket(
-                    name='my-bucket',
-                ),
-                'apply',
+        bucket = self.fixtures.enter_context(
+            BucketStubber(
+                goal.get_service(self.aws.add_bucket(name="my-bucket"), "apply")
             )
-        ))
+        )
         bucket.add_list_buckets_one_response()
         bucket.add_head_bucket()
         bucket.add_get_bucket_location()
@@ -81,18 +74,14 @@ class TestBucketCreation(StubberTestCase):
 
 
 class TestBucketDeletion(StubberTestCase):
-
     def test_delete_bucket(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        bucket = self.fixtures.enter_context(BucketStubber(
-            goal.get_service(
-                self.aws.add_bucket(
-                    name='my-bucket',
-                ),
-                'destroy',
+        bucket = self.fixtures.enter_context(
+            BucketStubber(
+                goal.get_service(self.aws.add_bucket(name="my-bucket"), "destroy")
             )
-        ))
+        )
         bucket.add_list_buckets_one_response()
         bucket.add_head_bucket()
         bucket.add_get_bucket_location()
@@ -101,26 +90,21 @@ class TestBucketDeletion(StubberTestCase):
         bucket.add_get_bucket_notification_configuration()
         bucket.add_get_bucket_accelerate_configuration()
 
-        bucket.add_list_objects([
-            {'Key': 'a'},
-        ])
-        bucket.add_delete_objects(['a'])
+        bucket.add_list_objects([{"Key": "a"}])
+        bucket.add_delete_objects(["a"])
 
         bucket.add_delete_bucket()
 
         goal.execute()
 
     def test_delete_bucket_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        bucket = self.fixtures.enter_context(BucketStubber(
-            goal.get_service(
-                self.aws.add_bucket(
-                    name='my-bucket',
-                ),
-                'destroy',
+        bucket = self.fixtures.enter_context(
+            BucketStubber(
+                goal.get_service(self.aws.add_bucket(name="my-bucket"), "destroy")
             )
-        ))
+        )
         bucket.add_list_buckets_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -128,49 +112,44 @@ class TestBucketDeletion(StubberTestCase):
 
 
 class TestBucketDescribe(StubberTestCase):
-
     def test_annotate_object(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        bucket = self.fixtures.enter_context(BucketStubber(
-            goal.get_service(
-                self.aws.add_bucket(name='mybucket'),
-                'describe',
+        bucket = self.fixtures.enter_context(
+            BucketStubber(
+                goal.get_service(self.aws.add_bucket(name="mybucket"), "describe")
             )
-        ))
+        )
         bucket.add_get_bucket_location()
         bucket.add_get_bucket_cors()
         bucket.add_get_bucket_policy()
         bucket.add_get_bucket_notification_configuration()
         bucket.add_get_bucket_accelerate_configuration()
 
-        obj = bucket.service.annotate_object({
-            'Name': 'ZzZzZz'
-        })
+        obj = bucket.service.annotate_object({"Name": "ZzZzZz"})
 
         # Assert name isn't trodden on by annotate_object
-        self.assertEqual(obj['Name'], 'ZzZzZz')
+        self.assertEqual(obj["Name"], "ZzZzZz")
 
 
 class TestBucketValidation(StubberTestCase):
-
     def test_starts_with_period(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='.foo')
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name=".foo")
 
     def test_ends_with_period(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='foo.')
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="foo.")
 
     def test_double_period(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='foo..bar')
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="foo..bar")
 
     def test_starts_with_hyphen(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='-foo')
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="-foo")
 
     def test_ends_with_hyphen(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='foo-')
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="foo-")
 
     def test_hyphen(self):
-        self.aws.add_bucket(name='foo--bar')
+        self.aws.add_bucket(name="foo--bar")
 
     def test_upper(self):
-        self.assertRaises(InvalidParameter, self.aws.add_bucket, name='FOO')
+        self.assertRaises(InvalidParameter, self.aws.add_bucket, name="FOO")

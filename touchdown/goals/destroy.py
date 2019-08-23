@@ -18,15 +18,19 @@ from touchdown.goals.action import ActionGoalMixin
 
 class Destroy(ActionGoalMixin, Goal):
 
-    ''' Tear down this infrastructure '''
+    """ Tear down this infrastructure """
 
-    name = 'destroy'
+    name = "destroy"
     execute_in_reverse = True
 
     def get_plan_class(self, resource):
-        if 'never-destroy' not in resource.ensure:
-            return resource.meta.get_plan('destroy') or resource.meta.get_plan('describe') or resource.meta.get_plan('null')
-        return resource.meta.get_plan('describe') or resource.meta.get_plan('null')
+        if "never-destroy" not in resource.ensure:
+            return (
+                resource.meta.get_plan("destroy")
+                or resource.meta.get_plan("describe")
+                or resource.meta.get_plan("null")
+            )
+        return resource.meta.get_plan("describe") or resource.meta.get_plan("null")
 
 
 register(Destroy)

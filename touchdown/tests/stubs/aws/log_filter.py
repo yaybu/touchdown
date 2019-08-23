@@ -17,57 +17,66 @@ from .service import ServiceStubber
 
 class LogFilterStubber(ServiceStubber):
 
-    client_service = 'logs'
+    client_service = "logs"
 
     def add_describe_log_filter_empty_response(self):
         self.add_response(
-            'describe_metric_filters',
+            "describe_metric_filters",
             service_response={},
-            expected_params={'filterNamePrefix': self.resource.name,
-                             'logGroupName': 'test-log-group'}
+            expected_params={
+                "filterNamePrefix": self.resource.name,
+                "logGroupName": "test-log-group",
+            },
         )
 
     def add_describe_log_filter_one_response(self):
         self.add_response(
-            'describe_metric_filters',
+            "describe_metric_filters",
             service_response={
-                'metricFilters': [{
-                    'filterName': self.resource.name,
-                    'filterPattern': 'pattern',
-                    'metricTransformations': [{
-                        'metricName': 'transformation-name',
-                        'metricNamespace': 'transformation-namespace',
-                        'metricValue': 'transformation-value',
-                        }],
-                }],
+                "metricFilters": [
+                    {
+                        "filterName": self.resource.name,
+                        "filterPattern": "pattern",
+                        "metricTransformations": [
+                            {
+                                "metricName": "transformation-name",
+                                "metricNamespace": "transformation-namespace",
+                                "metricValue": "transformation-value",
+                            }
+                        ],
+                    }
+                ]
             },
-            expected_params={'filterNamePrefix': self.resource.name,
-                             'logGroupName': 'test-log-group'}
+            expected_params={
+                "filterNamePrefix": self.resource.name,
+                "logGroupName": "test-log-group",
+            },
         )
 
     def add_create_log_filter(self):
         return self.add_response(
-            'put_metric_filter',
+            "put_metric_filter",
             service_response={},
             expected_params={
-                'filterName': self.resource.name,
-                'filterPattern': 'pattern',
-                'logGroupName': 'test-log-group',
-                'metricTransformations': [{
-                    'metricName': 'transformation-name',
-                    'metricNamespace': 'transformation-namespace',
-                    'metricValue': 'transformation-value',
-                    }],
-            }
+                "filterName": self.resource.name,
+                "filterPattern": "pattern",
+                "logGroupName": "test-log-group",
+                "metricTransformations": [
+                    {
+                        "metricName": "transformation-name",
+                        "metricNamespace": "transformation-namespace",
+                        "metricValue": "transformation-value",
+                    }
+                ],
+            },
         )
 
     def add_delete_log_filter(self):
         return self.add_response(
-            'delete_metric_filter',
-            service_response={
-            },
+            "delete_metric_filter",
+            service_response={},
             expected_params={
-                'filterName': self.resource.name,
-                'logGroupName': 'test-log-group',
-            }
+                "filterName": self.resource.name,
+                "logGroupName": "test-log-group",
+            },
         )

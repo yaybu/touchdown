@@ -17,52 +17,40 @@ from .service import ServiceStubber
 
 class RdsSubnetGroupStubber(ServiceStubber):
 
-    client_service = 'elasticache'
+    client_service = "elasticache"
 
     def add_describe_db_subnet_groups_empty(self):
         return self.add_response(
-            'describe_db_subnet_groups',
-            service_response={
-                'DBSubnetGroups': [],
-            },
-            expected_params={
-                'DBSubnetGroupName': self.resource.name,
-            }
+            "describe_db_subnet_groups",
+            service_response={"DBSubnetGroups": []},
+            expected_params={"DBSubnetGroupName": self.resource.name},
         )
 
     def add_describe_db_subnet_groups_one(self):
         return self.add_response(
-            'describe_db_subnet_groups',
+            "describe_db_subnet_groups",
             service_response={
-                'DBSubnetGroups': [{
-                    'DBSubnetGroupName': self.resource.name,
-                }],
+                "DBSubnetGroups": [{"DBSubnetGroupName": self.resource.name}]
             },
-            expected_params={
-                'DBSubnetGroupName': self.resource.name,
-            }
+            expected_params={"DBSubnetGroupName": self.resource.name},
         )
 
     def add_create_subnet_group(self):
         return self.add_response(
-            'create_db_subnet_group',
+            "create_db_subnet_group",
             service_response={
-                'DBSubnetGroup': {
-                    'DBSubnetGroupName': self.resource.name,
-                },
+                "DBSubnetGroup": {"DBSubnetGroupName": self.resource.name}
             },
             expected_params={
-                'DBSubnetGroupName': self.resource.name,
-                'DBSubnetGroupDescription': self.resource.description,
-                'SubnetIds': ['subnet-52f2381b']
+                "DBSubnetGroupName": self.resource.name,
+                "DBSubnetGroupDescription": self.resource.description,
+                "SubnetIds": ["subnet-52f2381b"],
             },
         )
 
     def add_delete_subnet_group(self):
         return self.add_response(
-            'delete_db_subnet_group',
+            "delete_db_subnet_group",
             service_response={},
-            expected_params={
-                'DBSubnetGroupName': self.resource.name
-            },
+            expected_params={"DBSubnetGroupName": self.resource.name},
         )

@@ -19,19 +19,16 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class StubberTestCase(WorkspaceTestCase):
-
     def setUp(self):
         super(StubberTestCase, self).setUp()
         self.aws = self.workspace.add_aws(
-            access_key_id='dummy',
-            secret_access_key='dummy',
-            region='eu-west-1',
+            access_key_id="dummy", secret_access_key="dummy", region="eu-west-1"
         )
-        self.fixtures.enter_context(mock.patch('time.sleep'))
+        self.fixtures.enter_context(mock.patch("time.sleep"))
 
 
 class Stubber(BaseStubber):
-    '''Extends the stubber from botocore so that it always asserts that
+    """Extends the stubber from botocore so that it always asserts that
     there are no leftover responses.
 
     So, for eg:
@@ -45,7 +42,7 @@ class Stubber(BaseStubber):
     pending resquest. The botocore's stubber doesn't - you have to
     remember to call `stub.assert_no_pending_responses()`.
 
-    '''
+    """
 
     def __exit__(self, exc_type, exc_value, traceback):
         super(Stubber, self).__exit__(exc_type, exc_value, traceback)

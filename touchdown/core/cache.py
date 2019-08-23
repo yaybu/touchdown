@@ -20,7 +20,6 @@ from touchdown.core import errors
 
 
 class Cache(object):
-
     def __contains__(self, cache_key):
         raise NotImplementedError(self.__contains__)
 
@@ -33,7 +32,7 @@ class Cache(object):
 
 class FileCache(Cache):
 
-    extension = ''
+    extension = ""
 
     def __init__(self, cache_directory):
         self.cache_directory = cache_directory
@@ -43,9 +42,9 @@ class FileCache(Cache):
             os.makedirs(self.cache_directory)
 
     def _cache_key_to_path(self, cache_key):
-        valid_chars = '-_.() %s%s' % (string.ascii_letters, string.digits)
-        cache_key = ''.join(c for c in cache_key if c in valid_chars)
-        cache_key = cache_key.replace(' ', '_')
+        valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+        cache_key = "".join(c for c in cache_key if c in valid_chars)
+        cache_key = cache_key.replace(" ", "_")
         return os.path.join(self.cache_directory, cache_key + self.extension)
 
     def _serialize(self, contents):
@@ -59,7 +58,7 @@ class FileCache(Cache):
 
     def __getitem__(self, cache_key):
         path = self._cache_key_to_path(cache_key)
-        with open(path, 'r') as fp:
+        with open(path, "r") as fp:
             return self._deserialize(fp.read())
 
     def __setitem__(self, cache_key, value):
@@ -69,22 +68,22 @@ class FileCache(Cache):
         self._ensure_cache_directory_exists()
 
         fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-        with os.fdopen(fd, 'w') as f:
+        with os.fdopen(fd, "w") as f:
             f.write(contents)
 
 
 class JSONFileCache(FileCache):
 
-    extension = '.json'
+    extension = ".json"
 
     def _serialize(self, contents):
         try:
             return json.dumps(contents)
         except (TypeError, ValueError):
-            raise errors.Error('\'%s\' cannot be serialised' % contents)
+            raise errors.Error("'%s' cannot be serialised" % contents)
 
     def _deserialize(self, contents):
         try:
             return json.loads(contents)
         except (ValueError,):
-            raise errors.Error('\'%s\' cannot be deserialised' % contents)
+            raise errors.Error("'%s' cannot be deserialised" % contents)

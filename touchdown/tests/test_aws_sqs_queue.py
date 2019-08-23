@@ -17,18 +17,14 @@ from touchdown.tests.stubs.aws import QueueStubber
 
 
 class TestQueueCreation(StubberTestCase):
-
     def test_create_queue(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        queue = self.fixtures.enter_context(QueueStubber(
-            goal.get_service(
-                self.aws.add_queue(
-                    name='test-queue',
-                ),
-                'apply',
+        queue = self.fixtures.enter_context(
+            QueueStubber(
+                goal.get_service(self.aws.add_queue(name="test-queue"), "apply")
             )
-        ))
+        )
 
         queue.add_get_queue_url_404()
         queue.add_create_queue()
@@ -42,16 +38,13 @@ class TestQueueCreation(StubberTestCase):
         goal.execute()
 
     def test_create_queue_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        queue = self.fixtures.enter_context(QueueStubber(
-            goal.get_service(
-                self.aws.add_queue(
-                    name='test-queue',
-                ),
-                'apply',
+        queue = self.fixtures.enter_context(
+            QueueStubber(
+                goal.get_service(self.aws.add_queue(name="test-queue"), "apply")
             )
-        ))
+        )
 
         queue.add_get_queue_url()
         queue.add_get_queue_attributes()
@@ -61,18 +54,14 @@ class TestQueueCreation(StubberTestCase):
 
 
 class TestQueueDestroy(StubberTestCase):
-
     def test_destroy_queue(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        queue = self.fixtures.enter_context(QueueStubber(
-            goal.get_service(
-                self.aws.add_queue(
-                    name='test-queue',
-                ),
-                'destroy',
+        queue = self.fixtures.enter_context(
+            QueueStubber(
+                goal.get_service(self.aws.add_queue(name="test-queue"), "destroy")
             )
-        ))
+        )
 
         queue.add_get_queue_url()
         queue.add_get_queue_attributes()
@@ -81,16 +70,13 @@ class TestQueueDestroy(StubberTestCase):
         goal.execute()
 
     def test_destroy_queue_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        queue = self.fixtures.enter_context(QueueStubber(
-            goal.get_service(
-                self.aws.add_queue(
-                    name='test-queue',
-                ),
-                'destroy',
+        queue = self.fixtures.enter_context(
+            QueueStubber(
+                goal.get_service(self.aws.add_queue(name="test-queue"), "destroy")
             )
-        ))
+        )
 
         queue.add_get_queue_url_404()
 

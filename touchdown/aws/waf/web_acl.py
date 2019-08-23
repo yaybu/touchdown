@@ -23,36 +23,30 @@ from .waf import WafApply, WafDescribe, WafDestroy
 
 class ActivatedRule(Resource):
 
-    resource_name = 'activated_rule'
+    resource_name = "activated_rule"
 
     action = argument.String(
-        field='Action',
-        choices=['BLOCK', 'ALLOW', 'COUNT'],
-        serializer=serializers.Dict(
-            Type=serializers.String(),
-        ),
+        field="Action",
+        choices=["BLOCK", "ALLOW", "COUNT"],
+        serializer=serializers.Dict(Type=serializers.String()),
     )
-    priority = argument.Integer(field='Priority')
-    rule = argument.Resource(Rule, field='RuleId')
+    priority = argument.Integer(field="Priority")
+    rule = argument.Resource(Rule, field="RuleId")
 
 
 class WebACL(Resource):
 
-    resource_name = 'web_acl'
+    resource_name = "web_acl"
 
-    name = argument.String(field='Name')
-    metric_name = argument.String(field='MetricName')
+    name = argument.String(field="Name")
+    metric_name = argument.String(field="MetricName")
     default_action = argument.String(
-        field='DefaultAction',
-        choices=['BLOCK', 'ALLOW', 'COUNT'],
-        serializer=serializers.Dict(
-            Type=serializers.String(),
-        )
+        field="DefaultAction",
+        choices=["BLOCK", "ALLOW", "COUNT"],
+        serializer=serializers.Dict(Type=serializers.String()),
     )
     activated_rules = argument.ResourceList(
-        ActivatedRule,
-        field='ActivatedRules',
-        create=False,
+        ActivatedRule, field="ActivatedRules", create=False
     )
     account = argument.Resource(BaseAccount)
 
@@ -60,29 +54,25 @@ class WebACL(Resource):
 class Describe(WafDescribe, Plan):
 
     resource = WebACL
-    service_name = 'waf'
-    api_version = '2015-08-24'
-    describe_action = 'list_web_acls'
-    describe_envelope = 'WebACLs'
-    annotate_action = 'get_web_acl'
-    key = 'WebACLId'
-    container_update_action = 'update_web_acl'
-    container = 'Rules'
-    container_member = 'ActivatedRule'
-    local_container = 'activated_rules'
+    service_name = "waf"
+    api_version = "2015-08-24"
+    describe_action = "list_web_acls"
+    describe_envelope = "WebACLs"
+    annotate_action = "get_web_acl"
+    key = "WebACLId"
+    container_update_action = "update_web_acl"
+    container = "Rules"
+    container_member = "ActivatedRule"
+    local_container = "activated_rules"
 
 
 class Apply(WafApply, Describe):
 
-    create_action = 'create_web_acl'
+    create_action = "create_web_acl"
 
-    signature = (
-        Present('name'),
-        Present('metric_name'),
-        Present('default_action'),
-    )
+    signature = (Present("name"), Present("metric_name"), Present("default_action"))
 
 
 class Destroy(WafDestroy, Describe):
 
-    destroy_action = 'delete_web_acl'
+    destroy_action = "delete_web_acl"

@@ -17,22 +17,18 @@ from .service import ServiceStubber
 
 class RouteTableStubber(ServiceStubber):
 
-    client_service = 'ec2'
+    client_service = "ec2"
 
     def make_id(self, name):
-        return 'rt-' + super(RouteTableStubber, self).make_id(name)[:8]
+        return "rt-" + super(RouteTableStubber, self).make_id(name)[:8]
 
     def add_describe_route_tables_one_response_by_name(self):
         return self.add_response(
-            'describe_route_tables',
+            "describe_route_tables",
             service_response={
-                'RouteTables': [{
-                    'RouteTableId': self.make_id(self.resource.name),
-                }],
+                "RouteTables": [{"RouteTableId": self.make_id(self.resource.name)}]
             },
             expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]}
-                ],
+                "Filters": [{"Name": "tag:Name", "Values": [self.resource.name]}]
             },
         )

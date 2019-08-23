@@ -18,16 +18,14 @@ from .fixture import AwsFixture
 
 
 class BucketFixture(AwsFixture):
-
     def __enter__(self):
-        self.bucket_stubber = self.fixtures.enter_context(BucketStubber(
-            self.goal.get_service(
-                self.aws.get_bucket(
-                    name='my-test-bucket',
-                ),
-                'describe',
-            ),
-        ))
+        self.bucket_stubber = self.fixtures.enter_context(
+            BucketStubber(
+                self.goal.get_service(
+                    self.aws.get_bucket(name="my-test-bucket"), "describe"
+                )
+            )
+        )
         self.bucket_stubber.add_list_buckets_one_response()
         self.bucket_stubber.add_head_bucket()
         self.bucket_stubber.add_get_bucket_location()

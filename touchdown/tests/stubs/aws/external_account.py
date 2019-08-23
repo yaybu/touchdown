@@ -19,21 +19,21 @@ from .service import ServiceStubber
 
 class ExternalAccountStubber(ServiceStubber):
 
-    client_service = 'sts'
+    client_service = "sts"
 
     def add_assume_role(self):
         return self.add_response(
-            'assume_role',
+            "assume_role",
             service_response={
-                'Credentials': {
-                    'AccessKeyId': 'AKIASSUMEROLEASSUMEROLE',
-                    'SecretAccessKey': 'abcdefghijklmnopqrstuvwxyz',
-                    'SessionToken': 'zyxwvutsrqpnomlkjihgfedcba',
-                    'Expiration': datetime.datetime.now(),
-                },
+                "Credentials": {
+                    "AccessKeyId": "AKIASSUMEROLEASSUMEROLE",
+                    "SecretAccessKey": "abcdefghijklmnopqrstuvwxyz",
+                    "SessionToken": "zyxwvutsrqpnomlkjihgfedcba",
+                    "Expiration": datetime.datetime.now(),
+                }
             },
             expected_params={
-                'RoleSessionName': 'session-name',
-                'RoleArn': 'arn:aws:iam::123456789012:role/S3Access',
-            }
+                "RoleSessionName": "session-name",
+                "RoleArn": "arn:aws:iam::123456789012:role/S3Access",
+            },
         )

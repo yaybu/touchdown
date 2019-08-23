@@ -18,20 +18,20 @@ from .fixture import AwsFixture
 
 
 class CustomerGatewayFixture(AwsFixture):
-
     def __enter__(self):
-        self.customer_gateway_stubber = self.fixtures.enter_context(CustomerGatewayStubber(
-            self.goal.get_service(
-                self.aws.get_customer_gateway(
-                    name='test-vpc',
-                    public_ip='8.8.8.8',
-                ),
-                'describe',
-            ),
-        ))
+        self.customer_gateway_stubber = self.fixtures.enter_context(
+            CustomerGatewayStubber(
+                self.goal.get_service(
+                    self.aws.get_customer_gateway(name="test-vpc", public_ip="8.8.8.8"),
+                    "describe",
+                )
+            )
+        )
         self.customer_gateway_stubber.add_describe_customer_gateways_one_response()
 
         self.customer_gateway = self.customer_gateway_stubber.resource
-        self.customer_gateway_id = self.customer_gateway_stubber.make_id(self.customer_gateway.name)
+        self.customer_gateway_id = self.customer_gateway_stubber.make_id(
+            self.customer_gateway.name
+        )
 
         return self

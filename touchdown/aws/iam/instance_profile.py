@@ -23,10 +23,10 @@ from .role import Role
 
 class InstanceProfile(Resource):
 
-    resource_name = 'instance_profile'
+    resource_name = "instance_profile"
 
-    name = argument.String(field='InstanceProfileName')
-    path = argument.String(field='Path')
+    name = argument.String(field="InstanceProfileName")
+    path = argument.String(field="Path")
     roles = argument.ResourceList(Role)
     account = argument.Resource(BaseAccount)
 
@@ -34,29 +34,29 @@ class InstanceProfile(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = InstanceProfile
-    service_name = 'iam'
-    api_version = '2010-05-08'
-    describe_action = 'list_instance_profiles'
-    describe_envelope = 'InstanceProfiles'
+    service_name = "iam"
+    api_version = "2010-05-08"
+    describe_action = "list_instance_profiles"
+    describe_envelope = "InstanceProfiles"
     describe_filters = {}
-    key = 'InstanceProfileName'
+    key = "InstanceProfileName"
 
     def describe_object_matches(self, instance_profile):
-        return instance_profile['InstanceProfileName'] == self.resource.name
+        return instance_profile["InstanceProfileName"] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_instance_profile'
+    create_action = "create_instance_profile"
 
     def update_object(self):
         # Make sure all roles in the workspace are linked up to the
         # corresponding InstanceProfile
-        remote_roles = [r['RoleName'] for r in self.object.get('Roles', [])]
+        remote_roles = [r["RoleName"] for r in self.object.get("Roles", [])]
         for role in self.resource.roles:
             if role.name not in remote_roles:
                 yield self.generic_action(
-                    'Add role {}'.format(role.name),
+                    "Add role {}".format(role.name),
                     self.client.add_role_to_instance_profile,
                     InstanceProfileName=self.resource.name,
                     RoleName=role.name,
@@ -68,7 +68,7 @@ class Apply(SimpleApply, Describe):
         for role in remote_roles:
             if role not in local_roles:
                 yield self.generic_action(
-                    'Remove role {}'.format(role),
+                    "Remove role {}".format(role),
                     self.client.remove_role_from_instance_profile,
                     InstanceProfileName=self.resource.name,
                     RoleName=role,
@@ -77,13 +77,13 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_instance_profile'
+    destroy_action = "delete_instance_profile"
 
     def destroy_object(self):
-        remote_roles = [r['RoleName'] for r in self.object.get('Roles', [])]
+        remote_roles = [r["RoleName"] for r in self.object.get("Roles", [])]
         for role in remote_roles:
             yield self.generic_action(
-                'Remove role {}'.format(role),
+                "Remove role {}".format(role),
                 self.client.remove_role_from_instance_profile,
                 InstanceProfileName=self.resource.name,
                 RoleName=role,

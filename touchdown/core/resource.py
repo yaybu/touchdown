@@ -23,7 +23,6 @@ marker = object()
 
 
 class Field(object):
-
     def __init__(self, name, argument):
         self.name = name
         self.argument = argument
@@ -45,10 +44,10 @@ class Field(object):
     def clean_value(self, instance, value):
         try:
             value = self.argument.clean(instance, value)
-            if hasattr(instance, 'clean_{}'.format(self.name)):
-                value = getattr(instance, 'clean_{}'.format(self.name))(value)
+            if hasattr(instance, "clean_{}".format(self.name)):
+                value = getattr(instance, "clean_{}".format(self.name))(value)
         except errors.InvalidParameter as e:
-            raise errors.InvalidParameter('{}: {}'.format(self.name, e.args[0]))
+            raise errors.InvalidParameter("{}: {}".format(self.name, e.args[0]))
         return value
 
     def __set__(self, instance, value):
@@ -75,7 +74,6 @@ class Field(object):
 
 
 class Meta(object):
-
     def __init__(self):
         self.plans = {}
         self.fields = {}
@@ -83,7 +81,7 @@ class Meta(object):
 
     def get_plan(self, plan):
         for cls in self.mro:
-            if hasattr(cls, 'meta') and plan in cls.meta.plans:
+            if hasattr(cls, "meta") and plan in cls.meta.plans:
                 return cls.meta.plans[plan]
 
     def iter_fields_in_order(self):
@@ -97,11 +95,11 @@ class ResourceType(type):
     __lazy_lookups__ = {}
 
     def __new__(meta_cls, class_name, bases, new_attrs):
-        meta = new_attrs['meta'] = Meta()
+        meta = new_attrs["meta"] = Meta()
 
         # FIXME: What order to process the bases in?
         for base in bases:
-            if hasattr(base, 'meta') and isinstance(base.meta, Meta):
+            if hasattr(base, "meta") and isinstance(base.meta, Meta):
                 meta.fields.update(base.meta.fields)
                 meta.field_order.extend(base.meta.field_order)
 
@@ -110,9 +108,9 @@ class ResourceType(type):
         # fits inside the cidr_block of its parent vpc. So the vpc must always
         # be processed first. This guarantee can't be made with kwargs on
         # cpython.
-        if 'field_order' in new_attrs:
-            meta.field_order.extend(new_attrs['field_order'])
-            del new_attrs['field_order']
+        if "field_order" in new_attrs:
+            meta.field_order.extend(new_attrs["field_order"])
+            del new_attrs["field_order"]
 
         # Replace all Argument instances with Field instances. The Field type
         # handles the 'clean' stage of input processing and the storage of
@@ -140,7 +138,7 @@ class ResourceType(type):
             field.argument.contribute_to_class(cls)
 
         # Fire any signals.
-        name = '.'.join((cls.__module__, cls.__name__))
+        name = ".".join((cls.__module__, cls.__name__))
         meta_cls.__all_resources__[name] = cls
 
         for callable, args, kwargs in meta_cls.__lazy_lookups__.get(name, []):
@@ -174,14 +172,14 @@ class Resource(six.with_metaclass(ResourceType)):
     def clean(cls, value):
         if not isinstance(value, dict):
             raise errors.InvalidParameter(
-                '{!r} cannot be adapted into a {}'.format(value, cls.resource_name)
+                "{!r} cannot be adapted into a {}".format(value, cls.resource_name)
             )
 
         params = {}
         compound_params = {}
         for key, subvalue in value.items():
-            if '__' in key:
-                key, subkey = key.split('__', 1)
+            if "__" in key:
+                key, subkey = key.split("__", 1)
                 compound_params.setdefault(key, {})[subkey] = subvalue
                 continue
             params[key] = subvalue
@@ -190,9 +188,7 @@ class Resource(six.with_metaclass(ResourceType)):
             if key in params:
                 raise errors.InvalidParameter(
                     'Cannot set "{}" and "{}__{}"'.format(
-                        key,
-                        key,
-                        next(iter(val.keys())),
+                        key, key, next(iter(val.keys()))
                     )
                 )
             params[key] = val
@@ -200,41 +196,32 @@ class Resource(six.with_metaclass(ResourceType)):
         for key in params.keys():
             if key not in cls.meta.fields:
                 raise errors.InvalidParameter(
-                    '{!r} is not a valid option for a {}'.format(key, cls.resource_name)
+                    "{!r} is not a valid option for a {}".format(key, cls.resource_name)
                 )
 
         return params
 
     def identifier(self):
-        ''' Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' '''
-        return serializers.Context(
-            serializers.Const(self),
-            serializers.Identifier(),
-        )
+        """ Returns a serializer that renders the identity of the resource, e.g. 'ami-123456' """
+        return serializers.Context(serializers.Const(self), serializers.Identifier())
 
     def get_property(self, property_name):
-        ''' Returns a serializer that renders a property fetched by describing a remote resource '''
-        return serializers.Property(
-            property_name,
-            serializers.Const(self),
-        )
+        """ Returns a serializer that renders a property fetched by describing a remote resource """
+        return serializers.Property(property_name, serializers.Const(self))
 
     def serializer_with_kwargs(self, **kwargs):
         return serializers.Context(
-            serializers.Const(self),
-            serializers.Resource(**kwargs),
+            serializers.Const(self), serializers.Resource(**kwargs)
         )
 
     def diff(self, runner, value, **kwargs):
-        return serializers.Resource(**kwargs).diff(
-            runner,
-            self,
-            value
-        )
+        return serializers.Resource(**kwargs).diff(runner, self, value)
 
     @property
     def arguments(self):
-        return list((name, field.argument) for (name, field) in self.meta.iter_fields_in_order())
+        return list(
+            (name, field.argument) for (name, field) in self.meta.iter_fields_in_order()
+        )
 
     @property
     def workspace(self):
@@ -246,8 +233,8 @@ class Resource(six.with_metaclass(ResourceType)):
             self.dependencies.add(dependency)
 
     def __str__(self):
-        if hasattr(self, 'name'):
-            return '{} \'{}\''.format(self.resource_name, self.name)
+        if hasattr(self, "name"):
+            return "{} '{}'".format(self.resource_name, self.name)
         return self.resource_name
 
     def __lt__(self, other):

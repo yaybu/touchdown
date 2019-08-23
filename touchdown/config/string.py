@@ -19,7 +19,7 @@ from . import variable
 
 class String(variable.Variable):
 
-    resource_name = 'string'
+    resource_name = "string"
 
     default = argument.String()
     min = argument.Integer()

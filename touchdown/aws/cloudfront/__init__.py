@@ -17,7 +17,4 @@ from .streaming_distribution import StreamingDistribution
 
 from . import tail  # noqa isort:skip
 
-__all__ = [
-    'Distribution',
-    'StreamingDistribution',
-]
+__all__ = ["Distribution", "StreamingDistribution"]

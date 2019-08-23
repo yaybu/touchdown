@@ -17,16 +17,15 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestSshPortForward(WorkspaceTestCase):
-
     def test_ssh_port_forward(self):
-        goal = self.create_goal('portfwd')
+        goal = self.create_goal("portfwd")
 
-        ssh_connection = self.fixtures.enter_context(SshConnectionFixture(goal, self.workspace))
+        ssh_connection = self.fixtures.enter_context(
+            SshConnectionFixture(goal, self.workspace)
+        )
 
         ssh_connection.ssh_connection.add_port_forward(
-            name='dummyport',
-            port='80',
-            host='localhost',
+            name="dummyport", port="80", host="localhost"
         )
 
         # goal.execute('dummyport=9080')

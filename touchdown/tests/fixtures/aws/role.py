@@ -18,16 +18,14 @@ from .fixture import AwsFixture
 
 
 class RoleFixture(AwsFixture):
-
     def __enter__(self):
-        self.role = self.fixtures.enter_context(RoleStubber(
-            self.goal.get_service(
-                self.aws.get_role(
-                    name='my-test-role',
-                ),
-                'describe',
-            ),
-        ))
+        self.role = self.fixtures.enter_context(
+            RoleStubber(
+                self.goal.get_service(
+                    self.aws.get_role(name="my-test-role"), "describe"
+                )
+            )
+        )
         self.role.add_list_roles_one_response_by_name()
 
         return self.role.resource

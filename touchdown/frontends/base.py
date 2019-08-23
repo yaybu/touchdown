@@ -20,7 +20,6 @@ from touchdown.core.utils import force_str
 
 
 class BaseFrontend(object):
-
     def __init__(self):
         self.preseeds = {}
 
@@ -32,28 +31,28 @@ class BaseFrontend(object):
 
     def echo(self, text, nl=True, **kwargs):
         text = force_str(text)
-        if threading.current_thread().name != 'MainThread':
-            text = '[{}] {}'.format(threading.current_thread().name, text)
+        if threading.current_thread().name != "MainThread":
+            text = "[{}] {}".format(threading.current_thread().name, text)
         if nl:
-            self._echo('{}\n'.format(text))
+            self._echo("{}\n".format(text))
         else:
             self._echo(text)
 
     def render_plan(self, plan):
         for resource, actions in plan:
-            self.echo('%s:' % resource)
+            self.echo("%s:" % resource)
             for action in actions:
                 description = list(action.description)
-                self.echo('  * %s' % description[0])
+                self.echo("  * %s" % description[0])
                 for line in description[1:]:
-                    self.echo('      %s' % line)
-            self.echo('')
+                    self.echo("      %s" % line)
+            self.echo("")
 
     def confirm_plan(self, plan):
-        self.echo('Generated a plan to update infrastructure configuration:')
-        self.echo('')
+        self.echo("Generated a plan to update infrastructure configuration:")
+        self.echo("")
         self.render_plan(plan)
-        return self.confirm('Do you want to continue?')
+        return self.confirm("Do you want to continue?")
 
     def progressbar(self, **kwargs):
         raise NotImplementedError(self.progressbar)

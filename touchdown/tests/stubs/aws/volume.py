@@ -17,60 +17,44 @@ from .service import ServiceStubber
 
 class VolumeStubber(ServiceStubber):
 
-    client_service = 'ec2'
+    client_service = "ec2"
 
     def add_describe_volumes_empty_response_by_name(self):
         return self.add_client_error(
-            'describe_volumes',
-            service_error_code='InvalidVolume.NotFound',
-            service_message='',
+            "describe_volumes",
+            service_error_code="InvalidVolume.NotFound",
+            service_message="",
         )
 
     def add_describe_volumes_one_response_by_name(self):
         return self.add_response(
-            'describe_volumes',
+            "describe_volumes",
             service_response={
-                'Volumes': [{
-                    'VolumeId': 'vol-abcdef12345',
-                    'State': 'available',
-                }],
+                "Volumes": [{"VolumeId": "vol-abcdef12345", "State": "available"}]
             },
             expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]}
-                ],
+                "Filters": [{"Name": "tag:Name", "Values": [self.resource.name]}]
             },
         )
 
-    def add_create_volume(self, availability_zone='eu-west-1a'):
+    def add_create_volume(self, availability_zone="eu-west-1a"):
         return self.add_response(
-            'create_volume',
-            service_response={
-                'VolumeId': 'vol-abcdef12345',
-            },
-            expected_params={
-                'AvailabilityZone': 'eu-west-1a',
-            },
+            "create_volume",
+            service_response={"VolumeId": "vol-abcdef12345"},
+            expected_params={"AvailabilityZone": "eu-west-1a"},
         )
 
     def add_create_tags(self, **tags):
-        tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
+        tag_list = [{"Key": k, "Value": v} for (k, v) in tags.items()]
         self.add_response(
-            'create_tags',
-            service_response={
-            },
-            expected_params={
-                'Resources': ['vol-abcdef12345'],
-                'Tags': tag_list,
-            },
+            "create_tags",
+            service_response={},
+            expected_params={"Resources": ["vol-abcdef12345"], "Tags": tag_list},
         )
 
     def add_delete_volume(self):
         return self.add_response(
-            'delete_volume',
-            service_response={
-            },
-            expected_params={
-                'VolumeId': 'vol-abcdef12345',
-            },
+            "delete_volume",
+            service_response={},
+            expected_params={"VolumeId": "vol-abcdef12345"},
         )

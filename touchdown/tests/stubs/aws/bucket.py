@@ -17,119 +17,101 @@ from .service import ServiceStubber
 
 class BucketStubber(ServiceStubber):
 
-    client_service = 's3'
+    client_service = "s3"
 
-    def add_get_bucket_location(self, location_constraint='eu-central-1'):
+    def add_get_bucket_location(self, location_constraint="eu-central-1"):
         return self.add_response(
-            'get_bucket_location',
-            {'LocationConstraint': location_constraint},
-            {'Bucket': self.resource.name},
+            "get_bucket_location",
+            {"LocationConstraint": location_constraint},
+            {"Bucket": self.resource.name},
         )
 
     def add_get_bucket_cors(self, rules=None):
         return self.add_response(
-            'get_bucket_cors',
-            {'CORSRules': rules or []},
-            {'Bucket': self.resource.name},
+            "get_bucket_cors",
+            {"CORSRules": rules or []},
+            {"Bucket": self.resource.name},
         )
 
     def add_get_bucket_policy(self, policy=None):
         return self.add_response(
-            'get_bucket_policy',
-            {'Policy': policy or '{}'},
-            {'Bucket': self.resource.name},
+            "get_bucket_policy",
+            {"Policy": policy or "{}"},
+            {"Bucket": self.resource.name},
         )
 
     def add_get_bucket_notification_configuration(self):
         return self.add_response(
-            'get_bucket_notification_configuration',
-            {},
-            {'Bucket': self.resource.name},
+            "get_bucket_notification_configuration", {}, {"Bucket": self.resource.name}
         )
 
     def add_get_bucket_accelerate_configuration(self):
         return self.add_response(
-            'get_bucket_accelerate_configuration',
-            {},
-            {'Bucket': self.resource.name},
+            "get_bucket_accelerate_configuration", {}, {"Bucket": self.resource.name}
         )
 
     def add_list_buckets_empty_response(self):
         return self.add_response(
-            'list_buckets',
-            service_response={},
-            expected_params={},
+            "list_buckets", service_response={}, expected_params={}
         )
 
     def add_list_buckets_one_response(self):
         return self.add_response(
-            'list_buckets',
-            service_response={
-                'Buckets': [{
-                    'Name': self.resource.name,
-                }],
-            },
+            "list_buckets",
+            service_response={"Buckets": [{"Name": self.resource.name}]},
             expected_params={},
         )
 
     def add_head_bucket(self):
         return self.add_response(
-            'head_bucket',
+            "head_bucket",
             service_response={},
-            expected_params={'Bucket': self.resource.name},
+            expected_params={"Bucket": self.resource.name},
         )
 
     def add_list_objects(self, contents):
         return self.add_response(
-            'list_objects',
-            service_response={
-                'Contents': contents,
-            },
-            expected_params={'Bucket': self.resource.name},
+            "list_objects",
+            service_response={"Contents": contents},
+            expected_params={"Bucket": self.resource.name},
         )
 
     def add_delete_objects(self, contents):
         return self.add_response(
-            'delete_objects',
+            "delete_objects",
             service_response={},
             expected_params={
-                'Delete': {
-                    'Objects': [{'Key': key} for key in contents],
-                    'Quiet': True,
+                "Delete": {
+                    "Objects": [{"Key": key} for key in contents],
+                    "Quiet": True,
                 },
-                'Bucket': self.resource.name,
+                "Bucket": self.resource.name,
             },
         )
 
     def add_create_bucket(self):
         return self.add_response(
-            'create_bucket',
+            "create_bucket",
             service_response={},
             expected_params={
-                'Bucket': self.resource.name,
-                'CreateBucketConfiguration': {
-                    'LocationConstraint': 'eu-west-1',
-                }
+                "Bucket": self.resource.name,
+                "CreateBucketConfiguration": {"LocationConstraint": "eu-west-1"},
             },
         )
 
     def add_put_bucket_notification_configuration(self):
         return self.add_response(
-            'put_bucket_notification_configuration',
+            "put_bucket_notification_configuration",
             service_response={},
             expected_params={
-                'Bucket': self.resource.name,
-                'NotificationConfiguration': {
-                    'LambdaFunctionConfigurations': [],
-                }
+                "Bucket": self.resource.name,
+                "NotificationConfiguration": {"LambdaFunctionConfigurations": []},
             },
         )
 
     def add_delete_bucket(self):
         return self.add_response(
-            'delete_bucket',
+            "delete_bucket",
             service_response={},
-            expected_params={
-                'Bucket': self.resource.name,
-            },
+            expected_params={"Bucket": self.resource.name},
         )

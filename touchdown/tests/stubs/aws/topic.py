@@ -17,69 +17,46 @@ from .service import ServiceStubber
 
 class TopicStubber(ServiceStubber):
 
-    client_service = 'sns'
+    client_service = "sns"
 
     def add_list_topics_empty_response(self):
         return self.add_response(
-            'list_topics',
-            service_response={
-                'Topics': [],
-            },
-            expected_params={
-            }
+            "list_topics", service_response={"Topics": []}, expected_params={}
         )
 
     def add_list_topics_one_response(self):
         return self.add_response(
-            'list_topics',
+            "list_topics",
             service_response={
-                'Topics': [{
-                    'TopicArn': 'arn:topic:1234:' + self.resource.name,
-                }],
+                "Topics": [{"TopicArn": "arn:topic:1234:" + self.resource.name}]
             },
-            expected_params={
-            }
+            expected_params={},
         )
 
     def add_list_subscriptions_by_topic(self, subscriptions=None):
         return self.add_response(
-            'list_subscriptions_by_topic',
-            service_response={
-                'Subscriptions': subscriptions or [],
-            },
-            expected_params={
-                'TopicArn': 'arn:topic:1234:' + self.resource.name,
-            }
+            "list_subscriptions_by_topic",
+            service_response={"Subscriptions": subscriptions or []},
+            expected_params={"TopicArn": "arn:topic:1234:" + self.resource.name},
         )
 
     def add_get_topic_attributes(self):
         return self.add_response(
-            'get_topic_attributes',
-            service_response={
-                'Attributes': {},
-            },
-            expected_params={
-                'TopicArn': 'arn:topic:1234:' + self.resource.name,
-            }
+            "get_topic_attributes",
+            service_response={"Attributes": {}},
+            expected_params={"TopicArn": "arn:topic:1234:" + self.resource.name},
         )
 
     def add_create_topic(self):
         return self.add_response(
-            'create_topic',
-            service_response={
-                'TopicArn': 'arn:topic:1234:' + self.resource.name,
-            },
-            expected_params={
-                'Name': self.resource.name,
-            }
+            "create_topic",
+            service_response={"TopicArn": "arn:topic:1234:" + self.resource.name},
+            expected_params={"Name": self.resource.name},
         )
 
     def add_delete_topic(self):
         return self.add_response(
-            'delete_topic',
-            service_response={
-            },
-            expected_params={
-                'TopicArn': 'arn:topic:1234:' + self.resource.name,
-            }
+            "delete_topic",
+            service_response={},
+            expected_params={"TopicArn": "arn:topic:1234:" + self.resource.name},
         )

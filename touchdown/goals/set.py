@@ -18,36 +18,28 @@ from touchdown.core.goals import Goal, register
 
 class Set(Goal):
 
-    ''' Set a configuration variable '''
+    """ Set a configuration variable """
 
-    name = 'set'
+    name = "set"
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan('set')
+        plan_class = resource.meta.get_plan("set")
         if not plan_class:
-            plan_class = resource.meta.get_plan('describe')
+            plan_class = resource.meta.get_plan("describe")
         if not plan_class:
-            plan_class = resource.meta.get_plan('null')
+            plan_class = resource.meta.get_plan("null")
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
+        parser.add_argument("name", metavar="NAME", type=str, help="The setting to set")
         parser.add_argument(
-            'name',
-            metavar='NAME',
-            type=str,
-            help='The setting to set',
-        )
-        parser.add_argument(
-            'value',
-            metavar='VALUE',
-            type=str,
-            help='The new value to set',
+            "value", metavar="VALUE", type=str, help="The new value to set"
         )
 
     def execute(self, name, value):
-        settings = self.collect_as_dict('set')
+        settings = self.collect_as_dict("set")
         if name not in settings:
             raise errors.Error('No such setting "{}"'.format(name))
         settings[name].execute(settings[name].from_string(value))

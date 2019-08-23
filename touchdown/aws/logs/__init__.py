@@ -17,7 +17,4 @@ from .group import LogGroup
 
 from . import tail  # noqa isort:skip
 
-__all__ = [
-    'LogGroup',
-    'Filter',
-]
+__all__ = ["LogGroup", "Filter"]

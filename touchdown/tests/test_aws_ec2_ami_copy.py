@@ -17,29 +17,26 @@ from touchdown.tests.stubs.aws import ImageCopyStubber
 
 
 class TestCreateImageCopy(StubberTestCase):
-
     def test_create_image_copy(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        image = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.get_image(
-                    name='test-image',
-                ),
-                'describe',
+        image = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(self.aws.get_image(name="test-image"), "describe")
             )
-        ))
+        )
         image.add_describe_images_one_response()
 
-        image_copy = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.add_image_copy(
-                    name='test-image_copy',
-                    source=image.resource,
-                ),
-                'apply',
+        image_copy = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(
+                    self.aws.add_image_copy(
+                        name="test-image_copy", source=image.resource
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         image_copy.add_describe_images_empty_response()
         image_copy.add_copy_image()
         image_copy.add_describe_images_one_response()
@@ -48,27 +45,25 @@ class TestCreateImageCopy(StubberTestCase):
         goal.execute()
 
     def test_create_image_copy_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        image = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.get_image(
-                    name='test-image',
-                ),
-                'describe',
+        image = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(self.aws.get_image(name="test-image"), "describe")
             )
-        ))
+        )
         image.add_describe_images_one_response()
 
-        image_copy = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.add_image_copy(
-                    name='test-image_copy',
-                    source=image.resource,
-                ),
-                'apply',
+        image_copy = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(
+                    self.aws.add_image_copy(
+                        name="test-image_copy", source=image.resource
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         image_copy.add_describe_images_one_response()
         image_copy.add_describe_image_attribute()
 
@@ -77,56 +72,51 @@ class TestCreateImageCopy(StubberTestCase):
 
 
 class TestDestroyImageCopy(StubberTestCase):
-
     def test_destroy_image_copy(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        image = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.get_image(
-                    name='test-image',
-                ),
-                'describe',
+        image = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(self.aws.get_image(name="test-image"), "describe")
             )
-        ))
+        )
         image.add_describe_images_one_response()
 
-        image_copy = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.add_image_copy(
-                    name='test-image_copy',
-                    source=image.resource,
-                ),
-                'destroy',
+        image_copy = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(
+                    self.aws.add_image_copy(
+                        name="test-image_copy", source=image.resource
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
         image_copy.add_describe_images_one_response()
         image_copy.add_deregister_image()
 
         goal.execute()
 
     def test_destroy_image_copy_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        image = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.get_image(
-                    name='test-image',
-                ),
-                'describe',
+        image = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(self.aws.get_image(name="test-image"), "describe")
             )
-        ))
+        )
         image.add_describe_images_one_response()
 
-        image_copy = self.fixtures.enter_context(ImageCopyStubber(
-            goal.get_service(
-                self.aws.add_image_copy(
-                    name='test-image_copy',
-                    source=image.resource,
-                ),
-                'destroy',
+        image_copy = self.fixtures.enter_context(
+            ImageCopyStubber(
+                goal.get_service(
+                    self.aws.add_image_copy(
+                        name="test-image_copy", source=image.resource
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
         image_copy.add_describe_images_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)

@@ -18,38 +18,34 @@ from touchdown.tests.stubs.aws import AccountStubber
 
 
 class TestAccount(StubberTestCase):
-
     def test_mfa(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        self.aws.mfa_serial = 'mymfaserial'
-        goal.ui.preseed('mymfaserial', '123456')
+        self.aws.mfa_serial = "mymfaserial"
+        goal.ui.preseed("mymfaserial", "123456")
 
-        account = self.fixtures.enter_context(AccountStubber(
-            goal.get_service(self.aws, 'null')
-        ))
+        account = self.fixtures.enter_context(
+            AccountStubber(goal.get_service(self.aws, "null"))
+        )
         account.add_get_session_token()
 
         self.assertEqual(
-            account.service.session.access_key_id,
-            'AKIMFAGETSESSIONMFAGETSESSION',
+            account.service.session.access_key_id, "AKIMFAGETSESSIONMFAGETSESSION"
         )
         self.assertEqual(
-            account.service.session.secret_access_key,
-            'abcdefghijklmnopqrstuvwxyzmfa',
+            account.service.session.secret_access_key, "abcdefghijklmnopqrstuvwxyzmfa"
         )
         self.assertEqual(
-            account.service.session.session_token,
-            'zyxwvutsrqpnomlkjihgfedcbamfa',
+            account.service.session.session_token, "zyxwvutsrqpnomlkjihgfedcbamfa"
         )
 
-        vpcf = self.fixtures.enter_context(VpcFixture(
-            goal,
-            account.resource,
-        ))
-        self.assertEqual(goal.get_service(vpcf.vpc, 'describe').describe_object(), {
-            'VpcId': vpcf.vpc_id,
-            'EnableDnsHostnames': {'Value': False},
-            'EnableDnsSupport': {'Value': True},
-            'State': 'available',
-        })
+        vpcf = self.fixtures.enter_context(VpcFixture(goal, account.resource))
+        self.assertEqual(
+            goal.get_service(vpcf.vpc, "describe").describe_object(),
+            {
+                "VpcId": vpcf.vpc_id,
+                "EnableDnsHostnames": {"Value": False},
+                "EnableDnsSupport": {"Value": True},
+                "State": "available",
+            },
+        )

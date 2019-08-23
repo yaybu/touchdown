@@ -19,26 +19,24 @@ from .aws import StubberTestCase
 
 
 class TestElasticIpCreation(StubberTestCase):
-
     def test_create_elastic_ip(self):
         # There is no local state. It should just make a new one.
 
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         config = self.fixtures.enter_context(ConfigFixture(goal, self.workspace))
-        public_ip = config.add_string(
-            name='network.nat-elastic-ip',
-        )
+        public_ip = config.add_string(name="network.nat-elastic-ip")
 
-        elastic_ip = self.fixtures.enter_context(ElasticIpStubber(
-            goal.get_service(
-                self.aws.add_elastic_ip(
-                    name='test-elastic_ip',
-                    public_ip=public_ip,
-                ),
-                'apply',
+        elastic_ip = self.fixtures.enter_context(
+            ElasticIpStubber(
+                goal.get_service(
+                    self.aws.add_elastic_ip(
+                        name="test-elastic_ip", public_ip=public_ip
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         elastic_ip.add_allocate_address()
 
         goal.execute()
@@ -46,26 +44,25 @@ class TestElasticIpCreation(StubberTestCase):
     def test_recreate_elastic_ip(self):
         # It should look up 8.8.4.4 (from the local state), find it no longer exists and allocate a new eip
 
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         config = self.fixtures.enter_context(ConfigFixture(goal, self.workspace))
-        public_ip = config.add_string(
-            name='network.nat-elastic-ip',
+        public_ip = config.add_string(name="network.nat-elastic-ip")
+
+        goal.get_service(public_ip, "set").execute("8.8.4.4")
+
+        elastic_ip = self.fixtures.enter_context(
+            ElasticIpStubber(
+                goal.get_service(
+                    self.aws.add_elastic_ip(
+                        name="test-elastic_ip", public_ip=public_ip
+                    ),
+                    "apply",
+                )
+            )
         )
 
-        goal.get_service(public_ip, 'set').execute('8.8.4.4')
-
-        elastic_ip = self.fixtures.enter_context(ElasticIpStubber(
-            goal.get_service(
-                self.aws.add_elastic_ip(
-                    name='test-elastic_ip',
-                    public_ip=public_ip,
-                ),
-                'apply',
-            )
-        ))
-
-        elastic_ip.add_describe_addresses_empty_response('8.8.4.4')
+        elastic_ip.add_describe_addresses_empty_response("8.8.4.4")
         elastic_ip.add_allocate_address()
 
         goal.execute()
@@ -73,53 +70,50 @@ class TestElasticIpCreation(StubberTestCase):
     def test_create_elastic_ip_idempotent(self):
         # It should look up 8.8.8.8 and find it - there is nothing to do.
 
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         config = self.fixtures.enter_context(ConfigFixture(goal, self.workspace))
-        public_ip = config.add_string(
-            name='network.nat-elastic-ip',
-        )
+        public_ip = config.add_string(name="network.nat-elastic-ip")
 
-        goal.get_service(public_ip, 'set').execute('8.8.8.8')
+        goal.get_service(public_ip, "set").execute("8.8.8.8")
 
-        elastic_ip = self.fixtures.enter_context(ElasticIpStubber(
-            goal.get_service(
-                self.aws.add_elastic_ip(
-                    name='test-elastic_ip',
-                    public_ip=public_ip,
-                ),
-                'apply',
+        elastic_ip = self.fixtures.enter_context(
+            ElasticIpStubber(
+                goal.get_service(
+                    self.aws.add_elastic_ip(
+                        name="test-elastic_ip", public_ip=public_ip
+                    ),
+                    "apply",
+                )
             )
-        ))
-        elastic_ip.add_describe_addresses_one_response('8.8.8.8')
+        )
+        elastic_ip.add_describe_addresses_one_response("8.8.8.8")
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(elastic_ip.resource)), 0)
 
 
 class TestElasticIpDestroy(StubberTestCase):
-
     def test_destroy_elastic_ip(self):
         # It should look up 8.8.8.8 (from local state) and find it - delete it
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         config = self.fixtures.enter_context(ConfigFixture(goal, self.workspace))
-        public_ip = config.add_string(
-            name='network.nat-elastic-ip',
-        )
+        public_ip = config.add_string(name="network.nat-elastic-ip")
 
-        goal.get_service(public_ip, 'set').execute('8.8.8.8')
+        goal.get_service(public_ip, "set").execute("8.8.8.8")
 
-        elastic_ip = self.fixtures.enter_context(ElasticIpStubber(
-            goal.get_service(
-                self.aws.add_elastic_ip(
-                    name='test-elastic_ip',
-                    public_ip=public_ip,
-                ),
-                'destroy',
+        elastic_ip = self.fixtures.enter_context(
+            ElasticIpStubber(
+                goal.get_service(
+                    self.aws.add_elastic_ip(
+                        name="test-elastic_ip", public_ip=public_ip
+                    ),
+                    "destroy",
+                )
             )
-        ))
-        elastic_ip.add_describe_addresses_one_response('8.8.8.8')
+        )
+        elastic_ip.add_describe_addresses_one_response("8.8.8.8")
         elastic_ip.add_release_address()
 
         goal.execute()
@@ -127,47 +121,45 @@ class TestElasticIpDestroy(StubberTestCase):
     def test_destroy_elastic_ip_idempotent_no_local_state(self):
         # There is no local state - no API calls are made
 
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         config = self.fixtures.enter_context(ConfigFixture(goal, self.workspace))
-        public_ip = config.add_string(
-            name='network.nat-elastic-ip',
-        )
+        public_ip = config.add_string(name="network.nat-elastic-ip")
 
-        elastic_ip = self.fixtures.enter_context(ElasticIpStubber(
-            goal.get_service(
-                self.aws.add_elastic_ip(
-                    name='test-elastic_ip',
-                    public_ip=public_ip,
-                ),
-                'destroy',
+        elastic_ip = self.fixtures.enter_context(
+            ElasticIpStubber(
+                goal.get_service(
+                    self.aws.add_elastic_ip(
+                        name="test-elastic_ip", public_ip=public_ip
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(elastic_ip.resource)), 0)
 
     def test_destroy_elastic_ip_idempotent(self):
         # It should look up 8.8.8.8 and not find it. No further API calls.
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
         config = self.fixtures.enter_context(ConfigFixture(goal, self.workspace))
-        public_ip = config.add_string(
-            name='network.nat-elastic-ip',
-        )
+        public_ip = config.add_string(name="network.nat-elastic-ip")
 
-        goal.get_service(public_ip, 'set').execute('8.8.8.8')
+        goal.get_service(public_ip, "set").execute("8.8.8.8")
 
-        elastic_ip = self.fixtures.enter_context(ElasticIpStubber(
-            goal.get_service(
-                self.aws.add_elastic_ip(
-                    name='test-elastic_ip',
-                    public_ip=public_ip,
-                ),
-                'destroy',
+        elastic_ip = self.fixtures.enter_context(
+            ElasticIpStubber(
+                goal.get_service(
+                    self.aws.add_elastic_ip(
+                        name="test-elastic_ip", public_ip=public_ip
+                    ),
+                    "destroy",
+                )
             )
-        ))
-        elastic_ip.add_describe_addresses_empty_response('8.8.8.8')
+        )
+        elastic_ip.add_describe_addresses_empty_response("8.8.8.8")
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(elastic_ip.resource)), 0)

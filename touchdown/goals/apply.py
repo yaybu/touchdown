@@ -18,18 +18,22 @@ from touchdown.goals.action import ActionGoalMixin
 
 class Apply(ActionGoalMixin, Goal):
 
-    ''' Converge infrastructure on the state defined '''
+    """ Converge infrastructure on the state defined """
 
-    name = 'apply'
+    name = "apply"
 
     def get_plan_class(self, resource):
-        if 'destroy' in resource.ensure:
-            return resource.meta.get_plan('destroy')
+        if "destroy" in resource.ensure:
+            return resource.meta.get_plan("destroy")
 
-        if 'never-create' in resource.ensure:
-            return resource.meta.get_plan('describe')
+        if "never-create" in resource.ensure:
+            return resource.meta.get_plan("describe")
 
-        return resource.meta.get_plan('apply') or resource.meta.get_plan('describe') or resource.meta.get_plan('null')
+        return (
+            resource.meta.get_plan("apply")
+            or resource.meta.get_plan("describe")
+            or resource.meta.get_plan("null")
+        )
 
 
 register(Apply)

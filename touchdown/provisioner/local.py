@@ -25,16 +25,15 @@ from .provisioner import Target
 
 class Local(Target):
 
-    resource_name = 'local'
+    resource_name = "local"
 
     user = argument.String()
-    state = argument.String(default=os.path.abspath('.fuselage'))
+    state = argument.String(default=os.path.abspath(".fuselage"))
 
     root = argument.Resource(workspace.Workspace)
 
 
 class Connection(object):
-
     def __init__(self, plan):
         self.plan = plan
         self.resource = plan.resource
@@ -44,20 +43,20 @@ class Connection(object):
             return fp.read()
 
     def get_path_bytes(self, path):
-        with open(path, 'rb') as fp:
+        with open(path, "rb") as fp:
             return fp.read()
 
     def run_script(self, script, args=None, sudo=False):
         fd, script_name = tempfile.mkstemp()
         try:
-            with os.fdopen(fd, 'wb') as fh:
+            with os.fdopen(fd, "wb") as fh:
                 fh.write(script.read())
             os.chmod(script_name, 0o755)
 
             command = [sys.executable, script_name]
 
             if self.resource.state:
-                command.extend(['--state', os.path.abspath('.fuselage')])
+                command.extend(["--state", os.path.abspath(".fuselage")])
 
             command.extend(args or [])
 
@@ -78,7 +77,7 @@ class Connection(object):
 
 class LocalPlan(plan.Plan):
 
-    name = 'describe'
+    name = "describe"
     resource = Local
 
     def get_client(self):

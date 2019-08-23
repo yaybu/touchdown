@@ -16,69 +16,59 @@ from .service import ServiceStubber
 
 
 class VolumeAttachmentStubber(ServiceStubber):
-
     def add_describe_attachments_empty_response_by_instance_and_volume(self):
         return self.add_response(
-            'describe_volumes',
-            service_response={
-                'Volumes': [],
-            },
-            expected_params={
-                'VolumeIds': ['vol-abcdef12345'],
-            }
+            "describe_volumes",
+            service_response={"Volumes": []},
+            expected_params={"VolumeIds": ["vol-abcdef12345"]},
         )
 
     def add_describe_attachments_one_response_by_volume_AVAILABLE(self):
         return self.add_response(
-            'describe_volumes',
+            "describe_volumes",
             service_response={
-                'Volumes': [{
-                    'VolumeId': 'vol-abcdef12345',
-                    'State': 'available',
-                    'Attachments': [],
-                }],
+                "Volumes": [
+                    {
+                        "VolumeId": "vol-abcdef12345",
+                        "State": "available",
+                        "Attachments": [],
+                    }
+                ]
             },
-            expected_params={
-                'VolumeIds': ['vol-abcdef12345'],
-            }
+            expected_params={"VolumeIds": ["vol-abcdef12345"]},
         )
 
     def add_describe_attachments_one_response_by_volume_INUSE(self, instance_id):
         return self.add_response(
-            'describe_volumes',
+            "describe_volumes",
             service_response={
-                'Volumes': [{
-                    'VolumeId': 'vol-abcdef12345',
-                    'State': 'in-use',
-                    'Attachments': [{
-                        'InstanceId': instance_id,
-                        'State': 'attached',
-                    }],
-                }],
+                "Volumes": [
+                    {
+                        "VolumeId": "vol-abcdef12345",
+                        "State": "in-use",
+                        "Attachments": [
+                            {"InstanceId": instance_id, "State": "attached"}
+                        ],
+                    }
+                ]
             },
-            expected_params={
-                'VolumeIds': ['vol-abcdef12345'],
-            }
+            expected_params={"VolumeIds": ["vol-abcdef12345"]},
         )
 
-    def add_attach_volume(self, instance_id, device='/foo'):
+    def add_attach_volume(self, instance_id, device="/foo"):
         return self.add_response(
-            'attach_volume',
-            service_response={
-            },
+            "attach_volume",
+            service_response={},
             expected_params={
-                'Device': device,
-                'InstanceId': instance_id,
-                'VolumeId': 'vol-abcdef12345',
-            }
+                "Device": device,
+                "InstanceId": instance_id,
+                "VolumeId": "vol-abcdef12345",
+            },
         )
 
     def add_detach_volume(self):
         return self.add_response(
-            'detach_volume',
-            service_response={
-            },
-            expected_params={
-                'VolumeId': 'vol-abcdef12345',
-            }
+            "detach_volume",
+            service_response={},
+            expected_params={"VolumeId": "vol-abcdef12345"},
         )

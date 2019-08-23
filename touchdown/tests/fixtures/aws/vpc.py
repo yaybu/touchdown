@@ -18,17 +18,15 @@ from .fixture import AwsFixture
 
 
 class VpcFixture(AwsFixture):
-
     def __enter__(self):
-        self.vpc_stubber = self.fixtures.enter_context(VpcStubber(
-            self.goal.get_service(
-                self.aws.get_vpc(
-                    name='test-vpc',
-                    cidr_block='192.168.0.0/25',
-                ),
-                'describe',
-            ),
-        ))
+        self.vpc_stubber = self.fixtures.enter_context(
+            VpcStubber(
+                self.goal.get_service(
+                    self.aws.get_vpc(name="test-vpc", cidr_block="192.168.0.0/25"),
+                    "describe",
+                )
+            )
+        )
         self.vpc_stubber.add_describe_vpcs_one_response_by_name()
         self.vpc_stubber.add_describe_vpc_attributes()
 

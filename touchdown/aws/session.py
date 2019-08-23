@@ -20,16 +20,19 @@ from dateutil import parser
 session = session.get_session()
 
 # Provide our own botocore json to override (and increase) various timeouts
-session.get_component('data_loader')._search_paths[1:1] = [os.path.join(os.path.dirname(__file__), 'data')]
+session.get_component("data_loader")._search_paths[1:1] = [
+    os.path.join(os.path.dirname(__file__), "data")
+]
 
 # Force botocore to initialise - this avoids race conditions around
 # get_component
-session.create_client('ec2', 'eu-west-1')
+session.create_client("ec2", "eu-west-1")
 
 
 class Session(object):
-
-    def __init__(self, access_key_id, secret_access_key, session_token, expiration, region):
+    def __init__(
+        self, access_key_id, secret_access_key, session_token, expiration, region
+    ):
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.session_token = session_token
@@ -48,19 +51,19 @@ class Session(object):
 
     def tojson(self):
         return {
-            'access_key_id': self.access_key_id,
-            'secret_access_key': self.secret_access_key,
-            'session_token': self.session_token,
-            'expiration': self.expiration.isoformat(),
-            'region': self.region,
+            "access_key_id": self.access_key_id,
+            "secret_access_key": self.secret_access_key,
+            "session_token": self.session_token,
+            "expiration": self.expiration.isoformat(),
+            "region": self.region,
         }
 
     @classmethod
     def fromjson(cls, payload):
         return cls(
-            access_key_id=payload['access_key_id'],
-            secret_access_key=payload['secret_access_key'],
-            session_token=payload['session_token'],
-            expiration=parser.parse(payload['expiration']),
-            region=payload['region'],
+            access_key_id=payload["access_key_id"],
+            secret_access_key=payload["secret_access_key"],
+            session_token=payload["session_token"],
+            expiration=parser.parse(payload["expiration"]),
+            region=payload["region"],
         )

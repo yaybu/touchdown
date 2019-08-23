@@ -19,7 +19,7 @@ from .service import ServiceStubber
 
 class AccountStubber(ServiceStubber):
 
-    client_service = 'sts'
+    client_service = "sts"
 
     def __init__(self, service):
         self.resource = service.resource
@@ -29,17 +29,14 @@ class AccountStubber(ServiceStubber):
 
     def add_get_session_token(self):
         return self.add_response(
-            'get_session_token',
+            "get_session_token",
             service_response={
-                'Credentials': {
-                    'AccessKeyId': 'AKIMFAGETSESSIONMFAGETSESSION',
-                    'SecretAccessKey': 'abcdefghijklmnopqrstuvwxyzmfa',
-                    'SessionToken': 'zyxwvutsrqpnomlkjihgfedcbamfa',
-                    'Expiration': now(),
-                },
+                "Credentials": {
+                    "AccessKeyId": "AKIMFAGETSESSIONMFAGETSESSION",
+                    "SecretAccessKey": "abcdefghijklmnopqrstuvwxyzmfa",
+                    "SessionToken": "zyxwvutsrqpnomlkjihgfedcbamfa",
+                    "Expiration": now(),
+                }
             },
-            expected_params={
-                'SerialNumber': 'mymfaserial',
-                'TokenCode': '123456',
-            }
+            expected_params={"SerialNumber": "mymfaserial", "TokenCode": "123456"},
         )

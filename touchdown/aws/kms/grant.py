@@ -22,33 +22,32 @@ from .key import Key
 
 class Grant(Resource):
 
-    resource_name = 'grant'
+    resource_name = "grant"
 
-    name = argument.String(max=8192, field='Name')
-    grantee_principal = argument.String(field='GranteePrincipal')
-    retiring_principal = argument.String(field='RetiringPrincipal')
+    name = argument.String(max=8192, field="Name")
+    grantee_principal = argument.String(field="GranteePrincipal")
+    retiring_principal = argument.String(field="RetiringPrincipal")
 
     operations = argument.List(
-        argument.String(choices=[
-            'Decrypt',
-            'Encrypt',
-            'GenerateDataKey',
-            'GenerateDataKeyWithoutPlaintext',
-            'ReEncryptFrom',
-            'ReEncryptTo',
-            'CreateGrant',
-            'RetireGrant',
-        ]),
-        field='Operations',
+        argument.String(
+            choices=[
+                "Decrypt",
+                "Encrypt",
+                "GenerateDataKey",
+                "GenerateDataKeyWithoutPlaintext",
+                "ReEncryptFrom",
+                "ReEncryptTo",
+                "CreateGrant",
+                "RetireGrant",
+            ]
+        ),
+        field="Operations",
     )
 
-    encryption_context = argument.Dict(field='EncryptionContextEquals')
-    encryption_context_subset = argument.Dict(field='EncryptionContextSubset')
+    encryption_context = argument.Dict(field="EncryptionContextEquals")
+    encryption_context_subset = argument.Dict(field="EncryptionContextSubset")
 
-    grant_tokens = argument.List(
-        argument.String(),
-        field='GrantTokens',
-    )
+    grant_tokens = argument.List(argument.String(), field="GrantTokens")
 
     key = argument.Resource(Key)
 
@@ -56,30 +55,28 @@ class Grant(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = Grant
-    service_name = 'kms'
-    api_version = '2014-11-01'
-    describe_action = 'list_grants'
-    describe_envelope = 'Grants'
-    key = 'GrantId'
+    service_name = "kms"
+    api_version = "2014-11-01"
+    describe_action = "list_grants"
+    describe_envelope = "Grants"
+    key = "GrantId"
 
     def get_describe_filters(self):
         key = self.runner.get_plan(self.resource.key)
         if not key.resource_id:
             return None
 
-        return {
-            'KeyId': key.resource_id,
-        }
+        return {"KeyId": key.resource_id}
 
     def describe_object_matches(self, grant):
-        return grant['Name'] == self.resource.name
+        return grant["Name"] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_grant'
+    create_action = "create_grant"
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_grant'
+    destroy_action = "delete_grant"

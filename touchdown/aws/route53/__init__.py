@@ -15,8 +15,4 @@
 from .alias_target import AliasTarget
 from .zone import HostedZone, _normalize
 
-__all__ = [
-    '_normalize',
-    'AliasTarget',
-    'HostedZone',
-]
+__all__ = ["_normalize", "AliasTarget", "HostedZone"]

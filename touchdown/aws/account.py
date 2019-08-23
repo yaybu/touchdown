@@ -31,12 +31,12 @@ class BaseAccount(Resource):
     region = argument.String()
     access_key_id = argument.String()
     secret_access_key = argument.String()
-    mfa_serial = argument.String(field='SerialNumber')
+    mfa_serial = argument.String(field="SerialNumber")
 
 
 class Account(BaseAccount):
 
-    resource_name = 'aws'
+    resource_name = "aws"
 
     root = argument.Resource(Workspace)
 
@@ -45,7 +45,7 @@ class Null(Plan):
 
     resource = Account
     default = True
-    name = 'null'
+    name = "null"
     _session = None
 
     _acquire_session = Lock()
@@ -62,7 +62,7 @@ class Null(Plan):
 
     @cached_property
     def base_client(self):
-        return self.base_session.create_client('sts')
+        return self.base_session.create_client("sts")
 
     @property
     def session(self):
@@ -71,7 +71,9 @@ class Null(Plan):
                 session = None
 
                 if self.resource.mfa_serial:
-                    cache_key = '_'.join((self.resource.access_key_id, self.resource.mfa_serial))
+                    cache_key = "_".join(
+                        (self.resource.access_key_id, self.resource.mfa_serial)
+                    )
                     if cache_key in self.cache:
                         session = Session.fromjson(self.cache[cache_key])
 
@@ -79,15 +81,17 @@ class Null(Plan):
                         creds = self.base_client.get_session_token(
                             SerialNumber=self.resource.mfa_serial,
                             TokenCode=self.ui.prompt(
-                                'Please enter a token for MFA device {}'.format(self.resource.mfa_serial),
+                                "Please enter a token for MFA device {}".format(
+                                    self.resource.mfa_serial
+                                ),
                                 key=self.resource.mfa_serial,
                             ),
-                        )['Credentials']
+                        )["Credentials"]
                         session = Session(
-                            access_key_id=creds['AccessKeyId'],
-                            secret_access_key=creds['SecretAccessKey'],
-                            session_token=creds['SessionToken'],
-                            expiration=creds['Expiration'],
+                            access_key_id=creds["AccessKeyId"],
+                            secret_access_key=creds["SecretAccessKey"],
+                            session_token=creds["SessionToken"],
+                            expiration=creds["Expiration"],
                             region=self.resource.region,
                         )
                         self.cache[cache_key] = session.tojson()

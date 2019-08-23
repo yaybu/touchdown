@@ -17,18 +17,14 @@ from touchdown.tests.stubs.aws import TopicStubber
 
 
 class TestTopicCreation(StubberTestCase):
-
     def test_create_topic(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        topic = self.fixtures.enter_context(TopicStubber(
-            goal.get_service(
-                self.aws.add_topic(
-                    name='test-topic',
-                ),
-                'apply',
+        topic = self.fixtures.enter_context(
+            TopicStubber(
+                goal.get_service(self.aws.add_topic(name="test-topic"), "apply")
             )
-        ))
+        )
 
         topic.add_list_topics_empty_response()
         topic.add_create_topic()
@@ -38,16 +34,13 @@ class TestTopicCreation(StubberTestCase):
         goal.execute()
 
     def test_create_topic_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        topic = self.fixtures.enter_context(TopicStubber(
-            goal.get_service(
-                self.aws.add_topic(
-                    name='test-topic',
-                ),
-                'apply',
+        topic = self.fixtures.enter_context(
+            TopicStubber(
+                goal.get_service(self.aws.add_topic(name="test-topic"), "apply")
             )
-        ))
+        )
 
         topic.add_list_topics_one_response()
         topic.add_list_subscriptions_by_topic()
@@ -58,18 +51,14 @@ class TestTopicCreation(StubberTestCase):
 
 
 class TestTopicDestroy(StubberTestCase):
-
     def test_destroy_topic(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        topic = self.fixtures.enter_context(TopicStubber(
-            goal.get_service(
-                self.aws.add_topic(
-                    name='test-topic',
-                ),
-                'destroy',
+        topic = self.fixtures.enter_context(
+            TopicStubber(
+                goal.get_service(self.aws.add_topic(name="test-topic"), "destroy")
             )
-        ))
+        )
 
         topic.add_list_topics_one_response()
         topic.add_delete_topic()
@@ -77,16 +66,13 @@ class TestTopicDestroy(StubberTestCase):
         goal.execute()
 
     def test_destroy_topic_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        topic = self.fixtures.enter_context(TopicStubber(
-            goal.get_service(
-                self.aws.add_topic(
-                    name='test-topic',
-                ),
-                'destroy',
+        topic = self.fixtures.enter_context(
+            TopicStubber(
+                goal.get_service(self.aws.add_topic(name="test-topic"), "destroy")
             )
-        ))
+        )
 
         topic.add_list_topics_empty_response()
 

@@ -14,6 +14,4 @@
 
 from .certificate import Certificate
 
-__all__ = [
-    'Certificate',
-]
+__all__ = ["Certificate"]

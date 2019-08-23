@@ -23,31 +23,27 @@ from .subnet import Subnet
 
 class NatGateway(Resource):
 
-    resource_name = 'nat_gateway'
+    resource_name = "nat_gateway"
 
     name = argument.Callable(lambda r: r.subnet.name)
 
     elastic_ip = argument.Resource(
-        ElasticIp,
-        field='AllocationId',
-        serializer=serializers.Property('AllocationId'),
+        ElasticIp, field="AllocationId", serializer=serializers.Property("AllocationId")
     )
 
     subnet = argument.Resource(
-        Subnet,
-        field='SubnetId',
-        serializer=serializers.Identifier(),
+        Subnet, field="SubnetId", serializer=serializers.Identifier()
     )
 
 
 class Describe(SimpleDescribe, Plan):
 
     resource = NatGateway
-    service_name = 'ec2'
-    api_version = '2015-10-01'
-    describe_action = 'describe_nat_gateways'
-    describe_envelope = 'NatGateways'
-    key = 'NatGatewayId'
+    service_name = "ec2"
+    api_version = "2015-10-01"
+    describe_action = "describe_nat_gateways"
+    describe_envelope = "NatGateways"
+    key = "NatGatewayId"
     signature = ()
 
     def get_describe_filters(self):
@@ -55,20 +51,16 @@ class Describe(SimpleDescribe, Plan):
         if not subnet.resource_id:
             return None
 
-        return {
-            'Filters': [
-                {'Name': 'subnet-id', 'Values': [subnet.resource_id]},
-            ]
-        }
+        return {"Filters": [{"Name": "subnet-id", "Values": [subnet.resource_id]}]}
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_nat_gateway'
-    waiter = 'nat_gateway_available'
+    create_action = "create_nat_gateway"
+    waiter = "nat_gateway_available"
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_nat_gateway'
-    waiter = 'nat_gateway_deleted'
+    destroy_action = "delete_nat_gateway"
+    waiter = "nat_gateway_deleted"

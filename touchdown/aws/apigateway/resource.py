@@ -21,50 +21,44 @@ from .rest_api import RestApi
 
 class Resource(resource.Resource):
 
-    resource_name = 'resource'
+    resource_name = "resource"
 
-    name = argument.String(field='pathPart')
+    name = argument.String(field="pathPart")
 
     parent_resource = argument.Resource(
-        'touchdown.aws.apigateway.resource.Resource',
-        field='parentId',
+        "touchdown.aws.apigateway.resource.Resource", field="parentId"
     )
-    api = argument.Resource(
-        RestApi,
-        field='restApiId'
-    )
+    api = argument.Resource(RestApi, field="restApiId")
 
 
 class Describe(SimpleDescribe, Plan):
 
     resource = Resource
-    service_name = 'apigateway'
-    api_version = '2015-07-09'
-    describe_action = 'get_resources'
-    describe_envelope = 'items'
-    key = 'id'
+    service_name = "apigateway"
+    api_version = "2015-07-09"
+    describe_action = "get_resources"
+    describe_envelope = "items"
+    key = "id"
 
     def get_describe_filters(self):
         api = self.runner.get_plan(self.resource.api)
         if not api.resource_id:
             return None
-        return {
-            'restApiId': api.resource_id,
-        }
+        return {"restApiId": api.resource_id}
 
     def describe_object_matches(self, obj):
-        return self.resource.name == obj.get('path', '')
+        return self.resource.name == obj.get("path", "")
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_resource'
-    create_envelope = '@'
+    create_action = "create_resource"
+    create_envelope = "@"
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_resource'
+    destroy_action = "delete_resource"
 
     def get_destroy_serializer(self):
         return serializers.Dict(
@@ -73,4 +67,4 @@ class Destroy(SimpleDestroy, Describe):
         )
 
     def can_delete(self):
-        return self.resource.name != '/'
+        return self.resource.name != "/"

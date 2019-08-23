@@ -17,48 +17,42 @@ from .service import ServiceStubber
 
 class PipelineStubber(ServiceStubber):
 
-    client_service = 'elastictranscoder'
+    client_service = "elastictranscoder"
 
     def add_list_pipelines_empty_response(self):
         return self.add_response(
-            'list_pipelines',
-            service_response={},
-            expected_params={},
+            "list_pipelines", service_response={}, expected_params={}
         )
 
     def add_list_pipelines_one_response(self, notifications=None):
         return self.add_response(
-            'list_pipelines',
+            "list_pipelines",
             service_response={
-                'Pipelines': [{
-                    'Name': self.resource.name,
-                    'Id': self.make_id(self.resource.name),
-                    'Notifications': notifications or {},
-                }]
+                "Pipelines": [
+                    {
+                        "Name": self.resource.name,
+                        "Id": self.make_id(self.resource.name),
+                        "Notifications": notifications or {},
+                    }
+                ]
             },
             expected_params={},
         )
 
     def add_create_pipeline(self, input_bucket, role):
         return self.add_response(
-            'create_pipeline',
-            service_response={
-                'Pipeline': {
-                    'Id': self.make_id(self.resource.name),
-                },
-            },
+            "create_pipeline",
+            service_response={"Pipeline": {"Id": self.make_id(self.resource.name)}},
             expected_params={
-                'Name': self.resource.name,
-                'InputBucket': input_bucket,
-                'Role': role,
-            }
+                "Name": self.resource.name,
+                "InputBucket": input_bucket,
+                "Role": role,
+            },
         )
 
     def add_delete_pipeline(self):
         return self.add_response(
-            'delete_pipeline',
+            "delete_pipeline",
             service_response={},
-            expected_params={
-                'Id': self.make_id(self.resource.name),
-            }
+            expected_params={"Id": self.make_id(self.resource.name)},
         )

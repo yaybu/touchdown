@@ -17,41 +17,34 @@ from .service import ServiceStubber
 
 class RestApiStubber(ServiceStubber):
 
-    client_service = 'apigateway'
+    client_service = "apigateway"
 
     def add_get_rest_apis_empty_response(self):
         return self.add_response(
-            'get_rest_apis',
-            service_response={},
-            expected_params={},
+            "get_rest_apis", service_response={}, expected_params={}
         )
 
     def add_get_rest_apis_one_response(self):
         return self.add_response(
-            'get_rest_apis',
+            "get_rest_apis",
             service_response={
-                'items': [{
-                    'name': self.resource.name,
-                    'id': self.make_id(self.resource.name),
-                }],
+                "items": [
+                    {"name": self.resource.name, "id": self.make_id(self.resource.name)}
+                ]
             },
             expected_params={},
         )
 
     def add_create_rest_api(self):
         return self.add_response(
-            'create_rest_api',
+            "create_rest_api",
             service_response={},
-            expected_params={
-                'name': self.resource.name,
-            }
+            expected_params={"name": self.resource.name},
         )
 
     def add_delete_rest_api(self):
         return self.add_response(
-            'delete_rest_api',
+            "delete_rest_api",
             service_response={},
-            expected_params={
-                'restApiId': self.make_id(self.resource.name),
-            }
+            expected_params={"restApiId": self.make_id(self.resource.name)},
         )

@@ -15,8 +15,4 @@
 from .alarm import Alarm, AlarmDestination
 from .metric import Metric
 
-__all__ = [
-    'Alarm',
-    'AlarmDestination',
-    'Metric',
-]
+__all__ = ["Alarm", "AlarmDestination", "Metric"]

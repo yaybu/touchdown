@@ -22,24 +22,22 @@ from touchdown.tests.stubs.aws import NetworkAclStubber
 
 
 class TestNetworkAclCreation(StubberTestCase):
-
     def test_create_network_acl(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        network_acl = self.fixtures.enter_context(NetworkAclStubber(
-            goal.get_service(
-                vpcf.vpc.add_network_acl(
-                    name='test-network-acl',
-                ),
-                'apply',
+        network_acl = self.fixtures.enter_context(
+            NetworkAclStubber(
+                goal.get_service(
+                    vpcf.vpc.add_network_acl(name="test-network-acl"), "apply"
+                )
             )
-        ))
+        )
 
         network_acl.add_describe_network_acls_empty_response_by_name()
         network_acl.add_describe_network_acls_empty_response_by_name()
         network_acl.add_create_network_acl()
-        network_acl.add_create_tags(Name='test-network-acl.1')
+        network_acl.add_create_tags(Name="test-network-acl.1")
 
         # Wait for it to exist...
         network_acl.add_describe_network_acls_empty_response_by_name()
@@ -56,17 +54,16 @@ class TestNetworkAclCreation(StubberTestCase):
         goal.execute()
 
     def test_create_network_acl_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        network_acl = self.fixtures.enter_context(NetworkAclStubber(
-            goal.get_service(
-                vpcf.vpc.add_network_acl(
-                    name='test-network-acl',
-                ),
-                'apply',
+        network_acl = self.fixtures.enter_context(
+            NetworkAclStubber(
+                goal.get_service(
+                    vpcf.vpc.add_network_acl(name="test-network-acl"), "apply"
+                )
             )
-        ))
+        )
 
         network_acl.add_describe_network_acls_one_response_by_name()
         network_acl.add_describe_network_acls_one_response_by_name()
@@ -76,19 +73,17 @@ class TestNetworkAclCreation(StubberTestCase):
 
 
 class TestNetworkAclDestroy(StubberTestCase):
-
     def test_destroy_network_acl(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        network_acl = self.fixtures.enter_context(NetworkAclStubber(
-            goal.get_service(
-                vpcf.vpc.add_network_acl(
-                    name='test-network-acl',
-                ),
-                'destroy',
+        network_acl = self.fixtures.enter_context(
+            NetworkAclStubber(
+                goal.get_service(
+                    vpcf.vpc.add_network_acl(name="test-network-acl"), "destroy"
+                )
             )
-        ))
+        )
 
         network_acl.add_describe_network_acls_one_response_by_name()
         network_acl.add_describe_network_acls_one_response_by_name()
@@ -98,17 +93,16 @@ class TestNetworkAclDestroy(StubberTestCase):
         goal.execute()
 
     def test_destroy_network_acl_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
 
-        network_acl = self.fixtures.enter_context(NetworkAclStubber(
-            goal.get_service(
-                vpcf.vpc.add_network_acl(
-                    name='test-network-acl',
-                ),
-                'destroy',
+        network_acl = self.fixtures.enter_context(
+            NetworkAclStubber(
+                goal.get_service(
+                    vpcf.vpc.add_network_acl(name="test-network-acl"), "destroy"
+                )
             )
-        ))
+        )
 
         network_acl.add_describe_network_acls_empty_response_by_name()
         network_acl.add_describe_network_acls_empty_response_by_name()
@@ -118,45 +112,35 @@ class TestNetworkAclDestroy(StubberTestCase):
 
 
 class TestNetworkAclRules(unittest.TestCase):
-
     def setUp(self):
         self.workspace = Workspace()
-        self.aws = self.workspace.add_aws(region='eu-west-1')
-        self.vpc = self.aws.add_vpc(name='test-vpc')
+        self.aws = self.workspace.add_aws(region="eu-west-1")
+        self.vpc = self.aws.add_vpc(name="test-vpc")
 
     def test_simple_rule_with_all_ports(self):
         acl = self.vpc.add_network_acl(
-            name='test-acl',
-            inbound=[dict(
-                network='10.0.0.0/20',
-                protocol='tcp',
-                port='*',
-            )]
+            name="test-acl",
+            inbound=[dict(network="10.0.0.0/20", protocol="tcp", port="*")],
         )
         assert acl.inbound[0].port.start == 1
         assert acl.inbound[0].port.end == 65535
 
     def test_simple_rule_with_single_port(self):
         acl = self.vpc.add_network_acl(
-            name='test-acl',
-            inbound=[dict(
-                network='10.0.0.0/20',
-                protocol='tcp',
-                port=20,
-            )]
+            name="test-acl",
+            inbound=[dict(network="10.0.0.0/20", protocol="tcp", port=20)],
         )
         assert acl.inbound[0].port.start == 20
         assert acl.inbound[0].port.end == 20
 
     def test_simple_rule_with_port_range(self):
         acl = self.vpc.add_network_acl(
-            name='test-acl',
-            inbound=[dict(
-                network='10.0.0.0/20',
-                protocol='tcp',
-                port__start=20,
-                port__end=40,
-            )]
+            name="test-acl",
+            inbound=[
+                dict(
+                    network="10.0.0.0/20", protocol="tcp", port__start=20, port__end=40
+                )
+            ],
         )
         assert acl.inbound[0].port.start == 20
         assert acl.inbound[0].port.end == 40
@@ -165,24 +149,18 @@ class TestNetworkAclRules(unittest.TestCase):
         self.assertRaises(
             errors.InvalidParameter,
             self.vpc.add_network_acl,
-            name='test-acl',
-            inbound=[dict(
-                network='10.0.0.0/20',
-                protocol='tcp',
-                port=20,
-                port__start=20,
-            )]
+            name="test-acl",
+            inbound=[
+                dict(network="10.0.0.0/20", protocol="tcp", port=20, port__start=20)
+            ],
         )
 
     def test_mixing_port_and_port__end(self):
         self.assertRaises(
             errors.InvalidParameter,
             self.vpc.add_network_acl,
-            name='test-acl',
-            inbound=[dict(
-                network='10.0.0.0/20',
-                protocol='tcp',
-                port=20,
-                port__end=20,
-            )]
+            name="test-acl",
+            inbound=[
+                dict(network="10.0.0.0/20", protocol="tcp", port=20, port__end=20)
+            ],
         )

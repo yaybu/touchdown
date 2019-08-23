@@ -18,7 +18,6 @@ import datetime
 
 
 class ProgressBar(object):
-
     def __init__(self, frontend, max_value=0, **kwargs):
         self.frontend = frontend
         self.max_value = max_value
@@ -33,5 +32,7 @@ class ProgressBar(object):
 
     def __exit__(self, *exc_info):
         duration = datetime.datetime.now() - self.start_time
-        self.frontend.echo('{} tasks executed out of {}'.format(self.current, self.max_value))
-        self.frontend.echo('Tasks executed in {}'.format(duration))
+        self.frontend.echo(
+            "{} tasks executed out of {}".format(self.current, self.max_value)
+        )
+        self.frontend.echo("Tasks executed in {}".format(duration))

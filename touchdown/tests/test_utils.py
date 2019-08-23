@@ -18,39 +18,38 @@ from touchdown.core.utils import force_bytes, force_str, force_unicode
 
 
 class TestStringHelpers(unittest.TestCase):
-
     def test_str_str(self):
-        self.assertEqual(force_str('foo'), 'foo')
+        self.assertEqual(force_str("foo"), "foo")
 
     def test_str_u(self):
-        self.assertEqual(force_str(u'foo'), 'foo')
+        self.assertEqual(force_str(u"foo"), "foo")
 
     def test_str_b(self):
-        self.assertEqual(force_str(b'foo'), 'foo')
+        self.assertEqual(force_str(b"foo"), "foo")
 
     def test_str_exception(self):
         self.assertRaises(ValueError, force_str, [])
 
     def test_unicode_str(self):
-        self.assertEqual(force_unicode('foo'), u'foo')
+        self.assertEqual(force_unicode("foo"), u"foo")
 
     def test_unicode_u(self):
-        self.assertEqual(force_unicode(u'foo'), u'foo')
+        self.assertEqual(force_unicode(u"foo"), u"foo")
 
     def test_unicode_b(self):
-        self.assertEqual(force_unicode(b'foo'), u'foo')
+        self.assertEqual(force_unicode(b"foo"), u"foo")
 
     def test_unicode_exception(self):
         self.assertRaises(ValueError, force_unicode, [])
 
     def test_bytes_str(self):
-        self.assertEqual(force_bytes('foo'), b'foo')
+        self.assertEqual(force_bytes("foo"), b"foo")
 
     def test_bytes_u(self):
-        self.assertEqual(force_bytes(u'foo'), b'foo')
+        self.assertEqual(force_bytes(u"foo"), b"foo")
 
     def test_bytes_b(self):
-        self.assertEqual(force_bytes(b'foo'), b'foo')
+        self.assertEqual(force_bytes(b"foo"), b"foo")
 
     def test_bytes_exception(self):
         self.assertRaises(ValueError, force_bytes, [])

@@ -21,7 +21,7 @@ from . import variable
 
 class IPNetwork(variable.Variable):
 
-    resource_name = 'ip_network'
+    resource_name = "ip_network"
 
     default = argument.String()
     min = argument.Integer()

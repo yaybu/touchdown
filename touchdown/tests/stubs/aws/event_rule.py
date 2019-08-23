@@ -17,60 +17,39 @@ from .service import ServiceStubber
 
 class EventRuleStubber(ServiceStubber):
 
-    client_service = 'events'
+    client_service = "events"
 
     def add_list_rules_empty_response(self):
         return self.add_response(
-            'list_rules',
-            service_response={
-                'Rules': [],
-            },
-            expected_params={
-                'NamePrefix': self.resource.name,
-            },
+            "list_rules",
+            service_response={"Rules": []},
+            expected_params={"NamePrefix": self.resource.name},
         )
 
     def add_list_rules_one_response_by_name(self):
         return self.add_response(
-            'list_rules',
-            service_response={
-                'Rules': [{
-                    'Name': self.resource.name,
-                }],
-            },
-            expected_params={
-                'NamePrefix': self.resource.name,
-            },
+            "list_rules",
+            service_response={"Rules": [{"Name": self.resource.name}]},
+            expected_params={"NamePrefix": self.resource.name},
         )
 
     def add_list_targets_by_rule(self, targets):
         return self.add_response(
-            'list_targets_by_rule',
-            service_response={
-                'Targets': targets,
-            },
-            expected_params={
-                'Rule': self.resource.name,
-            },
+            "list_targets_by_rule",
+            service_response={"Targets": targets},
+            expected_params={"Rule": self.resource.name},
         )
 
     def add_remove_targets(self, target_ids):
         return self.add_response(
-            'remove_targets',
-            service_response={
-            },
-            expected_params={
-                'Rule': self.resource.name,
-                'Ids': target_ids,
-            },
+            "remove_targets",
+            service_response={},
+            expected_params={"Rule": self.resource.name, "Ids": target_ids},
         )
 
     def add_delete_rule(self):
         return self.add_response(
-            'delete_rule',
-            service_response={
-            },
-            expected_params={
-                'Name': self.resource.name,
-            },
+            "delete_rule",
+            service_response={},
+            expected_params={"Name": self.resource.name},
         )

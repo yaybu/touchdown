@@ -26,7 +26,6 @@ logger = logging.getLogger(__name__)
 
 
 class SerialMap(object):
-
     def __init__(self, ui, resources, callable):
         self.ui = ui
         self.resources = resources
@@ -41,7 +40,6 @@ class SerialMap(object):
 
 
 class InteruptibleQueue(queue.Queue):
-
     def _init(self, maxsize):
         queue.Queue._init(self, maxsize)
         self.stopped = False
@@ -59,7 +57,6 @@ class InteruptibleQueue(queue.Queue):
 
 
 class QueueOnce(InteruptibleQueue):
-
     def _init(self, maxsize):
         InteruptibleQueue._init(self, maxsize)
         self._items = set()
@@ -140,7 +137,7 @@ class ParallelMap(object):
         try:
             # Start up as many workers as requested.
             for i in range(self.workers):
-                t = threading.Thread(target=self.worker, name='worker{}'.format(i))
+                t = threading.Thread(target=self.worker, name="worker{}".format(i))
                 t.start()
 
             # Seed the workers with the initial batch of work
@@ -154,14 +151,14 @@ class ParallelMap(object):
         except errors.Error as e:
             caught_error = e
             self.ui.failure(str(e))
-            self.ui.echo('Exiting...')
+            self.ui.echo("Exiting...")
 
         except KeyboardInterrupt:
-            self.ui.echo('Interrupted. Pending tasks cancelled.')
+            self.ui.echo("Interrupted. Pending tasks cancelled.")
 
         except Exception as e:
             caught_error = e
-            self.ui.echo('Unhandled error. Cleaning up.')
+            self.ui.echo("Unhandled error. Cleaning up.")
 
         finally:
             for current in self.wait_for_remaining():

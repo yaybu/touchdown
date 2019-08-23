@@ -22,26 +22,26 @@ from .waf import WafApply, WafDescribe, WafDestroy
 
 class IPSetDescriptor(Resource):
 
-    resource_name = 'ip_set_descriptor'
+    resource_name = "ip_set_descriptor"
 
-    address_type = argument.String(field='Type', choices=['IPV4'], default='IPV4')
-    address = argument.IPNetwork(field='Value')
+    address_type = argument.String(field="Type", choices=["IPV4"], default="IPV4")
+    address = argument.IPNetwork(field="Value")
 
     @classmethod
     def clean(cls, value):
         if isinstance(value, str):
-            return super(IPSetDescriptor, cls).clean({'address': value})
+            return super(IPSetDescriptor, cls).clean({"address": value})
         return super(IPSetDescriptor, cls).clean(value)
 
 
 class IpSet(Resource):
 
-    resource_name = 'ip_set'
+    resource_name = "ip_set"
 
-    name = argument.String(field='Name')
+    name = argument.String(field="Name")
     addresses = argument.ResourceList(
         IPSetDescriptor,
-        field='IPSetDescriptors',
+        field="IPSetDescriptors",
         create=False,
         serializer=serializers.List(serializers.Resource()),
     )
@@ -51,23 +51,23 @@ class IpSet(Resource):
 class Describe(WafDescribe, Plan):
 
     resource = IpSet
-    service_name = 'waf'
-    api_version = '2015-08-24'
-    describe_action = 'list_ip_sets'
-    describe_envelope = 'IPSets'
-    annotate_action = 'get_ip_set'
-    key = 'IPSetId'
-    local_container = 'addresses'
-    container_update_action = 'update_ip_set'
-    container = 'IPSetDescriptors'
-    container_member = 'IPSetDescriptor'
+    service_name = "waf"
+    api_version = "2015-08-24"
+    describe_action = "list_ip_sets"
+    describe_envelope = "IPSets"
+    annotate_action = "get_ip_set"
+    key = "IPSetId"
+    local_container = "addresses"
+    container_update_action = "update_ip_set"
+    container = "IPSetDescriptors"
+    container_member = "IPSetDescriptor"
 
 
 class Apply(WafApply, Describe):
 
-    create_action = 'create_ip_set'
+    create_action = "create_ip_set"
 
 
 class Destroy(WafDestroy, Describe):
 
-    destroy_action = 'delete_ip_set'
+    destroy_action = "delete_ip_set"

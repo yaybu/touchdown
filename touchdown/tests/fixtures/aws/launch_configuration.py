@@ -18,18 +18,19 @@ from .fixture import AwsFixture
 
 
 class LaunchConfigurationFixture(AwsFixture):
-
     def __enter__(self):
-        self.launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
-            self.goal.get_service(
-                self.aws.add_launch_configuration(
-                    name='my-test-lc',
-                    image='ami-cba130bc',
-                    instance_type='t2.micro',
-                ),
-                'apply',
+        self.launch_config = self.fixtures.enter_context(
+            LaunchConfigurationStubber(
+                self.goal.get_service(
+                    self.aws.add_launch_configuration(
+                        name="my-test-lc",
+                        image="ami-cba130bc",
+                        instance_type="t2.micro",
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
 
         self.launch_config.add_describe_launch_configurations_one_response()
         self.launch_config.add_describe_launch_configurations_one_response()

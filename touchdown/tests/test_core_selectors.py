@@ -16,15 +16,12 @@ from touchdown.tests.aws import StubberTestCase
 
 
 class TestSelectors(StubberTestCase):
-
     def setUp(self):
         super(TestSelectors, self).setUp()
-        self.aws.add_ec2_instance(
-            name='my-ec2-instance',
-        )
+        self.aws.add_ec2_instance(name="my-ec2-instance")
         self.database = self.aws.add_database(
-            name='my-database',
-            subnet_group=self.aws.add_db_subnet_group(name='my-subnet-group'),
+            name="my-database",
+            subnet_group=self.aws.add_db_subnet_group(name="my-subnet-group"),
         )
         self.echo = self.workspace.add_echo(text=self.database.endpoint_address)
         self.workspace.load()

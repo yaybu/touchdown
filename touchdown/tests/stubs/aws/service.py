@@ -21,7 +21,7 @@ from touchdown.core.utils import force_bytes
 
 class Stubber(BaseStubber):
 
-    '''Extends the stubber from botocore so that it always asserts that
+    """Extends the stubber from botocore so that it always asserts that
     there are no leftover responses.
 
     So, for eg:
@@ -34,7 +34,7 @@ class Stubber(BaseStubber):
     By using this stubber, the above will fail because there is a
     pending resquest. The botocore's stubber doesn't - you have to
     remember to call `stub.assert_no_pending_responses()`.
-    '''
+    """
 
     def __exit__(self, exc_type, exc_value, traceback):
         super(Stubber, self).__exit__(exc_type, exc_value, traceback)
@@ -45,7 +45,6 @@ class Stubber(BaseStubber):
 
 
 class ServiceStubber(Stubber):
-
     def __init__(self, service):
         self.resource = service.resource
         self.service = service
@@ -53,6 +52,6 @@ class ServiceStubber(Stubber):
         super(ServiceStubber, self).__init__(service.client)
 
     def make_id(self, name):
-        ''' Return consistent 'id's' given a name. Subclasses will typically
-        trim and prefix this to get something like i-abcd1234. '''
+        """ Return consistent 'id's' given a name. Subclasses will typically
+        trim and prefix this to get something like i-abcd1234. """
         return sha1(force_bytes(name)).hexdigest()

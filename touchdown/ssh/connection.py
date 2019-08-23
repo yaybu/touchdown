@@ -30,17 +30,19 @@ class Instance(adapters.Adapter):
 
 class Connection(Target):
 
-    resource_name = 'ssh_connection'
+    resource_name = "ssh_connection"
 
     name = argument.String()
-    username = argument.String(default='root', field='username')
-    password = argument.String(field='password')
-    private_key = argument.String(field='pkey', serializer=serializers.Identity())
-    hostname = argument.String(field='hostname')
-    instance = argument.Resource(Instance, field='hostname', serializer=serializers.Resource())
-    port = argument.Integer(field='port', default=22)
+    username = argument.String(default="root", field="username")
+    password = argument.String(field="password")
+    private_key = argument.String(field="pkey", serializer=serializers.Identity())
+    hostname = argument.String(field="hostname")
+    instance = argument.Resource(
+        Instance, field="hostname", serializer=serializers.Resource()
+    )
+    port = argument.Integer(field="port", default=22)
 
-    proxy = argument.Resource('touchdown.ssh.connection.Connection')
+    proxy = argument.Resource("touchdown.ssh.connection.Connection")
 
     forwarded_keys = argument.Dict()
 
@@ -49,33 +51,35 @@ class Connection(Target):
     def clean_private_key(self, private_key):
         if private_key and client:
             return client.private_key_from_string(private_key)
-        raise errors.InvalidParameter('Invalid SSH private key')
+        raise errors.InvalidParameter("Invalid SSH private key")
 
 
 class ConnectionPlan(plan.Plan):
 
-    name = 'describe'
+    name = "describe"
     resource = Connection
     _client = None
 
     def get_proxy(self, **kwargs):
-        self.echo('Setting up connection proxy via {}'.format(self.resource.proxy))
+        self.echo("Setting up connection proxy via {}".format(self.resource.proxy))
         proxy = self.runner.get_plan(self.resource.proxy)
         transport = proxy.get_client().get_transport()
-        self.echo('Setting up proxy channel to {}'.format(kwargs['hostname']))
+        self.echo("Setting up proxy channel to {}".format(kwargs["hostname"]))
 
         for i in range(20):
             try:
                 return transport.open_channel(
-                    'direct-tcpip',
-                    (kwargs['hostname'], kwargs['port']),
-                    ('', 0)
+                    "direct-tcpip", (kwargs["hostname"], kwargs["port"]), ("", 0)
                 )
             except (EOFError, ssh_exception.ChannelException):
                 time.sleep(i)
                 continue
 
-        raise errors.Error('Error setting up proxy channel to {} after 20 tries'.format(kwargs['hostname']))
+        raise errors.Error(
+            "Error setting up proxy channel to {} after 20 tries".format(
+                kwargs["hostname"]
+            )
+        )
 
     def get_client(self):
         if self._client and self._client.get_transport().active:
@@ -86,30 +90,37 @@ class ConnectionPlan(plan.Plan):
         kwargs = serializers.Resource().render(self.runner, self.resource)
 
         if self.resource.proxy:
-            kwargs['sock'] = self.get_proxy(**kwargs)
-            self.echo('Proxy setup')
+            kwargs["sock"] = self.get_proxy(**kwargs)
+            self.echo("Proxy setup")
 
         if not self.resource.password and not self.resource.private_key:
-            kwargs['look_for_keys'] = True
-            kwargs['allow_agent'] = True
+            kwargs["look_for_keys"] = True
+            kwargs["allow_agent"] = True
 
-        args = ['hostname={}'.format(kwargs['hostname']), 'username={}'.format(kwargs['username'])]
+        args = [
+            "hostname={}".format(kwargs["hostname"]),
+            "username={}".format(kwargs["username"]),
+        ]
         if self.resource.port != 22:
-            args.append('port={}'.format(kwargs['port']))
+            args.append("port={}".format(kwargs["port"]))
 
-        self.echo('Establishing ssh connection ({})'.format(', '.join(args)))
+        self.echo("Establishing ssh connection ({})".format(", ".join(args)))
         for i in range(20):
             try:
                 cli.connect(**kwargs)
                 break
             except (EOFError, ssh_exception.SSHException):
-                self.echo('Connection timeout. Retrying in 1s.')
+                self.echo("Connection timeout. Retrying in 1s.")
                 time.sleep(1)
                 continue
         else:
-            raise errors.Error('Error setting up connection to {} after 20 tries'.format(kwargs['hostname']))
+            raise errors.Error(
+                "Error setting up connection to {} after 20 tries".format(
+                    kwargs["hostname"]
+                )
+            )
 
-        self.echo('Got connection')
+        self.echo("Got connection")
 
         self._client = cli
 
@@ -117,5 +128,7 @@ class ConnectionPlan(plan.Plan):
 
     def get_actions(self):
         if not client:
-            raise errors.Error('Paramiko library is required to perform operations involving ssh')
+            raise errors.Error(
+                "Paramiko library is required to perform operations involving ssh"
+            )
         return []

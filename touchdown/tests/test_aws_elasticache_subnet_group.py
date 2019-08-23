@@ -18,39 +18,39 @@ from touchdown.tests.stubs.aws import ElastiCacheSubnetGroupStubber
 
 
 class TestSubnetGroupCreation(StubberTestCase):
-
     def test_create_subnet_group(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         vpcf = self.fixtures.enter_context(VpcFixture(goal, self.aws))
         subnet = self.fixtures.enter_context(SubnetFixture(goal, vpcf.vpc))
 
-        subnet_group = self.fixtures.enter_context(ElastiCacheSubnetGroupStubber(
-            goal.get_service(
-                self.aws.add_cache_subnet_group(
-                    name='my-subnet_group',
-                    description='my-subnet-group-description',
-                    subnets=[subnet],
-                ),
-                'apply',
+        subnet_group = self.fixtures.enter_context(
+            ElastiCacheSubnetGroupStubber(
+                goal.get_service(
+                    self.aws.add_cache_subnet_group(
+                        name="my-subnet_group",
+                        description="my-subnet-group-description",
+                        subnets=[subnet],
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         subnet_group.add_describe_cache_subnet_groups_empty()
         subnet_group.add_create_subnet_group()
 
         goal.execute()
 
     def test_create_subnet_group_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        subnet_group = self.fixtures.enter_context(ElastiCacheSubnetGroupStubber(
-            goal.get_service(
-                self.aws.add_cache_subnet_group(
-                    name='my-subnet_group',
-                ),
-                'apply',
+        subnet_group = self.fixtures.enter_context(
+            ElastiCacheSubnetGroupStubber(
+                goal.get_service(
+                    self.aws.add_cache_subnet_group(name="my-subnet_group"), "apply"
+                )
             )
-        ))
+        )
         subnet_group.add_describe_cache_subnet_groups_one()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -58,34 +58,31 @@ class TestSubnetGroupCreation(StubberTestCase):
 
 
 class TestSubnetGroupDeletion(StubberTestCase):
-
     def test_delete_subnet_group(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        subnet_group = self.fixtures.enter_context(ElastiCacheSubnetGroupStubber(
-            goal.get_service(
-                self.aws.add_cache_subnet_group(
-                    name='my-subnet_group',
-                ),
-                'destroy',
+        subnet_group = self.fixtures.enter_context(
+            ElastiCacheSubnetGroupStubber(
+                goal.get_service(
+                    self.aws.add_cache_subnet_group(name="my-subnet_group"), "destroy"
+                )
             )
-        ))
+        )
         subnet_group.add_describe_cache_subnet_groups_one()
         subnet_group.add_delete_subnet_group()
 
         goal.execute()
 
     def test_delete_subnet_group_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        subnet_group = self.fixtures.enter_context(ElastiCacheSubnetGroupStubber(
-            goal.get_service(
-                self.aws.add_cache_subnet_group(
-                    name='my-subnet_group',
-                ),
-                'destroy',
+        subnet_group = self.fixtures.enter_context(
+            ElastiCacheSubnetGroupStubber(
+                goal.get_service(
+                    self.aws.add_cache_subnet_group(name="my-subnet_group"), "destroy"
+                )
             )
-        ))
+        )
         subnet_group.add_describe_cache_subnet_groups_empty()
 
         self.assertEqual(len(list(goal.plan())), 0)

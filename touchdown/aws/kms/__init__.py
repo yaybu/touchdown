@@ -17,9 +17,4 @@ from .grant import Grant
 from .key import Key
 from .wrapper import Wrapper
 
-__all__ = [
-    'Alias',
-    'Grant',
-    'Key',
-    'Wrapper',
-]
+__all__ = ["Alias", "Grant", "Key", "Wrapper"]

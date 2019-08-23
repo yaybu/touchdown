@@ -16,7 +16,6 @@ from touchdown.tests.fixtures.fixture import Fixture
 
 
 class AwsFixture(Fixture):
-
     def __init__(self, goal, aws):
         super(AwsFixture, self).__init__(goal, aws.workspace)
         self.aws = aws

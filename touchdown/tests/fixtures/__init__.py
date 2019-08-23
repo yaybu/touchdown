@@ -15,7 +15,4 @@
 from .config import ConfigFixture
 from .folder import TemporaryFolderFixture
 
-__all__ = [
-    'ConfigFixture',
-    'TemporaryFolderFixture',
-]
+__all__ = ["ConfigFixture", "TemporaryFolderFixture"]

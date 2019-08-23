@@ -17,49 +17,40 @@ from .service import ServiceStubber
 
 class S3FileStubber(ServiceStubber):
 
-    client_service = 's3'
+    client_service = "s3"
 
     def add_list_objects_empty_response(self):
         return self.add_response(
-            'list_objects',
-            service_response={
-            },
-            expected_params={
-                'Bucket': self.resource.bucket.name
-            },
+            "list_objects",
+            service_response={},
+            expected_params={"Bucket": self.resource.bucket.name},
         )
 
     def add_list_objects_one_response(self):
         return self.add_response(
-            'list_objects',
-            service_response={
-                'Contents': [{
-                    'Key': self.resource.name,
-                }],
-            },
-            expected_params={
-                'Bucket': self.resource.bucket.name
-            },
+            "list_objects",
+            service_response={"Contents": [{"Key": self.resource.name}]},
+            expected_params={"Bucket": self.resource.bucket.name},
         )
 
     def add_put_object(self):
         return self.add_response(
-            'put_object',
+            "put_object",
             service_response={},
             expected_params={
-                'Key': self.resource.name,
-                'Bucket': self.resource.bucket.name,
-                'Body': 'my-test-content',
-                'ACL': 'private',
+                "Key": self.resource.name,
+                "Bucket": self.resource.bucket.name,
+                "Body": "my-test-content",
+                "ACL": "private",
             },
         )
 
     def add_delete_object(self):
         return self.add_response(
-            'delete_object',
+            "delete_object",
             service_response={},
             expected_params={
-                'Key': self.resource.name,
-                'Bucket': self.resource.bucket.name,
+                "Key": self.resource.name,
+                "Bucket": self.resource.bucket.name,
             },
         )

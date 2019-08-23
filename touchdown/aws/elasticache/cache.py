@@ -24,17 +24,28 @@ from .subnet_group import SubnetGroup
 
 class BaseCacheCluster(Resource):
 
-    instance_class = argument.String(field='CacheNodeType', update=False)
-    engine = argument.String(field='Engine', update=False)
-    engine_version = argument.String(field='EngineVersion')
-    port = argument.Integer(min=1, max=32768, field='Port', update=False)
-    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroupIds', update=False)
-    availability_zone = argument.String(field='PreferredAvailabilityZone')
-    multi_az = argument.Boolean(field='AZMode', serializer=serializers.Expression(lambda r, o: 'cross-az' if o else 'single-az'))
-    auto_minor_version_upgrade = argument.Boolean(field='AutoMinorVersionUpgrade', update=False)
-    subnet_group = argument.Resource(SubnetGroup, field='CacheSubnetGroupName', update=False)
+    instance_class = argument.String(field="CacheNodeType", update=False)
+    engine = argument.String(field="Engine", update=False)
+    engine_version = argument.String(field="EngineVersion")
+    port = argument.Integer(min=1, max=32768, field="Port", update=False)
+    security_groups = argument.ResourceList(
+        SecurityGroup, field="SecurityGroupIds", update=False
+    )
+    availability_zone = argument.String(field="PreferredAvailabilityZone")
+    multi_az = argument.Boolean(
+        field="AZMode",
+        serializer=serializers.Expression(
+            lambda r, o: "cross-az" if o else "single-az"
+        ),
+    )
+    auto_minor_version_upgrade = argument.Boolean(
+        field="AutoMinorVersionUpgrade", update=False
+    )
+    subnet_group = argument.Resource(
+        SubnetGroup, field="CacheSubnetGroupName", update=False
+    )
     # parameter_group = argument.Resource(ParamaterGroup, field='CacheParameterGroupName')
-    apply_immediately = argument.Boolean(field='ApplyImmediately', aws_create=False)
+    apply_immediately = argument.Boolean(field="ApplyImmediately", aws_create=False)
 
     # tags = argument.Dict()
     account = argument.Resource(BaseAccount)
@@ -42,41 +53,42 @@ class BaseCacheCluster(Resource):
 
 class CacheCluster(BaseCacheCluster):
 
-    resource_name = 'cache_cluster'
+    resource_name = "cache_cluster"
 
-    name = argument.String(min=1, max=20, regex=r'^[a-z1-9\-]*$', field='CacheClusterId')
-    num_cache_nodes = argument.Integer(default=1, min=1, field='NumCacheNodes')
+    name = argument.String(
+        min=1, max=20, regex=r"^[a-z1-9\-]*$", field="CacheClusterId"
+    )
+    num_cache_nodes = argument.Integer(default=1, min=1, field="NumCacheNodes")
 
     # replication_group = argument.Resource('touchdown.aws.elasticache.replication_group.ReplicationGroup', field='ReplicationGroupId')
 
-    endpoint_address = output.Output(serializers.Property('CacheNodes[0].Endpoint.Address'))
-    endpoint_port = output.Output(serializers.Property('CacheNodes[0].Endpoint.Port'))
+    endpoint_address = output.Output(
+        serializers.Property("CacheNodes[0].Endpoint.Address")
+    )
+    endpoint_port = output.Output(serializers.Property("CacheNodes[0].Endpoint.Port"))
 
 
 class Describe(SimpleDescribe, Plan):
 
     resource = CacheCluster
-    service_name = 'elasticache'
-    api_version = '2015-02-02'
-    describe_action = 'describe_cache_clusters'
-    describe_notfound_exception = 'CacheClusterNotFound'
-    describe_envelope = 'CacheClusters'
-    key = 'CacheClusterId'
+    service_name = "elasticache"
+    api_version = "2015-02-02"
+    describe_action = "describe_cache_clusters"
+    describe_notfound_exception = "CacheClusterNotFound"
+    describe_envelope = "CacheClusters"
+    key = "CacheClusterId"
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_cache_cluster'
+    create_action = "create_cache_cluster"
     # update_action = 'modify_cache_cluster'
-    waiter = 'cache_cluster_available'
+    waiter = "cache_cluster_available"
 
-    signature = (
-        Present('name'),
-        Present('instance_class'),
-    )
+    signature = (Present("name"), Present("instance_class"))
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_cache_cluster'
-    waiter = 'cache_cluster_deleted'
+    destroy_action = "delete_cache_cluster"
+    waiter = "cache_cluster_deleted"

@@ -16,8 +16,4 @@ from .cache import CacheCluster
 from .replication_group import ReplicationGroup
 from .subnet_group import SubnetGroup
 
-__all__ = [
-    'SubnetGroup',
-    'CacheCluster',
-    'ReplicationGroup',
-]
+__all__ = ["SubnetGroup", "CacheCluster", "ReplicationGroup"]

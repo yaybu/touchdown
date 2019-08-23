@@ -19,41 +19,40 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestParallelMap(WorkspaceTestCase):
-
     def test_parallel_map(self):
         # Use echo resources and set up the deps so that D depends on B and
         # C and B and C depend on A. Capture the order they run in and assert
         # that A ran first and D ran last.
 
-        goal = self.create_goal('apply', map_class=ParallelMap)
+        goal = self.create_goal("apply", map_class=ParallelMap)
 
         call_order = []
-        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
+        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, "echo"))
 
         def append(text):
-            if not text.startswith('[echo] '):
+            if not text.startswith("[echo] "):
                 return
-            if text == '[echo] Echo to console':
+            if text == "[echo] Echo to console":
                 return
             call_order.append(text[-1])
 
         echo.side_effect = append
 
-        a = self.workspace.add_echo(text='A')
+        a = self.workspace.add_echo(text="A")
 
-        b = self.workspace.add_echo(text='B')
+        b = self.workspace.add_echo(text="B")
         b.add_dependency(a)
 
-        c = self.workspace.add_echo(text='C')
+        c = self.workspace.add_echo(text="C")
         c.add_dependency(a)
 
-        d = self.workspace.add_echo(text='D')
+        d = self.workspace.add_echo(text="D")
         d.add_dependency(b)
         d.add_dependency(c)
 
         goal.execute()
 
-        assert call_order[0] == 'A'
-        assert call_order[1] in 'BC'
-        assert call_order[2] in 'BC'
-        assert call_order[3] == 'D'
+        assert call_order[0] == "A"
+        assert call_order[1] in "BC"
+        assert call_order[2] in "BC"
+        assert call_order[3] == "D"

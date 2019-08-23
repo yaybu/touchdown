@@ -16,8 +16,4 @@ from .echo import EchoNotification
 from .newrelic import NewRelicDeploymentNotification
 from .slack import SlackNotification
 
-__all__ = [
-    'EchoNotification',
-    'SlackNotification',
-    'NewRelicDeploymentNotification',
-]
+__all__ = ["EchoNotification", "SlackNotification", "NewRelicDeploymentNotification"]

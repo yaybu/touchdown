@@ -7,7 +7,7 @@ from paramiko.message import Message
 from paramiko.py3compat import byte_chr
 from six.moves import socketserver
 
-if not hasattr(socketserver, 'UnixStreamServer'):
+if not hasattr(socketserver, "UnixStreamServer"):
     raise ImportError(__name__)
 
 
@@ -22,9 +22,8 @@ class ConnectionError(Exception):
 
 
 class AgentHandler(object):
-
     def _read(self, wanted):
-        result = b''
+        result = b""
         while len(result) < wanted:
             buf = self.read(wanted - len(result))
             if not buf:
@@ -33,13 +32,13 @@ class AgentHandler(object):
         return result
 
     def read_message(self):
-        size = struct.unpack('>I', self._read(4))[0]
+        size = struct.unpack(">I", self._read(4))[0]
         msg = Message(self._read(size))
         return ord(msg.get_byte()), msg
 
     def send_message(self, msg):
         msg = asbytes(msg)
-        self.send(struct.pack('>I', len(msg)) + msg)
+        self.send(struct.pack(">I", len(msg)) + msg)
 
     def handler_11(self, msg):
         # SSH2_AGENTC_REQUEST_IDENTITIES = 11
@@ -71,7 +70,7 @@ class AgentHandler(object):
             except ConnectionError:
                 return
 
-            handler = getattr(self, 'handler_{}'.format(mtype))
+            handler = getattr(self, "handler_{}".format(mtype))
             if not handler:
                 continue
 
@@ -79,7 +78,6 @@ class AgentHandler(object):
 
 
 class PosixAgentHandler(AgentHandler, socketserver.BaseRequestHandler):
-
     def __init__(self, *args, **kwargs):
         socketserver.BaseRequestHandler.__init__(self, *args, **kwargs)
 
@@ -91,7 +89,6 @@ class PosixAgentHandler(AgentHandler, socketserver.BaseRequestHandler):
 
 
 class BaseAgentServer(object):
-
     def __init__(self):
         self.identities = {}
 
@@ -100,9 +97,10 @@ class BaseAgentServer(object):
 
 
 class PosixAgentServer(BaseAgentServer, socketserver.ThreadingUnixStreamServer):
-
     def __init__(self, socket_file):
-        socketserver.ThreadingUnixStreamServer.__init__(self, socket_file, PosixAgentHandler)
+        socketserver.ThreadingUnixStreamServer.__init__(
+            self, socket_file, PosixAgentHandler
+        )
         BaseAgentServer.__init__(self)
 
     def serve_while_pid(self, pid):
@@ -124,7 +122,6 @@ class PosixAgentServer(BaseAgentServer, socketserver.ThreadingUnixStreamServer):
 
 
 class ParamikoAgentHandler(AgentHandler):
-
     def __init__(self, server, channel):
         self.server = server
         self.channel = channel
@@ -137,7 +134,6 @@ class ParamikoAgentHandler(AgentHandler):
 
 
 class ParamikoAgentServer(BaseAgentServer):
-
     def handle(self, channel):
         handler = ParamikoAgentHandler(self, channel)
         t = threading.Thread(target=handler.handle)

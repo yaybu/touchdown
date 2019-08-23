@@ -18,20 +18,18 @@ from .fixture import AwsFixture
 
 
 class RouteTableFixture(AwsFixture):
-
     def __init__(self, goal, aws, vpc):
         super(RouteTableFixture, self).__init__(goal, aws)
         self.vpc = vpc
 
     def __enter__(self):
-        self.route_table = self.fixtures.enter_context(RouteTableStubber(
-            self.goal.get_service(
-                self.vpc.get_route_table(
-                    name='test-route-table',
-                ),
-                'describe',
-            ),
-        ))
+        self.route_table = self.fixtures.enter_context(
+            RouteTableStubber(
+                self.goal.get_service(
+                    self.vpc.get_route_table(name="test-route-table"), "describe"
+                )
+            )
+        )
         self.route_table.add_describe_route_tables_one_response_by_name()
 
         return self.route_table.resource

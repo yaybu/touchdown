@@ -25,15 +25,15 @@ from .vpc import VpcFixture
 from .vpn_gateway import VpnGatewayFixture
 
 __all__ = [
-    'BucketFixture',
-    'CustomerGatewayFixture',
-    'InstanceProfileFixture',
-    'LaunchConfigurationFixture',
-    'NetworkAclFixture',
-    'RestApiFixture',
-    'RoleFixture',
-    'RouteTableFixture',
-    'SubnetFixture',
-    'VpcFixture',
-    'VpnGatewayFixture',
+    "BucketFixture",
+    "CustomerGatewayFixture",
+    "InstanceProfileFixture",
+    "LaunchConfigurationFixture",
+    "NetworkAclFixture",
+    "RestApiFixture",
+    "RoleFixture",
+    "RouteTableFixture",
+    "SubnetFixture",
+    "VpcFixture",
+    "VpnGatewayFixture",
 ]

@@ -17,52 +17,40 @@ from .service import ServiceStubber
 
 class ElastiCacheSubnetGroupStubber(ServiceStubber):
 
-    client_service = 'rds'
+    client_service = "rds"
 
     def add_describe_cache_subnet_groups_empty(self):
         return self.add_response(
-            'describe_cache_subnet_groups',
-            service_response={
-                'CacheSubnetGroups': [],
-            },
-            expected_params={
-                'CacheSubnetGroupName': self.resource.name,
-            }
+            "describe_cache_subnet_groups",
+            service_response={"CacheSubnetGroups": []},
+            expected_params={"CacheSubnetGroupName": self.resource.name},
         )
 
     def add_describe_cache_subnet_groups_one(self):
         return self.add_response(
-            'describe_cache_subnet_groups',
+            "describe_cache_subnet_groups",
             service_response={
-                'CacheSubnetGroups': [{
-                    'CacheSubnetGroupName': self.resource.name,
-                }],
+                "CacheSubnetGroups": [{"CacheSubnetGroupName": self.resource.name}]
             },
-            expected_params={
-                'CacheSubnetGroupName': self.resource.name,
-            }
+            expected_params={"CacheSubnetGroupName": self.resource.name},
         )
 
     def add_create_subnet_group(self):
         return self.add_response(
-            'create_cache_subnet_group',
+            "create_cache_subnet_group",
             service_response={
-                'CacheSubnetGroup': {
-                    'CacheSubnetGroupName': self.resource.name,
-                },
+                "CacheSubnetGroup": {"CacheSubnetGroupName": self.resource.name}
             },
             expected_params={
-                'CacheSubnetGroupName': self.resource.name,
-                'CacheSubnetGroupDescription': self.resource.description,
-                'SubnetIds': ['subnet-52f2381b']
+                "CacheSubnetGroupName": self.resource.name,
+                "CacheSubnetGroupDescription": self.resource.description,
+                "SubnetIds": ["subnet-52f2381b"],
             },
         )
 
     def add_delete_subnet_group(self):
         return self.add_response(
-            'delete_cache_subnet_group',
+            "delete_cache_subnet_group",
             service_response={},
-            expected_params={
-                'CacheSubnetGroupName': self.resource.name
-            },
+            expected_params={"CacheSubnetGroupName": self.resource.name},
         )

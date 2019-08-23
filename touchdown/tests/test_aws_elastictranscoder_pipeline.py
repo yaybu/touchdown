@@ -18,47 +18,45 @@ from .stubs.aws import PipelineStubber
 
 
 class TestPipelineCreation(StubberTestCase):
-
     def test_create_pipeline(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         bucket = self.fixtures.enter_context(BucketFixture(goal, self.aws))
         role = self.fixtures.enter_context(RoleFixture(goal, self.aws))
 
-        pipeline = self.fixtures.enter_context(PipelineStubber(
-            goal.get_service(
-                self.aws.add_pipeline(
-                    name='test-pipeline',
-                    input_bucket=bucket.bucket,
-                    role=role,
-                ),
-                'apply',
+        pipeline = self.fixtures.enter_context(
+            PipelineStubber(
+                goal.get_service(
+                    self.aws.add_pipeline(
+                        name="test-pipeline", input_bucket=bucket.bucket, role=role
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         pipeline.add_list_pipelines_empty_response()
         pipeline.add_create_pipeline(
-            input_bucket='my-test-bucket',
-            role='12345678901234567890',
+            input_bucket="my-test-bucket", role="12345678901234567890"
         )
 
         goal.execute()
 
     def test_create_pipeline_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
         bucket = self.fixtures.enter_context(BucketFixture(goal, self.aws))
         role = self.fixtures.enter_context(RoleFixture(goal, self.aws))
 
-        pipeline = self.fixtures.enter_context(PipelineStubber(
-            goal.get_service(
-                self.aws.add_pipeline(
-                    name='test-pipeline',
-                    input_bucket=bucket.bucket,
-                    role=role,
-                ),
-                'apply',
+        pipeline = self.fixtures.enter_context(
+            PipelineStubber(
+                goal.get_service(
+                    self.aws.add_pipeline(
+                        name="test-pipeline", input_bucket=bucket.bucket, role=role
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
         pipeline.add_list_pipelines_one_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -66,34 +64,27 @@ class TestPipelineCreation(StubberTestCase):
 
 
 class TestPipelineDestroy(StubberTestCase):
-
     def test_destroy_pipeline(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        pipeline = self.fixtures.enter_context(PipelineStubber(
-            goal.get_service(
-                self.aws.add_pipeline(
-                    name='test-pipeline',
-                ),
-                'destroy',
+        pipeline = self.fixtures.enter_context(
+            PipelineStubber(
+                goal.get_service(self.aws.add_pipeline(name="test-pipeline"), "destroy")
             )
-        ))
+        )
         pipeline.add_list_pipelines_one_response()
         pipeline.add_delete_pipeline()
 
         goal.execute()
 
     def test_destroy_pipeline_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        pipeline = self.fixtures.enter_context(PipelineStubber(
-            goal.get_service(
-                self.aws.add_pipeline(
-                    name='test-pipeline',
-                ),
-                'destroy',
+        pipeline = self.fixtures.enter_context(
+            PipelineStubber(
+                goal.get_service(self.aws.add_pipeline(name="test-pipeline"), "destroy")
             )
-        ))
+        )
         pipeline.add_list_pipelines_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)

@@ -17,34 +17,27 @@ from touchdown.tests.stubs.aws import RestApiStubber
 
 
 class TestCreateRestApi(StubberTestCase):
-
     def test_create_rest_api(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        rest_api = self.fixtures.enter_context(RestApiStubber(
-            goal.get_service(
-                self.aws.add_rest_api(
-                    name='test-rest_api',
-                ),
-                'apply',
+        rest_api = self.fixtures.enter_context(
+            RestApiStubber(
+                goal.get_service(self.aws.add_rest_api(name="test-rest_api"), "apply")
             )
-        ))
+        )
         rest_api.add_get_rest_apis_empty_response()
         rest_api.add_create_rest_api()
 
         goal.execute()
 
     def test_create_rest_api_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        rest_api = self.fixtures.enter_context(RestApiStubber(
-            goal.get_service(
-                self.aws.add_rest_api(
-                    name='test-rest_api',
-                ),
-                'apply',
+        rest_api = self.fixtures.enter_context(
+            RestApiStubber(
+                goal.get_service(self.aws.add_rest_api(name="test-rest_api"), "apply")
             )
-        ))
+        )
         rest_api.add_get_rest_apis_one_response()
 
         self.assertEqual(len(list(goal.plan())), 0)
@@ -52,34 +45,27 @@ class TestCreateRestApi(StubberTestCase):
 
 
 class TestDestroyRestApi(StubberTestCase):
-
     def test_destroy_rest_api(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        rest_api = self.fixtures.enter_context(RestApiStubber(
-            goal.get_service(
-                self.aws.add_rest_api(
-                    name='test-rest_api',
-                ),
-                'destroy',
+        rest_api = self.fixtures.enter_context(
+            RestApiStubber(
+                goal.get_service(self.aws.add_rest_api(name="test-rest_api"), "destroy")
             )
-        ))
+        )
         rest_api.add_get_rest_apis_one_response()
         rest_api.add_delete_rest_api()
 
         goal.execute()
 
     def test_destroy_rest_api_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        rest_api = self.fixtures.enter_context(RestApiStubber(
-            goal.get_service(
-                self.aws.add_rest_api(
-                    name='test-rest_api',
-                ),
-                'destroy',
+        rest_api = self.fixtures.enter_context(
+            RestApiStubber(
+                goal.get_service(self.aws.add_rest_api(name="test-rest_api"), "destroy")
             )
-        ))
+        )
         rest_api.add_get_rest_apis_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)

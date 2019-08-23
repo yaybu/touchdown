@@ -23,16 +23,18 @@ from ..kms import Key
 
 class Volume(Resource):
 
-    resource_name = 'volume'
+    resource_name = "volume"
 
-    name = argument.String(min=3, max=128, field='Name', group='tags')
+    name = argument.String(min=3, max=128, field="Name", group="tags")
 
-    size = argument.Integer(field='Size', min=1, max=16384)
-    availability_zone = argument.String(field='AvailabilityZone')
-    volume_type = argument.String(field='VolumeType', choices=['gp2', 'io1', 'st1', 'standard'])
-    iops = argument.Integer(field='Iops')
+    size = argument.Integer(field="Size", min=1, max=16384)
+    availability_zone = argument.String(field="AvailabilityZone")
+    volume_type = argument.String(
+        field="VolumeType", choices=["gp2", "io1", "st1", "standard"]
+    )
+    iops = argument.Integer(field="Iops")
 
-    key = argument.Resource(Key, field='KmsKeyId')
+    key = argument.Resource(Key, field="KmsKeyId")
 
     account = argument.Resource(BaseAccount)
 
@@ -40,29 +42,26 @@ class Volume(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = Volume
-    service_name = 'ec2'
-    api_version = '2015-10-01'
-    describe_action = 'describe_volumes'
-    describe_notfound_exception = 'InvalidVolume.NotFound'
-    describe_envelope = 'Volumes'
-    key = 'VolumeId'
+    service_name = "ec2"
+    api_version = "2015-10-01"
+    describe_action = "describe_volumes"
+    describe_notfound_exception = "InvalidVolume.NotFound"
+    describe_envelope = "Volumes"
+    key = "VolumeId"
 
     def get_describe_filters(self):
-        return {'Filters': [{'Name': 'tag:Name', 'Values': [self.resource.name]}]}
+        return {"Filters": [{"Name": "tag:Name", "Values": [self.resource.name]}]}
 
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = 'create_volume'
-    create_envelope = '@'
-    waiter = 'volume_available'
-    signature = (
-        Present('name'),
-        Present('availability_zone')
-    )
+    create_action = "create_volume"
+    create_envelope = "@"
+    waiter = "volume_available"
+    signature = (Present("name"), Present("availability_zone"))
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_volume'
-    waiter = 'volume_deleted'
+    destroy_action = "delete_volume"
+    waiter = "volume_deleted"

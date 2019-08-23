@@ -18,24 +18,25 @@ from touchdown.tests.stubs.aws import ServerCertificateStubber
 
 
 class TestCreateServerCertificate(StubberTestCase):
-
     def test_create_server_certificate(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        with open(ServerCertificateStubber.cert_file) as cert_file,\
-                open(ServerCertificateStubber.key_file) as key_file,\
-                open(ServerCertificateStubber.chain_file) as chain_file:
-            server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
-                goal.get_service(
-                    self.aws.add_server_certificate(
-                        name='my-test-server-certificate',
-                        certificate_body=cert_file.read(),
-                        private_key=key_file.read(),
-                        certificate_chain=chain_file.read(),
-                    ),
-                    'apply',
+        with open(ServerCertificateStubber.cert_file) as cert_file, open(
+            ServerCertificateStubber.key_file
+        ) as key_file, open(ServerCertificateStubber.chain_file) as chain_file:
+            server_certificate = self.fixtures.enter_context(
+                ServerCertificateStubber(
+                    goal.get_service(
+                        self.aws.add_server_certificate(
+                            name="my-test-server-certificate",
+                            certificate_body=cert_file.read(),
+                            private_key=key_file.read(),
+                            certificate_chain=chain_file.read(),
+                        ),
+                        "apply",
+                    )
                 )
-            ))
+            )
         # first list is to find things to delete
         server_certificate.add_list_server_certificate_empty_response()
         # second is to find if there is an existing matching cert
@@ -54,19 +55,23 @@ class TestCreateServerCertificate(StubberTestCase):
         goal.execute()
 
     def test_create_server_certificate_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        with open(ServerCertificateStubber.cert_file) as cert_file, open(ServerCertificateStubber.key_file) as key_file:
-            server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
-                goal.get_service(
-                    self.aws.add_server_certificate(
-                        name='my-test-server-certificate',
-                        certificate_body=cert_file.read(),
-                        private_key=key_file.read()
-                    ),
-                    'apply',
+        with open(ServerCertificateStubber.cert_file) as cert_file, open(
+            ServerCertificateStubber.key_file
+        ) as key_file:
+            server_certificate = self.fixtures.enter_context(
+                ServerCertificateStubber(
+                    goal.get_service(
+                        self.aws.add_server_certificate(
+                            name="my-test-server-certificate",
+                            certificate_body=cert_file.read(),
+                            private_key=key_file.read(),
+                        ),
+                        "apply",
+                    )
                 )
-            ))
+            )
         server_certificate.add_list_server_certificate_one_response()
         server_certificate.add_get_server_certificate()
         server_certificate.add_list_server_certificate_one_response()
@@ -76,47 +81,46 @@ class TestCreateServerCertificate(StubberTestCase):
         self.assertEqual(len(goal.get_changes(server_certificate.resource)), 0)
 
     def test_create_server_certificate_wrong_chain(self):
-        with open(ServerCertificateStubber.cert_file) as cert_file,\
-                open(ServerCertificateStubber.key_file) as key_file,\
-                open(ServerCertificateStubber.chain_file) as chain_file:
+        with open(ServerCertificateStubber.cert_file) as cert_file, open(
+            ServerCertificateStubber.key_file
+        ) as key_file, open(ServerCertificateStubber.chain_file) as chain_file:
 
             with self.assertRaises(errors.Error) as cm:
                 self.aws.add_server_certificate(
-                    name='my-test-server-certificate',
+                    name="my-test-server-certificate",
                     certificate_body=chain_file.read(),  # to trigger error
                     private_key=key_file.read(),
                     certificate_chain=cert_file.read(),  # to trigger error
                 )
-            self.assertIn('Certificate does not match private_key', str(cm.exception))
+            self.assertIn("Certificate does not match private_key", str(cm.exception))
 
     def test_create_server_certificate_bad_chain(self):
-        with open(ServerCertificateStubber.cert_file) as cert_file,\
-                open(ServerCertificateStubber.key_file) as key_file,\
-                open(ServerCertificateStubber.bad_chain_file) as bad_chain_file:
+        with open(ServerCertificateStubber.cert_file) as cert_file, open(
+            ServerCertificateStubber.key_file
+        ) as key_file, open(ServerCertificateStubber.bad_chain_file) as bad_chain_file:
 
             with self.assertRaises(errors.Error) as cm:
                 self.aws.add_server_certificate(
-                    name='my-test-server-certificate',
+                    name="my-test-server-certificate",
                     certificate_body=cert_file.read(),  # to trigger error
                     private_key=key_file.read(),
                     certificate_chain=bad_chain_file.read(),  # to trigger error
                 )
-            self.assertIn('Invalid chain for', str(cm.exception))
+            self.assertIn("Invalid chain for", str(cm.exception))
 
 
 class TestDestroyServerCertificate(StubberTestCase):
-
     def test_destroy_server_certificate(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
-            goal.get_service(
-                self.aws.add_server_certificate(
-                    name='my-test-server-certificate',
-                ),
-                'destroy',
+        server_certificate = self.fixtures.enter_context(
+            ServerCertificateStubber(
+                goal.get_service(
+                    self.aws.add_server_certificate(name="my-test-server-certificate"),
+                    "destroy",
+                )
             )
-        ))
+        )
         server_certificate.add_list_server_certificate_one_response()
         server_certificate.add_get_server_certificate()
         server_certificate.add_list_server_certificate_one_response()
@@ -126,16 +130,16 @@ class TestDestroyServerCertificate(StubberTestCase):
         goal.execute()
 
     def test_destroy_server_certificate_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        server_certificate = self.fixtures.enter_context(ServerCertificateStubber(
-            goal.get_service(
-                self.aws.add_server_certificate(
-                    name='my-test-server-certificate',
-                ),
-                'destroy',
+        server_certificate = self.fixtures.enter_context(
+            ServerCertificateStubber(
+                goal.get_service(
+                    self.aws.add_server_certificate(name="my-test-server-certificate"),
+                    "destroy",
+                )
             )
-        ))
+        )
         server_certificate.add_list_server_certificate_empty_response()
         server_certificate.add_list_server_certificate_empty_response()
 

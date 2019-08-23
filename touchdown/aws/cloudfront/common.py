@@ -19,18 +19,17 @@ from ..s3 import Bucket
 
 
 class CloudFrontList(serializers.Dict):
-
     def __init__(self, inner=None, **kwargs):
         self.kwargs = dict(kwargs)
-        self.kwargs['Items'] = inner or serializers.List()
-        self.kwargs['Quantity'] = serializers.Expression(
-            lambda runner, object: len(self.kwargs['Items'].render(runner, object)),
+        self.kwargs["Items"] = inner or serializers.List()
+        self.kwargs["Quantity"] = serializers.Expression(
+            lambda runner, object: len(self.kwargs["Items"].render(runner, object))
         )
 
     def diff(self, runner, obj, value):
         if len(self.kwargs) == 2:
-            items = value['Items'] if value else []
-            return self.kwargs['Items'].diff(runner, obj, items)
+            items = value["Items"] if value else []
+            return self.kwargs["Items"].diff(runner, obj, items)
         return super(CloudFrontList, self).diff(runner, obj, value)
 
 
@@ -40,18 +39,19 @@ def CloudFrontResourceList():
 
 class S3Origin(Resource):
 
-    resource_name = 's3_origin'
+    resource_name = "s3_origin"
     extra_serializers = {
-        'S3OriginConfig': serializers.Dict(
-            OriginAccessIdentity=serializers.Argument('origin_access_identity'),
+        "S3OriginConfig": serializers.Dict(
+            OriginAccessIdentity=serializers.Argument("origin_access_identity")
         ),
-        'CustomHeaders': serializers.Dict(
-            Quantity=0,
-            Items=[],
-        ),
+        "CustomHeaders": serializers.Dict(Quantity=0, Items=[]),
     }
 
-    name = argument.String(field='Id')
-    bucket = argument.Resource(Bucket, field='DomainName', serializer=serializers.Format('{0}.s3.amazonaws.com', serializers.Identifier()))
-    origin_path = argument.String(default='', field='OriginPath')
-    origin_access_identity = argument.String(default='')
+    name = argument.String(field="Id")
+    bucket = argument.Resource(
+        Bucket,
+        field="DomainName",
+        serializer=serializers.Format("{0}.s3.amazonaws.com", serializers.Identifier()),
+    )
+    origin_path = argument.String(default="", field="OriginPath")
+    origin_access_identity = argument.String(default="")

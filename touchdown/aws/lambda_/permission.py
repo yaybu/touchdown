@@ -24,43 +24,39 @@ from .function import Function
 
 class Permission(Resource):
 
-    resource_name = 'permission'
+    resource_name = "permission"
 
-    name = argument.String(field='StatementId')
-    action = argument.String(field='Action')
-    principal = argument.String(field='Principal')
-    source_account = argument.String(field='SourceAccount')
-    source_arn = argument.String(field='SourceArn')
+    name = argument.String(field="StatementId")
+    action = argument.String(field="Action")
+    principal = argument.String(field="Principal")
+    source_account = argument.String(field="SourceAccount")
+    source_arn = argument.String(field="SourceArn")
 
-    function = argument.Resource(
-        Function,
-        field='FunctionName',
-    )
+    function = argument.Resource(Function, field="FunctionName")
 
 
 class Describe(SimpleDescribe, Plan):
 
     resource = Permission
-    service_name = 'lambda'
-    api_version = '2015-03-31'
-    describe_action = 'get_policy'
-    describe_notfound_exception = 'ResourceNotFoundException'
-    describe_envelope = '[@]'
-    key = 'Sid'
+    service_name = "lambda"
+    api_version = "2015-03-31"
+    describe_action = "get_policy"
+    describe_notfound_exception = "ResourceNotFoundException"
+    describe_envelope = "[@]"
+    key = "Sid"
 
     def get_describe_filters(self):
         func = self.runner.get_plan(self.resource.function)
         if not func.resource_id:
             return None
-        return {'FunctionName': self.resource.function.name}
+        return {"FunctionName": self.resource.function.name}
 
     def describe_object(self):
         obj = super(Describe, self).describe_object()
-        policy = json.loads(obj.get('Policy', '{}'))
+        policy = json.loads(obj.get("Policy", "{}"))
 
         matching = filter(
-            lambda s: s['Sid'] == self.resource.name,
-            policy.get('Statement', []),
+            lambda s: s["Sid"] == self.resource.name, policy.get("Statement", [])
         )
 
         if matching:
@@ -71,19 +67,15 @@ class Describe(SimpleDescribe, Plan):
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'add_permission'
-    create_envelope = '@'
+    create_action = "add_permission"
+    create_envelope = "@"
 
-    signature = (
-        Present('name'),
-        Present('action'),
-        Present('principal'),
-    )
+    signature = (Present("name"), Present("action"), Present("principal"))
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'remove_permission'
+    destroy_action = "remove_permission"
 
     def get_destroy_serializer(self):
         return serializers.Dict(

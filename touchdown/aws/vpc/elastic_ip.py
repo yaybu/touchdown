@@ -24,7 +24,7 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy
 
 class ElasticIp(Resource):
 
-    resource_name = 'elastic_ip'
+    resource_name = "elastic_ip"
 
     name = argument.String()
     public_ip = argument.Resource(String)
@@ -35,51 +35,43 @@ class ElasticIp(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = ElasticIp
-    service_name = 'ec2'
-    api_version = '2015-10-01'
-    describe_action = 'describe_addresses'
-    describe_envelope = 'Addresses'
-    key = 'PublicIp'
+    service_name = "ec2"
+    api_version = "2015-10-01"
+    describe_action = "describe_addresses"
+    describe_envelope = "Addresses"
+    key = "PublicIp"
 
-    signature = (
-        Present('name'),
-        Present('public_ip'),
-    )
+    signature = (Present("name"), Present("public_ip"))
 
     def get_describe_filters(self):
-        public_ip, _ = self.runner.get_service(self.resource.public_ip, 'get').execute()
+        public_ip, _ = self.runner.get_service(self.resource.public_ip, "get").execute()
         if not public_ip:
             return
 
-        return {
-            'Filters': [
-                {'Name': 'public-ip', 'Values': [public_ip]},
-            ]
-        }
+        return {"Filters": [{"Name": "public-ip", "Values": [public_ip]}]}
 
 
 class NameAction(Action):
-
     @property
     def description(self):
-        yield 'Store setting elastic ip as setting {!r}'.format(self.resource.public_ip.name)
+        yield "Store setting elastic ip as setting {!r}".format(
+            self.resource.public_ip.name
+        )
 
     def run(self):
-        self.runner.get_service(self.resource.public_ip, 'set').execute(
-            self.plan.object['PublicIp']
+        self.runner.get_service(self.resource.public_ip, "set").execute(
+            self.plan.object["PublicIp"]
         )
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'allocate_address'
-    create_envelope = '@'
-    create_response = 'full-description'
+    create_action = "allocate_address"
+    create_envelope = "@"
+    create_response = "full-description"
 
     def get_create_serializer(self):
-        return serializers.Dict(
-            Domain='vpc',
-        )
+        return serializers.Dict(Domain="vpc")
 
     def name_object(self):
         yield NameAction(self)
@@ -87,9 +79,7 @@ class Apply(SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'release_address'
+    destroy_action = "release_address"
 
     def get_destroy_serializer(self):
-        return serializers.Dict(
-            AllocationId=serializers.Property('AllocationId'),
-        )
+        return serializers.Dict(AllocationId=serializers.Property("AllocationId"))

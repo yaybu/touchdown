@@ -19,7 +19,7 @@ from .provisioner import Provisioner
 
 class Output(resource.Resource):
 
-    resource_name = 'output'
+    resource_name = "output"
 
     name = argument.String()
 
@@ -27,7 +27,6 @@ class Output(resource.Resource):
 
 
 class OutputAsString(serializers.Serializer):
-
     def __init__(self, resource):
         self.resource = resource
 
@@ -36,23 +35,22 @@ class OutputAsString(serializers.Serializer):
             return serializers.Pending(self.resource)
 
         # Extract the contents from the file on the (potentially remote) target
-        service = runner.get_service(self.resource.provisioner.target, 'describe')
+        service = runner.get_service(self.resource.provisioner.target, "describe")
         client = service.get_client()
         return client.get_path_contents(self.resource.name)
 
     def pending(self, runner, object):
-        provisioner = runner.get_service(self.resource.provisioner, 'apply')
-        return provisioner.object['Result'] == 'Pending'
+        provisioner = runner.get_service(self.resource.provisioner, "apply")
+        return provisioner.object["Result"] == "Pending"
 
     def dependencies(self, object):
-        return frozenset((self.resource, ))
+        return frozenset((self.resource,))
 
 
 argument.String.register_adapter(Output, lambda r: OutputAsString(r))
 
 
 class OutputAsBytes(serializers.Serializer):
-
     def __init__(self, resource):
         self.resource = resource
 
@@ -61,16 +59,16 @@ class OutputAsBytes(serializers.Serializer):
             return serializers.Pending(self.resource)
 
         # Extract the contents from the file on the (potentially remote) target
-        service = runner.get_service(self.resource.provisioner.target, 'describe')
+        service = runner.get_service(self.resource.provisioner.target, "describe")
         client = service.get_client()
         return client.get_path_bytes(self.resource.name)
 
     def pending(self, runner, object):
-        provisioner = runner.get_service(self.resource.provisioner, 'apply')
-        return provisioner.object['Result'] == 'Pending'
+        provisioner = runner.get_service(self.resource.provisioner, "apply")
+        return provisioner.object["Result"] == "Pending"
 
     def dependencies(self, object):
-        return frozenset((self.resource, ))
+        return frozenset((self.resource,))
 
 
 argument.Bytes.register_adapter(Output, lambda r: OutputAsBytes(r))

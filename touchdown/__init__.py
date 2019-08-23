@@ -23,6 +23,4 @@ import touchdown.ssh  # noqa
 import touchdown.template  # noqa
 from touchdown.core import Workspace
 
-__all__ = [
-    'Workspace',
-]
+__all__ = ["Workspace"]

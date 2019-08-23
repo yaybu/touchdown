@@ -18,12 +18,4 @@ from .local import Local
 from .output import Output
 from .provisioner import Provisioner, Target
 
-__all__ = [
-    'Provisioner',
-    'Step',
-    'Target',
-    'Script',
-    'Bundle',
-    'Local',
-    'Output',
-]
+__all__ = ["Provisioner", "Step", "Target", "Script", "Bundle", "Local", "Output"]

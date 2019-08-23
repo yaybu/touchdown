@@ -24,11 +24,13 @@ try:
     import fuselage
     from fuselage import argument as f_args, builder, bundle, resources
 except ImportError:
-    raise errors.Error('You need the fuselage package to use the fuselage_bundle resource')
+    raise errors.Error(
+        "You need the fuselage package to use the fuselage_bundle resource"
+    )
 
 
 def underscore(title):
-    return re.sub(r'(?<=[a-z])(?=[A-Z])', u'_', title).lower()
+    return re.sub(r"(?<=[a-z])(?=[A-Z])", u"_", title).lower()
 
 
 arguments = {
@@ -40,32 +42,31 @@ arguments = {
     f_args.Octal: lambda resource_type, klass, arg: argument.Integer(field=arg),
     f_args.Dict: lambda resource_type, klass, arg: argument.Dict(field=arg),
     f_args.List: lambda resource_type, klass, arg: argument.List(field=arg),
-    f_args.SubscriptionArgument: lambda resource_type, klass, arg: argument.List(field=arg),
-    f_args.PolicyArgument: lambda resource_type, klass, arg: argument.String(field=arg, choices=resource_type.policies.keys()),
+    f_args.SubscriptionArgument: lambda resource_type, klass, arg: argument.List(
+        field=arg
+    ),
+    f_args.PolicyArgument: lambda resource_type, klass, arg: argument.String(
+        field=arg, choices=resource_type.policies.keys()
+    ),
 }
 
 
 class FuselageResource(resource.Resource):
-
     @classmethod
     def adapt(base_klass, resource_type):
         args = {
-            'resource_name': underscore(resource_type.__resource_name__),
-            'fuselage_class': resource_type,
-            'root': argument.Resource(Bundle),
+            "resource_name": underscore(resource_type.__resource_name__),
+            "fuselage_class": resource_type,
+            "root": argument.Resource(Bundle),
         }
 
         for arg, klass in resource_type.__args__.items():
             args[arg] = arguments[klass.__class__](resource_type, klass, arg)
 
-        cls = type(
-            resource_type.__resource_name__,
-            (base_klass, ),
-            args
-        )
+        cls = type(resource_type.__resource_name__, (base_klass,), args)
 
         def _(self, **kwargs):
-            arguments = {'parent': self}
+            arguments = {"parent": self}
             arguments.update(kwargs)
             resource = cls(**arguments)
             if not self.resources:
@@ -73,19 +74,17 @@ class FuselageResource(resource.Resource):
             self.resources.append(resource)
             self.add_dependency(resource)
             return resource
-        setattr(Bundle, 'add_%s' % cls.resource_name, _)
+
+        setattr(Bundle, "add_%s" % cls.resource_name, _)
 
         return cls
 
 
 class BundleSerializer(serializers.Serializer):
-
     def render(self, runner, value):
         b = bundle.ResourceBundle()
         for res in value:
-            b.add(res.fuselage_class(
-                **serializers.Resource().render(runner, res)
-            ))
+            b.add(res.fuselage_class(**serializers.Resource().render(runner, res)))
         return builder.build(b)
 
     def pending(self, runner, value):
@@ -97,49 +96,49 @@ class BundleSerializer(serializers.Serializer):
 
 class Bundle(provisioner.Provisioner):
 
-    resource_name = 'fuselage_bundle'
+    resource_name = "fuselage_bundle"
 
     always_apply = argument.Boolean()
     resources = argument.List(
         argument.Resource(FuselageResource),
-        field='script',
+        field="script",
         serializer=BundleSerializer(),
     )
-    sudo = argument.Boolean(field='sudo', default=True)
+    sudo = argument.Boolean(field="sudo", default=True)
 
 
 class Describe(provisioner.Describe):
 
-    name = 'describe'
+    name = "describe"
     resource = Bundle
 
     def describe_object(self):
         if self.resource.always_apply:
-            return {'Results': 'Pending'}
+            return {"Results": "Pending"}
 
         if not self.resource.target:
             # If target is not set we are probably dealing with an AMI... YUCK
             # Bail out
-            return {'Result': 'Pending'}
+            return {"Result": "Pending"}
 
         serializer = serializers.Resource()
         if serializer.pending(self.runner, self.resource):
-            return {'Result': 'Pending'}
+            return {"Result": "Pending"}
 
         kwargs = serializer.render(self.runner, self.resource)
 
         try:
             client = self.runner.get_plan(self.resource.target).get_client()
         except errors.ServiceNotReady:
-            return {'Result': 'Pending'}
+            return {"Result": "Pending"}
 
         try:
-            client.run_script(kwargs['script'], ['-s'])
+            client.run_script(kwargs["script"], ["-s"])
         except errors.CommandFailed as e:
             if e.exit_code == 254:
-                return {'Result': 'Success'}
+                return {"Result": "Success"}
 
-        return {'Result': 'Pending'}
+        return {"Result": "Pending"}
 
 
 class Apply(provisioner.Apply):

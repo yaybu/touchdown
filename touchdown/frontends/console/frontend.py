@@ -21,13 +21,12 @@ from ..progress import ProgressBar
 
 
 class ConsoleFrontend(BaseFrontend):
-
     def __init__(self, interactive=True):
         super(ConsoleFrontend, self).__init__()
         self.interactive = interactive
 
     def _echo(self, text, nl=True, **kwargs):
-        print(text, end='')
+        print(text, end="")
 
     def progressbar(self, **kwargs):
         return ProgressBar(self, **kwargs)
@@ -36,15 +35,15 @@ class ConsoleFrontend(BaseFrontend):
         retval = super(ConsoleFrontend, self).prompt(message, key, default)
         if retval:
             return retval
-        response = six.moves.input('{}: '.format(message))
+        response = six.moves.input("{}: ".format(message))
         while not response:
-            response = six.moves.input('{}: '.format(message))
+            response = six.moves.input("{}: ".format(message))
         return response
 
     def confirm(self, message):
         if not self.interactive:
             return True
-        response = six.moves.input('{} [Y/n] '.format(message))
-        while response.lower() not in ('y', 'n', ''):
-            response = six.moves.input('{} [Y/n] '.format(message))
-        return response.lower() != 'n'
+        response = six.moves.input("{} [Y/n] ".format(message))
+        while response.lower() not in ("y", "n", ""):
+            response = six.moves.input("{} [Y/n] ".format(message))
+        return response.lower() != "n"

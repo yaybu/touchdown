@@ -18,99 +18,93 @@ from touchdown.tests.stubs.aws import DatabaseStubber
 
 
 class TestDatabaseSnapshots(StubberTestCase):
-
     def test_snapshot_database(self):
-        goal = self.create_goal('snapshot')
+        goal = self.create_goal("snapshot")
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'snapshot',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "snapshot",
+                )
             )
-        ))
+        )
 
         # Database is running
         database.add_describe_db_instances_one()
 
         # No matching snapshots
         database.add_response(
-            'describe_db_snapshots',
-            service_response={
-                'DBSnapshots': [],
-            },
+            "describe_db_snapshots",
+            service_response={"DBSnapshots": []},
             expected_params={
-                'DBInstanceIdentifier': 'my-database',
-                'DBSnapshotIdentifier': 'my-snapshot',
-            }
+                "DBInstanceIdentifier": "my-database",
+                "DBSnapshotIdentifier": "my-snapshot",
+            },
         )
 
         database.add_response(
-            'create_db_snapshot',
-            service_response={
-            },
+            "create_db_snapshot",
+            service_response={},
             expected_params={
-                'DBInstanceIdentifier': 'my-database',
-                'DBSnapshotIdentifier': 'my-snapshot',
-            }
+                "DBInstanceIdentifier": "my-database",
+                "DBSnapshotIdentifier": "my-snapshot",
+            },
         )
 
         # Waiting for snapshot to be available
         database.add_response(
-            'describe_db_snapshots',
+            "describe_db_snapshots",
             service_response={
-                'DBSnapshots': [{
-                    'DBSnapshotIdentifier': 'snap-12335',
-                    'Status': 'not-ready',
-                }],
+                "DBSnapshots": [
+                    {"DBSnapshotIdentifier": "snap-12335", "Status": "not-ready"}
+                ]
             },
-            expected_params={
-                'DBSnapshotIdentifier': 'my-snapshot',
-            }
+            expected_params={"DBSnapshotIdentifier": "my-snapshot"},
         )
 
         # Finish waiting for snapshot
         database.add_response(
-            'describe_db_snapshots',
+            "describe_db_snapshots",
             service_response={
-                'DBSnapshots': [{
-                    'DBSnapshotIdentifier': 'snap-12335',
-                    'Status': 'available',
-                }],
+                "DBSnapshots": [
+                    {"DBSnapshotIdentifier": "snap-12335", "Status": "available"}
+                ]
             },
-            expected_params={
-                'DBSnapshotIdentifier': 'my-snapshot',
-            }
+            expected_params={"DBSnapshotIdentifier": "my-snapshot"},
         )
 
-        goal.execute('my-database', 'my-snapshot')
+        goal.execute("my-database", "my-snapshot")
 
     def test_snapshot_database_no_database(self):
-        goal = self.create_goal('snapshot')
+        goal = self.create_goal("snapshot")
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'snapshot',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "snapshot",
+                )
             )
-        ))
+        )
 
         # Database is not running
         database.add_describe_db_instances_empty()
 
-        self.assertRaises(errors.Error, goal.execute, 'my-database', 'my-snapshot')
+        self.assertRaises(errors.Error, goal.execute, "my-database", "my-snapshot")

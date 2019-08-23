@@ -19,32 +19,37 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestFile(WorkspaceTestCase):
-
     def test_get(self):
         # Test `touchdown get file.txt` works for any resource implementing the
         # file interface
-        goal = self.create_goal('get')
+        goal = self.create_goal("get")
 
-        folder = self.fixtures.enter_context(TemporaryFolderFixture(goal, self.workspace))
-        test_txt = folder.add_file(name='test.txt')
+        folder = self.fixtures.enter_context(
+            TemporaryFolderFixture(goal, self.workspace)
+        )
+        test_txt = folder.add_file(name="test.txt")
 
-        goal.get_service(test_txt, 'set').execute('hello!!!')
+        goal.get_service(test_txt, "set").execute("hello!!!")
 
-        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
-        goal.execute('test.txt')
-        echo.assert_called_with('hello!!! (overriden by user)')
+        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, "echo"))
+        goal.execute("test.txt")
+        echo.assert_called_with("hello!!! (overriden by user)")
 
     def test_set(self):
         # Test `touchdown set file.txt value` works for any resource implementing the
         # file interface
-        goal = self.create_goal('set')
+        goal = self.create_goal("set")
 
-        folder = self.fixtures.enter_context(TemporaryFolderFixture(goal, self.workspace))
-        test_txt = folder.add_file(name='test.txt')
+        folder = self.fixtures.enter_context(
+            TemporaryFolderFixture(goal, self.workspace)
+        )
+        test_txt = folder.add_file(name="test.txt")
 
-        goal.execute('test.txt', 'hello!!!')
+        goal.execute("test.txt", "hello!!!")
 
-        self.assertEqual(goal.get_service(test_txt, 'get').execute(), ('hello!!!', True))
+        self.assertEqual(
+            goal.get_service(test_txt, "get").execute(), ("hello!!!", True)
+        )
 
     def test_echoing_file_as_string(self):
         # This ensures that a file resource can be used anywhere a string can
@@ -53,15 +58,17 @@ class TestFile(WorkspaceTestCase):
         # fi = fl.add_file(name='myfile.txt')
         # workspace.add_echo(text=fi)
 
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        folder = self.fixtures.enter_context(TemporaryFolderFixture(goal, self.workspace))
-        test_txt = folder.add_file(name='test.txt')
+        folder = self.fixtures.enter_context(
+            TemporaryFolderFixture(goal, self.workspace)
+        )
+        test_txt = folder.add_file(name="test.txt")
         self.workspace.add_echo(text=test_txt)
 
-        goal.get_service(test_txt, 'set').execute('hello!!!')
+        goal.get_service(test_txt, "set").execute("hello!!!")
 
-        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
+        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, "echo"))
         goal.execute()
 
-        echo.assert_called_with('[echo] hello!!!')
+        echo.assert_called_with("[echo] hello!!!")

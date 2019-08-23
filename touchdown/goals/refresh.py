@@ -18,30 +18,27 @@ from touchdown.core.goals import Goal, register
 
 class Refresh(Goal):
 
-    ''' Replace a configuration variable with its default setting '''
+    """ Replace a configuration variable with its default setting """
 
-    name = 'refresh'
+    name = "refresh"
     mutator = False
 
     def get_plan_class(self, resource):
-        plan_class = resource.meta.get_plan('refresh')
+        plan_class = resource.meta.get_plan("refresh")
         if not plan_class:
-            plan_class = resource.meta.get_plan('describe')
+            plan_class = resource.meta.get_plan("describe")
         if not plan_class:
-            plan_class = resource.meta.get_plan('null')
+            plan_class = resource.meta.get_plan("null")
         return plan_class
 
     @classmethod
     def setup_argparse(cls, parser):
         parser.add_argument(
-            'name',
-            metavar='NAME',
-            type=str,
-            help='The setting to refresh',
+            "name", metavar="NAME", type=str, help="The setting to refresh"
         )
 
     def execute(self, name):
-        settings = self.collect_as_dict('refresh')
+        settings = self.collect_as_dict("refresh")
         if name not in settings:
             raise errors.Error('No such setting "{}"'.format(name))
         settings[name].execute()

@@ -23,13 +23,13 @@ from .rest_api import RestApi
 from .stage import Stage
 
 __all__ = [
-    'Deployment',
-    'Integration',
-    'IntegrationResponse',
-    'Method',
-    'MethodResponse',
-    'Model',
-    'Resource',
-    'RestApi',
-    'Stage',
+    "Deployment",
+    "Integration",
+    "IntegrationResponse",
+    "Method",
+    "MethodResponse",
+    "Model",
+    "Resource",
+    "RestApi",
+    "Stage",
 ]

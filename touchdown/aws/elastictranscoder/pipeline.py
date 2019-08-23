@@ -25,45 +25,41 @@ from ..sns import Topic
 
 class Pipeline(Resource):
 
-    resource_name = 'pipeline'
+    resource_name = "pipeline"
 
-    name = argument.String(field='Name')
-    input_bucket = argument.Resource(Bucket, field='InputBucket')
-    output_bucket = argument.Resource(Bucket, field='OutputBucket')
+    name = argument.String(field="Name")
+    input_bucket = argument.Resource(Bucket, field="InputBucket")
+    output_bucket = argument.Resource(Bucket, field="OutputBucket")
     # key = argument.Resource(KmsKey, field='AwsKmsKeyArn')
 
-    role = argument.Resource(
-        Role,
-        field='Role',
-        serializer=serializers.Property('Arn')
-    )
+    role = argument.Resource(Role, field="Role", serializer=serializers.Property("Arn"))
 
     progressing = argument.Resource(
         Topic,
-        field='Progressing',
-        serializer=serializers.Property('TopicArn'),
-        group='notifications'
+        field="Progressing",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications",
     )
 
     completed = argument.Resource(
         Topic,
-        field='Completed',
-        serializer=serializers.Property('TopicArn'),
-        group='notifications'
+        field="Completed",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications",
     )
 
     warning = argument.Resource(
         Topic,
-        field='Warning',
-        serializer=serializers.Property('TopicArn'),
-        group='notifications'
+        field="Warning",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications",
     )
 
     error = argument.Resource(
         Topic,
-        field='Error',
-        serializer=serializers.Property('TopicArn'),
-        group='notifications'
+        field="Error",
+        serializer=serializers.Property("TopicArn"),
+        group="notifications",
     )
 
     # content_config = argument.Dict(field='ContentConfig', default=None)
@@ -75,42 +71,36 @@ class Pipeline(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = Pipeline
-    service_name = 'elastictranscoder'
-    api_version = '2012-09-25'
-    describe_action = 'list_pipelines'
-    describe_envelope = 'Pipelines'
+    service_name = "elastictranscoder"
+    api_version = "2012-09-25"
+    describe_action = "list_pipelines"
+    describe_envelope = "Pipelines"
     describe_filters = {}
-    key = 'Id'
+    key = "Id"
 
     def describe_object_matches(self, pipeline):
-        return pipeline['Name'] == self.resource.name
+        return pipeline["Name"] == self.resource.name
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_pipeline'
+    create_action = "create_pipeline"
 
-    signature = (
-        Present('name'),
-        Present('input_bucket'),
-        Present('role'),
-    )
+    signature = (Present("name"), Present("input_bucket"), Present("role"))
 
     def update_object(self):
-        d = serializers.Resource(group='notifications').diff(
-            self.runner,
-            self.resource,
-            self.object.get('Notifications', {})
+        d = serializers.Resource(group="notifications").diff(
+            self.runner, self.resource, self.object.get("Notifications", {})
         )
         if not d.matches():
             yield self.generic_action(
-                ['Update pipeline notification topics'] + list(d.lines()),
+                ["Update pipeline notification topics"] + list(d.lines()),
                 self.client.update_pipeline_notifications,
                 Id=serializers.Identifier(),
-                Notifications=serializers.Resource(group='notifications'),
+                Notifications=serializers.Resource(group="notifications"),
             )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_pipeline'
+    destroy_action = "delete_pipeline"

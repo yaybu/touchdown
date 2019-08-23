@@ -17,37 +17,38 @@ from touchdown.core import argument, resource, serializers
 
 class KeyFilterRule(resource.Resource):
 
-    resource_name = 'filter_rule'
+    resource_name = "filter_rule"
 
-    name = argument.String(field='Name', choices=['prefix', 'suffix'])
-    value = argument.String(field='Value')
+    name = argument.String(field="Name", choices=["prefix", "suffix"])
+    value = argument.String(field="Value")
 
 
 class NotificationConfiguration(resource.Resource):
 
-    resource_name = 'notification_configuration'
+    resource_name = "notification_configuration"
 
-    name = argument.String(field='Id')
-    events = argument.List(argument.String(
-        choices=[
-            's3:ReducedRedundancyLostObject',
-            's3:ObjectCreated:*',
-            's3:ObjectCreated:Put',
-            's3:ObjectCreated:Post',
-            's3:ObjectCreated:Copy',
-            's3:ObjectCreated:CompleteMultipartUpload',
-            's3:ObjectRemoved:*',
-            's3:ObjectRemoved:Delete',
-            's3:ObjectRemoved:DeleteMarkerCreated',
-        ],
-    ), field='Events')
+    name = argument.String(field="Id")
+    events = argument.List(
+        argument.String(
+            choices=[
+                "s3:ReducedRedundancyLostObject",
+                "s3:ObjectCreated:*",
+                "s3:ObjectCreated:Put",
+                "s3:ObjectCreated:Post",
+                "s3:ObjectCreated:Copy",
+                "s3:ObjectCreated:CompleteMultipartUpload",
+                "s3:ObjectRemoved:*",
+                "s3:ObjectRemoved:Delete",
+                "s3:ObjectRemoved:DeleteMarkerCreated",
+            ]
+        ),
+        field="Events",
+    )
 
     filters = argument.ResourceList(
         KeyFilterRule,
-        field='Filter',
+        field="Filter",
         serializer=serializers.Dict(
-            Key=serializers.Dict(
-                FilterRules=serializers.List(serializers.Resource()),
-            ),
+            Key=serializers.Dict(FilterRules=serializers.List(serializers.Resource()))
         ),
     )

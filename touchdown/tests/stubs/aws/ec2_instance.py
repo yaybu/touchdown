@@ -17,105 +17,109 @@ from .service import ServiceStubber
 
 class EC2InstanceStubber(ServiceStubber):
 
-    client_service = 'ec2'
+    client_service = "ec2"
 
     def make_id(self, name):
-        return 'i-' + super(EC2InstanceStubber, self).make_id(name)[:8]
+        return "i-" + super(EC2InstanceStubber, self).make_id(name)[:8]
 
     def add_describe_instances_empty_response_by_name(self):
         return self.add_response(
-            'describe_instances',
-            service_response={
-                'Reservations': [],
-            },
+            "describe_instances",
+            service_response={"Reservations": []},
             expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]},
-                    {'Name': 'instance-state-name', 'Values': [
-                        'pending', 'running', 'shutting-down', ' stopping', 'stopped'
-                    ]},
-                ],
+                "Filters": [
+                    {"Name": "tag:Name", "Values": [self.resource.name]},
+                    {
+                        "Name": "instance-state-name",
+                        "Values": [
+                            "pending",
+                            "running",
+                            "shutting-down",
+                            " stopping",
+                            "stopped",
+                        ],
+                    },
+                ]
             },
         )
 
-    def add_describe_instances_one_response_by_name(self, state='running'):
+    def add_describe_instances_one_response_by_name(self, state="running"):
         return self.add_response(
-            'describe_instances',
+            "describe_instances",
             service_response={
-                'Reservations': [{
-                    'Instances': [{
-                        'InstanceId': self.make_id(self.resource.name),
-                        'State': {
-                            'Name': state
-                        },
-                        'VpcId': 'vpc-de3db33',
-                        'PrivateIpAddress': '10.0.0.42',
-                    }],
-                }]
+                "Reservations": [
+                    {
+                        "Instances": [
+                            {
+                                "InstanceId": self.make_id(self.resource.name),
+                                "State": {"Name": state},
+                                "VpcId": "vpc-de3db33",
+                                "PrivateIpAddress": "10.0.0.42",
+                            }
+                        ]
+                    }
+                ]
             },
             expected_params={
-                'Filters': [
-                    {'Name': 'tag:Name', 'Values': [self.resource.name]},
-                    {'Name': 'instance-state-name', 'Values': [
-                        'pending', 'running', 'shutting-down', ' stopping', 'stopped'
-                    ]},
-                ],
+                "Filters": [
+                    {"Name": "tag:Name", "Values": [self.resource.name]},
+                    {
+                        "Name": "instance-state-name",
+                        "Values": [
+                            "pending",
+                            "running",
+                            "shutting-down",
+                            " stopping",
+                            "stopped",
+                        ],
+                    },
+                ]
             },
         )
 
     def add_run_instance(self):
         return self.add_response(
-            'run_instances',
+            "run_instances",
             service_response={
-                'Instances': [{
-                    'InstanceId': self.make_id(self.resource.name),
-                }],
+                "Instances": [{"InstanceId": self.make_id(self.resource.name)}]
             },
             expected_params={
-                'BlockDeviceMappings': [],
-                'MaxCount': 1,
-                'MinCount': 1,
-                'ImageId': 'foobarbaz',
+                "BlockDeviceMappings": [],
+                "MaxCount": 1,
+                "MinCount": 1,
+                "ImageId": "foobarbaz",
             },
         )
 
     def add_run_instance_with_profile(self):
         return self.add_response(
-            'run_instances',
+            "run_instances",
             service_response={
-                'Instances': [{
-                    'InstanceId': self.make_id(self.resource.name),
-                }],
+                "Instances": [{"InstanceId": self.make_id(self.resource.name)}]
             },
             expected_params={
-                'IamInstanceProfile': {
-                    'Name': 'my-test-profile',
-                },
-                'BlockDeviceMappings': [],
-                'MaxCount': 1,
-                'MinCount': 1,
-                'ImageId': 'foobarbaz',
+                "IamInstanceProfile": {"Name": "my-test-profile"},
+                "BlockDeviceMappings": [],
+                "MaxCount": 1,
+                "MinCount": 1,
+                "ImageId": "foobarbaz",
             },
         )
 
     def add_create_tags(self, **tags):
-        tag_list = [{'Key': k, 'Value': v} for (k, v) in tags.items()]
+        tag_list = [{"Key": k, "Value": v} for (k, v) in tags.items()]
         self.add_response(
-            'create_tags',
-            service_response={
-            },
+            "create_tags",
+            service_response={},
             expected_params={
-                'Resources': [self.make_id(self.resource.name)],
-                'Tags': tag_list,
+                "Resources": [self.make_id(self.resource.name)],
+                "Tags": tag_list,
             },
         )
 
     def add_terminate_instances(self):
         return self.add_response(
-            'terminate_instances',
-            service_response={
-            },
-            expected_params={
-                'InstanceIds': [self.make_id(self.resource.name)],
-            },
+            "terminate_instances",
+            service_response={},
+            expected_params={"InstanceIds": [self.make_id(self.resource.name)]},
         )

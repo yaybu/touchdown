@@ -17,48 +17,43 @@ from .service import ServiceStubber
 
 class ResourceStubber(ServiceStubber):
 
-    client_service = 'apigateway'
+    client_service = "apigateway"
 
     def add_get_resources_empty_response(self, rest_api_id):
         return self.add_response(
-            'get_resources',
+            "get_resources",
             service_response={},
-            expected_params={
-                'restApiId': rest_api_id,
-            },
+            expected_params={"restApiId": rest_api_id},
         )
 
     def add_get_resources_one_response(self, rest_api_id):
         return self.add_response(
-            'get_resources',
+            "get_resources",
             service_response={
-                'items': [{
-                    'path': self.resource.name,
-                    'id': self.make_id(self.resource.name),
-                }],
+                "items": [
+                    {"path": self.resource.name, "id": self.make_id(self.resource.name)}
+                ]
             },
-            expected_params={
-                'restApiId': rest_api_id,
-            },
+            expected_params={"restApiId": rest_api_id},
         )
 
     def add_create_resource(self, rest_api_id, parent_id):
         return self.add_response(
-            'create_resource',
+            "create_resource",
             service_response={},
             expected_params={
-                'pathPart': self.resource.name,
-                'restApiId': rest_api_id,
-                'parentId': parent_id,
-            }
+                "pathPart": self.resource.name,
+                "restApiId": rest_api_id,
+                "parentId": parent_id,
+            },
         )
 
     def add_delete_resource(self, rest_api_id):
         return self.add_response(
-            'delete_resource',
+            "delete_resource",
             service_response={},
             expected_params={
-                'restApiId': rest_api_id,
-                'resourceId': self.make_id(self.resource.name),
-            }
+                "restApiId": rest_api_id,
+                "resourceId": self.make_id(self.resource.name),
+            },
         )

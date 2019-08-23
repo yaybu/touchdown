@@ -17,55 +17,42 @@ from .service import ServiceStubber
 
 class QueueStubber(ServiceStubber):
 
-    client_service = 'sqs'
+    client_service = "sqs"
 
     def add_get_queue_url(self):
         return self.add_response(
-            'get_queue_url',
-            service_response={
-                'QueueUrl': 'https://' + self.resource.name,
-            },
-            expected_params={
-                'QueueName': self.resource.name,
-            },
+            "get_queue_url",
+            service_response={"QueueUrl": "https://" + self.resource.name},
+            expected_params={"QueueName": self.resource.name},
         )
 
     def add_get_queue_url_404(self):
         return self.add_client_error(
-            'get_queue_url',
-            service_error_code='AWS.SimpleQueueService.NonExistentQueue',
-            service_message='',
+            "get_queue_url",
+            service_error_code="AWS.SimpleQueueService.NonExistentQueue",
+            service_message="",
         )
 
     def add_get_queue_attributes(self):
         return self.add_response(
-            'get_queue_attributes',
-            service_response={
-                'Attributes': {},
-            },
+            "get_queue_attributes",
+            service_response={"Attributes": {}},
             expected_params={
-                'AttributeNames': ['All'],
-                'QueueUrl': 'https://' + self.resource.name,
+                "AttributeNames": ["All"],
+                "QueueUrl": "https://" + self.resource.name,
             },
         )
 
     def add_create_queue(self):
         return self.add_response(
-            'create_queue',
-            service_response={
-                'QueueUrl': 'https://' + self.resource.name,
-            },
-            expected_params={
-                'QueueName': self.resource.name,
-            }
+            "create_queue",
+            service_response={"QueueUrl": "https://" + self.resource.name},
+            expected_params={"QueueName": self.resource.name},
         )
 
     def add_delete_queue(self):
         return self.add_response(
-            'delete_queue',
-            service_response={
-            },
-            expected_params={
-                'QueueUrl': 'https://' + self.resource.name,
-            }
+            "delete_queue",
+            service_response={},
+            expected_params={"QueueUrl": "https://" + self.resource.name},
         )

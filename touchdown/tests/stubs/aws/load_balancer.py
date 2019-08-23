@@ -17,60 +17,48 @@ from .service import ServiceStubber
 
 class LoadBalancerStubber(ServiceStubber):
 
-    client_service = 'elb'
+    client_service = "elb"
 
     def add_describe_load_balancers_empty(self):
         return self.add_response(
-            'describe_load_balancers',
+            "describe_load_balancers",
             service_response={},
-            expected_params={
-                'LoadBalancerNames': [self.resource.name],
-            },
+            expected_params={"LoadBalancerNames": [self.resource.name]},
         )
 
     def add_describe_load_balancers_one(self):
         return self.add_response(
-            'describe_load_balancers',
+            "describe_load_balancers",
             service_response={
-                'LoadBalancerDescriptions': [{
-                    'LoadBalancerName': self.resource.name,
-                    'CanonicalHostedZoneName': 'mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com',
-                    'CanonicalHostedZoneNameID': 'Z3DZXE0Q79N41H',
-                    'DNSName': 'mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com',
-                }]
+                "LoadBalancerDescriptions": [
+                    {
+                        "LoadBalancerName": self.resource.name,
+                        "CanonicalHostedZoneName": "mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com",
+                        "CanonicalHostedZoneNameID": "Z3DZXE0Q79N41H",
+                        "DNSName": "mystack-myelb-15HMABG9ZCN57-1013119603.us-east-1.elb.amazonaws.com",
+                    }
+                ]
             },
-            expected_params={
-                'LoadBalancerNames': [self.resource.name],
-            },
+            expected_params={"LoadBalancerNames": [self.resource.name]},
         )
 
     def add_describe_load_balancer_attributes(self):
         return self.add_response(
-            'describe_load_balancer_attributes',
-            service_response={
-                'LoadBalancerAttributes': {
-                },
-            },
-            expected_params={
-                'LoadBalancerName': self.resource.name,
-            },
+            "describe_load_balancer_attributes",
+            service_response={"LoadBalancerAttributes": {}},
+            expected_params={"LoadBalancerName": self.resource.name},
         )
 
     def add_create_load_balancer(self):
         return self.add_response(
-            'create_load_balancer',
+            "create_load_balancer",
             service_response={},
-            expected_params={
-                'LoadBalancerName': self.resource.name,
-                'Listeners': [],
-            },
+            expected_params={"LoadBalancerName": self.resource.name, "Listeners": []},
         )
 
     def add_delete_load_balancer(self):
         return self.add_response(
-            'delete_load_balancer',
+            "delete_load_balancer",
             service_response={},
-            expected_params={
-                'LoadBalancerName': self.resource.name,
-            },
+            expected_params={"LoadBalancerName": self.resource.name},
         )

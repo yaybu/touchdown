@@ -18,16 +18,15 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestDotGraphGeneration(WorkspaceTestCase):
-
     def test_generate_dot_graph(self):
-        goal = self.create_goal('dot')
+        goal = self.create_goal("dot")
 
         aws = self.workspace.add_aws()
-        vpc = aws.add_vpc(name='test-vpc')
-        vpc.add_subnet(name='subnet-a')
-        vpc.add_subnet(name='subnet-b')
+        vpc = aws.add_vpc(name="test-vpc")
+        vpc.add_subnet(name="subnet-a")
+        vpc.add_subnet(name="subnet-b")
 
-        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, 'echo'))
+        echo = self.fixtures.enter_context(mock.patch.object(goal.ui, "echo"))
         goal.execute()
 
         # This should generate something like this:
@@ -43,10 +42,10 @@ class TestDotGraphGeneration(WorkspaceTestCase):
         # As id() output isn't stable between test runs we have to settle for:
 
         output = echo.call_args[0][0]
-        assert output.startswith('digraph ast {')
-        assert ' [label="vpc \'test-vpc\'"];' in output
-        assert ' [label="subnet \'subnet-a\'"];' in output
-        assert ' [label="subnet \'subnet-b\'"];' in output
-        assert output.count(' -> ') == 2
-        assert output.count(';') == 5
-        assert output.endswith('}')
+        assert output.startswith("digraph ast {")
+        assert " [label=\"vpc 'test-vpc'\"];" in output
+        assert " [label=\"subnet 'subnet-a'\"];" in output
+        assert " [label=\"subnet 'subnet-b'\"];" in output
+        assert output.count(" -> ") == 2
+        assert output.count(";") == 5
+        assert output.endswith("}")

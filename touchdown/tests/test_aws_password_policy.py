@@ -17,21 +17,20 @@ from touchdown.tests.stubs.aws import PasswordPolicyStubber
 
 
 class TestPasswordPolicyCreation(StubberTestCase):
-
     def test_create_password_policy(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        password_policy = self.fixtures.enter_context(PasswordPolicyStubber(
-            goal.get_service(
-                self.aws.add_password_policy(
-                    allow_users_to_change_password=False,
-                ),
-                'apply',
+        password_policy = self.fixtures.enter_context(
+            PasswordPolicyStubber(
+                goal.get_service(
+                    self.aws.add_password_policy(allow_users_to_change_password=False),
+                    "apply",
+                )
             )
-        ))
+        )
         password_policy.add_get_account_password_policy_empty_response()
         password_policy.add_update_account_password_policy(
-            AllowUsersToChangePassword=False,
+            AllowUsersToChangePassword=False
         )
         password_policy.add_get_account_password_policy()
         password_policy.add_get_account_password_policy()
@@ -40,65 +39,58 @@ class TestPasswordPolicyCreation(StubberTestCase):
         goal.execute()
 
     def test_create_password_policy_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        password_policy = self.fixtures.enter_context(PasswordPolicyStubber(
-            goal.get_service(
-                self.aws.add_password_policy(
-                ),
-                'apply',
+        password_policy = self.fixtures.enter_context(
+            PasswordPolicyStubber(
+                goal.get_service(self.aws.add_password_policy(), "apply")
             )
-        ))
+        )
         password_policy.add_get_account_password_policy()
 
         self.assertEqual(len(list(goal.plan())), 0)
         self.assertEqual(len(goal.get_changes(password_policy.resource)), 0)
 
     def test_update_password_policy(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        password_policy = self.fixtures.enter_context(PasswordPolicyStubber(
-            goal.get_service(
-                self.aws.add_password_policy(
-                    allow_users_to_change_password=True,
-                ),
-                'apply',
+        password_policy = self.fixtures.enter_context(
+            PasswordPolicyStubber(
+                goal.get_service(
+                    self.aws.add_password_policy(allow_users_to_change_password=True),
+                    "apply",
+                )
             )
-        ))
+        )
         password_policy.add_get_account_password_policy()
         password_policy.add_update_account_password_policy(
-            AllowUsersToChangePassword=True,
+            AllowUsersToChangePassword=True
         )
         goal.execute()
 
 
 class TestPasswordPolicyDeletion(StubberTestCase):
-
     def test_delete_password_policy(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        password_policy = self.fixtures.enter_context(PasswordPolicyStubber(
-            goal.get_service(
-                self.aws.add_password_policy(
-                ),
-                'destroy',
+        password_policy = self.fixtures.enter_context(
+            PasswordPolicyStubber(
+                goal.get_service(self.aws.add_password_policy(), "destroy")
             )
-        ))
+        )
         password_policy.add_get_account_password_policy()
         password_policy.add_delete_account_password_policy()
 
         goal.execute()
 
     def test_delete_password_policy_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        password_policy = self.fixtures.enter_context(PasswordPolicyStubber(
-            goal.get_service(
-                self.aws.add_password_policy(
-                ),
-                'destroy',
+        password_policy = self.fixtures.enter_context(
+            PasswordPolicyStubber(
+                goal.get_service(self.aws.add_password_policy(), "destroy")
             )
-        ))
+        )
         password_policy.add_get_account_password_policy_empty_response()
 
         self.assertEqual(len(list(goal.plan())), 0)

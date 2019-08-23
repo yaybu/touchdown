@@ -21,176 +21,173 @@ from touchdown.tests.stubs.aws import DatabaseStubber
 
 
 class TestDatabaseRollback(StubberTestCase):
-
     def test_rollback_database_to_snapshot(self):
-        goal = self.create_goal('rollback')
+        goal = self.create_goal("rollback")
 
-        now = self.fixtures.enter_context(mock.patch('touchdown.aws.rds.rollback.now'))
+        now = self.fixtures.enter_context(mock.patch("touchdown.aws.rds.rollback.now"))
         now.return_value = datetime.datetime(2016, 9, 15, 12, 0, 0)
 
-        database = self.fixtures.enter_context(DatabaseStubber(
-            goal.get_service(
-                self.aws.add_database(
-                    name='my-database',
-                    allocated_storage=5,
-                    instance_class='db.m3.medium',
-                    engine='postgres',
-                    master_username='root',
-                    master_password='password',
-                    storage_encrypted=True,
-                ),
-                'rollback',
+        database = self.fixtures.enter_context(
+            DatabaseStubber(
+                goal.get_service(
+                    self.aws.add_database(
+                        name="my-database",
+                        allocated_storage=5,
+                        instance_class="db.m3.medium",
+                        engine="postgres",
+                        master_username="root",
+                        master_password="password",
+                        storage_encrypted=True,
+                    ),
+                    "rollback",
+                )
             )
-        ))
+        )
 
         # Database is running
         database.add_response(
-            'describe_db_instances',
+            "describe_db_instances",
             service_response={
-                'DBInstances': [{
-                    'DBInstanceIdentifier': 'my-database',
-                    'DBInstanceStatus': 'available',
-                    'PendingModifiedValues': {},
-                    'Engine': 'postgres',
-                    'PubliclyAccessible': True,
-                    'MultiAZ': True,
-                    'DBSubnetGroup': {
-                        'DBSubnetGroupName': 'database-subnet',
-                    },
-                    'Endpoint': {
-                        'Port': 8000,
-                    },
-                    'DBSecurityGroups': [{
-                        'DBSecurityGroupName': 'mysecuritygroup',
-                        'Status': 'active',
-                    }],
-                    'AllocatedStorage': 1000,
-                    'DBParameterGroups': [{
-                        'DBParameterGroupName': 'some-really-good-parameters'
-                    }],
-                    'CACertificateIdentifier': 'really-secure-certificates',
-                }],
+                "DBInstances": [
+                    {
+                        "DBInstanceIdentifier": "my-database",
+                        "DBInstanceStatus": "available",
+                        "PendingModifiedValues": {},
+                        "Engine": "postgres",
+                        "PubliclyAccessible": True,
+                        "MultiAZ": True,
+                        "DBSubnetGroup": {"DBSubnetGroupName": "database-subnet"},
+                        "Endpoint": {"Port": 8000},
+                        "DBSecurityGroups": [
+                            {
+                                "DBSecurityGroupName": "mysecuritygroup",
+                                "Status": "active",
+                            }
+                        ],
+                        "AllocatedStorage": 1000,
+                        "DBParameterGroups": [
+                            {"DBParameterGroupName": "some-really-good-parameters"}
+                        ],
+                        "CACertificateIdentifier": "really-secure-certificates",
+                    }
+                ]
             },
-            expected_params={
-                'DBInstanceIdentifier': 'my-database',
-            }
+            expected_params={"DBInstanceIdentifier": "my-database"},
         )
 
         # It picks a name to rename the existing database to and checks it isn't in use
         database.add_client_error(
-            'describe_db_instances',
-            service_error_code='NotFound',
+            "describe_db_instances", service_error_code="NotFound"
         )
 
         # Is 'my-snapshot' a snapshot we can use?
         database.add_response(
-            'describe_db_snapshots',
+            "describe_db_snapshots",
             service_response={
-                'DBSnapshots': [{
-                    'DBSnapshotIdentifier': 'snap-12335',
-                    'Status': 'available',
-                }],
+                "DBSnapshots": [
+                    {"DBSnapshotIdentifier": "snap-12335", "Status": "available"}
+                ]
             },
             expected_params={
-                'DBInstanceIdentifier': 'my-database',
-                'DBSnapshotIdentifier': 'my-snapshot',
-            }
+                "DBInstanceIdentifier": "my-database",
+                "DBSnapshotIdentifier": "my-snapshot",
+            },
         )
 
         # Move the existing database out of the way
         database.add_response(
-            'modify_db_instance',
+            "modify_db_instance",
             service_response={},
             expected_params={
-                'ApplyImmediately': True,
-                'DBInstanceIdentifier': 'my-database',
-                'NewDBInstanceIdentifier': 'my-database-20160915120000',
-            }
+                "ApplyImmediately": True,
+                "DBInstanceIdentifier": "my-database",
+                "NewDBInstanceIdentifier": "my-database-20160915120000",
+            },
         )
 
         # Wait for old database to be out of the way
         database.add_response(
-            'describe_db_instances',
+            "describe_db_instances",
             service_response={
-                'DBInstances': [{
-                    'DBInstanceIdentifier': 'my-database-20160915120000',
-                    'DBInstanceStatus': 'available',
-                    'PendingModifiedValues': {},
-                }],
+                "DBInstances": [
+                    {
+                        "DBInstanceIdentifier": "my-database-20160915120000",
+                        "DBInstanceStatus": "available",
+                        "PendingModifiedValues": {},
+                    }
+                ]
             },
-            expected_params={
-                'DBInstanceIdentifier': 'my-database-20160915120000',
-            }
+            expected_params={"DBInstanceIdentifier": "my-database-20160915120000"},
         )
 
         # OK: Actually restore an instance from the snapshot
         database.add_response(
-            'restore_db_instance_from_db_snapshot',
+            "restore_db_instance_from_db_snapshot",
             service_response={},
             expected_params={
-                'DBInstanceIdentifier': 'my-database',
-                'DBSnapshotIdentifier': 'my-snapshot',
-                'DBSubnetGroupName': 'database-subnet',
-                'Engine': 'postgres',
-                'MultiAZ': True,
-                'Port': 8000,
-                'PubliclyAccessible': True,
-            }
+                "DBInstanceIdentifier": "my-database",
+                "DBSnapshotIdentifier": "my-snapshot",
+                "DBSubnetGroupName": "database-subnet",
+                "Engine": "postgres",
+                "MultiAZ": True,
+                "Port": 8000,
+                "PubliclyAccessible": True,
+            },
         )
 
         # Wait for the new database to be ready...
         database.add_response(
-            'describe_db_instances',
+            "describe_db_instances",
             service_response={
-                'DBInstances': [{
-                    'DBInstanceIdentifier': 'my-database',
-                    'DBInstanceStatus': 'available',
-                    'PendingModifiedValues': {},
-                }],
+                "DBInstances": [
+                    {
+                        "DBInstanceIdentifier": "my-database",
+                        "DBInstanceStatus": "available",
+                        "PendingModifiedValues": {},
+                    }
+                ]
             },
-            expected_params={
-                'DBInstanceIdentifier': 'my-database',
-            }
+            expected_params={"DBInstanceIdentifier": "my-database"},
         )
 
         # And then change its settings again. This is because you can't choose
         # them all on the restore API call!!!!!!
         database.add_response(
-            'modify_db_instance',
+            "modify_db_instance",
             service_response={},
             expected_params={
-                'AllocatedStorage': 1000,
-                'ApplyImmediately': True,
-                'CACertificateIdentifier': 'really-secure-certificates',
-                'DBInstanceIdentifier': 'my-database',
-                'DBParameterGroupName': 'some-really-good-parameters',
-                'DBSecurityGroups': ['mysecuritygroup'],
-            }
+                "AllocatedStorage": 1000,
+                "ApplyImmediately": True,
+                "CACertificateIdentifier": "really-secure-certificates",
+                "DBInstanceIdentifier": "my-database",
+                "DBParameterGroupName": "some-really-good-parameters",
+                "DBSecurityGroups": ["mysecuritygroup"],
+            },
         )
 
         # Wait for the new database to be ready...
         database.add_response(
-            'describe_db_instances',
+            "describe_db_instances",
             service_response={
-                'DBInstances': [{
-                    'DBInstanceIdentifier': 'my-database',
-                    'DBInstanceStatus': 'available',
-                    'PendingModifiedValues': {},
-                }],
+                "DBInstances": [
+                    {
+                        "DBInstanceIdentifier": "my-database",
+                        "DBInstanceStatus": "available",
+                        "PendingModifiedValues": {},
+                    }
+                ]
             },
-            expected_params={
-                'DBInstanceIdentifier': 'my-database',
-            }
+            expected_params={"DBInstanceIdentifier": "my-database"},
         )
 
         # Now delete the old database...
         database.add_response(
-            'delete_db_instance',
+            "delete_db_instance",
             service_response={},
             expected_params={
-                'DBInstanceIdentifier': 'my-database-20160915120000',
-                'SkipFinalSnapshot': True,
-            }
+                "DBInstanceIdentifier": "my-database-20160915120000",
+                "SkipFinalSnapshot": True,
+            },
         )
 
-        goal.execute('my-database', 'my-snapshot')
+        goal.execute("my-database", "my-snapshot")

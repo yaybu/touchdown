@@ -21,15 +21,20 @@ from touchdown.tests.testcases import WorkspaceTestCase
 
 
 class TestSshClient(WorkspaceTestCase):
-
-    @unittest.skip('test doesn\'t work on CI')
+    @unittest.skip("test doesn't work on CI")
     def test_ssh_client(self):
-        goal = self.create_goal('ssh')
-        ssh_connection = self.fixtures.enter_context(SshConnectionFixture(goal, self.workspace))
-        connection_plan = goal.get_service(ssh_connection.ssh_connection, 'describe')
+        goal = self.create_goal("ssh")
+        ssh_connection = self.fixtures.enter_context(
+            SshConnectionFixture(goal, self.workspace)
+        )
+        connection_plan = goal.get_service(ssh_connection.ssh_connection, "describe")
 
-        self.fixtures.enter_context(mock.patch('touchdown.ssh.client.Client.verify_transport'))
-        self.fixtures.enter_context(mock.patch('touchdown.ssh.client.Client.set_input_encoding'))
+        self.fixtures.enter_context(
+            mock.patch("touchdown.ssh.client.Client.verify_transport")
+        )
+        self.fixtures.enter_context(
+            mock.patch("touchdown.ssh.client.Client.set_input_encoding")
+        )
 
         connection_plan.get_client()
 

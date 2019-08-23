@@ -17,20 +17,21 @@ from touchdown.tests.stubs.aws import LaunchConfigurationStubber
 
 
 class TestCreateLaunchConfiguration(StubberTestCase):
-
     def test_create_launch_config(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
-            goal.get_service(
-                self.aws.add_launch_configuration(
-                    name='my-test-lc',
-                    image='ami-cba130bc',
-                    instance_type='t2.micro',
-                ),
-                'apply',
+        launch_config = self.fixtures.enter_context(
+            LaunchConfigurationStubber(
+                goal.get_service(
+                    self.aws.add_launch_configuration(
+                        name="my-test-lc",
+                        image="ami-cba130bc",
+                        instance_type="t2.micro",
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
 
         launch_config.add_describe_launch_configurations_empty_response()
         launch_config.add_describe_launch_configurations_empty_response()
@@ -41,18 +42,20 @@ class TestCreateLaunchConfiguration(StubberTestCase):
         goal.execute()
 
     def test_create_launch_config_idempotent(self):
-        goal = self.create_goal('apply')
+        goal = self.create_goal("apply")
 
-        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
-            goal.get_service(
-                self.aws.add_launch_configuration(
-                    name='my-test-lc',
-                    image='ami-cba130bc',
-                    instance_type='t2.micro',
-                ),
-                'apply',
+        launch_config = self.fixtures.enter_context(
+            LaunchConfigurationStubber(
+                goal.get_service(
+                    self.aws.add_launch_configuration(
+                        name="my-test-lc",
+                        image="ami-cba130bc",
+                        instance_type="t2.micro",
+                    ),
+                    "apply",
+                )
             )
-        ))
+        )
 
         launch_config.add_describe_launch_configurations_one_response()
         launch_config.add_describe_launch_configurations_one_response()
@@ -63,20 +66,21 @@ class TestCreateLaunchConfiguration(StubberTestCase):
 
 
 class TestDestroyLaunchConfiguration(StubberTestCase):
-
     def test_destroy_launch_config(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
-            goal.get_service(
-                self.aws.add_launch_configuration(
-                    name='my-test-lc',
-                    image='ami-cba130bc',
-                    instance_type='t2.micro',
-                ),
-                'destroy',
+        launch_config = self.fixtures.enter_context(
+            LaunchConfigurationStubber(
+                goal.get_service(
+                    self.aws.add_launch_configuration(
+                        name="my-test-lc",
+                        image="ami-cba130bc",
+                        instance_type="t2.micro",
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
 
         launch_config.add_describe_launch_configurations_one_response()
         launch_config.add_describe_launch_configurations_one_response()
@@ -85,18 +89,20 @@ class TestDestroyLaunchConfiguration(StubberTestCase):
         goal.execute()
 
     def test_destroy_launch_config_idempotent(self):
-        goal = self.create_goal('destroy')
+        goal = self.create_goal("destroy")
 
-        launch_config = self.fixtures.enter_context(LaunchConfigurationStubber(
-            goal.get_service(
-                self.aws.add_launch_configuration(
-                    name='my-test-lc',
-                    image='ami-cba130bc',
-                    instance_type='t2.micro',
-                ),
-                'destroy',
+        launch_config = self.fixtures.enter_context(
+            LaunchConfigurationStubber(
+                goal.get_service(
+                    self.aws.add_launch_configuration(
+                        name="my-test-lc",
+                        image="ami-cba130bc",
+                        instance_type="t2.micro",
+                    ),
+                    "destroy",
+                )
             )
-        ))
+        )
 
         launch_config.add_describe_launch_configurations_empty_response()
         launch_config.add_describe_launch_configurations_empty_response()

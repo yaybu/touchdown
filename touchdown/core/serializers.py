@@ -31,9 +31,9 @@ class RequiredFieldNotPresent(Exception):
 
 
 class Pending(object):
-    ''' A render can return a Pending if it is rendered while in the pending state
+    """ A render can return a Pending if it is rendered while in the pending state
        eq and nonzero are safety check to ensure it's not used anywhere
-    '''
+    """
 
     def __init__(self, value):
         self.value = value
@@ -48,31 +48,29 @@ class Pending(object):
         return str(self.value)
 
     def __repr__(self):
-        return '(pending {})'.format(self.value)
+        return "(pending {})".format(self.value)
 
 
 class Serializer(object):
-
     def render(self, runner, object):
-        ''' turn incoming into 'json' for botocore '''
+        """ turn incoming into 'json' for botocore """
         raise NotImplementedError(self.render)
 
     def diff(self, runner, object, value):
-        ''' takes a resource and some botocore 'stuff'. returns the differences '''
+        """ takes a resource and some botocore 'stuff'. returns the differences """
         rendered = self.render(runner, object)
         return diff.ValueDiff(value, rendered)
 
     def pending(self, runner, obj):
-        ''' given something to serialize, do I know enough to serialize it yet '''
+        """ given something to serialize, do I know enough to serialize it yet """
         return False
 
     def dependencies(self, object):
-        ''' given something to serialize what other things do I need in order to serialize it '''
+        """ given something to serialize what other things do I need in order to serialize it """
         return frozenset()
 
 
 class Identity(Serializer):
-
     def render(self, runner, object):
         return object
 
@@ -84,7 +82,6 @@ class Identity(Serializer):
 
 
 class SubSerializer(Serializer):
-
     def render(self, runner, object):
         return object.render(runner, object)
 
@@ -96,9 +93,8 @@ class SubSerializer(Serializer):
 
 
 class Chain(Serializer):
-
     def __init__(self, *children, **kwargs):
-        self.skip_empty = kwargs.get('skip_empty', False)
+        self.skip_empty = kwargs.get("skip_empty", False)
         self.children = children
 
     def render(self, runner, object):
@@ -116,11 +112,12 @@ class Chain(Serializer):
         return any(itertools.chain(*(c.pending(runner, object) for c in self.children)))
 
     def dependencies(self, object):
-        return frozenset(itertools.chain(*(c.dependencies(object) for c in self.children)))
+        return frozenset(
+            itertools.chain(*(c.dependencies(object) for c in self.children))
+        )
 
 
 class Const(Serializer):
-
     def __init__(self, const):
         self.const = const
 
@@ -131,13 +128,12 @@ class Const(Serializer):
         return isinstance(object, Pending)
 
     def dependencies(self, object):
-        if hasattr(self.const, 'add_dependency'):  # if is a Resource
-            return frozenset((self.const, ))
+        if hasattr(self.const, "add_dependency"):  # if is a Resource
+            return frozenset((self.const,))
         return frozenset()
 
 
 class Identifier(Serializer):
-
     def __init__(self, inner=Identity()):
         self.inner = inner
 
@@ -155,12 +151,8 @@ class Identifier(Serializer):
         if not value or value == rendered:
             return diff.ValueDiff(value, rendered)
         describe = runner.get_plan(resource)
-        d = Resource().diff(
-            runner,
-            resource,
-            describe.get_object_by_id(value),
-        )
-        d.diffs.insert(0, ('name', diff.ValueDiff(value, rendered)))
+        d = Resource().diff(runner, resource, describe.get_object_by_id(value))
+        d.diffs.insert(0, ("name", diff.ValueDiff(value, rendered)))
         return d
 
     def pending(self, runner, object):
@@ -171,8 +163,8 @@ class Identifier(Serializer):
 
 
 class Property(Serializer):
-    ''' an output from a botocore action
-        e.g. describe queue returns queue_url'''
+    """ an output from a botocore action
+        e.g. describe queue returns queue_url"""
 
     def __init__(self, property, inner=Identity()):
         self.selector = property
@@ -186,7 +178,7 @@ class Property(Serializer):
             return Pending(target)
         result = self.property.search(target_plan.object)
         if not result:
-            raise errors.Error('{} not available'.format(self.selector))
+            raise errors.Error("{} not available".format(self.selector))
         return result
 
     def pending(self, runner, object):
@@ -203,9 +195,9 @@ class Property(Serializer):
 
 
 class Argument(Serializer):
-    ''' for retrieving an argument from a resource object
+    """ for retrieving an argument from a resource object
         i.e. rather than acting on this resource act on a field of this resource
-    '''
+    """
 
     def __init__(self, attribute, field=None):
         self.attribute = attribute
@@ -236,7 +228,9 @@ class Argument(Serializer):
             if self.field:
                 result = self.field.clean_value(object, result)
 
-        return object.meta.fields[self.attribute].argument.serializer.render(runner, result)
+        return object.meta.fields[self.attribute].argument.serializer.render(
+            runner, result
+        )
 
     def diff(self, runner, object, value):
         try:
@@ -248,7 +242,9 @@ class Argument(Serializer):
 
         if isinstance(result, Serializer):
             return result.diff(runner, result, value)
-        return object.meta.fields[self.attribute].argument.serializer.diff(runner, result, value)
+        return object.meta.fields[self.attribute].argument.serializer.diff(
+            runner, result, value
+        )
 
     def pending(self, runner, object):
         try:
@@ -261,11 +257,12 @@ class Argument(Serializer):
         if maybe(inner).pending(runner, object):
             return True
 
-        return object.meta.fields[self.attribute].argument.serializer.pending(runner, inner)
+        return object.meta.fields[self.attribute].argument.serializer.pending(
+            runner, inner
+        )
 
 
 class Expression(Serializer):
-
     def __init__(self, callback):
         self.callback = callback
 
@@ -280,7 +277,7 @@ class Expression(Serializer):
 
 class Annotation(Serializer):
 
-    ''' An annotation node does not change the output, but records some metadata about it '''
+    """ An annotation node does not change the output, but records some metadata about it """
 
     def __init__(self, inner):
         self.inner = inner
@@ -293,7 +290,6 @@ class Annotation(Serializer):
 
 
 class Required(Annotation):
-
     def render(self, runner, object):
         try:
             return self.inner.render(runner, object)
@@ -302,7 +298,6 @@ class Required(Annotation):
 
 
 class Default(Annotation):
-
     def __init__(self, inner=Identity(), default=None):
         super(Default, self).__init__(inner)
         self.default = default
@@ -315,7 +310,7 @@ class Default(Annotation):
 
 
 class Formatter(Serializer):
-    ''' abc '''
+    """ abc """
 
     def __init__(self, inner=Identity()):
         self.inner = inner
@@ -328,7 +323,6 @@ class Formatter(Serializer):
 
 
 class Boolean(Formatter):
-
     def __init__(self, inner=Identity(), on_true=True, on_false=False):
         super(Boolean, self).__init__(inner)
         self.on_true = on_true
@@ -339,7 +333,6 @@ class Boolean(Formatter):
 
 
 class String(Formatter):
-
     def render(self, runner, object):
         if object is None:
             return None
@@ -350,11 +343,12 @@ class String(Formatter):
             return str(self.inner.render(runner, object))
 
     def diff(self, runner, object, value):
-        return super(String, self).diff(runner, object, None if value is None else str(value))
+        return super(String, self).diff(
+            runner, object, None if value is None else str(value)
+        )
 
 
 class Bytes(Formatter):
-
     def render(self, runner, object):
         if object is None:
             return None
@@ -365,7 +359,9 @@ class Bytes(Formatter):
             return str(self.inner.render(runner, object))
 
     def diff(self, runner, object, value):
-        return super(Bytes, self).diff(runner, object, None if value is None else str(value))
+        return super(Bytes, self).diff(
+            runner, object, None if value is None else str(value)
+        )
 
 
 class Integer(Formatter):
@@ -374,10 +370,10 @@ class Integer(Formatter):
 
 
 class ListOfOne(Formatter):
-    ''' list that can only have one entry - thanks amazon '''
+    """ list that can only have one entry - thanks amazon """
 
     def __init__(self, *args, **kwargs):
-        self.maybe_empty = kwargs.pop('maybe_empty', False)
+        self.maybe_empty = kwargs.pop("maybe_empty", False)
         Formatter.__init__(self, *args, **kwargs)
 
     def render(self, runner, object):
@@ -395,10 +391,10 @@ class ListOfOne(Formatter):
 
 class CommaSeperatedList(Formatter):
     def render(self, runner, object):
-        return ','.join(self.inner.render(runner, object))
+        return ",".join(self.inner.render(runner, object))
 
     def diff(self, runner, object, value):
-        v = value.split(',') if value else []
+        v = value.split(",") if value else []
         return self.inner.diff(runner, object, v)
 
 
@@ -412,7 +408,6 @@ class Json(Formatter):
 
 
 class Append(Formatter):
-
     def __init__(self, post_string, inner=Identity()):
         super(Append, self).__init__(inner)
         self.post_string = post_string
@@ -421,7 +416,7 @@ class Append(Formatter):
         inner = self.inner.render(runner, object)
         if isinstance(inner, Pending):
             return inner
-        return '{}{}'.format(inner, self.post_string)
+        return "{}{}".format(inner, self.post_string)
 
 
 class Format(Formatter):
@@ -431,17 +426,16 @@ class Format(Formatter):
 
     def render(self, runner, object):
         if not object:
-            return ''
-        if hasattr(object, 'resource_name') and not runner.get_plan(object).object:
-            return ''
+            return ""
+        if hasattr(object, "resource_name") and not runner.get_plan(object).object:
+            return ""
         try:
             return self.format_string.format(self.inner.render(runner, object))
         except Exception:
-            return ''
+            return ""
 
 
 class Dict(Serializer):
-
     def __init__(self, **kwargs):
         self.kwargs = {}
         for k, v in kwargs.items():
@@ -487,11 +481,14 @@ class Dict(Serializer):
         return any(v.pending(runner, v) for v in self.kwargs.values())
 
     def dependencies(self, object):
-        return frozenset(itertools.chain(*tuple(c.dependencies(object) for c in self.kwargs.values())))
+        return frozenset(
+            itertools.chain(
+                *tuple(c.dependencies(object) for c in self.kwargs.values())
+            )
+        )
 
 
 class Map(Dict):
-
     def render(self, runner, object):
         result = dict()
         for key, value in object.items():
@@ -522,44 +519,48 @@ class Map(Dict):
         return any(maybe(v).pending(runner, v) for v in object.values())
 
     def dependencies(self, object):
-        return frozenset(itertools.chain(*tuple(maybe(c).dependencies(object) for c in object.values())))
+        return frozenset(
+            itertools.chain(
+                *tuple(maybe(c).dependencies(object) for c in object.values())
+            )
+        )
 
 
 class Resource(Dict):
 
-    ''' Automatically generate a Dict definition by inspect the 'field'
-    paramters of a resource '''
+    """ Automatically generate a Dict definition by inspect the 'field'
+    paramters of a resource """
 
-    def __init__(self, mode='create', group='', **kwargs):
+    def __init__(self, mode="create", group="", **kwargs):
         self.mode = mode
         self.group = group
         super(Resource, self).__init__(**kwargs)
 
     def should_ignore_field(self, object, field, value):
         arg = field.argument
-        if not hasattr(arg, 'field'):
+        if not hasattr(arg, "field"):
             return True
         if not arg.empty_serializer and not field.present(object):
             if value is None:
                 return True
         if arg.field in self.kwargs:
             return True
-        if self.mode == 'create' and not getattr(arg, 'create', True):
+        if self.mode == "create" and not getattr(arg, "create", True):
             return True
-        if self.mode == 'update' and not getattr(arg, 'update', True):
+        if self.mode == "update" and not getattr(arg, "update", True):
             return True
-        if self.group != getattr(arg, 'group', ''):
+        if self.group != getattr(arg, "group", ""):
             return True
         return False
 
     def render(self, runner, object):
-        if hasattr(object, 'get_serializer'):
+        if hasattr(object, "get_serializer"):
             return object.get_serializer(runner, **self.kwargs).render(runner, object)
 
         kwargs = dict(self.kwargs)
 
         if not self.group:
-            for name, serializer in getattr(object, 'extra_serializers', {}).items():
+            for name, serializer in getattr(object, "extra_serializers", {}).items():
                 kwargs[name] = serializer
 
         for field in object.meta.iter_fields_in_order():
@@ -580,11 +581,11 @@ class Resource(Dict):
             arg = field.argument
             if not field.present(obj):
                 continue
-            if not getattr(arg, 'field', ''):
+            if not getattr(arg, "field", ""):
                 continue
-            if not getattr(arg, 'update', True):
+            if not getattr(arg, "update", True):
                 continue
-            if getattr(arg, 'group', '') != self.group:
+            if getattr(arg, "group", "") != self.group:
                 continue
 
             # If a field is present in the remote, then diff against that
@@ -595,7 +596,10 @@ class Resource(Dict):
                 remote_val = None
 
             try:
-                d.add(field.name, Argument(field.name, field).diff(runner, obj, remote_val))
+                d.add(
+                    field.name,
+                    Argument(field.name, field).diff(runner, obj, remote_val),
+                )
             except FieldNotPresent:
                 continue
 
@@ -615,7 +619,6 @@ class Resource(Dict):
 
 
 class List(Serializer):
-
     def __init__(self, child=Identity(), skip_empty=False):
         self.child = child
         self.skip_empty = skip_empty
@@ -647,7 +650,9 @@ class List(Serializer):
         for i, v in enumerate(new):
             _longest_intersections = {}
             for j in intersections.get(i, []):
-                _longest_intersections[j] = (j and longest_intersections.get(j - 1, 0)) + 1
+                _longest_intersections[j] = (
+                    j and longest_intersections.get(j - 1, 0)
+                ) + 1
                 if _longest_intersections[j] > length:
                     length = _longest_intersections[j]
                     start_old = j - length + 1
@@ -657,22 +662,21 @@ class List(Serializer):
 
     def _walk_intersections(self, runner, old, new):
         length, start_old, start_new = self._find_longest_intersection(
-            old,
-            new,
-            self._find_intersections(runner, old, new),
+            old, new, self._find_intersections(runner, old, new)
         )
 
         if length == 0:
             # No intersections between begin and end...
             return itertools.chain(
-                [('-', old)] if old else [],
-                [('+', new)] if new else [],
+                [("-", old)] if old else [], [("+", new)] if new else []
             )
         else:
             return itertools.chain(
                 self._walk_intersections(runner, old[:start_old], new[:start_new]),
-                [('=', new[start_new:start_new+length])],
-                self._walk_intersections(runner, old[start_old + length:], new[start_new + length:]),
+                [("=", new[start_new : start_new + length])],
+                self._walk_intersections(
+                    runner, old[start_old + length :], new[start_new + length :]
+                ),
             )
 
     def diff_slow(self, runner, object, value):
@@ -680,17 +684,16 @@ class List(Serializer):
         idx = 0
         pending = []
         intersections = itertools.chain(
-            self._walk_intersections(runner, value, object),
-            [('*', [])],
+            self._walk_intersections(runner, value, object), [("*", [])]
         )
         for op, vals in intersections:
-            if op == '-':
+            if op == "-":
                 pending = vals
-            elif op == '+':
+            elif op == "+":
                 for i, (old, new) in enumerate(zip_longest(pending, vals), idx):
                     diffs.add(i, self.child.diff(runner, new, old))
                 pending = []
-            elif pending and op in ('=', '*'):
+            elif pending and op in ("=", "*"):
                 for i, old in enumerate(pending, idx):
                     diffs.add(i, self.child.diff(runner, None, old))
                 pending = []
@@ -720,7 +723,7 @@ class List(Serializer):
 
 
 class Context(Serializer):
-    ''' new way of doing inner (Identity) '''
+    """ new way of doing inner (Identity) """
 
     def __init__(self, serializer, inner):
         if not isinstance(serializer, Serializer):
@@ -743,7 +746,9 @@ class Context(Serializer):
         return self.inner.pending(runner, object)
 
     def dependencies(self, object):
-        return self.inner.dependencies(object).union(self.serializer.dependencies(object))
+        return self.inner.dependencies(object).union(
+            self.serializer.dependencies(object)
+        )
 
 
 def maybe(val):

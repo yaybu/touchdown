@@ -22,11 +22,13 @@ from ..common import SimpleApply, SimpleDescribe, SimpleDestroy, TagsMixin
 
 class VPC(Resource):
 
-    resource_name = 'vpc'
+    resource_name = "vpc"
 
-    name = argument.String(field='Name', group='tags')
-    cidr_block = argument.IPNetwork(field='CidrBlock')
-    tenancy = argument.String(default='default', choices=['default', 'dedicated'], field='InstanceTenancy')
+    name = argument.String(field="Name", group="tags")
+    cidr_block = argument.IPNetwork(field="CidrBlock")
+    tenancy = argument.String(
+        default="default", choices=["default", "dedicated"], field="InstanceTenancy"
+    )
 
     tags = argument.Dict()
 
@@ -34,82 +36,72 @@ class VPC(Resource):
 
     enable_dns_support = argument.Boolean(
         default=True,
-        field='EnableDnsSupport',
-        serializer=serializers.Dict(
-            Value=serializers.Identity()
-        ),
-        group='dns_support_attribute',
+        field="EnableDnsSupport",
+        serializer=serializers.Dict(Value=serializers.Identity()),
+        group="dns_support_attribute",
     )
 
     enable_dns_hostnames = argument.Boolean(
         default=True,
-        field='EnableDnsHostnames',
-        serializer=serializers.Dict(
-            Value=serializers.Identity()
-        ),
-        group='dns_hostnames_attribute',
+        field="EnableDnsHostnames",
+        serializer=serializers.Dict(Value=serializers.Identity()),
+        group="dns_hostnames_attribute",
     )
 
 
 class Describe(SimpleDescribe, Plan):
 
     resource = VPC
-    service_name = 'ec2'
-    api_version = '2015-10-01'
-    describe_action = 'describe_vpcs'
-    describe_envelope = 'Vpcs'
-    key = 'VpcId'
+    service_name = "ec2"
+    api_version = "2015-10-01"
+    describe_action = "describe_vpcs"
+    describe_envelope = "Vpcs"
+    key = "VpcId"
 
     def get_describe_filters(self):
-        return {
-            'Filters': [
-                {'Name': 'tag:Name', 'Values': [self.resource.name]},
-            ],
-        }
+        return {"Filters": [{"Name": "tag:Name", "Values": [self.resource.name]}]}
 
     def annotate_object(self, obj):
-        obj['EnableDnsSupport'] = self.client.describe_vpc_attribute(
-            Attribute='enableDnsSupport',
-            VpcId=obj['VpcId'],
-        )['EnableDnsSupport']
-        obj['EnableDnsHostnames'] = self.client.describe_vpc_attribute(
-            Attribute='enableDnsHostnames',
-            VpcId=obj['VpcId'],
-        )['EnableDnsHostnames']
+        obj["EnableDnsSupport"] = self.client.describe_vpc_attribute(
+            Attribute="enableDnsSupport", VpcId=obj["VpcId"]
+        )["EnableDnsSupport"]
+        obj["EnableDnsHostnames"] = self.client.describe_vpc_attribute(
+            Attribute="enableDnsHostnames", VpcId=obj["VpcId"]
+        )["EnableDnsHostnames"]
         return obj
 
 
 class Apply(TagsMixin, SimpleApply, Describe):
 
-    create_action = 'create_vpc'
-    waiter = 'vpc_available'
+    create_action = "create_vpc"
+    waiter = "vpc_available"
 
     def update_dnssupport_attribute(self):
         diff = self.resource.diff(
             self.runner,
-            self.object.get('EnableDnsSupport', {}),
-            group='dns_support_attribute',
+            self.object.get("EnableDnsSupport", {}),
+            group="dns_support_attribute",
         )
         if not diff.matches():
             yield self.generic_action(
-                ['Configure DNS Support Setting'] + list(diff.lines()),
+                ["Configure DNS Support Setting"] + list(diff.lines()),
                 self.client.modify_vpc_attribute,
                 VpcId=serializers.Identifier(),
-                EnableDnsSupport=serializers.Argument('enable_dns_support'),
+                EnableDnsSupport=serializers.Argument("enable_dns_support"),
             )
 
     def update_dnshostnames_attribute(self):
         diff = self.resource.diff(
             self.runner,
-            self.object.get('EnableDnsHostnames', {}),
-            group='dns_hostnames_attribute',
+            self.object.get("EnableDnsHostnames", {}),
+            group="dns_hostnames_attribute",
         )
         if not diff.matches():
             yield self.generic_action(
-                ['Configure DNS Hostnames Setting'] + list(diff.lines()),
+                ["Configure DNS Hostnames Setting"] + list(diff.lines()),
                 self.client.modify_vpc_attribute,
                 VpcId=serializers.Identifier(),
-                EnableDnsHostnames=serializers.Argument('enable_dns_hostnames'),
+                EnableDnsHostnames=serializers.Argument("enable_dns_hostnames"),
             )
 
     def update_object(self):
@@ -123,5 +115,5 @@ class Apply(TagsMixin, SimpleApply, Describe):
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_vpc'
+    destroy_action = "delete_vpc"
     # waiter = 'vpc_terminated'

@@ -23,13 +23,13 @@ from .volume import Volume
 from .volume_attachment import VolumeAttachment
 
 __all__ = [
-    'Image',
-    'ImageCopy',
-    'Instance',
-    'KeyPair',
-    'AutoScalingGroup',
-    'Policy',
-    'LaunchConfiguration',
-    'Volume',
-    'VolumeAttachment',
+    "Image",
+    "ImageCopy",
+    "Instance",
+    "KeyPair",
+    "AutoScalingGroup",
+    "Policy",
+    "LaunchConfiguration",
+    "Volume",
+    "VolumeAttachment",
 ]

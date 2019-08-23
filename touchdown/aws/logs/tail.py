@@ -27,21 +27,19 @@ from touchdown.core.utils import force_str
 
 class Plan(common.SimplePlan, plan.Plan):
 
-    name = 'tail'
+    name = "tail"
     resource = LogGroup
-    service_name = 'logs'
+    service_name = "logs"
 
     def get_log_group_name(self):
         return self.resource.name
 
     def tail(self, start, end, follow):
-        kwargs = {
-            'logGroupName': self.get_log_group_name(),
-        }
+        kwargs = {"logGroupName": self.get_log_group_name()}
         if start:
-            kwargs['startTime'] = as_seconds(start) * 1000
+            kwargs["startTime"] = as_seconds(start) * 1000
         if end:
-            kwargs['endTime'] = as_seconds(end) * 1000
+            kwargs["endTime"] = as_seconds(end) * 1000
 
         def pull(kwargs, previous_events):
             seen = set()
@@ -49,19 +47,27 @@ class Plan(common.SimplePlan, plan.Plan):
             filters.update(kwargs)
             results = self.client.filter_log_events(**filters)
             while True:
-                for event in results.get('events', []):
-                    seen.add(event['eventId'])
-                    if event['eventId'] in previous_events:
+                for event in results.get("events", []):
+                    seen.add(event["eventId"])
+                    if event["eventId"] in previous_events:
                         continue
-                    self.runner.ui.echo('[{timestamp}] [{logStreamName}] {message}'.format(**{
-                        'logStreamName': event.get('logStreamName', ''),
-                        'message': force_str(event['message'].encode('utf-8', 'ignore')),
-                        'timestamp': datetime.datetime.utcfromtimestamp(int(event['timestamp']) / 1000.0),
-                    }))
-                    kwargs['startTime'] = event['timestamp']
-                if 'nextToken' not in results:
+                    self.runner.ui.echo(
+                        "[{timestamp}] [{logStreamName}] {message}".format(
+                            **{
+                                "logStreamName": event.get("logStreamName", ""),
+                                "message": force_str(
+                                    event["message"].encode("utf-8", "ignore")
+                                ),
+                                "timestamp": datetime.datetime.utcfromtimestamp(
+                                    int(event["timestamp"]) / 1000.0
+                                ),
+                            }
+                        )
+                    )
+                    kwargs["startTime"] = event["timestamp"]
+                if "nextToken" not in results:
                     break
-                filters['nextToken'] = results['nextToken']
+                filters["nextToken"] = results["nextToken"]
                 results = self.client.filter_log_events(**filters)
             return seen
 

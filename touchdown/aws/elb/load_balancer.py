@@ -31,90 +31,84 @@ from ..vpc import SecurityGroup, Subnet
 
 class Listener(Resource):
 
-    resource_name = 'listener'
+    resource_name = "listener"
 
-    protocol = argument.String(field='Protocol')
-    port = argument.Integer(field='LoadBalancerPort')
-    instance_protocol = argument.String(field='InstanceProtocol')
-    instance_port = argument.Integer(field='InstancePort')
+    protocol = argument.String(field="Protocol")
+    port = argument.Integer(field="LoadBalancerPort")
+    instance_protocol = argument.String(field="InstanceProtocol")
+    instance_port = argument.Integer(field="InstancePort")
     ssl_certificate = argument.Resource(
         ServerCertificate,
-        field='SSLCertificateId',
-        serializer=serializers.Property('Arn'),
+        field="SSLCertificateId",
+        serializer=serializers.Property("Arn"),
     )
     acm_certificate = argument.Resource(
         Certificate,
-        field='SSLCertificiateId',
-        serializer=serializers.Property('CertificateArn'),
+        field="SSLCertificiateId",
+        serializer=serializers.Property("CertificateArn"),
     )
 
 
 class HealthCheck(Resource):
 
-    resource_name = 'health_check'
+    resource_name = "health_check"
     dot_ignore = True
 
-    interval = argument.Integer(field='Interval')
-    check = argument.String(field='Target')
-    healthy_threshold = argument.Integer(field='HealthyThreshold')
-    unhealthy_threshold = argument.Integer(field='UnhealthyThreshold')
-    timeout = argument.Integer(field='Timeout')
+    interval = argument.Integer(field="Interval")
+    check = argument.String(field="Target")
+    healthy_threshold = argument.Integer(field="HealthyThreshold")
+    unhealthy_threshold = argument.Integer(field="UnhealthyThreshold")
+    timeout = argument.Integer(field="Timeout")
 
 
 class LoadBalancer(Resource):
 
-    resource_name = 'load_balancer'
+    resource_name = "load_balancer"
 
-    name = argument.String(field='LoadBalancerName')
+    name = argument.String(field="LoadBalancerName")
     listeners = argument.ResourceList(
-        Listener,
-        field='Listeners',
-        serializer=serializers.List(serializers.Resource()),
+        Listener, field="Listeners", serializer=serializers.List(serializers.Resource())
     )
-    availability_zones = argument.List(field='AvailabilityZones')
-    scheme = argument.String(choices=['internet-facing', 'private'], field='Scheme')
-    subnets = argument.ResourceList(Subnet, field='Subnets')
-    security_groups = argument.ResourceList(SecurityGroup, field='SecurityGroups')
+    availability_zones = argument.List(field="AvailabilityZones")
+    scheme = argument.String(choices=["internet-facing", "private"], field="Scheme")
+    subnets = argument.ResourceList(Subnet, field="Subnets")
+    security_groups = argument.ResourceList(SecurityGroup, field="SecurityGroups")
     # tags = argument.Dict()
 
     health_check = argument.Resource(HealthCheck, serializer=serializers.Resource())
 
     idle_timeout = argument.Integer(
         default=30,
-        field='ConnectionSettings',
-        group='attributes',
-        serializer=serializers.Dict(
-            IdleTimeout=serializers.Identity(),
-        ),
+        field="ConnectionSettings",
+        group="attributes",
+        serializer=serializers.Dict(IdleTimeout=serializers.Identity()),
     )
 
     connection_draining = argument.Integer(
         default=0,
-        field='ConnectionDraining',
-        group='attributes',
+        field="ConnectionDraining",
+        group="attributes",
         serializer=serializers.Dict(
             Enabled=serializers.Expression(lambda runner, object: object > 0),
             Timeout=serializers.Identity(),
-        )
+        ),
     )
 
     cross_zone_load_balancing = argument.Boolean(
         default=True,
-        field='CrossZoneLoadBalancing',
-        group='attributes',
-        serializer=serializers.Dict(
-            Enabled=serializers.Identity(),
-        )
+        field="CrossZoneLoadBalancing",
+        group="attributes",
+        serializer=serializers.Dict(Enabled=serializers.Identity()),
     )
 
     access_log = argument.Resource(
         Bucket,
-        field='AccessLog',
-        group='attributes',
+        field="AccessLog",
+        group="attributes",
         serializer=serializers.Dict(
             Enabled=serializers.Expression(lambda runner, object: object is not None),
             S3BucketName=serializers.Identifier(),
-        )
+        ),
     )
     # FIXME Support EmitInterval and S3BucketPrefix
 
@@ -124,59 +118,56 @@ class LoadBalancer(Resource):
 class Describe(SimpleDescribe, Plan):
 
     resource = LoadBalancer
-    service_name = 'elb'
-    api_version = '2012-06-01'
-    describe_action = 'describe_load_balancers'
-    describe_envelope = 'LoadBalancerDescriptions'
-    describe_notfound_exception = 'LoadBalancerNotFound'
-    key = 'LoadBalancerName'
+    service_name = "elb"
+    api_version = "2012-06-01"
+    describe_action = "describe_load_balancers"
+    describe_envelope = "LoadBalancerDescriptions"
+    describe_notfound_exception = "LoadBalancerNotFound"
+    key = "LoadBalancerName"
 
     def get_describe_filters(self):
-        return {'LoadBalancerNames': [self.resource.name]}
+        return {"LoadBalancerNames": [self.resource.name]}
 
     def annotate_object(self, obj):
-        obj['LoadBalancerAttributes'] = self.client.describe_load_balancer_attributes(
-            LoadBalancerName=obj['LoadBalancerName'],
-        )['LoadBalancerAttributes']
+        obj["LoadBalancerAttributes"] = self.client.describe_load_balancer_attributes(
+            LoadBalancerName=obj["LoadBalancerName"]
+        )["LoadBalancerAttributes"]
         return obj
 
 
 class Apply(SimpleApply, Describe):
 
-    create_action = 'create_load_balancer'
-    create_response = 'not-that-useful'
+    create_action = "create_load_balancer"
+    create_response = "not-that-useful"
 
     retryable = {
         # 'Server Certificate not found for the key: .*'
-        'CertificateNotFound': [],
+        "CertificateNotFound": []
     }
 
-    signature = [
-        Present('name'),
-        Present('listeners'),
-    ]
+    signature = [Present("name"), Present("listeners")]
 
     def update_attributes(self):
         diff = self.resource.diff(
             self.runner,
-            self.object.get('LoadBalancerAttributes', {}),
-            group='attributes',
+            self.object.get("LoadBalancerAttributes", {}),
+            group="attributes",
         )
         if not diff.matches():
             yield self.generic_action(
-                ['Configure attributes'] + list(diff.lines()),
+                ["Configure attributes"] + list(diff.lines()),
                 self.client.modify_load_balancer_attributes,
                 LoadBalancerName=serializers.Identifier(),
-                LoadBalancerAttributes=serializers.Resource(group='attributes'),
+                LoadBalancerAttributes=serializers.Resource(group="attributes"),
             )
 
     def update_health_check(self):
         if not self.object and self.resource.health_check:
             yield self.generic_action(
-                'Configure health check',
+                "Configure health check",
                 self.client.configure_health_check,
                 LoadBalancerName=self.resource.name,
-                HealthCheck=serializers.Argument('health_check'),
+                HealthCheck=serializers.Argument("health_check"),
             )
 
     def update_object(self):
@@ -190,16 +181,14 @@ class Apply(SimpleApply, Describe):
 
 class WaitForNetworkInterfaces(Action):
 
-    description = ['Wait for network interfaces to be released']
+    description = ["Wait for network interfaces to be released"]
 
     def run(self):
-        description = 'ELB {}'.format(self.plan.resource.name)
+        description = "ELB {}".format(self.plan.resource.name)
         for i in range(120):
             interfaces = self.plan.ec2_client.describe_network_interfaces(
-                Filters=[
-                    {'Name': 'description', 'Values': [description]},
-                ]
-            ).get('NetworkInterfaces', [])
+                Filters=[{"Name": "description", "Values": [description]}]
+            ).get("NetworkInterfaces", [])
 
             if len(interfaces) == 0:
                 return
@@ -207,19 +196,19 @@ class WaitForNetworkInterfaces(Action):
             time.sleep(1)
 
         raise errors.Error(
-            'Load balancer {} still hanging around in Elastic Network Interfaces after deletion for over 2 minutes.'.format(
-                self.plan.resource_id,
+            "Load balancer {} still hanging around in Elastic Network Interfaces after deletion for over 2 minutes.".format(
+                self.plan.resource_id
             )
         )
 
 
 class Destroy(SimpleDestroy, Describe):
 
-    destroy_action = 'delete_load_balancer'
+    destroy_action = "delete_load_balancer"
 
     @cached_property
     def ec2_client(self):
-        return self.session.create_client('ec2')
+        return self.session.create_client("ec2")
 
     def destroy_object(self):
         for change in super(Destroy, self).destroy_object():
@@ -229,34 +218,33 @@ class Destroy(SimpleDestroy, Describe):
 
 class AliasTarget(route53.AliasTarget):
 
-    ''' Adapts a LoadBalancer into a AliasTarget '''
+    """ Adapts a LoadBalancer into a AliasTarget """
 
-    resource_name = 'load_balancer_alias_target'
+    resource_name = "load_balancer_alias_target"
 
     load_balancer = argument.Resource(
         LoadBalancer,
-        field='DNSName',
+        field="DNSName",
         serializer=serializers.Context(
-            serializers.Property('CanonicalHostedZoneName'),
+            serializers.Property("CanonicalHostedZoneName"),
             serializers.Expression(lambda r, o: route53._normalize(o)),
         ),
     )
 
     hosted_zone_id = argument.Serializer(
-        field='HostedZoneId',
+        field="HostedZoneId",
         serializer=serializers.Context(
             serializers.Expression(lambda r, o: o.load_balancer),
-            serializers.Property('CanonicalHostedZoneNameID'),
-        )
+            serializers.Property("CanonicalHostedZoneNameID"),
+        ),
     )
 
     evaluate_target_health = argument.Boolean(
-        field='EvaluateTargetHealth',
-        default=False,
+        field="EvaluateTargetHealth", default=False
     )
 
     @classmethod
     def clean(cls, value):
         if isinstance(value, LoadBalancer):
-            return super(AliasTarget, cls).clean({'load_balancer': value})
+            return super(AliasTarget, cls).clean({"load_balancer": value})
         return super(AliasTarget, cls).clean(value)

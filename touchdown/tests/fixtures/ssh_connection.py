@@ -22,9 +22,8 @@ from touchdown.tests.fixtures.fixture import Fixture
 
 
 class DummyServer(paramiko.ServerInterface):
-
     def get_allowed_auths(self, username):
-        return 'publickey,password'
+        return "publickey,password"
 
     def check_auth_password(self, username, password):
         return paramiko.AUTH_SUCCESSFUL
@@ -41,24 +40,23 @@ class DummyServer(paramiko.ServerInterface):
     def check_channel_shell_request(self, channel):
         return True
 
-    def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight, modes):
+    def check_channel_pty_request(
+        self, channel, term, width, height, pixelwidth, pixelheight, modes
+    ):
         return True
 
 
 class SshConnectionFixture(Fixture):
-
     def __enter__(self):
         self.listen_socket = socket.socket()
-        self.listen_socket.bind(('0.0.0.0', 0))
+        self.listen_socket.bind(("0.0.0.0", 0))
         self.listen_socket.listen(1)
         self.address, self.port = self.listen_socket.getsockname()
         self.fixtures.push(lambda *exc_info: self.listen_socket.close())
         self.event = threading.Event()
 
         self.ssh_connection = self.workspace.add_ssh_connection(
-            name='test-ssh-connection',
-            hostname=self.address,
-            port=self.port,
+            name="test-ssh-connection", hostname=self.address, port=self.port
         )
 
         self.listen_thread = threading.Thread(target=self.server_thread)
@@ -76,12 +74,8 @@ class SshConnectionFixture(Fixture):
 
         self.server_transport.add_server_key(
             paramiko.RSAKey.from_private_key_file(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    '..',
-                    'assets/id_rsa_test',
-                ),
-            ),
+                os.path.join(os.path.dirname(__file__), "..", "assets/id_rsa_test")
+            )
         )
 
         self.server = DummyServer()

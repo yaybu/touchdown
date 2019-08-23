@@ -14,7 +14,6 @@
 
 
 class Action(object):
-
     def __init__(self, plan):
         self.plan = plan
         self.runner = plan.runner
@@ -24,4 +23,4 @@ class Action(object):
         return self.runner.get_plan(resource)
 
     def __str__(self):
-        return '\n'.join(self.description)
+        return "\n".join(self.description)

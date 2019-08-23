@@ -17,58 +17,58 @@ from .service import ServiceStubber
 
 class ReplicationGroupStubber(ServiceStubber):
 
-    client_service = 'elasticache'
+    client_service = "elasticache"
 
     def add_describe_replication_groups_empty_response(self):
         return self.add_client_error(
-            'describe_replication_groups',
-            service_error_code='ReplicationGroupNotFoundFault',
-            service_message='',
+            "describe_replication_groups",
+            service_error_code="ReplicationGroupNotFoundFault",
+            service_message="",
             # expected_params={
             #    'ReplicationGroupId': self.resource.name,
             # },
         )
 
-    def add_describe_replication_groups_one_response(self, status='available'):
+    def add_describe_replication_groups_one_response(self, status="available"):
         return self.add_response(
-            'describe_replication_groups',
+            "describe_replication_groups",
             service_response={
-                'ReplicationGroups': [{
-                    'ReplicationGroupId': self.resource.name,
-                    'Status': status,
-                    'NodeGroups': [{
-                        'PrimaryEndpoint': {
-                            'Address': 'myreplgrp.q68zge.ng.0001.use1devo.elmo-dev.amazonaws.com',
-                            'Port': 6379,
-                        }
-                    }]
-                }],
+                "ReplicationGroups": [
+                    {
+                        "ReplicationGroupId": self.resource.name,
+                        "Status": status,
+                        "NodeGroups": [
+                            {
+                                "PrimaryEndpoint": {
+                                    "Address": "myreplgrp.q68zge.ng.0001.use1devo.elmo-dev.amazonaws.com",
+                                    "Port": 6379,
+                                }
+                            }
+                        ],
+                    }
+                ]
             },
-            expected_params={
-                'ReplicationGroupId': self.resource.name,
-            }
+            expected_params={"ReplicationGroupId": self.resource.name},
         )
 
     def add_create_replication_group(self):
         return self.add_response(
-            'create_replication_group',
+            "create_replication_group",
             service_response={
-                'ReplicationGroup': {
-                    'ReplicationGroupId': self.resource.name,
-                },
+                "ReplicationGroup": {"ReplicationGroupId": self.resource.name}
             },
             expected_params={
-                'ReplicationGroupId': self.resource.name,
-                'ReplicationGroupDescription': self.resource.name,
+                "ReplicationGroupId": self.resource.name,
+                "ReplicationGroupDescription": self.resource.name,
             },
         )
 
     def add_delete_replication_group(self):
         return self.add_response(
-            'delete_replication_group',
+            "delete_replication_group",
             service_response={},
             expected_params={
-                'ReplicationGroupId': self.resource.name,
-                'RetainPrimaryCluster': False
+                "ReplicationGroupId": self.resource.name,
+                "RetainPrimaryCluster": False,
             },
         )

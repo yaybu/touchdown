@@ -17,7 +17,4 @@ from .subnet_group import SubnetGroup
 
 from . import rollback, snapshot  # noqa isort:skip
 
-__all__ = [
-    'SubnetGroup',
-    'Database',
-]
+__all__ = ["SubnetGroup", "Database"]

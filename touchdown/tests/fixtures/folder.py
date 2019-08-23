@@ -19,7 +19,6 @@ from touchdown.tests.fixtures.fixture import Fixture
 
 
 class TemporaryFolder(object):
-
     def __enter__(self):
         self.folder = tempfile.mkdtemp()
         return self
@@ -29,8 +28,7 @@ class TemporaryFolder(object):
 
 
 class TemporaryFolderFixture(Fixture):
-
     def __enter__(self):
         return self.workspace.add_local_folder(
-            name=self.fixtures.enter_context(TemporaryFolder()).folder,
+            name=self.fixtures.enter_context(TemporaryFolder()).folder
         )

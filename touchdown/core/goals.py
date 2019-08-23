@@ -21,7 +21,6 @@ from .cache import JSONFileCache
 
 
 class GoalFactory(object):
-
     def __init__(self):
         self.goals = {}
 
@@ -48,7 +47,7 @@ class Goal(object):
         self.ui = ui
         self.cache = cache
         if not self.cache:
-            self.cache = JSONFileCache(os.path.expanduser('~/.touchdown'))
+            self.cache = JSONFileCache(os.path.expanduser("~/.touchdown"))
         self.workspace = workspace
         self.resources = {}
         self.Map = map
@@ -78,7 +77,9 @@ class Goal(object):
         return self.resources[service_key]
 
     def get_execution_order(self):
-        return dependencies.DependencyMap(self.workspace, tips_first=self.execute_in_reverse)
+        return dependencies.DependencyMap(
+            self.workspace, tips_first=self.execute_in_reverse
+        )
 
     def visit(self, message, dep_map, callable):
         with self.ui.progressbar(max_value=len(dep_map)) as pb:
@@ -92,7 +93,8 @@ class Goal(object):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected.append(plan)
-        self.visit('Building plan...', self.get_plan_order(), _)
+
+        self.visit("Building plan...", self.get_plan_order(), _)
         return collected
 
     def collect_as_dict(self, plan_name):
@@ -102,7 +104,8 @@ class Goal(object):
             plan = self.get_plan(resource)
             if plan.name == plan_name:
                 collected[plan.resource.name] = plan
-        self.visit('Building plan...', self.get_plan_order(), _)
+
+        self.visit("Building plan...", self.get_plan_order(), _)
         return collected
 
 
