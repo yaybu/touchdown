@@ -74,7 +74,7 @@ class TestReplicationGroupDeletion(StubberTestCase):
         replication_group.add_delete_replication_group()
 
         # Wait for it to go away
-        replication_group.add_describe_replication_groups_one_response()
+        replication_group.add_describe_replication_groups_one_response(status='deleting')
         replication_group.add_describe_replication_groups_empty_response()
 
         goal.execute()
