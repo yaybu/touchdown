@@ -93,14 +93,13 @@ class ServerCertificate(Resource):
             certs.append(load_pem_x509_certificate(cert, backend))
 
         for i, (cert, issuer) in enumerate(zip(certs, certs[1:])):
-            verifier = issuer.public_key().verifier(
-                cert.signature,
-                asymmetric.padding.PKCS1v15(),
-                cert.signature_hash_algorithm,
-            )
-            verifier.update(cert.tbs_certificate_bytes)
             try:
-                verifier.verify()
+                issuer.public_key().verify(
+                    cert.signature,
+                    cert.tbs_certificate_bytes,
+                    asymmetric.padding.PKCS1v15(),
+                    cert.signature_hash_algorithm,
+                )
             except:
                 error_message = '\n'.join([
                     'Invalid chain for  {} at position {}.',

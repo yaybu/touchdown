@@ -1,31 +1,30 @@
-botocore==1.5.0
-jmespath==0.9.0
-netaddr==0.7.18
-contextlib2==0.5.3
-paramiko==2.0.0
-ecdsa==0.13
-six==1.10.0
+botocore==1.12.214
+jmespath==0.9.4
+netaddr==0.7.19
+contextlib2==0.5.5
+paramiko==2.6.0
+ecdsa==0.13.2
+six==1.12.0
 fuselage==1.0.0
-cryptography==1.5
-python-gnupg==0.3.8
+cryptography==2.7
+python-gnupg==0.4.5
 
 Jinja2
 
-coverage==4.0.3
-codecov==2.0.3
+coverage==4.5.4
+codecov==2.0.15
 
-# See https://github.com/gforcada/flake8-isort/pull/14
-flake8==2.5.4  # rq.filter: <3
+flake8==2.5.4
 flake8-quotes==0.8.1
 flake8-isort==1.2
 isort==4.2.5
 mccabe==0.4.0
 mock==2.0.0
-pep8==1.5.7  # rq.filter: <1.6
-py==1.4.31
-pyflakes==1.1.0  # rq.filter: <1.2.0
-pytest==2.9.1
-pytest-cov==2.2.1
-requests==2.10.0
+pep8==1.5.7
+py==1.8.0
+pyflakes==1.1.0
+pytest==5.1.1
+pytest-cov==2.7.1
+requests==2.22.0
 
 -e .
