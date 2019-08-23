@@ -82,6 +82,49 @@ class TestBucketCreation(StubberTestCase):
 
 class TestBucketDeletion(StubberTestCase):
 
+    def test_delete_bucket_forbidden(self):
+        # If a bucket is marked as never-destroy then it's destroy plan is
+        # still used, but it should never harm it
+        goal = self.create_goal('destroy')
+
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(
+                    name='my-bucket',
+                    ensure=['never-destroy'],
+                ),
+                'destroy',
+            )
+        ))
+
+        bucket.add_list_buckets_one_response()
+        bucket.add_head_bucket()
+        bucket.add_get_bucket_location()
+        bucket.add_get_bucket_cors()
+        bucket.add_get_bucket_policy()
+        bucket.add_get_bucket_notification_configuration()
+        bucket.add_get_bucket_accelerate_configuration()
+
+        self.assertRaises(errors.NothingChanged, goal.execute)
+
+    def test_delete_bucket_forbidden_not_found(self):
+        # If a bucket is marked as never-destroy then it's destroy plan is
+        # still used, but it should never harm it
+        goal = self.create_goal('destroy')
+
+        bucket = self.fixtures.enter_context(BucketStubber(
+            goal.get_service(
+                self.aws.add_bucket(
+                    name='my-bucket',
+                    ensure=['never-destroy'],
+                ),
+                'destroy',
+            )
+        ))
+        bucket.add_list_buckets_empty_response()
+
+        self.assertRaises(errors.NothingChanged, goal.execute)
+
     def test_delete_bucket(self):
         goal = self.create_goal('destroy')
 
