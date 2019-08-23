@@ -43,7 +43,7 @@ class TestCase(WorkspaceTestCase):
             )
             self.apply()
             self.assertTrue(os.path.exists(fp.name))
-            self.assertEquals(open(fp.name, 'r').read(), 'hello')
+            self.assertEqual(open(fp.name, 'r').read(), 'hello')
 
     def test_file_apply_serializers(self):
         with tempfile.NamedTemporaryFile(delete=True) as fp:
@@ -57,7 +57,7 @@ class TestCase(WorkspaceTestCase):
                 contents=serializers.Const('hello'),
             )
             self.apply()
-            self.assertEquals(open(fp.name, 'r').read(), 'hello')
+            self.assertEqual(open(fp.name, 'r').read(), 'hello')
 
     def test_file_remove(self):
         with tempfile.NamedTemporaryFile(delete=False) as fp:

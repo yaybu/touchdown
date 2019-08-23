@@ -44,7 +44,7 @@ class Describe(Plan):
         fp = self.runner.get_service(self.resource.file, 'fileio')
         config = configparser.ConfigParser()
         try:
-            config.readfp(six.StringIO(force_str(fp.read().read())))
+            config.read_file(six.StringIO(force_str(fp.read().read())))
         except FileNotFound:
             pass
         return config

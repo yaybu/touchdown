@@ -1,10 +1,22 @@
 Changelog for Touchdown
 =======================
 
-0.15.15 (unreleased)
+0.15.17 (unreleased)
 --------------------
 
 - Nothing changed yet.
+
+
+0.15.16 (2018-12-07)
+--------------------
+
+- Change ACM Certificates to simple strings, so they can actually be used
+
+
+0.15.15 (2017-12-13)
+--------------------
+
+- AWD VPC: Allow setting of VPC attributes
 
 
 0.15.14 (2017-06-09)

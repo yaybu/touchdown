@@ -77,7 +77,7 @@ class TestCacheClusterDeletion(StubberTestCase):
         cache_cluster.add_delete_cache_cluster()
 
         # Wait for it to go away
-        cache_cluster.add_describe_cache_clusters_one_response()
+        cache_cluster.add_describe_cache_clusters_one_response(status='deleting')
         cache_cluster.add_describe_cache_clusters_empty_response()
 
         goal.execute()

@@ -20,7 +20,6 @@ from touchdown.core.resource import Resource
 
 from .. import route53
 from ..account import BaseAccount
-from ..acm import Certificate
 from ..common import (
     RefreshMetadata,
     SimpleApply,
@@ -60,7 +59,7 @@ class CustomOrigin(Resource):
         group='custom-origin-config',
     )
     ssl_policy = argument.List(
-        choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
+        choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.1_2016'],
         default=['SSLv3', 'TLSv1'],
         field='OriginSslProtocols',
         group='custom-origin-config',
@@ -102,7 +101,7 @@ class LoadBalancerOrigin(Resource):
         group='custom-origin-config',
     )
     ssl_policy = argument.List(
-        choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
+        choices=['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.1_2016'],
         default=['SSLv3', 'TLSv1'],
         field='OriginSslProtocols',
         group='custom-origin-config',
@@ -272,11 +271,9 @@ class Distribution(Resource):
         serializer=serializers.Property('ServerCertificateId'),
     )
 
-    acm_certificate = argument.Resource(
-        Certificate,
-        field='Certificate',
+    acm_certificate = argument.String(
+        field='ACMCertificateArn',
         group='viewer-certificate',
-        serializer=serializers.Property('CertificateArn'),
     )
 
     ssl_support_method = argument.String(
@@ -288,7 +285,7 @@ class Distribution(Resource):
 
     ssl_minimum_protocol_version = argument.String(
         default='TLSv1',
-        choices=['TLSv1', 'SSLv3'],
+        choices=['TLSv1', 'SSLv3', 'TLSv1.1_2016'],
         field='MinimumProtocolVersion',
         group='viewer-certificate',
     )

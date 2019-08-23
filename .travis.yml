@@ -1,10 +1,8 @@
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
   - "3.5"
-
+  - "3.6"
+  - "3.7"
 # The version of pypy on Travis is too old for cryptography
 #  - "pypy"
 
@@ -22,14 +20,3 @@ script:
 
 after_success:
   - codecov
-
-notifications:
-    irc:
-        channels:
-          - "irc.oftc.net#yaybu"
-        use_notice: true
-        skip_join: true
-        on_success: change
-        on_failure: always
-    slack:
-        secure: Seu/v6ws/auhAstqrPDlRzOl6dfExUxFaFxgby7+e3J8UC6CKDXZsRGtK4QfHOHdsFbhuSJ9C7i/L153O33RVfz+2XZ4DFw0XMKWYMyi+vHM/OgsimCpDgE1k4k1eDb+YIteRXXLPip6WmfAvTXb/wHV4jKc+xZ/RBioSJNAYnk=

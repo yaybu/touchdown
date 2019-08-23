@@ -1,14 +1,17 @@
 version: '{build}'
 environment:
   matrix:
-  - PYTHON: "C:\\Python27"
-    PYTHON_VERSION: "2.7.8"
+  - PYTHON: "C:\\Python35"
+    PYTHON_VERSION: "3.5.4"
     PYTHON_ARCH: "32"
-  - PYTHON: "C:\\Python34"
-    PYTHON_VERSION: "3.4.1"
-    PYTHON_ARCH: "32"
-  - PYTHON: "C:\\Python34-x64"
-    PYTHON_VERSION: "3.4.1"
+  - PYTHON: "C:\\Python35-x64"
+    PYTHON_VERSION: "3.5.4"
+    PYTHON_ARCH: "64"
+  - PYTHON: "C:\\Python36-x64"
+    PYTHON_VERSION: "3.6.8"
+    PYTHON_ARCH: "64"
+  - PYTHON: "C:\\Python37-x64"
+    PYTHON_VERSION: "3.7.4"
     PYTHON_ARCH: "64"
 install:
 - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
@@ -19,8 +22,3 @@ cache: C:\wheelhouse
 build: off
 test_script:
 - python -m pytest touchdown
-notifications:
-  - provider: Slack
-    auth_token:
-      secure: 3B+1y9v9ei1yPhW9DEy75z+OdRATgFN3ktUTIAqpcvm6ObcJ+aZcuohLqs0Mk5Qf4Kl+1FbsZ1F3kDxr+4pkoA==
-    channel: general
