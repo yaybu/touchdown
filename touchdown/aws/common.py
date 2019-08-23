@@ -306,7 +306,7 @@ class SimpleDescribe(SimplePlan):
                     yield row
         except ClientError as e:
             if e.response['Error']['Code'] == self.describe_notfound_exception:
-                raise StopIteration
+                return
 
     def get_possible_objects(self):
         '''
