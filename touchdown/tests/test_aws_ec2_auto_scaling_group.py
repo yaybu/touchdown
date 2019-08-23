@@ -15,10 +15,7 @@
 from touchdown.core import errors
 from touchdown.tests.aws import Stubber, StubberTestCase
 from touchdown.tests.fixtures.aws import LaunchConfigurationFixture
-from touchdown.tests.stubs.aws import (
-    AutoScalingGroupStubber,
-    EC2InstanceStubber,
-)
+from touchdown.tests.stubs.aws import AutoScalingGroupStubber, EC2InstanceStubber
 
 
 class TestCreateAutoScalingGroupuration(StubberTestCase):

@@ -20,13 +20,7 @@ from touchdown.core.resource import Resource
 
 from .. import route53
 from ..account import BaseAccount
-from ..common import (
-    RefreshMetadata,
-    SimpleApply,
-    SimpleDescribe,
-    SimpleDestroy,
-    Waiter,
-)
+from ..common import RefreshMetadata, SimpleApply, SimpleDescribe, SimpleDestroy, Waiter
 from ..elb import LoadBalancer
 from ..iam import ServerCertificate
 from ..s3 import Bucket

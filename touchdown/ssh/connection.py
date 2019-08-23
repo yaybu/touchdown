@@ -14,14 +14,7 @@
 
 import time
 
-from touchdown.core import (
-    adapters,
-    argument,
-    errors,
-    plan,
-    serializers,
-    workspace,
-)
+from touchdown.core import adapters, argument, errors, plan, serializers, workspace
 from touchdown.provisioner import Target
 
 try:

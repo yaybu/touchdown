@@ -13,10 +13,7 @@
 # limitations under the License.
 
 from touchdown.tests.aws import StubberTestCase
-from touchdown.tests.stubs.aws import (
-    CacheClusterStubber,
-    LaunchConfigurationStubber,
-)
+from touchdown.tests.stubs.aws import CacheClusterStubber, LaunchConfigurationStubber
 
 
 class TestCacheClusterCreation(StubberTestCase):

@@ -20,11 +20,7 @@ from touchdown.core.utils import force_str
 
 from ..account import BaseAccount
 from ..iam import InstanceProfile
-from ..replacement import (
-    ReplacementApply,
-    ReplacementDescribe,
-    ReplacementDestroy,
-)
+from ..replacement import ReplacementApply, ReplacementDescribe, ReplacementDestroy
 from ..vpc import SecurityGroup
 from .keypair import KeyPair
 

@@ -25,11 +25,7 @@ from touchdown.core.resource import Resource
 from touchdown.core.utils import force_bytes
 
 from ..account import BaseAccount
-from ..replacement import (
-    ReplacementApply,
-    ReplacementDescribe,
-    ReplacementDestroy,
-)
+from ..replacement import ReplacementApply, ReplacementDescribe, ReplacementDestroy
 
 
 def split_cert_chain(chain):

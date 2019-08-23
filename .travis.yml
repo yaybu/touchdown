@@ -15,8 +15,9 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - py.test --cov=. touchdown
   - flake8 touchdown
+  - isort -rc -df touchdown
+  - py.test --cov=. touchdown
 
 after_success:
   - codecov
