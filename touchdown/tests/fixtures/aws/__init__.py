@@ -24,7 +24,6 @@ from .subnet import SubnetFixture
 from .vpc import VpcFixture
 from .vpn_gateway import VpnGatewayFixture
 
-
 __all__ = [
     'BucketFixture',
     'CustomerGatewayFixture',

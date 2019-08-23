@@ -18,7 +18,6 @@ import threading
 import time
 
 from botocore.exceptions import ClientError
-
 from six.moves import queue
 
 from .base import BaseFrontend

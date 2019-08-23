@@ -14,7 +14,6 @@
 
 from .frontend import ConsoleFrontend
 
-
 __all__ = [
     'ConsoleFrontend',
 ]

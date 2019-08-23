@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .provisioner import Provisioner, Target
 from .bash import Script
 from .fuselage import Bundle
 from .local import Local
 from .output import Output
-
+from .provisioner import Provisioner, Target
 
 __all__ = [
     'Provisioner',

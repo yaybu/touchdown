@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from touchdown import ssh
-from touchdown.aws.ec2 import KeyPair
+from touchdown.aws.ec2.keypair import KeyPair
 from touchdown.aws.iam import InstanceProfile
 from touchdown.aws.vpc import SecurityGroup, Subnet
 from touchdown.core import argument, errors, serializers

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .group import LogGroup
 from .filter import Filter
-from . import tail  # noqa
+from .group import LogGroup
 
+from . import tail  # noqa isort:skip
 
 __all__ = [
     'LogGroup',

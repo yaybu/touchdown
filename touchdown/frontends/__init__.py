@@ -16,7 +16,6 @@ from .cloudwatch import CloudWatchFrontend
 from .console import ConsoleFrontend
 from .multi import MultiFrontend
 
-
 __all__ = [
     'CloudWatchFrontend',
     'ConsoleFrontend',

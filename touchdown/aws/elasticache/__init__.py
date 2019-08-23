@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .subnet_group import SubnetGroup
 from .cache import CacheCluster
 from .replication_group import ReplicationGroup
-
+from .subnet_group import SubnetGroup
 
 __all__ = [
     'SubnetGroup',

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import binascii
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import asymmetric, serialization
 from cryptography.x509 import load_pem_x509_certificate
@@ -100,7 +101,7 @@ class ServerCertificate(Resource):
                     asymmetric.padding.PKCS1v15(),
                     cert.signature_hash_algorithm,
                 )
-            except:
+            except Exception:
                 error_message = '\n'.join([
                     'Invalid chain for  {} at position {}.',
                     'Expected cert with subject "{}" and subject key identifier "{}".',

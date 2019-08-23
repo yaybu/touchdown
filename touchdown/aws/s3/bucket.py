@@ -108,7 +108,7 @@ class Describe(SimpleDescribe, Plan):
             try:
                 self.client.head_bucket(Bucket=self.resource.name)
                 return True
-            except:
+            except Exception:
                 return False
         return False
 

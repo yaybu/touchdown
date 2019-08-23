@@ -189,7 +189,7 @@ class RetryAction(Action):
                 if not self.should_retry(e.response):
                     raise
             time.sleep(i)
-        raise e
+        return self.action.run()
 
 
 class PostCreation(Action):

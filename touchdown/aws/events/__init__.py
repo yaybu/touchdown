@@ -14,7 +14,6 @@
 
 from .rule import EventRule
 
-
 __all__ = [
     'EventRule',
 ]

@@ -78,4 +78,5 @@ class Tail(Goal):
             raise errors.Error('No such log stream "{}"'.format(stream))
         tailers[stream].tail(start, end, follow)
 
+
 register(Tail)

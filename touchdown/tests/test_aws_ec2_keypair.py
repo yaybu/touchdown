@@ -19,7 +19,6 @@ from touchdown.aws.ec2.keypair import PublicKeyFromPrivateKey
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.stubs.aws import KeyPairStubber
 
-
 PUBLIC_KEY_PATH = os.path.join(
     os.path.dirname(__file__),
     'assets/id_rsa_test.pub'

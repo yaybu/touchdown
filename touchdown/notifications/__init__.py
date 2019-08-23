@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from .echo import EchoNotification
-from .slack import SlackNotification
 from .newrelic import NewRelicDeploymentNotification
+from .slack import SlackNotification
 
 __all__ = [
     'EchoNotification',

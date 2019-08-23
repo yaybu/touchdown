@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import datetime
-import mock
 
+import mock
 from botocore.stub import ANY
 
 from touchdown.core.datetime import now

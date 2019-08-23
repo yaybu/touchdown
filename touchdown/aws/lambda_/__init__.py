@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from . import tail  # noqa
 from .function import Function
 from .permission import Permission
 from .s3 import S3LambdaNotification
 from .sns import Subscription
-from . import tail  # noqa
-
 
 __all__ = [
     'Function',

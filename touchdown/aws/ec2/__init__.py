@@ -14,14 +14,13 @@
 
 from .ami import Image
 from .ami_copy import ImageCopy
-from .keypair import KeyPair
-from .instance import Instance
 from .auto_scaling_group import AutoScalingGroup
 from .auto_scaling_policy import Policy
+from .instance import Instance
+from .keypair import KeyPair
 from .launch_configuration import LaunchConfiguration
 from .volume import Volume
 from .volume_attachment import VolumeAttachment
-
 
 __all__ = [
     'Image',

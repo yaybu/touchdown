@@ -50,4 +50,5 @@ class Get(Goal):
         else:
             self.ui.echo('{} (default value)'.format(val))
 
+
 register(Get)

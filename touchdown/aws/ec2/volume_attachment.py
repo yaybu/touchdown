@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from touchdown.aws import common
-
 from touchdown.core import argument
 from touchdown.core.plan import Plan, Present
 from touchdown.core.resource import Resource

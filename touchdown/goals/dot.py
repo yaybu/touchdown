@@ -44,4 +44,5 @@ class Dot(Goal):
     def execute(self):
         self.ui.echo(self.get_digraph())
 
+
 register(Dot)

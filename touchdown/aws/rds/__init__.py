@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .subnet_group import SubnetGroup
 from .database import Database
-from . import rollback, snapshot  # noqa
+from .subnet_group import SubnetGroup
 
+from . import rollback, snapshot  # noqa isort:skip
 
 __all__ = [
     'SubnetGroup',

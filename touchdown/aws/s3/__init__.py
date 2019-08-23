@@ -17,7 +17,6 @@ from .file import File
 from .folder import Folder
 from .notification_configuration import NotificationConfiguration
 
-
 __all__ = [
     'Bucket',
     'File',

@@ -22,7 +22,6 @@ from .resource import Resource
 from .rest_api import RestApi
 from .stage import Stage
 
-
 __all__ = [
     'Deployment',
     'Integration',

@@ -14,7 +14,8 @@
 
 from .distribution import Distribution
 from .streaming_distribution import StreamingDistribution
-from . import tail  # noqa
+
+from . import tail  # noqa isort:skip
 
 __all__ = [
     'Distribution',

@@ -14,14 +14,13 @@
 
 import touchdown.aws  # noqa
 import touchdown.config  # noqa
+import touchdown.goals  # noqa
 import touchdown.gpg  # noqa
 import touchdown.local  # noqa
+import touchdown.notifications  # noqa
 import touchdown.provisioner  # noqa
 import touchdown.ssh  # noqa
 import touchdown.template  # noqa
-import touchdown.goals  # noqa
-import touchdown.notifications  # noqa
-
 from touchdown.core import Workspace
 
 __all__ = [
