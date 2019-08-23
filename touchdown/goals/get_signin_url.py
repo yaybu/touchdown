@@ -44,4 +44,5 @@ class GetSigninUrl(Goal):
             raise errors.Error('No such resource "{}"'.format(resource))
         self.ui.echo(resources[resource].get_signin_url())
 
+
 register(GetSigninUrl)

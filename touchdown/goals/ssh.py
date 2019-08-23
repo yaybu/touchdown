@@ -49,4 +49,5 @@ class Ssh(Goal):
             raise errors.Error('No such host "{}"'.format(box))
         boxes[box].execute(args)
 
+
 register(Ssh)

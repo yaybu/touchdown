@@ -13,8 +13,7 @@
 # limitations under the License.
 
 from .alias_target import AliasTarget
-from .zone import _normalize, HostedZone
-
+from .zone import HostedZone, _normalize
 
 __all__ = [
     '_normalize',

@@ -16,7 +16,6 @@ import unittest
 
 from touchdown.core import errors
 from touchdown.core.workspace import Workspace
-
 from touchdown.tests.aws import StubberTestCase
 from touchdown.tests.fixtures.aws import VpcFixture
 from touchdown.tests.stubs.aws import NetworkAclStubber

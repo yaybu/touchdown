@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import six
-
 from six.moves import configparser
+
 from touchdown.core import argument, resource
 from touchdown.core.plan import Plan
 from touchdown.core.utils import force_bytes, force_str

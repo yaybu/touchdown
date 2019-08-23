@@ -52,4 +52,5 @@ class Set(Goal):
             raise errors.Error('No such setting "{}"'.format(name))
         settings[name].execute(settings[name].from_string(value))
 
+
 register(Set)

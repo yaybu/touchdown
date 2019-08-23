@@ -46,4 +46,5 @@ class Edit(Goal):
             raise errors.Error('No such file "{}"'.format(name))
         files[name].execute()
 
+
 register(Edit)

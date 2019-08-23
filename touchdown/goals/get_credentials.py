@@ -44,4 +44,5 @@ class GetCredentials(Goal):
             raise errors.Error('No such resource "{}"'.format(resource))
         self.ui.echo(resources[resource].get_credentials())
 
+
 register(GetCredentials)

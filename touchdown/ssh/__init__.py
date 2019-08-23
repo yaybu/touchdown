@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from . import terminal  # noqa
 from .client import Client, private_key_from_string
 from .connection import Connection, Instance
 from .portfwd import PortForward
-
-from . import terminal  # noqa
-
 
 __all__ = [
     'Client',

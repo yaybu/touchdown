@@ -28,7 +28,6 @@ from .snapshot import Snapshot
 from .ssh import Ssh
 from .tail import Tail
 
-
 __all__ = [
     'Apply',
     'Destroy',

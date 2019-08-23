@@ -79,6 +79,7 @@ class FunctionSerializer(serializers.Serializer):
         zf.close()
         return buf.getvalue()
 
+
 argument.Bytes.register_adapter(types.FunctionType, lambda r: FunctionSerializer(r))
 
 

@@ -60,4 +60,5 @@ class Scp(Goal):
 
         boxes[server].execute(source, destination)
 
+
 register(Scp)

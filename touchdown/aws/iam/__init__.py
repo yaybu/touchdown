@@ -16,7 +16,6 @@ from .instance_profile import InstanceProfile
 from .role import Role
 from .server_certificate import ServerCertificate
 
-
 __all__ = [
     'InstanceProfile',
     'Role',

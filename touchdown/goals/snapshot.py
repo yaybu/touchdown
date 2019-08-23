@@ -49,4 +49,5 @@ class Snapshot(Goal):
             raise errors.Error('No such resource "{}"'.format(target))
         snapshotable[target].snapshot(snapshot_name)
 
+
 register(Snapshot)

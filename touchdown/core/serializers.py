@@ -16,8 +16,8 @@ import itertools
 import json
 
 import jmespath
-
 from six.moves import zip_longest
+
 from touchdown.core import diff, errors
 from touchdown.core.utils import force_bytes, force_str
 
@@ -436,7 +436,7 @@ class Format(Formatter):
             return ''
         try:
             return self.format_string.format(self.inner.render(runner, object))
-        except:
+        except Exception:
             return ''
 
 

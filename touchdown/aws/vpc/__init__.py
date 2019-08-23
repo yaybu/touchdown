@@ -19,12 +19,11 @@ from .internet_gateway import InternetGateway
 from .nat_gateway import NatGateway
 from .network_acl import NetworkACL
 from .route_table import RouteTable
-from .subnet import Subnet
 from .security_group import SecurityGroup
+from .subnet import Subnet
 from .vpc import VPC
 from .vpn_connection import VpnConnection
 from .vpn_gateway import VpnGateway
-
 
 __all__ = [
     'VPC',

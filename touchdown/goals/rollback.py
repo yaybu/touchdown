@@ -59,4 +59,5 @@ class Rollback(Goal):
         restorable[target].rollback(from_backup)
         self.post_restore()
 
+
 register(Rollback)

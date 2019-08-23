@@ -15,7 +15,6 @@
 from .gpg import Gpg
 from .wrapper import Wrapper
 
-
 __all__ = [
     'Gpg',
     'Wrapper',

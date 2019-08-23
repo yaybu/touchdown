@@ -15,7 +15,6 @@
 import datetime
 
 import mock
-
 from botocore.stub import Stubber
 
 from touchdown.tests.aws import StubberTestCase

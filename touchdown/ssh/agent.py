@@ -5,7 +5,6 @@ import threading
 from paramiko.common import asbytes
 from paramiko.message import Message
 from paramiko.py3compat import byte_chr
-
 from six.moves import socketserver
 
 if not hasattr(socketserver, 'UnixStreamServer'):
