@@ -1,4 +1,4 @@
-botocore==1.15.22
+botocore==1.15.23
 jmespath==0.9.5
 netaddr==0.7.19
 contextlib2==0.6.0.post1
@@ -12,7 +12,7 @@ python-gnupg==0.4.5
 Jinja2
 
 coverage==5.0.4
-codecov==2.0.20
+codecov==2.0.21
 
 flake8==3.7.9
 isort==4.3.21
