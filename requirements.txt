@@ -1,4 +1,4 @@
-botocore==1.15.41
+botocore==1.15.42
 jmespath==0.9.5
 netaddr==0.7.19
 contextlib2==0.6.0.post1
