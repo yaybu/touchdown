@@ -12,7 +12,7 @@ python-gnupg==0.4.6
 Jinja2
 
 coverage==5.2
-codecov==2.1.7
+codecov==2.1.8
 
 flake8==3.8.3
 isort==5.1.0
