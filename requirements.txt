@@ -11,7 +11,7 @@ python-gnupg==0.4.6
 
 Jinja2
 
-coverage==5.4
+coverage==5.5
 codecov==2.1.11
 
 flake8==3.8.4
