@@ -15,7 +15,7 @@ coverage==5.5
 codecov==2.1.11
 
 flake8==3.9.2
-isort==5.9.1
+isort==5.9.2
 mccabe==0.6.1
 mock==4.0.3
 pep8==1.7.1
